@@ -5,6 +5,10 @@
     "languageSwitch": "Choose language",
     "user": "ITSG tester"
   },
+  "common": {
+    "loading": "Loading …",
+    "error": "The data could not be loaded."
+  },
   "nav": {
     "label": "Main navigation",
     "overview": "Overview",
@@ -41,5 +45,82 @@
       "subtitle": "Signed reports for ITSG and the vendor."
     }
   },
-  "placeholder": "This screen is built in a later step."
+  "placeholder": "This screen is built in a later step.",
+  "status": {
+    "exact": "Exact match",
+    "identical": "Identical",
+    "valid": "Valid",
+    "variant": "Correct variant",
+    "bug": "Bug",
+    "invalid": "Invalid",
+    "unclear": "Unclear",
+    "ignored": "Ignored"
+  },
+  "chips": {
+    "all": "All fields",
+    "identical": "Identical",
+    "valid": "Rule field",
+    "variant": "Correct variant",
+    "bug": "Bug",
+    "invalid": "Invalid",
+    "unclear": "Unclear",
+    "ignored": "Ignored"
+  },
+  "mode": {
+    "compare": "compare",
+    "ignore": "ignore",
+    "rule": "rule"
+  },
+  "modeHint": {
+    "compare": "The value must match the model solution.",
+    "ignore": "Not compared (timestamp or set by someone else).",
+    "rule": "Not compared with the model solution, checked by a rule instead."
+  },
+  "decidedBy": {
+    "diff": "Field comparison",
+    "catalogue": "Known-variant catalogue, step a",
+    "rules": "Rule re-check, step b",
+    "ai_proposal": "AI proposal, confirmed by the system advisor",
+    "advisor": "System advisor"
+  },
+  "result": {
+    "topbar": "Submission <strong>#{{id}}</strong> · rule set <strong>V{{ruleSet}}</strong>",
+    "subtitle": "Round {{round}} of {{total}} · {{kind}} received {{date}} · checked under V{{ruleSet}}",
+    "verdict": "Result:",
+    "openReport": "Open report",
+    "filter": "Filter fields",
+    "onlyDeviations": "Show only deviations",
+    "col": {
+      "block": "Block",
+      "field": "Field",
+      "expected": "Model solution",
+      "actual": "Vendor file",
+      "mode": "Mode",
+      "label": "Label"
+    },
+    "empty": "empty or not present",
+    "vendorField": "vendor: {{field}}",
+    "noRows": "No fields for this filter.",
+    "notFound": "This submission was not found.",
+    "why": "Why this label",
+    "fieldInfo": "Field info",
+    "decidedBy": "Decided by",
+    "rule": "Rule",
+    "specPassage": "Spec passage",
+    "criterion": "ITSG criterion",
+    "reasoning": "Reasoning",
+    "explanation": "Explanation",
+    "source": "Source",
+    "identicalNote": "The value matches the model solution."
+  },
+  "submissions": {
+    "col": {
+      "vendor": "Vendor (demo)",
+      "testCase": "Test case",
+      "round": "Round",
+      "ruleSet": "Rule set",
+      "result": "Result",
+      "received": "Received"
+    }
+  }
 }

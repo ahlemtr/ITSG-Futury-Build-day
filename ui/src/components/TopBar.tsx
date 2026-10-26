@@ -1,14 +1,16 @@
 import { Trans, useTranslation } from "react-i18next";
 import { LANGUAGES, setLanguage } from "../i18n";
+import { useTopBarContent } from "./TopBarContext";
 
 export function TopBar() {
   const { t, i18n } = useTranslation();
+  const screenContext = useTopBarContent();
   return (
     <header className="topbar">
       <span className="wordmark">ITSG</span>
       <span className="product">{t("app.product")}</span>
       <span className="topbar-context">
-        <Trans i18nKey="app.ruleSetContext" components={{ strong: <strong /> }} />
+        {screenContext ?? <Trans i18nKey="app.ruleSetContext" components={{ strong: <strong /> }} />}
       </span>
       <div className="lang-switch" role="group" aria-label={t("app.languageSwitch")}>
         {LANGUAGES.map((lang) => (

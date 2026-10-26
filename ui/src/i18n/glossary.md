@@ -15,9 +15,9 @@ Rules (from `ui/UI_PLAN.md` section 6):
 | Abgabegrund | message type code |
 | Entgeltfortzahlung (EFZ) | employer-paid sick period |
 | Arbeitsunfähigkeit (AU) | incapacity for work |
-| Systemberater | ITSG system advisor |
-| Musterlösung | model solution |
 | Vorbewertung | preliminary evaluation (eVpT) |
+
+Field and block names, Abgabegrund codes (41, 61 ...) and spec references (VB V13.3, 3.12) are shown as they are in both languages.
 
 ## Fixed UI words
 
@@ -38,3 +38,13 @@ Rules (from `ui/UI_PLAN.md` section 6):
 | Ignoriert | Ignored |
 | Präzedenzfall | Precedent |
 | Versteckte Variante | Hidden variant |
+| Musterlösung | Model solution |
+| Herstellerdatei | Vendor file |
+| Systemberater | System advisor |
+| Baustein | Block |
+| Regelfeld | Rule field |
+| Gültig | Valid |
+| Identisch | Identical |
+| vergleichen / ignorieren / Regel | compare / ignore / rule |
+| Einreichung | Submission |
+| Runde | Round |

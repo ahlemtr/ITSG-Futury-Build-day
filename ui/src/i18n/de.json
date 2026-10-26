@@ -5,6 +5,10 @@
     "languageSwitch": "Sprache wählen",
     "user": "ITSG-Prüfer"
   },
+  "common": {
+    "loading": "Wird geladen …",
+    "error": "Die Daten konnten nicht geladen werden."
+  },
   "nav": {
     "label": "Hauptnavigation",
     "overview": "Übersicht",
@@ -41,5 +45,82 @@
       "subtitle": "Signierte Berichte für ITSG und Hersteller."
     }
   },
-  "placeholder": "Dieser Bildschirm wird in einem späteren Schritt gebaut."
+  "placeholder": "Dieser Bildschirm wird in einem späteren Schritt gebaut.",
+  "status": {
+    "exact": "Exakte Übereinstimmung",
+    "identical": "Identisch",
+    "valid": "Gültig",
+    "variant": "Zulässige Variante",
+    "bug": "Fehler",
+    "invalid": "Ungültig",
+    "unclear": "Unklar",
+    "ignored": "Ignoriert"
+  },
+  "chips": {
+    "all": "Alle Felder",
+    "identical": "Identisch",
+    "valid": "Regelfeld",
+    "variant": "Zulässige Variante",
+    "bug": "Fehler",
+    "invalid": "Ungültig",
+    "unclear": "Unklar",
+    "ignored": "Ignoriert"
+  },
+  "mode": {
+    "compare": "vergleichen",
+    "ignore": "ignorieren",
+    "rule": "Regel"
+  },
+  "modeHint": {
+    "compare": "Wert muss der Musterlösung entsprechen.",
+    "ignore": "Wird nicht verglichen (Zeitstempel oder von anderen gesetzt).",
+    "rule": "Wird nicht mit der Musterlösung verglichen, sondern per Regel geprüft."
+  },
+  "decidedBy": {
+    "diff": "Feldvergleich",
+    "catalogue": "Katalog bekannter Varianten, Schritt a",
+    "rules": "Regelprüfung, Schritt b",
+    "ai_proposal": "KI-Vorschlag, vom Systemberater bestätigt",
+    "advisor": "Systemberater"
+  },
+  "result": {
+    "topbar": "Einreichung <strong>#{{id}}</strong> · Regelwerk <strong>V{{ruleSet}}</strong>",
+    "subtitle": "Runde {{round}} von {{total}} · {{kind}} eingegangen am {{date}} · geprüft unter V{{ruleSet}}",
+    "verdict": "Ergebnis:",
+    "openReport": "Bericht öffnen",
+    "filter": "Felder filtern",
+    "onlyDeviations": "Nur Abweichungen zeigen",
+    "col": {
+      "block": "Baustein",
+      "field": "Feld",
+      "expected": "Musterlösung",
+      "actual": "Herstellerdatei",
+      "mode": "Modus",
+      "label": "Label"
+    },
+    "empty": "leer oder nicht vorhanden",
+    "vendorField": "beim Hersteller: {{field}}",
+    "noRows": "Keine Felder für diesen Filter.",
+    "notFound": "Diese Einreichung wurde nicht gefunden.",
+    "why": "Warum dieses Label",
+    "fieldInfo": "Feld-Info",
+    "decidedBy": "Entschieden durch",
+    "rule": "Regel",
+    "specPassage": "Spec-Passage",
+    "criterion": "ITSG-Kriterium",
+    "reasoning": "Begründung",
+    "explanation": "Erklärung",
+    "source": "Quelle",
+    "identicalNote": "Der Wert stimmt mit der Musterlösung überein."
+  },
+  "submissions": {
+    "col": {
+      "vendor": "Hersteller (Demo)",
+      "testCase": "Testfall",
+      "round": "Runde",
+      "ruleSet": "Regelwerk",
+      "result": "Ergebnis",
+      "received": "Eingegangen"
+    }
+  }
 }

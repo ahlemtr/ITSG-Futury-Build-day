@@ -8,8 +8,6 @@ export const TERMS = {
   abgabegrund: { de: "Abgabegrund", en: "message type code" },
   entgeltfortzahlung: { de: "Entgeltfortzahlung", en: "employer-paid sick period" },
   arbeitsunfaehigkeit: { de: "Arbeitsunfähigkeit", en: "incapacity for work" },
-  systemberater: { de: "Systemberater", en: "ITSG system advisor" },
-  musterloesung: { de: "Musterlösung", en: "model solution" },
   vorbewertung: { de: "Vorbewertung", en: "preliminary evaluation (eVpT)" },
 } as const;
 
