@@ -1,0 +1,50 @@
+record: DBEE
+title: Ende Entgeltersatzleistung
+spec:
+  document: Verfahrensbeschreibung DTA EEL
+  version: '13.4'
+  valid_from: '2027-01-01'
+  section: '3.7'
+  page: 91
+announced_by:
+  record: DSLW
+  field: MM-EELENDE
+  value_if_present: J
+status: extracted
+fixed_length: 30
+fields:
+- name: KENNUNG
+  start: 1
+  end: 4
+  length: 4
+  type: an
+  required: M
+  constant: DBEE
+  source: structure
+- name: EEL-ABAG
+  start: 5
+  end: 12
+  length: 8
+  type: n
+  required: M
+  format: date_yyyymmdd
+- name: EEL-ABSV
+  start: 13
+  end: 20
+  length: 8
+  type: n
+  required: M
+  format: date_yyyymmdd
+- name: EEL-ENDE
+  start: 21
+  end: 28
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: EEL-ENDE-GRUND
+  start: 29
+  end: 30
+  length: 2
+  type: n
+  required: M

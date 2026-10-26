@@ -1,0 +1,71 @@
+# Step K1 (08 section 4). Versions join by valid_from, never by number:
+# BP 13.3 belongs with VB 13.4 (both valid from 2027-01-01).
+documents:
+  - code: VB
+    title: Verfahrensbeschreibung DTA EEL
+    versions:
+      - version: "13.3"
+        published: 2025-11-24
+        valid_from: 2026-01-01
+        file: sources/2025_11_24_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.3.pdf
+      - version: "13.4"
+        published: 2026-03-10
+        valid_from: 2027-01-01
+        file: sources/2026_03_10_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.4_ab_01.01.2027.pdf
+        succeeds: "13.3"
+  - code: GG
+    title: Gemeinsame Grundsätze EEL
+    versions:
+      - version: "13.1"
+        published: 2025-05-06
+        valid_from: 2026-01-01
+        file: sources/GG_EEL_V13.1_06.05.2025.pdf
+  - code: PTA
+    title: Pool-Testaufgaben 2025/2026
+    versions:
+      - version: "2025-2026-v3"
+        published: 2026-09-22
+        valid_from: 2026-01-01
+        file: sources/PTA_Gemeinsame-Testaufgaben-2025-2026_Version-3.pdf
+  - code: BP
+    title: Beispielpapier DTA EEL
+    versions:
+      - version: "13.3"
+        published: 2026-03-10
+        valid_from: 2027-01-01
+        file: sources/2026_03_10_Endfassung_Beispielpapier_DTA_EEL_Version_13.3_gueltig_ab_01.01.2027.pdf
+  - code: HINWEISE
+    title: Hinweise DTA-EEL-Beispiel Vorerkrankung Testkonstellation
+    versions:
+      - version: "1"
+        published: null
+        valid_from: 2027-01-01
+        file: sources/Hinweise_DTA-EEL-Bespiel_Vorerkrankung_Testkonstellation.docx
+  - code: BVORERK
+    title: DTA-EEL-Beispiel_Vorerkrankung (ITSG criteria)
+    versions:
+      - version: "1"
+        published: null
+        valid_from: 2027-01-01
+        file: sources/DTA-EEL-Beispiel_Vorerkrankung.docx
+  - code: RS-ANL1
+    title: Rundschreiben Entgeltersatzleistungen, Anlage 1
+    versions:
+      - version: "2025-12-10"
+        published: 2025-12-10
+        valid_from: 2025-12-10
+        file: sources/2025_12_10_NS_FLB_TOP_01_24c24i45SGBV45SGBVII47SGBXIV_Aktualisierung_der_GR_zu_EEL_Anl1.pdf
+  - code: RS-ANL2
+    title: Rundschreiben Entgeltersatzleistungen, Anlage 2
+    versions:
+      - version: "2025-12-10"
+        published: 2025-12-10
+        valid_from: 2025-12-10
+        file: sources/2025_12_10_NS_FLB_TOP_01_24c24i45SGBV45SGBVII47SGBXIV_Aktualisierung_der_GR_zu_EEL_Anl2.pdf
+  - code: RS-ANL3
+    title: Rundschreiben Entgeltersatzleistungen, Anlage 3
+    versions:
+      - version: "2024-12-11"
+        published: 2024-12-11
+        valid_from: 2024-12-11
+        file: sources/2024_12_11_NS_FLB_TOP_02_24c24i4444b45SGBV45SGBVII47SGBXIV_Aktualisierung_der_GR_zu_Entgeltersatzleistungen_Anl3.pdf

@@ -1,0 +1,53 @@
+# Step K4 (08 section 7). Out-of-scope names from VB 3.1.18, senders from 06 section 1.
+message_types:
+  - {code: "01", name: Entgeltbescheinigung Krankengeld, sender: employer, in_scope: true}
+  - {code: "41", name: Anforderung anrechenbare Vorerkrankungen, sender: employer, in_scope: true}
+  - {code: "61", name: Rückmeldung Vorerkrankungen, sender: insurer, in_scope: true}
+  - {code: "62", name: Rückmeldung Ende Entgeltersatzleistung, sender: insurer, in_scope: true}
+  - {code: "88", name: Stornierung, sender: both, in_scope: true}
+  - {code: "02", name: Entgeltbescheinigung KV bei Kinderkrankengeld, sender: employer, in_scope: false}
+  - {code: "03", name: Entgeltbescheinigung KV bei Mutterschaftsgeld, sender: employer, in_scope: false}
+  - {code: "04", name: Entgeltbescheinigung KV bei Krankengeld wegen Mitaufnahme im Krankenhaus, sender: employer, in_scope: false}
+  - {code: "11", name: Entgeltbescheinigung RV bei Übergangsgeld Leistungen zur medizinischen Rehabilitation, sender: employer, in_scope: false}
+  - {code: "12", name: Entgeltbescheinigung RV bei Übergangsgeld Leistungen zur Teilhabe am Arbeitsleben, sender: employer, in_scope: false}
+  - {code: "21", name: Entgeltbescheinigung UV bei Verletztengeld, sender: employer, in_scope: false}
+  - {code: "22", name: Entgeltbescheinigung UV bei Übergangsgeld, sender: employer, in_scope: false}
+  - {code: "23", name: Entgeltbescheinigung UV bei Kinderverletztengeld, sender: employer, in_scope: false}
+  - {code: "31", name: Entgeltbescheinigung BA Übergangsgeld, sender: employer, in_scope: false}
+  - {code: "42", name: Anforderung Ende Entgeltersatzleistung, sender: employer, in_scope: false}
+  - {code: "51", name: Höhe der beitragspflichtigen Einnahmen (§ 23c SGB IV), sender: employer, in_scope: false}
+  - {code: "66", name: Rückmeldung falscher Abgabegrund, sender: insurer, in_scope: false}
+  - {code: "67", name: Unzuständige Krankenkasse/unbekannte Person, sender: insurer, in_scope: false}
+  - {code: "71", name: Höhe der Entgeltersatzleistung, sender: insurer, in_scope: false}
+  - {code: "72", name: Anforderung Anzahl freigestellter Arbeitstage, sender: insurer, in_scope: false}
+  - {code: "73", name: Rückmeldung Anzahl freigestellter Arbeitstage, sender: employer, in_scope: false}
+  - {code: "99", name: Wechsel der meldenden Stelle und Systemwechsel, sender: employer, in_scope: false}
+
+# mandatory: unknown where Anlage 3 of the VB would decide (00 question 11). Do not guess.
+blocks:
+  - {type: "41", record: DBNA, flag: MM-NAME,      mandatory: true}
+  - {type: "41", record: DBAN, flag: MM-ANSCHRIFT, mandatory: unknown}
+  - {type: "41", record: DBVO, flag: MM-VOER,      mandatory: true}
+  - {type: "41", record: DBAP, flag: MM-ANSPRECH,  mandatory: unknown}
+  - {type: "41", record: DBID, flag: MM-ID,        mandatory: unknown}
+  - {type: "61", record: DBNA, flag: MM-NAME,      mandatory: true}
+  - {type: "61", record: DBVO, flag: MM-VOER,      mandatory: true}
+  - {type: "61", record: DBAP, flag: MM-ANSPRECH,  mandatory: unknown}
+  - {type: "61", record: DBID, flag: MM-ID,        mandatory: true}
+  - {type: "01", record: DBNA, flag: MM-NAME,      mandatory: true}
+  - {type: "01", record: DBAL, flag: MM-ALLGEMEIN, mandatory: true}
+  - {type: "01", record: DBAE, flag: MM-ENTGELT,   mandatory: true}
+  - {type: "01", record: DBAP, flag: MM-ANSPRECH,  mandatory: unknown}
+  - {type: "01", record: DBID, flag: MM-ID,        mandatory: unknown}
+  - {type: "88", record: DBSD, flag: MM-SD,        mandatory: true}
+  - {type: "62", record: DBNA, flag: MM-NAME,      mandatory: true}
+  - {type: "62", record: DBEE, flag: MM-EELENDE,   mandatory: true}
+  - {type: "62", record: DBAP, flag: MM-ANSPRECH,  mandatory: unknown}
+  - {type: "62", record: DBID, flag: MM-ID,        mandatory: true}
+
+described_in:
+  "01": [GG@13.1#2.1.1]
+  "41": [GG@13.1#2.1.2]
+  "61": [GG@13.1#2.2.1]
+  "62": [GG@13.1#2.2.2]
+  "88": [GG@13.1#2.5]

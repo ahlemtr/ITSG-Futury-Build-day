@@ -1,0 +1,86 @@
+record: DBZA
+title: Arbeitszeit
+spec:
+  document: Verfahrensbeschreibung DTA EEL
+  version: '13.4'
+  valid_from: '2027-01-01'
+  section: '3.6'
+  page: 86
+announced_by:
+  record: DSLW
+  field: MM-ZEITKG
+  value_if_present: J
+status: extracted
+fixed_length: 60
+fields:
+- name: KENNUNG
+  start: 1
+  end: 4
+  length: 4
+  type: an
+  required: M
+  constant: DBZA
+  source: structure
+- name: ANZAHL-STD
+  start: 5
+  end: 9
+  length: 5
+  type: n
+  required: M
+  format: amount_2dp
+- name: REG-AZ
+  start: 10
+  end: 13
+  length: 4
+  type: n
+  required: m
+  format: amount_2dp
+- name: MAZR-1
+  start: 14
+  end: 18
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZBEGINN-2
+  start: 19
+  end: 26
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: AZENDE-2
+  start: 27
+  end: 34
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: MAZR-2
+  start: 35
+  end: 39
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZBEGINN-3
+  start: 40
+  end: 47
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: AZENDE-3
+  start: 48
+  end: 55
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: MAZR-3
+  start: 56
+  end: 60
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp

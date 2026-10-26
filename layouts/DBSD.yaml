@@ -1,0 +1,47 @@
+record: DBSD
+title: Stornierungsdaten
+spec:
+  document: Verfahrensbeschreibung DTA EEL
+  version: '13.4'
+  valid_from: '2027-01-01'
+  section: '3.20'
+  page: 166
+announced_by:
+  record: DSLW
+  field: MM-SD
+  value_if_present: J
+status: extracted
+fixed_length: 120
+fields:
+- name: KENNUNG
+  start: 1
+  end: 4
+  length: 4
+  type: an
+  required: M
+  constant: DBSD
+  source: structure
+- name: DATENSATZ-ID-URSPRUNGSMELDUNG
+  start: 5
+  end: 40
+  length: 36
+  type: an
+  required: M
+- name: VORNAME
+  start: 41
+  end: 70
+  length: 30
+  type: an
+  required: M
+- name: FAMILIENNAME
+  start: 71
+  end: 100
+  length: 30
+  type: an
+  required: M
+- name: AKTENZEICHEN-VERURSACHER
+  start: 101
+  end: 120
+  length: 20
+  type: an
+  required: M

@@ -1,0 +1,307 @@
+record: DBMU
+title: Entgeltbescheinigung zur Berechnung von Mutterschaftsgeld
+spec:
+  document: Verfahrensbeschreibung DTA EEL
+  version: '13.4'
+  valid_from: '2027-01-01'
+  section: '3.11'
+  page: 118
+announced_by:
+  record: DSLW
+  field: MM-ENTMU
+  value_if_present: J
+status: extracted
+fixed_length: 214
+notes:
+- Months 2 and 3 (positions 115-210) repeat the month-1 group (067-114). Only month 1 is described in the spec;
+  months 2 and 3 are derived and match AZ-WOECH starting at 211.
+fields:
+- name: KENNUNG
+  start: 1
+  end: 4
+  length: 4
+  type: an
+  required: M
+  constant: DBMU
+  source: structure
+- name: SCHUTZFR-BEGINN
+  start: 5
+  end: 12
+  length: 8
+  type: n
+  required: M
+  format: date_yyyymmdd
+- name: BV-BEGINN
+  start: 13
+  end: 20
+  length: 8
+  type: n
+  required: M
+  format: date_yyyymmdd
+- name: LETZTTAG
+  start: 21
+  end: 28
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: ENDE-BV-AM
+  start: 29
+  end: 36
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: ENDE-BV-ZUM
+  start: 37
+  end: 44
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: BV-GEKUEND
+  start: 45
+  end: 46
+  length: 2
+  type: n
+  required: m
+- name: WAEHREEL-NETTO
+  start: 47
+  end: 54
+  length: 8
+  type: n
+  required: m
+  format: amount_2dp
+- name: DATUM-AE-BIS
+  start: 55
+  end: 62
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: FEHLZEIT
+  start: 63
+  end: 64
+  length: 2
+  type: n
+  required: m
+- name: AE-UEBER
+  start: 65
+  end: 65
+  length: 1
+  type: an
+  required: M
+- name: ENTGART
+  start: 66
+  end: 66
+  length: 1
+  type: n
+  required: M
+- name: BEGINN-1
+  start: 67
+  end: 74
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: ENDE-1
+  start: 75
+  end: 82
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: BEZAZ-1
+  start: 83
+  end: 87
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: MASTD-1
+  start: 88
+  end: 92
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZ-UNENT-STD-1
+  start: 93
+  end: 97
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZ-UNENT-TAGE-1
+  start: 98
+  end: 99
+  length: 2
+  type: n
+  required: m
+- name: AZ-ENTSCH-STD-1
+  start: 100
+  end: 104
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZ-ENTSCH-TAGE-1
+  start: 105
+  end: 106
+  length: 2
+  type: n
+  required: m
+- name: NETTO-1
+  start: 107
+  end: 114
+  length: 8
+  type: n
+  required: m
+  format: amount_2dp
+- name: BEGINN-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 115
+  end: 122
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: ENDE-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 123
+  end: 130
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: BEZAZ-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 131
+  end: 135
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: MASTD-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 136
+  end: 140
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZ-UNENT-STD-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 141
+  end: 145
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZ-UNENT-TAGE-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 146
+  end: 147
+  length: 2
+  type: n
+  required: m
+- name: AZ-ENTSCH-STD-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 148
+  end: 152
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZ-ENTSCH-TAGE-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 153
+  end: 154
+  length: 2
+  type: n
+  required: m
+- name: NETTO-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 155
+  end: 162
+  length: 8
+  type: n
+  required: m
+  format: amount_2dp
+- name: BEGINN-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 163
+  end: 170
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: ENDE-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 171
+  end: 178
+  length: 8
+  type: n
+  required: m
+  format: date_yyyymmdd
+- name: BEZAZ-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 179
+  end: 183
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: MASTD-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 184
+  end: 188
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZ-UNENT-STD-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 189
+  end: 193
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZ-UNENT-TAGE-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 194
+  end: 195
+  length: 2
+  type: n
+  required: m
+- name: AZ-ENTSCH-STD-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 196
+  end: 200
+  length: 5
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZ-ENTSCH-TAGE-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 201
+  end: 202
+  length: 2
+  type: n
+  required: m
+- name: NETTO-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
+  start: 203
+  end: 210
+  length: 8
+  type: n
+  required: m
+  format: amount_2dp
+- name: AZ-WOECH
+  start: 211
+  end: 214
+  length: 4
+  type: n
+  required: m
+  format: amount_2dp

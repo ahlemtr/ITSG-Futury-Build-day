@@ -1,0 +1,88 @@
+record: DBLT
+title: Zusatzdaten für die Berechnung des Übergangsgeldes bei Leistungen zur Teilhabe
+spec:
+  document: Verfahrensbeschreibung DTA EEL
+  version: '13.4'
+  valid_from: '2027-01-01'
+  section: '3.15'
+  page: 153
+announced_by:
+  record: DSLW
+  field: MM-UEGLTA
+  value_if_present: J
+status: extracted
+fixed_length: 76
+fields:
+- name: KENNUNG
+  start: 1
+  end: 4
+  length: 4
+  type: an
+  required: M
+  constant: DBLT
+  source: structure
+- name: BV-SEIT
+  start: 5
+  end: 12
+  length: 8
+  type: n
+  required: M
+  format: date_yyyymmdd
+- name: BV-BIS
+  start: 13
+  end: 20
+  length: 8
+  type: n
+  required: M
+  format: date_yyyymmdd
+- name: BV-ALS
+  start: 21
+  end: 50
+  length: 30
+  type: an
+  required: m
+- name: AUSBVERH
+  start: 51
+  end: 51
+  length: 1
+  type: an
+  required: M
+- name: VORER
+  start: 52
+  end: 52
+  length: 1
+  type: an
+  required: m
+- name: VWL
+  start: 53
+  end: 58
+  length: 6
+  type: n
+  required: m
+  format: amount_2dp
+- name: BRUTTO-SB
+  start: 59
+  end: 66
+  length: 8
+  type: n
+  required: m
+  format: amount_2dp
+- name: NETTO-SB
+  start: 67
+  end: 74
+  length: 8
+  type: n
+  required: m
+  format: amount_2dp
+- name: AE-UEBERGANGSBEREICH
+  start: 75
+  end: 75
+  length: 1
+  type: an
+  required: M
+- name: RECHTSKREIS
+  start: 76
+  end: 76
+  length: 1
+  type: an
+  required: m

@@ -1,0 +1,30 @@
+[project]
+name = "eel-review"
+version = "0.1.0"
+description = "DTA EEL test platform: rules engine, checker and knowledge graph"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2",
+    "pyyaml",
+    "python-dateutil",
+    "python-docx",
+    "pdfplumber",
+    "neo4j",
+    "openai",
+    "python-dotenv",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
