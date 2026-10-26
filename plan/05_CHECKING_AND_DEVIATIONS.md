@@ -105,7 +105,7 @@ Result per test case: the worst label found (invalid > bug > unclear > correct v
 
 | Step | Input | Output | Notes |
 |---|---|---|---|
-| a. Known-variant catalogue | deviation signature (record, field, kind of difference) | correct variant, with the catalogue entry as reason | `kg/seed/variants.yaml`, seeded from variants the Pool-Testaufgaben name explicitly, plus precedents via `kg.find_precedent`. Candidate seed: MM-ANSCHRIFT J + DBAN (Beispielpapier 13.1) vs N (ITSG file), once ITSG confirms |
+| a. Known-variant catalogue | deviation signature (record, field, kind of difference) | correct variant, with the catalogue entry as reason | `engine/data/variants.yaml`, seeded from variants the Pool-Testaufgaben name explicitly, plus precedents via `kg.find_precedent`. Candidate seed: MM-ANSCHRIFT J + DBAN (Beispielpapier 13.1) vs N (ITSG file), once ITSG confirms |
 | b. Rule re-check | the vendor's value + scenario | correct variant / bug / invalid | deterministic: "does the vendor's file also satisfy the rules?" |
 | c. AI triage | deviation + retrieved spec passages + similar precedents | proposal (likely variant / likely bug / unclear) + citation + confidence | done by the OpenAI check agent through its tools (`09_TECH_STACK.md` section 3); never final; output rejected if it cites no passage |
 | d. System advisor | proposal | final label + reason | stored as a **precedent** |

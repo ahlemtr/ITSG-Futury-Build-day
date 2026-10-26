@@ -53,6 +53,7 @@ All of it runs with Docker Compose on the team VM.
 |---|---|---|---|---|
 | **Spec-update agent** | a new spec version | reads the diff, the affected rules and the existing test cases through tools; decides per change: no change / update test / new test; drafts the test case and the curated change | draft test cases + draft changes | ITSG approves before use |
 | **Check agent** | a vendor submission | reads the parsed files and the diff against the solution through tools; for each deviation proposes correct variant / bug / invalid / unclear with a citation; drafts the report | draft labels + draft report | advisor confirms and sends |
+| **Criteria agent** | a spec section (shown on VB 13.4 section 3.12) | finds the requirement sentences through tools (`search_passages`, `get_passage`) and translates each into a testable criterion with parameters, rule mapping and citations; the engine scores the drafts against the ITSG criteria; drafts the engine cannot match go back to the agent, which proposes equivalent / new valid requirement / wrong / unclear with citations; confirmed drafts become boundary test cases (`02` task M8.3) | draft criteria + score + draft test cases | ITSG approves before use |
 | **Explain** | one verdict | plain-language explanation with rule id and section | text | none (display only) |
 | **Story** | a scenario | TA-style test story | text | part of the test approval |
 

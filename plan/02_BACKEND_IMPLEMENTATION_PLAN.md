@@ -46,6 +46,7 @@ eel-review/
 │   ├── runs.py                # test rounds, reply generation, verdicts
 │   ├── builder.py             # clones, boundary variants, change impact
 │   ├── specdiff.py            # version diff -> changed sections -> rules
+│   ├── criteria.py            # criterion drafts -> score vs ITSG criteria -> draft test cases (M8.3)
 │   ├── report.py              # JSON + HTML report
 │   └── signing.py
 ├── kg/                        # exact layout: 08_KG_SEEDING_GUIDE.md section 2
@@ -56,7 +57,7 @@ eel-review/
 │   ├── extract/, seed_graph.py, validate.py, load.py, embed.py
 │   ├── seed/                  # ONE set of hand-written seed files, read by both backends:
 │   │                          # documents, message_types, parameters, rules (with criteria),
-│   │                          # compare_modes, variants, changes, test_cases, precedents
+│   │                          # compare_modes, changes, test_cases, precedents
 │   └── build/                 # generated, not committed: passage text, embeddings cache
 ├── llm/
 │   ├── client.py              # OpenAI client, Structured Outputs, cache by input hash
@@ -66,7 +67,7 @@ eel-review/
 │   │   └── check.py           # deviations -> proposed labels + draft report
 │   ├── explain.py             # fail verdict -> plain explanation with citation
 │   ├── story.py               # scenario -> readable test story (TA style)
-│   └── extract.py             # spec passage -> draft rule (shown on 3.12)
+│   └── extract.py             # spec section -> requirement sentences -> criterion drafts (shown on 3.12)
 ├── store/
 │   ├── schema.sql
 │   ├── repo.py
@@ -117,7 +118,7 @@ Each task lists what to implement, what to test and how to test it. A milestone 
 
 | Task | Implement | Test / how |
 |---|---|---|
-| M3.1 | scenario format `fixtures/scenarios/<id>.yaml`: person, employer ids, AU periods (start, end, certified, source), employment end, report date, insurer behavior per step (which flags) | Peter and all clones from rules doc section 9 written as YAML |
+| M3.1 | scenario = inputs from `kg/seed/test_cases.yaml` (read through `kg.get_test_case`, the only source for AU periods, employment end and report date) + `fixtures/scenarios/<id>.yaml` for what the full chain needs on top: person names, employer ids, insurer behavior per step (which flags) | Peter and all clones from rules doc section 9 written as YAML |
 | M3.2 | `expected.build_chain(scenario, version) -> [ExpectedMessage]`: step, actor, abgabegrund, expected fields with `compare_mode` (compare / rule / ignore, per `05_CHECKING_AND_DEVIATIONS.md` section 4) | Peter -> 7 messages (41, 61, 01, 61, 88, 01, 62) with EFZ ends 30.03 and 27.03. Clones are **single-step** tests (only the 41 decision and its content, rules doc section 9): `peter-gap-exact` -> no 41 under 13.3, 41 with 1 period under 13.4 |
 | M3.3 | `writer_messages`: expected chain -> files. Employer files TEEL0 (the "solution"), insurer files TEEK0 (61 with REF-ID, BBNR-VU, AZVU echoed, flags; 62 with DBEE) | generated Peter 41 equals the ITSG file on every `compare` field |
 | M3.4 | `tools/make_submissions.py`: build seed submissions (section 7) by copying the expected files and applying mutations | each mutation produces a file the parser still reads |
@@ -132,7 +133,7 @@ See `05_CHECKING_AND_DEVIATIONS.md` for the flow, compare modes and labels.
 | M4.1 | **diff engine** on three levels: messages (expected vs present), matching (person + Abgabegrund + chain position, not line order), fields (`compare` fields only). Output `Deviation(step, record, field, expected, actual, kind)` | ITSG reference vs generated solution: 0 deviations. Same file with lines in another order: still 0. Missing 88: 1 message-level deviation |
 | M4.2 | rule-field checks: UUID format and uniqueness, product id, test sender number, AZVU constant, REFERENZ-ID links | reused DSID: C-1 bug. AZVU changed in step 6: C-2 bug |
 | M4.3 | format checks (F41-*, MM flags vs blocks, insurer-only fields zero, types) -> label **invalid** | AU-AB-SV filled: F41-6 invalid. Letter in a numeric field: invalid |
-| M4.4 | **known-variant catalogue** `kg/seed/variants.yaml`: deviation signature -> correct variant + reason; approved precedents come from `kg.find_precedent` | a seeded precedent resolves its deviation without AI |
+| M4.4 | **known-variant catalogue** `engine/data/variants.yaml` (owned by the backend, not part of `kg/`): deviation signature -> correct variant + reason; approved precedents come from `kg.find_precedent` | a seeded precedent resolves its deviation without AI |
 | M4.5 | **rule re-check** per deviation: evaluate the vendor's version against R41, E, C rules -> correct variant or bug | 3 of 4 periods: correct variant (note "as many as possible"). July missing: bug R41-3. Pay end 30.03 after corrected 61: bug E-1 |
 | M4.6 | label aggregation: worst label per test case (invalid > bug > unclear > correct variant > exact match), counts per `resolved_by` | Peter reference: exact match |
 | M4.7 | `check(submission, valid_on=date)` picks the rule set by validity date, never "latest" | `s-legacy-1` with valid_on 2026-11-01 (13.3): exact match. With valid_on 2027-01-01 (13.4): bug R41-2 |
@@ -173,7 +174,7 @@ See `05_CHECKING_AND_DEVIATIONS.md` for the flow, compare modes and labels.
 | M8.0 | `llm/client.py` (Structured Outputs, retry once on invalid JSON) and `llm/tools.py`: every `kg/interface` method (except `add_precedent`, `subgraph`) and the engine tools of `09_TECH_STACK.md` section 3.3 as OpenAI function tools | an agent call that needs `gap_inclusive` on 2027-01-01 gets `true` through `get_param` |
 | M8.1 | `explain(verdict, passage)`: 2 to 4 sentences, German or English, must quote the rule id and section; reject output without them | for the July-period fail, text mentions R41-3 and 3.12 |
 | M8.2 | `story(scenario)`: TA-style month-by-month description for the test package | Peter story lists the 4 prior periods and 11.03.2026 |
-| M8.3 | `extract(passage)`: draft a rule (condition + parameters) from the 3.12 text, shown next to the approved rule | draft for the chaining sentence contains a 6-month parameter |
+| M8.3 | **requirements-to-criteria pipeline** (covers the deck objectives "identify requirements", "translate into testable criteria", "generate test cases with expected results"), shown on VB 13.4 section 3.12: (1) find: agent lists the requirement sentences with passage keys via `search_passages` / `get_passage`; (2) translate: one `CriterionDraft` per requirement `{text, applies_to, condition, params[], maps_to_rule, citations[]}`; (3) measure: first deterministic, compares rule mapping and parameters with `get_rules` / `get_param`; then, only for unmatched drafts and unfound ITSG criteria, the agent proposes `equivalent` / `new_valid` / `wrong` / `unclear` with citations (never final, a human confirms; parameter values always compared by code); score "X exact, Y proposed by AI, Z missing" against the 4 ITSG criteria; (4) generate: `builder.boundaries` + `expected.build_chain` for the drafts that pass, status `draft`. Files `llm/extract.py`, `engine/criteria.py`. Built right after M8.0 | 4 of 4 ITSG criteria found (f41c7278, 0cefe80e, aade0289, 9c8c9b58) with `gap_months = 6`, `min_total_days = 30`, `sum_window_months = 12`; a draft with `gap_months = 5` gets `params_ok = false`; a draft without citation is rejected; matched drafts make no LLM call; a draft merging R41-2 and R41-3 -> `equivalent`; a draft for the open-ended AU (R41-6) -> `new_valid`; generate for R41-2 returns gap-in, gap-exact, gap-out |
 | M8.4 | cache LLM outputs by input hash, so the demo works offline after one run | second run makes no API call |
 | M8.5 | **AI deviation triage**: input = deviation + context from `kg.get_deviation_context` (rules, passages, precedents, flagged blocks); output JSON `{proposal: likely_variant / likely_bug / unclear, reasoning, citations[], confidence}`; rejected if no citation; never sets a final label | `s-no-contact` (41 without DBAP): proposal "likely bug", cites Beispielpapier 13.1 where every 41 carries MM-ANSPRECH = J |
 | M8.6 | **advisor decision -> precedent**: `POST /deviations/{id}/decide` stores label + reason, adds the signature to the catalogue | re-check `s-no-contact`: resolved by precedent, no AI call |
@@ -243,6 +244,8 @@ This is the final contract (agreed with `07_KNOWLEDGE_GRAPH.md` section 11 and `
 | POST | `/builder/hidden` | `{test_case_id, seed}` | hidden variant (stored, never exported) |
 | GET | `/test-cases/{id}/package` | | zip with scenario, expected TEEL0/TEEK0, story (refused for hidden tests) |
 | GET | `/graph/subgraph` | `?label=&key=&depth=` | nodes and edges for the impact view |
+| POST | `/criteria/extract` | `{document, version, section}` | requirement sentences, criterion drafts, score against the ITSG criteria, draft test cases (M8.3) |
+| POST | `/criteria/{id}/approve` | `{approver, decision}` | updated status of a criterion draft |
 
 ## 7. Seed data: what the database contains and which diffs it shows
 
@@ -300,6 +303,7 @@ Vorerkrankung rule set (`03_DOMAIN_RULES_VORERKRANKUNG.md`) with parameters per 
 - [ ] `/specdiff` 13.3 vs 13.4 returns the DBVO change and identifies `peter-gap-exact` (recompute tier = R41-2, R41-3 only)
 - [ ] all engine tests pass with `KG_BACKEND=yaml` and `KG_BACKEND=graph`
 - [ ] signed HTML report for one fail and one pass submission
+- [ ] `/criteria/extract` on VB 13.4 section 3.12 finds the 4 ITSG criteria with correct parameters and returns draft boundary test cases
 - [ ] at least one LLM explanation shown for a fail, cached for offline demo
 - [ ] frontend can call every endpoint used in the demo storyline
 - [ ] in the vendor view, a vendor uploads a file, gets a receipt, receives the next insurer reply and downloads the signed report
