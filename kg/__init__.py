@@ -1,23 +1,19 @@
-"""Knowledge graph package. Only `get_kb()` and `interface.KnowledgeBase` are used by the backend."""
+"""Knowledge graph: seed files, build scripts and the two backends behind kg.interface.KnowledgeBase."""
 
 from __future__ import annotations
 
-import os
-from functools import lru_cache
 
-from kg.interface import KnowledgeBase
+def get_kb(backend: str | None = None):
+    """The backend selected by KG_BACKEND (`yaml` or `graph`), default yaml."""
+    from kg.common import env
 
-
-@lru_cache(maxsize=1)
-def get_kb() -> KnowledgeBase:
-    """Return the backend selected by KG_BACKEND (`yaml` default, `graph`)."""
-    backend = os.environ.get("KG_BACKEND", "yaml")
-    if backend == "yaml":
-        from kg.yaml_backend import YamlBackend  # built by the KG teammate (plan/08)
-
-        return YamlBackend()
+    backend = (backend or env("KG_BACKEND", "yaml")).lower()
     if backend == "graph":
         from kg.graph_backend import GraphBackend
 
         return GraphBackend()
-    raise ValueError(f"unknown KG_BACKEND: {backend}")
+    if backend == "yaml":
+        from kg.yaml_backend import YamlBackend
+
+        return YamlBackend()
+    raise ValueError(f"unknown KG_BACKEND {backend!r}, expected 'yaml' or 'graph'")

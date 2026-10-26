@@ -9,7 +9,9 @@ D = date.fromisoformat
 
 def test_scenarios_load(kb):
     for t in kb.get_test_cases(include_hidden=True):
-        sc = load_scenario(kb, t.id)
+        if t.origin == "pta":
+            continue
+        sc = load_scenario(kb, t.key)
         assert sc.extras["person"]["familienname"] == "Mustermann"
 
 

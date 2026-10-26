@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, Response
 from pydantic import BaseModel
 
 from api.routes.common import ai, kb, repo, test_case
-from engine import intake, report, signing
+from engine import intake, layouts, report, signing
 from engine.checker import Checker
 from engine.diff import Differ
 from engine.expected import build_chain, load_scenario
@@ -97,8 +97,8 @@ def side_by_side(request: Request, sid: str, valid_on: date | None = None):
     steps, plain = [], 0
     for m, r in pairs:
         rows = []
-        for blk in ["DSLW"] + [b for b in k.get_layout("DSLW", version).block_order if b in m.blocks or b in r.blocks]:
-            lay = k.get_layout(blk, version)
+        for blk in ["DSLW"] + [b for b in layouts.get(k, "DSLW", version).block_order if b in m.blocks or b in r.blocks]:
+            lay = layouts.get(k, blk, version)
             exp_vals = m.head if blk == "DSLW" else m.blocks.get(blk)
             act_vals = r.head if blk == "DSLW" else (r.blocks[blk].fields if blk in r.blocks else None)
             for f in lay.fields:
@@ -140,6 +140,21 @@ def advisor_queue(request: Request):
     return out
 
 
+def _justifications(k, refs: list[str]) -> list[str]:
+    """Rule ids and passage keys the KB knows (it rejects a precedent justified by anything else)."""
+    out = []
+    for ref in dict.fromkeys(refs):
+        try:
+            if "#" in ref:
+                k.get_passage(ref)
+            elif not any(r.id == ref for ag in ("41", "61", "62", "01", "88") for r in k.get_rules(ag, "13.4")):
+                continue
+            out.append(ref)
+        except KeyError:
+            continue
+    return out
+
+
 @router.post("/deviations/{dev_id}/decide")
 def decide(request: Request, dev_id: str, body: DecideBody):
     found = repo(request).find_deviation(dev_id)
@@ -149,9 +164,12 @@ def decide(request: Request, dev_id: str, body: DecideBody):
         raise HTTPException(422, "label must be correct_variant, bug or invalid")
     sid, d = found
     cites = body.citations or (d.ai_proposal.citations if d.ai_proposal else []) or d.sources
-    p = Precedent(key=d.signature, verdict=body.label, reason=body.reason, advisor=body.advisor,
-                  decided_on=datetime.now(UTC).date(), citations=cites)
+    p = Precedent(abgabegrund=d.abgabegrund or "", field=d.field_key, kind=d.kind, verdict=body.label,
+                  reason=body.reason, advisor=body.advisor, decided=datetime.now(UTC).date(),
+                  justified_by=_justifications(kb(request), ([d.rule] if d.rule else []) + cites))
     kb(request).add_precedent(p)
+    stored = kb(request).find_precedent(d.signature)  # the KB normalises the field key
+    p = stored or p
     d.label, d.resolved_by, d.precedent_key = body.label, "advisor", p.key
     d.explanation = f"advisor {body.advisor}: {body.reason}"
     repo(request).update_deviation(sid, d)

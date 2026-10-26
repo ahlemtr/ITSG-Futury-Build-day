@@ -11,7 +11,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from engine.model import CheckResult, CriterionDraft, Deviation, TestCase
+from engine.model import Case, CheckResult, CriterionDraft, Deviation
 
 SCHEMA = Path(__file__).resolve().parent / "schema.sql"
 
@@ -38,7 +38,7 @@ class Submission(BaseModel):
 
 class MemoryRepo:
     def __init__(self) -> None:
-        self.test_cases: dict[str, TestCase] = {}
+        self.test_cases: dict[str, Case] = {}
         self.approvals: list[dict] = []
         self.submissions: dict[str, Submission] = {}
         self.checks: dict[str, CheckResult] = {}
@@ -47,18 +47,18 @@ class MemoryRepo:
         self.criteria: dict[str, CriterionDraft] = {}
 
     # test cases
-    def upsert_test_case(self, tc: TestCase) -> None:
+    def upsert_test_case(self, tc: Case) -> None:
         self.test_cases[tc.id] = tc.model_copy(deep=True)
 
-    def get_test_case(self, id_: str) -> TestCase | None:
+    def get_test_case(self, id_: str) -> Case | None:
         tc = self.test_cases.get(id_)
         return tc.model_copy(deep=True) if tc else None
 
-    def list_test_cases(self, kind: str | None = None, hidden: bool | None = None) -> list[TestCase]:
+    def list_test_cases(self, kind: str | None = None, hidden: bool | None = None) -> list[Case]:
         return [t for t in self.test_cases.values()
                 if (kind is None or t.kind == kind) and (hidden is None or t.hidden == hidden)]
 
-    def approve(self, id_: str, approver: str, decision: str) -> TestCase:
+    def approve(self, id_: str, approver: str, decision: str) -> Case:
         tc = self.test_cases[id_]
         tc.status = "approved" if decision == "approved" else "rejected"
         self.approvals.append({"test_case_id": id_, "approver": approver, "decision": decision,
@@ -139,7 +139,7 @@ class PgRepo:
     def _all(self, sql: str, *args: Any):
         return self.conn.execute(sql, args).fetchall()
 
-    def upsert_test_case(self, tc: TestCase) -> None:
+    def upsert_test_case(self, tc: Case) -> None:
         self.conn.execute(
             """INSERT INTO test_case (id, parent_id, branch_point, kind, origin, status, hidden, target_rules, scenario)
                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
@@ -148,16 +148,16 @@ class PgRepo:
                target_rules=EXCLUDED.target_rules, scenario=EXCLUDED.scenario""",
             (tc.id, tc.parent, tc.branch_point, tc.kind, tc.origin, tc.status, tc.hidden, tc.targets, _j(tc)))
 
-    def get_test_case(self, id_: str) -> TestCase | None:
+    def get_test_case(self, id_: str) -> Case | None:
         row = self._one("SELECT scenario FROM test_case WHERE id=%s", id_)
-        return TestCase.model_validate(row[0]) if row else None
+        return Case.model_validate(row[0]) if row else None
 
-    def list_test_cases(self, kind: str | None = None, hidden: bool | None = None) -> list[TestCase]:
+    def list_test_cases(self, kind: str | None = None, hidden: bool | None = None) -> list[Case]:
         rows = self._all("""SELECT scenario FROM test_case WHERE (%s::text IS NULL OR kind=%s)
                             AND (%s::boolean IS NULL OR hidden=%s) ORDER BY id""", kind, kind, hidden, hidden)
-        return [TestCase.model_validate(r[0]) for r in rows]
+        return [Case.model_validate(r[0]) for r in rows]
 
-    def approve(self, id_: str, approver: str, decision: str) -> TestCase:
+    def approve(self, id_: str, approver: str, decision: str) -> Case:
         tc = self.get_test_case(id_)
         if tc is None:
             raise KeyError(id_)

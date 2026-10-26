@@ -15,13 +15,13 @@ from pydantic import BaseModel
 
 from engine import builder
 from engine.model import (
+    Case,
     CriteriaScore,
     CriterionDraft,
     CriterionMatch,
     CriterionReview,
     RequirementSentence,
     Rule,
-    TestCase,
 )
 from kg.interface import KnowledgeBase
 
@@ -110,9 +110,9 @@ def score(measured: Measured, reviews: list[CriterionReview]) -> CriteriaScore:
                          matches=matches, summary=summary)
 
 
-def generate(kb: KnowledgeBase, rules: list[str], base: str = BASE_TEST_CASE) -> list[TestCase]:
+def generate(kb: KnowledgeBase, rules: list[str], base: str = BASE_TEST_CASE) -> list[Case]:
     """Step 4: draft boundary test cases for the rules of matched / confirmed drafts."""
-    out: list[TestCase] = []
+    out: list[Case] = []
     for r in dict.fromkeys(rules):
         try:
             out += builder.boundaries(kb, r, base)
@@ -127,7 +127,7 @@ class PipelineResult(BaseModel):
     params_ok: dict[str, bool | None]
     reviews: list[CriterionReview]
     score: CriteriaScore
-    test_cases: list[TestCase]
+    test_cases: list[Case]
 
 
 def run_pipeline(kb: KnowledgeBase, extractor: Extractor, document: str, version: str, section: str,

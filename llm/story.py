@@ -6,7 +6,7 @@ import json
 
 from pydantic import BaseModel
 
-from engine.model import TestCase
+from engine.model import Case
 from llm.client import LLMClient
 
 SYSTEM = """Write the test story for a DTA EEL test case in the style of the ITSG Pool-Testaufgaben
@@ -18,7 +18,7 @@ class Story(BaseModel):
     text: str
 
 
-def story(client: LLMClient, tc: TestCase) -> str:
+def story(client: LLMClient, tc: Case) -> str:
     f = lambda d: d.strftime("%d.%m.%Y")
     i = tc.inputs
     dates = [f(a.start) for a in i.priors] + [f(i.current.start)]

@@ -1,6 +1,6 @@
 """Scenarios and expected message chains (P3.1, P3.2).
 
-A scenario = case facts from the knowledge base (`kb.get_test_case`) + chain-only extras from
+A scenario = case facts from the knowledge base (`kb.get_test_case`, as `Case`) + chain-only extras from
 `fixtures/scenarios/<id>.yaml` (decision D3). `build_chain` turns it into the expected messages
 under one rule set version. Clones are single-step tests: only the 41 decision (plan/03 s.9).
 """
@@ -15,7 +15,7 @@ from typing import Any
 import yaml
 from pydantic import BaseModel
 
-from engine.model import AuPeriod, Decision41, ExpectedMessage, TestCase, Trace
+from engine.model import AuPeriod, Case, Decision41, ExpectedMessage, Trace
 from engine.rules import params as params_mod
 from engine.rules.vorerkrankung import efz_end, must_send_41
 from kg.interface import KnowledgeBase
@@ -25,7 +25,7 @@ DEFAULT_EXTRAS = "peter"
 
 
 class Scenario(BaseModel):
-    test_case: TestCase
+    test_case: Case
     extras: dict[str, Any]
 
     @property
@@ -44,7 +44,7 @@ class ChainResult(BaseModel):
         return [m for m in self.messages if m.actor == "employer"]
 
 
-def load_extras(kb: KnowledgeBase, tc: TestCase) -> dict[str, Any]:
+def load_extras(kb: KnowledgeBase, tc: Case) -> dict[str, Any]:
     seen = set()
     key: str | None = tc.id
     while key and key not in seen:
@@ -59,8 +59,13 @@ def load_extras(kb: KnowledgeBase, tc: TestCase) -> dict[str, Any]:
     return yaml.safe_load((SCENARIO_DIR / f"{DEFAULT_EXTRAS}.yaml").read_text(encoding="utf-8"))
 
 
-def load_scenario(kb: KnowledgeBase, test_case: str | TestCase) -> Scenario:
-    tc = kb.get_test_case(test_case) if isinstance(test_case, str) else test_case
+def get_case(kb: KnowledgeBase, key: str) -> Case:
+    """The KG test case as the engine's typed `Case`."""
+    return Case.from_kb(kb.get_test_case(key))
+
+
+def load_scenario(kb: KnowledgeBase, test_case: str | Case) -> Scenario:
+    tc = get_case(kb, test_case) if isinstance(test_case, str) else test_case
     return Scenario(test_case=tc, extras=load_extras(kb, tc))
 
 

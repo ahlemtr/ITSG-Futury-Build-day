@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from engine import builder, runs, specdiff
-from engine.expected import build_chain, load_scenario
+from engine.expected import build_chain, get_case, load_scenario
 from engine.records import parse_file
 from engine.writer_messages import chain_files
 
@@ -39,7 +39,7 @@ def test_impact(kb):
 
 
 def test_recompute(kb):
-    ids = [t.id for t in kb.get_test_cases(include_hidden=True)]
+    ids = [t.key for t in kb.get_test_cases(include_hidden=True) if t.origin != "pta"]
     diff = [r.id for r in builder.recompute(kb, ids, "13.3", "13.4") if r.differs]
     assert sorted(diff) == ["peter-gap-exact", "peter-gap-exact-hidden"]
 
@@ -48,24 +48,24 @@ def test_boundaries(kb):
     b = builder.boundaries(kb, "R41-4", "peter")
     assert [t.id for t in b] == ["peter-b27", "peter-b28", "peter-b29", "peter-b30"]
     for t in b:
-        ref = kb.get_test_case(t.id)
+        ref = get_case(kb, t.id)
         assert t.inputs.current == ref.inputs.current and t.status == "draft"
         assert {v: e.send_41 for v, e in t.expected.items()} == {v: e.send_41 for v, e in ref.expected.items()}
     g = {t.id: t for t in builder.boundaries(kb, "R41-2", "peter")}
     assert set(g) == {"peter-gap-in", "peter-gap-exact", "peter-gap-out"}
     for k, t in g.items():
-        ref = kb.get_test_case(k)
+        ref = get_case(kb, k)
         assert t.inputs.priors == ref.inputs.priors and t.parent == "peter"
         assert {v: e.send_41 for v, e in t.expected.items()} == {v: e.send_41 for v, e in ref.expected.items()}
     assert len(builder.boundaries(kb, "R41-3", "peter")) == 3
 
 
 def test_package(kb):
-    files = builder.package(kb, kb.get_test_case("peter-gap-exact"), "13.4")
+    files = builder.package(kb, get_case(kb, "peter-gap-exact"), "13.4")
     assert sorted(files) == ["TEEK0-peter-gap-exact-s2-61", "TEEL0-peter-gap-exact-r1", "scenario.yaml", "story.txt"]
     assert builder.package_zip(files)[:2] == b"PK"
     with pytest.raises(PermissionError):
-        builder.package(kb, kb.get_test_case("peter-gap-exact-hidden"), "13.4")
+        builder.package(kb, get_case(kb, "peter-gap-exact-hidden"), "13.4")
 
 
 def test_hidden(kb):

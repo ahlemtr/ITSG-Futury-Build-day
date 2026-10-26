@@ -33,7 +33,7 @@ def triage(client: LLMClient, tools: ToolBox, d: Deviation, version: str, cites_
                       "expected": d.expected, "actual": d.actual, "signature": d.signature},
         "rule_set_version": version,
         "context": {"rules": [{"id": r.id, "title": r.title, "sources": r.sources} for r in ctx.rules],
-                    "blocks": [b.model_dump() for b in ctx.blocks],
+                    "blocks": [b.model_dump() for b in ctx.flagged_blocks],
                     "passages": [{"key": p.key, "text": p.text[:1500]} for p in ctx.passages],
                     "precedents": [p.model_dump(mode="json") for p in ctx.precedents]},
     }, ensure_ascii=False, default=str)

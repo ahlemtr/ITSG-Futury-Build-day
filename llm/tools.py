@@ -13,7 +13,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from engine.builder import outcome
-from engine.expected import build_chain, load_scenario
+from engine.expected import build_chain, get_case, load_scenario
 from engine.model import AuPeriod
 from engine.rules import params as params_mod
 from engine.rules.vorerkrankung import add_months, days, must_send_41
@@ -129,7 +129,7 @@ class ToolBox:
         raise KeyError(f"unknown tool {name}")
 
     def evaluate_rule(self, rule_id: str, test_case_id: str, version: str, vendor_values: dict | None = None) -> dict:
-        tc = self.kb.get_test_case(test_case_id)
+        tc = get_case(self.kb, test_case_id)
         i = tc.inputs
         d = must_send_41(i.current, i.priors, i.report_date, params_mod.load(self.kb, version=version))
         steps = [s for s in d.trace.steps if s.startswith(rule_id)]

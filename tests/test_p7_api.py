@@ -9,13 +9,12 @@ from fastapi.testclient import TestClient
 
 from api.main import create_app
 from store.repo import MemoryRepo
-from tests.fakes.fake_kb import FakeKB
 
 
 @pytest.fixture
-def client(tmp_path, monkeypatch):
+def client(fresh_kb, tmp_path, monkeypatch):
     monkeypatch.setenv("SIGNING_KEY_PATH", str(tmp_path / "key.pem"))
-    app = create_app(kb=FakeKB(), repo=MemoryRepo(), ai=False, data_root=tmp_path, seed=True)
+    app = create_app(kb=fresh_kb, repo=MemoryRepo(), ai=False, data_root=tmp_path, seed=True)
     return TestClient(app)
 
 
@@ -25,7 +24,7 @@ def test_health(client):
 
 def test_seed_counts(client):
     tcs = client.get("/test-cases").json()
-    assert len(tcs) == 16 and len([t for t in tcs if not t["hidden"]]) == 14
+    assert len(tcs) == 18 and len([t for t in tcs if not t["hidden"]]) == 16  # incl. ta-167, ta-168
     assert len(client.get("/submissions").json()) == 10
     assert [v["version"] for v in client.get("/versions").json()] == ["13.3", "13.4"]
 

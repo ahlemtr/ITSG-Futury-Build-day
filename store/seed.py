@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
+from engine.expected import get_case
 from engine.intake import receive
 from kg.interface import KnowledgeBase
 from tools.make_submissions import build_submissions
@@ -15,7 +16,7 @@ from tools.make_submissions import build_submissions
 
 def seed(kb: KnowledgeBase, repo, root: Path | None = None) -> dict[str, int]:
     for ref in kb.get_test_cases(include_hidden=True):
-        repo.upsert_test_case(kb.get_test_case(ref.id))
+        repo.upsert_test_case(get_case(kb, ref.key))
     subs = build_submissions(kb)
     for s in subs:
         valid_on = date.fromisoformat(max(s.expected_label))

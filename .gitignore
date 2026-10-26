@@ -1,10 +1,33 @@
-.env
-.venv/
+# ITSG source documents and sample files: all rights reserved, never commit
+sources/
+
+# Node / Vite
+node_modules/
+dist/
+*.local
+*.tsbuildinfo
+
+# Python
 __pycache__/
 *.pyc
+.venv/
 .pytest_cache/
 .ruff_cache/
+
+# Secrets
+.env
+
+# Generated at run time
 /data/
 kg/build/
 fixtures/generated/
+
+# Personal notes, never commit
 HANDOVER.md
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+!.vscode/tasks.json
+.DS_Store
+Thumbs.db

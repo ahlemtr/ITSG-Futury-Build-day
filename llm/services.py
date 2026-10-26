@@ -8,7 +8,7 @@ import logging
 import re
 
 from engine.criteria import run_pipeline
-from engine.model import CheckResult, CriterionReview, Deviation, TestCase
+from engine.model import Case, CheckResult, CriterionReview, Deviation
 from kg.interface import KnowledgeBase
 from llm import explain as explain_mod
 from llm import story as story_mod
@@ -69,7 +69,7 @@ class AIServices:
         return self._safe(explain_mod.explain, self.client, d, passage)
 
     # P8.4
-    def story(self, tc: TestCase) -> str | None:
+    def story(self, tc: Case) -> str | None:
         return self._safe(story_mod.story, self.client, tc)
 
     # P8.7

@@ -1,0 +1,68 @@
+"""Splitter for GG, PTA, BP and the Rundschreiben (08 section 5.3)."""
+
+from __future__ import annotations
+
+import re
+
+from kg.extract.pdf_text import Line, is_successor, join_text, match_heading, passage, section_str
+
+MAX_INDENT = 12  # GG indents sub-sections
+# A heading-shaped line ending in a page number is a TOC entry (RS-ANL3 has one per chapter, without dots)
+TOC_ENTRY_RE = re.compile(r"\s\d{1,3}\s*$")
+
+# Sections that must exist per document (08 section 5.3)
+REQUIRED = {
+    "GG": ["2.1.1", "2.1.2", "2.2.1", "2.2.2", "2.5"],
+    "PTA": ["5.14"],
+    "BP": ["13.1", "13.2", "13.3", "13.4", "13.5", "16.1", "16.5", "16.7", "17.1", "23"],
+}
+PTA_CHAPTERS = {1, 2, 5, 8}  # process, EEL, permanent test cases
+
+
+def split(doc: str, version: str, lines: list[Line], toc_last_page: int, warn) -> list[dict]:
+    # the body starts on the page after the table of contents (wrapped TOC entries have no dots)
+    body = [line for line in lines if line.page > toc_last_page]
+    sections: list[tuple[tuple[int, ...] | None, str, list[Line]]] = [(None, "", [])]
+    prev = None
+    for line in body:
+        h = match_heading(line.text, MAX_INDENT, allow_bare=True)
+        # refused as a heading, but kept as body text (PTA calendar rows like "2  Fr  Mo  6" look the same)
+        if h and TOC_ENTRY_RE.search(line.text):
+            h = None
+        if h:
+            num, _title, bare = h
+            # a chapter without a dot only counts as a following chapter number ("9    Abkürzungsverzeichnis")
+            ok = is_successor(num, prev) and (not bare or prev is None or num[0] - prev[0] in (1, 2))
+            ok = ok and (prev is not None or num[0] <= 2)
+            if ok:
+                sections.append((num, " ".join(line.text.split()), []))
+                prev = num
+                continue
+        sections[-1][2].append(line)
+
+    out = []
+    if len(sections) == 1:
+        # no heading found: one passage per page (Rundschreiben)
+        pages: dict[int, list[Line]] = {}
+        for line in body:
+            pages.setdefault(line.page, []).append(line)
+        for page, chunk in sorted(pages.items()):
+            text = join_text(chunk)
+            if text:
+                out.append(passage(doc, version, f"p{page}", f"Seite {page}", text, page))
+        return out
+
+    intro = sections[0][2]
+    if join_text(intro) and doc != "PTA":
+        out.append(passage(doc, version, "intro", "", join_text(intro), intro[0].page))
+    for num, heading, chunk in sections[1:]:
+        if doc == "PTA" and num[0] not in PTA_CHAPTERS:
+            continue
+        page = chunk[0].page if chunk else None
+        out.append(passage(doc, version, section_str(num), heading, join_text(chunk), page))
+
+    have = {p["section"] for p in out}
+    for section in REQUIRED.get(doc, []):
+        if section not in have:
+            warn(f"{doc}@{version}#{section}: required section not found")
+    return out

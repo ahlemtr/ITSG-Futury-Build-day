@@ -11,6 +11,7 @@ from pydantic import BaseModel
 
 from api.routes.common import ai, kb, real_versions, repo, test_case
 from engine import builder, specdiff
+from engine.expected import get_case
 
 router = APIRouter()
 
@@ -55,7 +56,7 @@ def spec_diff(request: Request, body: SpecdiffBody):
     k = kb(request)
     changes = k.get_changes(body.document, body.old_version, body.new_version, in_scope_only=True)
     imp = specdiff.impact(changes, k)
-    rec = builder.recompute(k, [k.get_test_case(t.id) for t in imp.tests], body.old_version, body.new_version)
+    rec = builder.recompute(k, [get_case(k, t.key) for t in imp.tests], body.old_version, body.new_version)
     out = {"changes": [c.model_dump() for c in changes],
            "recompute": [r.id for r in imp.recompute], "review": [r.id for r in imp.review],
            "tests": [t.model_dump() for t in imp.tests],

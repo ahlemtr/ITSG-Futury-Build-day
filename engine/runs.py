@@ -16,8 +16,8 @@ from pydantic import BaseModel
 
 from engine.builder import story_text
 from engine.checker import Checker
-from engine.expected import build_chain, load_scenario
-from engine.model import ExpectedMessage, Record, TestCase
+from engine.expected import build_chain, get_case, load_scenario
+from engine.model import Case, ExpectedMessage, Record
 from engine.records import parse_file
 from engine.rules import params as params_mod
 from engine.writer_messages import write_file
@@ -42,7 +42,7 @@ class RoundResult(BaseModel):
 
 class RunState(BaseModel):
     id: str
-    test_case: TestCase
+    test_case: Case
     valid_on: date
     version: str
     round: int = 0
@@ -59,8 +59,8 @@ def _rounds(chain_msgs: list[ExpectedMessage], steps: str) -> int:
     return last + 1 if steps == "chain" and ins_after else last
 
 
-def start(kb: KnowledgeBase, test_case: str | TestCase, valid_on: date) -> tuple[RunState, str]:
-    tc = kb.get_test_case(test_case) if isinstance(test_case, str) else test_case
+def start(kb: KnowledgeBase, test_case: str | Case, valid_on: date) -> tuple[RunState, str]:
+    tc = get_case(kb, test_case) if isinstance(test_case, str) else test_case
     version = params_mod.version_on(kb, valid_on)
     ch = build_chain(load_scenario(kb, tc), version, kb)
     st = RunState(id=str(uuid.uuid4()), test_case=tc, valid_on=valid_on, version=version,

@@ -1,0 +1,377 @@
+# Step K8 (08 section 11). Facts and expected values from 03 section 9
+# (recomputed with the 03 section 3 algorithm). Years in the BP examples: XX = 2026, YY = 2025.
+# steps: single = only the 41 decision is graded; chain = full message chain.
+# Periods are listed newest first (F41-8). Hidden cases are in the graph like the others;
+# the API decides what a vendor may see.
+test_cases:
+  - id: peter
+    kind: reference
+    origin: itsg
+    status: approved
+    hidden: false
+    parent: null
+    targets: [R41-1, R41-2, R41-3, R41-4, R41-5, R41-6,
+              F41-1, F41-2, F41-3, F41-4, F41-5, F41-6, F41-7, F41-8, F41-9, F41-10,
+              K61-1, K61-2, K61-3, K61-4, K61-5, K61-6, K61-7, K62-1, K62-2,
+              E-1, E-2, E-3, C-1, C-2, C-3, C-4, C-5, C-6, C-7, C-8]
+    steps: chain
+    inputs:
+      report_date: 2026-03-11
+      employment_end: 2026-03-31
+      current: {start: 2026-03-11, end: 2026-03-20, certified: true, final_end: 2026-04-10}
+      priors:
+        - {start: 2025-07-14, end: 2025-07-15, certified: true}
+        - {start: 2025-10-01, end: 2025-10-17, certified: true}
+        - {start: 2025-12-01, end: 2025-12-03, certified: true}
+        - {start: 2026-03-01, end: 2026-03-03, certified: true, note: paper at the employer only, no eAU}
+    expected:
+      "13.3": &peter_expected
+        send_41: true
+        periods: [[2026-03-01, 2026-03-03], [2025-12-01, 2025-12-03], [2025-10-01, 2025-10-17], [2025-07-14, 2025-07-15]]
+        total_days: 35
+        efz_end: {after_first_61: 2026-03-30, after_corrected_61: 2026-03-27}
+        chain: ["41", "61", "01", "61", "88", "01", "62"]
+      "13.4": *peter_expected
+      "sim-13.5": *peter_expected
+    sources: [HINWEISE@1#facts, HINWEISE@1#chain]
+
+  - id: peter-gap-exact
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [R41-2, R41-3]
+    steps: single
+    inputs:
+      report_date: 2026-03-11
+      employment_end: 2026-03-31
+      current: {start: 2026-03-11, end: 2026-03-20, certified: true}
+      priors:
+        - {start: 2025-08-07, end: 2025-09-11, certified: true}
+    expected:
+      "13.3":     {send_41: false}
+      "13.4":     {send_41: true, periods: [[2025-08-07, 2025-09-11]], total_days: 46}
+      "sim-13.5": {send_41: true, periods: [[2025-08-07, 2025-09-11]], total_days: 46}
+    sources: [VB@13.4#3.12/chaining]
+
+  - id: peter-gap-in
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [R41-2, R41-3]
+    steps: single
+    inputs:
+      report_date: 2026-03-11
+      employment_end: 2026-03-31
+      current: {start: 2026-03-11, end: 2026-03-20, certified: true}
+      priors:
+        - {start: 2025-08-08, end: 2025-09-12, certified: true}
+    expected:
+      "13.3":     {send_41: true, periods: [[2025-08-08, 2025-09-12]], total_days: 46}
+      "13.4":     {send_41: true, periods: [[2025-08-08, 2025-09-12]], total_days: 46}
+      "sim-13.5": {send_41: true, periods: [[2025-08-08, 2025-09-12]], total_days: 46}
+    sources: [VB@13.4#3.12/chaining]
+
+  - id: peter-gap-out
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [R41-2, R41-3]
+    steps: single
+    inputs:
+      report_date: 2026-03-11
+      employment_end: 2026-03-31
+      current: {start: 2026-03-11, end: 2026-03-20, certified: true}
+      priors:
+        - {start: 2025-08-06, end: 2025-09-10, certified: true}
+    expected:
+      "13.3":     {send_41: false}
+      "13.4":     {send_41: false}
+      "sim-13.5": {send_41: false}
+    sources: [VB@13.4#3.12/chaining]
+
+  - id: peter-b27
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [R41-4]
+    steps: single
+    inputs: &peter_b_inputs
+      report_date: 2026-03-11
+      employment_end: 2026-03-31
+      current: {start: 2026-03-11, end: 2026-03-12, certified: true}
+      priors:
+        - {start: 2025-07-14, end: 2025-07-15, certified: true}
+        - {start: 2025-10-01, end: 2025-10-17, certified: true}
+        - {start: 2025-12-01, end: 2025-12-03, certified: true}
+        - {start: 2026-03-01, end: 2026-03-03, certified: true, note: paper at the employer only, no eAU}
+    expected:
+      "13.3":     {send_41: false, total_days: 27}
+      "13.4":     {send_41: false, total_days: 27}
+      "sim-13.5": {send_41: false, total_days: 27}
+    sources: [VB@13.4#3.12/conditions]
+
+  - id: peter-b28
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [R41-4]
+    steps: single
+    inputs:
+      <<: *peter_b_inputs
+      current: {start: 2026-03-11, end: 2026-03-13, certified: true}
+    expected:
+      "13.3":     {send_41: false, total_days: 28}
+      "13.4":     {send_41: false, total_days: 28}
+      "sim-13.5":
+        send_41: true
+        periods: [[2026-03-01, 2026-03-03], [2025-12-01, 2025-12-03], [2025-10-01, 2025-10-17], [2025-07-14, 2025-07-15]]
+        total_days: 28
+    sources: [VB@13.4#3.12/conditions]
+
+  - id: peter-b29
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [R41-4]
+    steps: single
+    inputs:
+      <<: *peter_b_inputs
+      current: {start: 2026-03-11, end: 2026-03-14, certified: true}
+    expected:
+      "13.3":     {send_41: false, total_days: 29}
+      "13.4":     {send_41: false, total_days: 29}
+      "sim-13.5":
+        send_41: true
+        periods: [[2026-03-01, 2026-03-03], [2025-12-01, 2025-12-03], [2025-10-01, 2025-10-17], [2025-07-14, 2025-07-15]]
+        total_days: 29
+    sources: [VB@13.4#3.12/conditions]
+
+  - id: peter-b30
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [R41-4]
+    steps: single
+    inputs:
+      <<: *peter_b_inputs
+      current: {start: 2026-03-11, end: 2026-03-15, certified: true}
+    expected:
+      "13.3": &peter_b30_expected
+        send_41: true
+        periods: [[2026-03-01, 2026-03-03], [2025-12-01, 2025-12-03], [2025-10-01, 2025-10-17], [2025-07-14, 2025-07-15]]
+        total_days: 30
+      "13.4": *peter_b30_expected
+      "sim-13.5": *peter_b30_expected
+    sources: [VB@13.4#3.12/conditions]
+
+  - id: peter-noteless
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [R41-1, R41-5]
+    steps: single
+    inputs:
+      report_date: 2026-03-11
+      employment_end: 2026-03-31
+      current: {start: 2026-03-11, end: 2026-03-20, certified: true}
+      priors:
+        - {start: 2025-07-14, end: 2025-07-15, certified: true}
+        - {start: 2025-10-01, end: 2025-10-17, certified: false, note: no sick note (Kurz-AU)}
+        - {start: 2025-12-01, end: 2025-12-03, certified: true}
+        - {start: 2026-03-01, end: 2026-03-03, certified: true, note: paper at the employer only, no eAU}
+    expected:
+      "13.3":     {send_41: false, total_days: 18}
+      "13.4":     {send_41: false, total_days: 18}
+      "sim-13.5": {send_41: false, total_days: 18}
+    sources: [VB@13.4#3.12/chaining, VB@13.4#3.12/conditions]
+
+  - id: peter-hidden
+    kind: hidden
+    origin: builder
+    status: approved
+    hidden: true
+    parent: peter
+    targets: [R41-1, R41-2, R41-3, R41-4]
+    steps: single
+    inputs:
+      note: whole story shifted by +37 days
+      report_date: 2026-04-17
+      employment_end: 2026-05-07
+      current: {start: 2026-04-17, end: 2026-04-26, certified: true}
+      priors:
+        - {start: 2025-08-20, end: 2025-08-21, certified: true}
+        - {start: 2025-11-07, end: 2025-11-23, certified: true}
+        - {start: 2026-01-07, end: 2026-01-09, certified: true}
+        - {start: 2026-04-07, end: 2026-04-09, certified: true, note: paper at the employer only, no eAU}
+    expected:
+      "13.3": &peter_hidden_expected
+        send_41: true
+        periods: [[2026-04-07, 2026-04-09], [2026-01-07, 2026-01-09], [2025-11-07, 2025-11-23], [2025-08-20, 2025-08-21]]
+        total_days: 35
+      "13.4": *peter_hidden_expected
+      "sim-13.5": *peter_hidden_expected
+    sources: [HINWEISE@1#facts]
+
+  - id: peter-gap-exact-hidden
+    kind: hidden
+    origin: builder
+    status: approved
+    hidden: true
+    parent: peter-gap-exact
+    targets: [R41-2, R41-3]
+    steps: single
+    inputs:
+      note: month-end variant, 31.08 + 6 months = 28.02
+      report_date: 2026-02-28
+      employment_end: 2026-03-31
+      current: {start: 2026-02-28, end: 2026-03-09, certified: true}
+      priors:
+        - {start: 2025-07-27, end: 2025-08-31, certified: true}
+    expected:
+      "13.3":     {send_41: false}
+      "13.4":     {send_41: true, periods: [[2025-07-27, 2025-08-31]], total_days: 46}
+      "sim-13.5": {send_41: true, periods: [[2025-07-27, 2025-08-31]], total_days: 46}
+    sources: [VB@13.4#3.12/chaining]
+
+  - id: bp-13-1
+    kind: reference
+    origin: beispielpapier
+    status: approved
+    hidden: false
+    parent: null
+    targets: [R41-1, R41-6]
+    steps: single
+    inputs:
+      note: report date assumed = AU start, the BP gives none
+      report_date: 2026-08-31
+      current: {start: 2026-08-31, end: null, certified: true}
+      priors:
+        - {start: 2026-06-01, end: 2026-06-25, certified: true}
+    expected:
+      "13.3": &bp_13_1_expected {send_41: true, periods: [[2026-06-01, 2026-06-25]], total_days: 32}
+      "13.4": *bp_13_1_expected
+      "sim-13.5": *bp_13_1_expected
+    sources: [BP@13.3#13.1]
+
+  - id: bp-13-2
+    kind: reference
+    origin: beispielpapier
+    status: approved
+    hidden: false
+    parent: null
+    targets: [R41-3]
+    steps: single
+    inputs:
+      report_date: 2026-08-31
+      current: {start: 2026-08-31, end: null, certified: true}
+      priors:
+        - {start: 2026-06-01, end: 2026-06-25, certified: true}
+        - {start: 2026-05-03, end: 2026-05-06, certified: true}
+        - {start: 2025-10-01, end: 2025-10-28, certified: true}
+    expected:
+      "13.3": &bp_13_2_expected {send_41: true, periods: [[2026-06-01, 2026-06-25], [2026-05-03, 2026-05-06]], total_days: 36}
+      "13.4": *bp_13_2_expected
+      "sim-13.5": *bp_13_2_expected
+    sources: [BP@13.3#13.2]
+
+  - id: bp-13-3
+    kind: reference
+    origin: beispielpapier
+    status: approved
+    hidden: false
+    parent: null
+    targets: [R41-2]
+    steps: single
+    inputs:
+      report_date: 2026-08-31
+      current: {start: 2026-08-31, end: null, certified: true}
+      priors:
+        - {start: 2026-01-10, end: 2026-01-28, certified: true}
+    expected:
+      "13.3":     {send_41: false}
+      "13.4":     {send_41: false}
+      "sim-13.5": {send_41: false}
+    sources: [BP@13.3#13.3]
+
+  - id: bp-13-4
+    kind: reference
+    origin: beispielpapier
+    status: approved
+    hidden: false
+    parent: null
+    targets: [R41-4]
+    steps: single
+    inputs:
+      report_date: 2026-08-31
+      current: {start: 2026-08-31, end: 2026-09-08, certified: true}
+      priors:
+        - {start: 2026-06-01, end: 2026-06-10, certified: true}
+        - {start: 2026-05-03, end: 2026-05-06, certified: true}
+    expected:
+      "13.3":     {send_41: false, total_days: 23}
+      "13.4":     {send_41: false, total_days: 23}
+      "sim-13.5": {send_41: false, total_days: 23}
+    sources: [BP@13.3#13.4]
+
+  - id: bp-13-5
+    kind: reference
+    origin: beispielpapier
+    status: approved
+    hidden: false
+    parent: null
+    targets: [R41-6]
+    steps: single
+    inputs:
+      note: open end counted until 08.09 (report date + 6 days)
+      report_date: 2026-09-02
+      current: {start: 2026-08-31, end: null, certified: true}
+      priors:
+        - {start: 2026-06-01, end: 2026-06-10, certified: true}
+        - {start: 2026-05-03, end: 2026-05-06, certified: true}
+    expected:
+      "13.3":     {send_41: false, total_days: 23}
+      "13.4":     {send_41: false, total_days: 23}
+      "sim-13.5": {send_41: false, total_days: 23}
+    sources: [BP@13.3#13.5]
+
+  # Official test tasks: inputs only, no solution available yet, so no targets (allowed for origin pta)
+  - id: ta-167
+    kind: reference
+    origin: pta
+    status: draft
+    hidden: false
+    parent: null
+    targets: []
+    steps: chain
+    inputs:
+      summary: Testaufgabe 167, EEL-Bescheinigungen sind zu erstellen (PTA 5.14)
+    expected: {}
+    sources: [PTA@2025-2026-v3#5.14]
+  - id: ta-168
+    kind: reference
+    origin: pta
+    status: draft
+    hidden: false
+    parent: null
+    targets: []
+    steps: chain
+    inputs:
+      summary: Testaufgabe 168, EEL-Bescheinigungen sind zu erstellen (PTA 5.14)
+    expected: {}
+    sources: [PTA@2025-2026-v3#5.14]

@@ -1,14 +1,18 @@
 from datetime import date
+from pathlib import Path
 
 import pytest
+import yaml
 
+from engine.expected import get_case
 from engine.records import parse_file
 from engine.rules import formats, params
 from engine.rules.vorerkrankung import add_months, deciding_rule, efz_end, must_send_41
-from tests.fakes.fake_kb import FakeKB
 
 VERSIONS = ["13.3", "13.4", "sim-13.5"]
-CASES = [t.id for t in FakeKB().get_test_cases(include_hidden=True)]
+ROOT = Path(__file__).resolve().parents[1]
+CASES = [t["id"] for t in yaml.safe_load((ROOT / "kg/seed/test_cases.yaml").read_text(encoding="utf-8"))["test_cases"]
+         if t["origin"] != "pta"]
 D = date.fromisoformat
 
 
@@ -24,7 +28,7 @@ def test_params_by_date_and_version(kb):
 @pytest.mark.parametrize("case", CASES)
 def test_rules_table(kb, case, version):
     """Every row of plan/03 section 9 under 13.3, 13.4 and sim-13.5."""
-    tc = kb.get_test_case(case)
+    tc = get_case(kb, case)
     exp = tc.expected[version]
     d = must_send_41(tc.inputs.current, tc.inputs.priors, tc.inputs.report_date, params.load(kb, version=version))
     assert d.send == exp.send_41
@@ -34,13 +38,13 @@ def test_rules_table(kb, case, version):
 
 
 def test_bp_13_5_counts_until_0809(kb):
-    tc = kb.get_test_case("bp-13-5")
+    tc = get_case(kb, "bp-13-5")
     d = must_send_41(tc.inputs.current, tc.inputs.priors, tc.inputs.report_date, params.load(kb, version="13.4"))
     assert d.total_days == 23 and "R41-6" in d.trace.rules
 
 
 def test_peter_trace(kb):
-    tc = kb.get_test_case("peter")
+    tc = get_case(kb, "peter")
     d = must_send_41(tc.inputs.current, tc.inputs.priors, tc.inputs.report_date, params.load(kb, version="13.4"))
     assert {"R41-1", "R41-2", "R41-3", "R41-4"} <= set(d.trace.rules)
     assert d.trace.values["total"] == 35
@@ -53,7 +57,7 @@ def test_month_end():
 def test_deciding_rule(kb):
     p = params.load(kb, version="13.4")
     for case, rule in [("peter-gap-exact", "R41-2"), ("peter-b30", "R41-4")]:
-        tc = kb.get_test_case(case)
+        tc = get_case(kb, case)
         assert deciding_rule(tc.inputs.current, tc.inputs.priors, tc.inputs.report_date, p) == rule
 
 

@@ -12,8 +12,8 @@ from datetime import date, timedelta
 import yaml
 from pydantic import BaseModel
 
-from engine.expected import build_chain, insurer_flags, load_scenario, msg_61
-from engine.model import AuPeriod, ExpectedOutcome, TestCase
+from engine.expected import build_chain, get_case, insurer_flags, load_scenario, msg_61
+from engine.model import AuPeriod, Case, ExpectedOutcome
 from engine.rules import params as params_mod
 from engine.rules.vorerkrankung import add_months, days, days_in_window, must_send_41
 from engine.writer_messages import chain_files, write_file
@@ -25,14 +25,14 @@ VERSIONS = ("13.3", "13.4", "sim-13.5")
 # ---------------------------------------------------------------- expectations
 
 
-def outcome(kb: KnowledgeBase, tc: TestCase, version: str) -> ExpectedOutcome:
+def outcome(kb: KnowledgeBase, tc: Case, version: str) -> ExpectedOutcome:
     i = tc.inputs
     d = must_send_41(i.current, i.priors, i.report_date, params_mod.load(kb, version=version))
     return ExpectedOutcome(send_41=d.send, periods=[(a.start, a.end) for a in d.chain] if d.send else [],
                            total_days=d.total_days if d.send else None)
 
 
-def with_expected(kb: KnowledgeBase, tc: TestCase, versions=VERSIONS) -> TestCase:
+def with_expected(kb: KnowledgeBase, tc: Case, versions=VERSIONS) -> Case:
     tc.expected = {v: outcome(kb, tc, v) for v in versions}
     return tc
 
@@ -44,11 +44,11 @@ class Recomputed(BaseModel):
     differs: bool
 
 
-def recompute(kb: KnowledgeBase, test_cases: list[str | TestCase], old: str, new: str) -> list[Recomputed]:
+def recompute(kb: KnowledgeBase, test_cases: list[str | Case], old: str, new: str) -> list[Recomputed]:
     """P5.3: expected results under both versions; `differs` marks the ones a spec change touches."""
     out = []
     for t in test_cases:
-        tc = kb.get_test_case(t) if isinstance(t, str) else t
+        tc = get_case(kb, t) if isinstance(t, str) else t
         o, n = outcome(kb, tc, old), outcome(kb, tc, new)
         out.append(Recomputed(id=tc.id, old=o, new=n, differs=o != n))
     return out
@@ -57,11 +57,11 @@ def recompute(kb: KnowledgeBase, test_cases: list[str | TestCase], old: str, new
 # ---------------------------------------------------------------- clones and boundaries
 
 
-def clone(kb: KnowledgeBase, base: str | TestCase, branch_point: date | None, change: dict, new_id: str | None = None,
-          targets: list[str] | None = None) -> TestCase:
+def clone(kb: KnowledgeBase, base: str | Case, branch_point: date | None, change: dict, new_id: str | None = None,
+          targets: list[str] | None = None) -> Case:
     """P5.4: copy a test case, apply `change` to its inputs (`current`, `priors`, `report_date`,
     `employment_end`), keep `parent`. Status draft, origin builder."""
-    b = kb.get_test_case(base) if isinstance(base, str) else base
+    b = get_case(kb, base) if isinstance(base, str) else base
     tc = b.model_copy(deep=True)
     inputs = tc.inputs.model_dump()
     inputs.update(change)
@@ -71,21 +71,20 @@ def clone(kb: KnowledgeBase, base: str | TestCase, branch_point: date | None, ch
     tc.steps = "single"
     tc.branch_point = branch_point
     tc.targets = targets or b.targets
-    tc.efz_ends, tc.chain = {}, []
     return with_expected(kb, tc)
 
 
-def boundaries(kb: KnowledgeBase, rule: str, base: str | TestCase) -> list[TestCase]:
+def boundaries(kb: KnowledgeBase, rule: str, base: str | Case) -> list[Case]:
     """Threshold -1 / = / +1 variants of one rule (P5.4).
 
     R41-4: totals from (smallest min_total_days - 1) to the largest one, by moving the current end.
     R41-2: one prior of 36 days ending 6 months + 1 day / exactly / - 1 day before the current start.
     R41-3: the oldest link of the chain at gap - 1 day / exact / + 1 day.
     """
-    b = kb.get_test_case(base) if isinstance(base, str) else base
+    b = get_case(kb, base) if isinstance(base, str) else base
     cur = b.inputs.current
     pv = [params_mod.load(kb, version=v) for v in VERSIONS]
-    out: list[TestCase] = []
+    out: list[Case] = []
     if rule == "R41-4":
         p = pv[0]
         window = add_months(cur.start, -p.sum_window_months)
@@ -134,14 +133,14 @@ def _month_ends(around: date) -> list[date]:
     return out
 
 
-def hidden(kb: KnowledgeBase, test_case: str | TestCase, seed: int = 0) -> TestCase:
+def hidden(kb: KnowledgeBase, test_case: str | Case, seed: int = 0) -> Case:
     """Same rule, other dates; expected results computed by the engine, never exported.
 
     Gap boundary cases (one prior, targets R41-2): the prior moves to a month end whose `+ gap`
     is clamped (31.08 + 6 months = 28.02, leap years give 29.02); the gap offset (in / exact /
     out) and both durations are kept. Other cases: the whole story is shifted by a seeded number
     of days, keeping every decision unchanged."""
-    b = kb.get_test_case(test_case) if isinstance(test_case, str) else test_case
+    b = get_case(kb, test_case) if isinstance(test_case, str) else test_case
     i = b.inputs
     gap = params_mod.load(kb, version="13.4").gap_months
     hid = f"{b.id}-hidden" + (f"-{seed}" if seed else "")
@@ -181,7 +180,7 @@ def hidden(kb: KnowledgeBase, test_case: str | TestCase, seed: int = 0) -> TestC
 # ---------------------------------------------------------------- story and package (P5.5)
 
 
-def story_text(tc: TestCase) -> str:
+def story_text(tc: Case) -> str:
     """Deterministic TA-style story (inputs only). P8 can replace it with an LLM story."""
     f = lambda d: d.strftime("%d.%m.%Y")
     i = tc.inputs
@@ -200,7 +199,7 @@ def story_text(tc: TestCase) -> str:
     return "\n".join(lines) + "\n"
 
 
-def single_step_reply(kb: KnowledgeBase, tc: TestCase, version: str):
+def single_step_reply(kb: KnowledgeBase, tc: Case, version: str):
     """The insurer's 61 for a single-step test (round 1 only), default flags."""
     sc = load_scenario(kb, tc)
     ch = build_chain(sc, version, kb)
@@ -210,7 +209,7 @@ def single_step_reply(kb: KnowledgeBase, tc: TestCase, version: str):
     return msg_61(sc, ch.decision.chain, "corrected_61", 2, 1, m41.head["DATENSATZ-ID"])
 
 
-def package(kb: KnowledgeBase, tc: TestCase, version: str, story: str | None = None) -> dict[str, str]:
+def package(kb: KnowledgeBase, tc: Case, version: str, story: str | None = None) -> dict[str, str]:
     """Scenario YAML + expected TEEL0 + TEEK0 + story. Refused for hidden tests."""
     if tc.hidden:
         raise PermissionError("hidden test cases are never exported")

@@ -1,0 +1,359 @@
+/* Panels */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  padding: 20px;
+}
+
+.panel-flush {
+  padding: 0;
+  overflow: auto;
+}
+
+/* Buttons */
+.button {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: var(--radius-button);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.button-primary {
+  background: var(--itsg-red);
+  border-color: var(--itsg-red);
+  color: var(--surface);
+}
+
+.button-primary:hover {
+  background: var(--red-dark);
+  border-color: var(--red-dark);
+}
+
+/* Badges: neutral text label; only a small dot carries the colour (team feedback:
+   coloured backgrounds looked unprofessional). To drop the dot too, delete .badge::before. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dot, var(--label-neutral-fg));
+  flex-shrink: 0;
+}
+
+/* Only two colours (team decision): green for exact match / passed, red for bug / failed.
+   All other labels keep the neutral grey dot; the text says what they are. */
+.badge-exact { --dot: var(--label-exact-fg); }
+.badge-bug { --dot: var(--label-bug-fg); }
+
+/* Page header with actions on the right */
+.page-header-split {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.verdict {
+  color: var(--ink-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Filter chips + toggle */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius-button);
+  padding: 4px 10px;
+  font-size: 13px;
+}
+
+.chip[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.chip-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  margin-left: 2px;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+/* List + detail */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Tables */
+.diff-table,
+.list-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.diff-table th,
+.list-table th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--ink-muted);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}
+
+.diff-table td,
+.list-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.diff-table tr[tabindex],
+.row-link {
+  cursor: pointer;
+}
+
+.diff-table tbody tr:hover,
+.row-link:hover {
+  background: var(--ground);
+}
+
+.row-quiet td {
+  color: var(--ink-muted);
+}
+
+.row-deviation .cell-field {
+  font-weight: 500;
+}
+
+.diff-table tr.row-selected,
+.diff-table tr.row-selected:hover {
+  background: var(--red-faint);
+}
+
+.diff-table tr.row-selected td {
+  color: var(--ink);
+}
+
+.cell-field {
+  white-space: nowrap;
+}
+
+.cell-value {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-hint {
+  font-size: 12px;
+  color: var(--ink-muted);
+  white-space: normal;
+}
+
+.missing {
+  color: var(--ink-muted);
+}
+
+.empty {
+  color: var(--ink-muted);
+  padding: 24px 12px;
+  text-align: center;
+}
+
+/* Explanation panel */
+.explain {
+  position: sticky;
+  top: 16px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.explain h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.facts {
+  margin: 16px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.facts > div {
+  background: var(--ground);
+  border-radius: var(--radius-panel);
+  padding: 10px 12px;
+}
+
+.facts dt {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.facts dd {
+  margin: 2px 0 0;
+}
+
+abbr[title] {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+/* Overview */
+.overview-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.overview-bottom {
+  display: grid;
+  grid-template-columns: minmax(280px, 2fr) 3fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.card-title {
+  font-size: 18px;
+}
+
+.card-subtitle {
+  margin: 2px 0 16px;
+  color: var(--ink-muted);
+}
+
+.panel-title {
+  font-size: 18px;
+  padding: 16px 16px 4px;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+}
+
+.figure-value {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Neutral like the rest (team feedback); the resolution bar keeps its colours as a chart */
+.figure-attention {
+  color: var(--ink);
+}
+
+.figure-label {
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.stacked-bar {
+  display: flex;
+  height: 18px;
+  border-radius: var(--radius-button);
+  overflow: hidden;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.bar-ink { background: var(--ink); }
+.bar-grey { background: #8a94a3; }
+.bar-waiting { background: var(--label-bug-fg); }
+
+.legend-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.legend-table td {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.legend-table td:last-child {
+  text-align: right;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 2px;
+}

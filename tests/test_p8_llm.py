@@ -8,16 +8,13 @@ from pydantic import BaseModel
 
 from api.main import create_app
 from engine.checker import check
+from engine.expected import get_case
 from engine.model import AiProposal
 from llm.client import LLMClient, LLMInvalid
 from llm.services import AIServices
 from llm.tools import ToolBox
 from store.repo import MemoryRepo
-from tests.fakes.fake_kb import FakeKB
 from tests.fakes.fake_llm import ScriptedTransport, content, tool_call, tool_results, user_json
-from tools.make_submissions import build_submissions
-
-SEEDS = {s.id: s for s in build_submissions(FakeKB())}
 
 
 def ai_with(kb, handlers, tmp_path):
@@ -61,10 +58,10 @@ def test_engine_tools(kb):
                    )["ok"] is False
 
 
-def test_retry_once_then_fail(kb, tmp_path):
+def test_retry_once_then_fail(kb, tmp_path, seeds):
     ai, t = ai_with(kb, {"AiProposal": lambda m: content({"proposal": "likely_bug", "reasoning": "x",
                                                           "citations": [], "confidence": 0.5})}, tmp_path)
-    s = SEEDS["s-no-contact"]
+    s = seeds["s-no-contact"]
     res = check(kb, s.test_case_id, list(s.files.values()), date(2027, 1, 1), triage=ai.triage)
     assert res.deviations[0].ai_proposal is None and t.calls == ["AiProposal", "AiProposal"]
 
@@ -75,7 +72,8 @@ TRIAGE = {"proposal": "likely_bug", "confidence": 0.7, "citations": ["BP@13.3#13
           "reasoning": "Beispielpapier 13.1 shows every 41 with MM-ANSPRECH = J and a DBAP block."}
 
 
-def test_no_contact_flow(kb, tmp_path, monkeypatch):
+def test_no_contact_flow(fresh_kb, tmp_path, monkeypatch):
+    kb = fresh_kb
     monkeypatch.setenv("SIGNING_KEY_PATH", str(tmp_path / "key.pem"))
     ai, t = ai_with(kb, {"AiProposal": lambda m: content(TRIAGE)}, tmp_path)
     c = TestClient(create_app(kb=kb, repo=MemoryRepo(), ai=ai, data_root=tmp_path, seed=True))
@@ -93,10 +91,10 @@ def test_no_contact_flow(kb, tmp_path, monkeypatch):
 # ---------------------------------------------------------------- P8.3, P8.4 explain and story
 
 
-def test_explain(kb, tmp_path):
+def test_explain(kb, tmp_path, seeds):
     good = "The 41 does not list the July period. Rule R41-3 (VB 3.12) requires going back to the first illness."
     ai, _ = ai_with(kb, {"Explanation": lambda m: content({"text": good})}, tmp_path)
-    s = SEEDS["s-missing-july"]
+    s = seeds["s-missing-july"]
     d = check(kb, s.test_case_id, list(s.files.values()), date(2027, 1, 1)).deviations[0]
     assert ai.explain(d) == good
     ai2, t = ai_with(kb, {"Explanation": lambda m: content({"text": "Something is wrong. Fix it."})},
@@ -112,7 +110,7 @@ def test_story(kb, tmp_path):
         return content({"text": "\n".join(lines + [f"Neue AU ab {f(inp['current']['start'])}"])})
 
     ai, _ = ai_with(kb, {"Story": handler}, tmp_path)
-    text = ai.story(kb.get_test_case("peter"))
+    text = ai.story(get_case(kb, "peter"))
     for d in ("14.07.2025", "01.10.2025", "01.12.2025", "01.03.2026", "11.03.2026"):
         assert d in text
 
@@ -141,8 +139,8 @@ def test_spec_update_agent(kb, tmp_path):
     assert out["status"] == "draft"
 
 
-def test_report_draft(kb, tmp_path):
-    s = SEEDS["s-missing-july"]
+def test_report_draft(kb, tmp_path, seeds):
+    s = seeds["s-missing-july"]
     res = check(kb, s.test_case_id, list(s.files.values()), date(2027, 1, 1))
 
     def handler(m):
@@ -252,7 +250,8 @@ def test_criteria_draft_without_citation_rejected(kb, tmp_path):
     assert t.calls.count("Translated") == 2  # retried once, then failed
 
 
-def test_criteria_endpoint(kb, tmp_path):
+def test_criteria_endpoint(fresh_kb, tmp_path):
+    kb = fresh_kb
     ai, _ = ai_with(kb, criteria_handlers(kb, GOOD), tmp_path)
     c = TestClient(create_app(kb=kb, repo=MemoryRepo(), ai=ai, data_root=tmp_path))
     r = c.post("/criteria/extract", json={"document": "VB", "version": "13.4", "section": "3.12"}).json()

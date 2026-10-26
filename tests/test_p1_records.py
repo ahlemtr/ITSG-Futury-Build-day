@@ -1,7 +1,7 @@
 from datetime import date
 from decimal import Decimal
 
-from engine.model import Field
+from engine import layouts
 from engine.records import parse_file, record_to_dicts, to_value, write_dslw, write_file
 
 
@@ -19,9 +19,9 @@ def test_parse_itsg_file(kb, itsg_bytes):
     assert m.tail == ""
 
 
-def test_typed_values():
-    amt = Field(name="X", start=1, end=8, length=8, type="n", format="amount_2dp")
-    dt = Field(name="D", start=1, end=8, length=8, type="n", format="date_yyyymmdd")
+def test_typed_values(kb):
+    amt = layouts.get(kb, "DBAE", "13.4").field("BRUTTO-1")
+    dt = layouts.get(kb, "DBVO", "13.4").field("AU-AB-AG")
     assert to_value(amt, "00135384")[0] == Decimal("1353.84")
     assert to_value(dt, "00000000")[0] is None
 

@@ -1,6 +1,6 @@
 """Parser and writer for DTA EEL fixed-width files (P1, plan/02 M1).
 
-Layouts come from `kb.get_layout`. DSLW lines are parsed into a fixed part plus the blocks whose
+Layouts come from `kb.get_layout`, seen through `engine.layouts`. DSLW lines are parsed into a fixed part plus the blocks whose
 MM flag is `J`, in `block_order`. DBVO has a repeating group counted by `ANZAHL-AU`. Envelope lines
 (VOSZ, DSKO, NCSZ) are kept as raw lines. Lengths are counted in characters, not bytes (plan/02 s.9).
 Errors are data: every problem becomes a `ParseIssue`, the parser never raises on bad input.
@@ -12,7 +12,9 @@ from datetime import date
 from decimal import Decimal
 from typing import Any
 
-from engine.model import Block, Field, FieldValue, Layout, ParsedFile, ParseIssue, Record
+from engine import layouts
+from engine.layouts import LayoutView
+from engine.model import Block, FieldDef, FieldValue, ParsedFile, ParseIssue, Record
 from kg.interface import KnowledgeBase
 
 ENVELOPE = {"VOSZ", "DSKO", "NCSZ"}
@@ -41,7 +43,7 @@ def _split_lines(text: str) -> list[tuple[str, str]]:
 # ---------------------------------------------------------------- typed values
 
 
-def to_value(f: Field, raw: str) -> tuple[Any, str | None]:
+def to_value(f: FieldDef, raw: str) -> tuple[Any, str | None]:
     """Raw string -> typed value. Returns (value, problem)."""
     if f.type == "an":
         return raw.rstrip(" "), None
@@ -61,7 +63,7 @@ def to_value(f: Field, raw: str) -> tuple[Any, str | None]:
     return int(raw), None
 
 
-def format_value(f: Field, value: Any) -> str:
+def format_value(f: FieldDef, value: Any) -> str:
     """Typed value -> fixed-width string. `an` padded right with spaces, `n` left with zeros."""
     if isinstance(value, FieldValue):
         value = value.value
@@ -92,9 +94,9 @@ class Parser:
     def __init__(self, kb: KnowledgeBase, version: str = DEFAULT_VERSION):
         self.kb = kb
         self.version = version
-        self.dslw = kb.get_layout("DSLW", version)
+        self.dslw = layouts.get(kb, "DSLW", version)
 
-    def _cut(self, line: str, f: Field, base: int, rec: str, issues: list[ParseIssue], line_no: int) -> FieldValue:
+    def _cut(self, line: str, f: FieldDef, base: int, rec: str, issues: list[ParseIssue], line_no: int) -> FieldValue:
         a = base + f.start - 1
         raw = line[a: a + f.length]
         value, problem = to_value(f, raw) if len(raw) == f.length else (None, "line too short")
@@ -102,7 +104,7 @@ class Parser:
             issues.append(ParseIssue(record=rec, field=f.name, pos=a + 1, message=problem, line=line_no))
         return FieldValue(name=f.name, raw=raw, value=value, pos=a + 1)
 
-    def _block(self, line: str, pos: int, lay: Layout, issues: list[ParseIssue], line_no: int) -> Block:
+    def _block(self, line: str, pos: int, lay: LayoutView, issues: list[ParseIssue], line_no: int) -> Block:
         """pos = 0-based index where the block starts."""
         b = Block(record=lay.record, pos=pos + 1)
         b.fields = {f.name: self._cut(line, f, pos, lay.record, issues, line_no) for f in lay.fields}
@@ -136,14 +138,15 @@ class Parser:
         rec.head = {f.name: self._cut(line, f, 0, "DSLW", issues, line_no) for f in self.dslw.fields}
         pos = self.dslw.fixed_length
         for blk in self.dslw.block_order:
-            lay = self.kb.get_layout(blk, self.version)
-            flag = rec.head.get(lay.announced_by) if lay.announced_by else None
+            lay = layouts.get(self.kb, blk, self.version)
+            flag_name = self.dslw.flags[blk]
+            flag = rec.head.get(flag_name)
             if not flag or flag.value != "J":
                 continue
             found = line[pos: pos + 4]
             if found != blk:
-                issues.append(ParseIssue(record="DSLW", field=lay.announced_by, pos=pos + 1, line=line_no,
-                                         message=f"{lay.announced_by}=J but found {found!r} instead of {blk}"))
+                issues.append(ParseIssue(record="DSLW", field=flag_name, pos=pos + 1, line=line_no,
+                                         message=f"{flag_name}=J but found {found!r} instead of {blk}"))
                 rec.tail = line[pos:]
                 return rec, issues
             if lay.status == "missing":
@@ -188,18 +191,16 @@ def write_dslw(head: dict[str, Any], blocks: dict[str, dict[str, Any]], kb: Know
     """Build one DSLW line. MM flags are set from the blocks present. `blocks[name]` is a
     field -> value dict; DBVO carries `groups: [ {BEGINN-AU: date, ...}, ... ]`. Missing fields:
     constants for `KENNUNG`, else zeros / spaces."""
-    dslw = kb.get_layout("DSLW", version)
+    dslw = layouts.get(kb, "DSLW", version)
     head = {k: (v.value if isinstance(v, FieldValue) else v) for k, v in head.items()}
     for blk in dslw.block_order:
-        lay = kb.get_layout(blk, version)
-        if lay.announced_by:
-            head[lay.announced_by] = "J" if blk in blocks else "N"
+        head[dslw.flags[blk]] = "J" if blk in blocks else "N"
     head.setdefault("KENNUNG", "DSLW")
     line = "".join(format_value(f, head.get(f.name, f.constant)) for f in dslw.fields)
     for blk in dslw.block_order:
         if blk not in blocks:
             continue
-        lay = kb.get_layout(blk, version)
+        lay = layouts.get(kb, blk, version)
         vals = dict(blocks[blk])
         groups = vals.pop("groups", [])
         rg = lay.repeating_group

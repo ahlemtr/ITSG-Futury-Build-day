@@ -1,0 +1,243 @@
+/* Vendor view: test runs, upload, receipt, parsed record */
+.nav-vendor {
+  color: var(--ink);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.muted {
+  color: var(--ink-muted);
+}
+
+.mono {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 12px;
+}
+
+.hash {
+  white-space: nowrap;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.run-layout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.story {
+  position: sticky;
+  top: 16px;
+}
+
+.story p {
+  margin: 0 0 12px;
+}
+
+.fact-tiles {
+  display: grid;
+  gap: 8px;
+}
+
+.fact-tile {
+  display: flex;
+  flex-direction: column;
+  background: var(--ground);
+  border-radius: var(--radius-panel);
+  padding: 8px 12px;
+}
+
+.hint-box {
+  background: var(--ground);
+  border-left: 3px solid var(--ink-muted);
+  padding: 8px 12px;
+  border-radius: var(--radius-button);
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.rounds {
+  display: grid;
+  gap: 16px;
+}
+
+/* Round stepper */
+.stepper {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  padding: 8px 12px;
+  font-weight: 500;
+}
+
+.step-nr {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  background: var(--ground);
+  flex-shrink: 0;
+}
+
+.step-sub {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+/* Neutral steps: the state is in the text below the label (done / failed / open) */
+.step-current { border-color: var(--ink); }
+.step-current .step-nr { background: var(--ink); color: var(--surface); }
+.step-done .step-nr,
+.step-failed .step-nr { background: var(--surface); color: var(--ink); border: 1px solid var(--ink); }
+.step-locked { color: var(--ink-muted); }
+
+/* Round card and its parts */
+.round-card {
+  display: grid;
+  gap: 12px;
+}
+
+.round-card > p {
+  margin: 0;
+}
+
+.round-card h2 {
+  font-size: 20px;
+}
+
+.round-current {
+  border-color: var(--ink);
+}
+
+.sub-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  padding: 12px 16px;
+}
+
+.sub-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.sub-card h3 {
+  font-size: 16px;
+}
+
+.sub-card > p {
+  margin: 0 0 8px;
+}
+
+.list-table.compact td,
+.list-table.compact th {
+  padding: 5px 8px;
+}
+
+.issues-title {
+  margin: 12px 0 4px;
+  color: var(--label-bug-fg);
+  font-size: 14px;
+}
+
+.parsed-record + .parsed-record {
+  margin-top: 16px;
+}
+
+.parsed-record details {
+  border-top: 1px solid var(--border);
+  padding: 6px 0;
+}
+
+.parsed-record summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.rule-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.reply {
+  background: var(--ground);
+}
+
+.reply .list-table {
+  background: var(--surface);
+  margin-bottom: 6px;
+}
+
+.reply .button {
+  margin-top: 6px;
+}
+
+.round-next {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Upload */
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-panel);
+  padding: 20px;
+  text-align: center;
+  background: var(--ground);
+}
+
+.dropzone-active {
+  border-color: var(--ink);
+  background: var(--red-faint);
+}
+
+.dropzone p {
+  margin: 0 0 12px;
+  color: var(--ink-muted);
+}
+
+.dropzone-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Final verdict */
+/* Neutral verdict: "Bestanden" / "Nicht bestanden" in large ink type */
+.verdict-card {
+  margin-bottom: 16px;
+  border-left: 4px solid var(--ink);
+}
+
+.verdict-text {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 32px;
+  margin: 0;
+}

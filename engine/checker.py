@@ -15,13 +15,13 @@ from engine.diff import Differ, _dev_id
 from engine.expected import ChainResult, Scenario, build_chain, load_scenario
 from engine.model import (
     LABEL_ORDER,
+    Case,
     CheckResult,
     Deviation,
     ParseIssue,
     Record,
     Rule,
     RuleResult,
-    TestCase,
     base_field_name,
 )
 from engine.records import parse_file
@@ -69,7 +69,7 @@ class Checker:
         return True
 
     # ------------------------------------------------------------ main entry
-    def check(self, test_case_id: str | TestCase, files: list[str | bytes], valid_on: date, version: str | None = None,
+    def check(self, test_case_id: str | Case, files: list[str | bytes], valid_on: date, version: str | None = None,
               triage: Triage | None = None) -> CheckResult:
         version = version or params_mod.version_on(self.kb, valid_on)
         self.version = version
@@ -228,7 +228,7 @@ def _s(v):
     return v if v is None or isinstance(v, (str, int, list)) else str(v)
 
 
-def check(kb: KnowledgeBase, test_case_id: str | TestCase, files: list[str | bytes], valid_on: date,
+def check(kb: KnowledgeBase, test_case_id: str | Case, files: list[str | bytes], valid_on: date,
           catalogue: Catalogue | None = None, version: str | None = None, triage: Triage | None = None) -> CheckResult:
     return Checker(kb, catalogue).check(test_case_id, files, valid_on, version=version, triage=triage)
 

@@ -1,25 +1,17 @@
 # HANDOUT: backend implementation status (for the next teammate and their Claude)
 
-Plan implemented: `BACKEND_IMPLEMENTATION_PLAN.md`, phases P0 to P8. Source of truth for details: `plan/02`, `03`, `05`, `06`, `08`, `09`. State on 2026-10-27. Nothing is committed yet (branch `backend`).
+Plan implemented: `BACKEND_IMPLEMENTATION_PLAN.md`, phases P0 to P8. Source of truth for details: `plan/02`, `03`, `05`, `06`, `08`, `09`. State on 2026-10-27. Merged with the knowledge graph (PR #2) on `main`; the backend now runs on the KG teammate's `kg/yaml_backend.py`.
 
 ## How to run
 
 ```
 UV_LINK_MODE=copy uv sync      # copy mode needed on OneDrive (hardlinks fail)
-uv run pytest -q               # 130 tests, about 10 s, no network, no database
+uv run pytest -q               # backend + KG tests, about 15 s; Neo4j tests skip without a graph
 uv run ruff check .
+uv run uvicorn api.main:app    # KG_BACKEND=yaml by default, SEED_ON_START=1 seeds the store on start
 ```
 
-The API needs a knowledge base. Until the KG teammate's `kg/yaml_backend.py` exists, `kg.get_kb()` fails, so start the app with the fake KB from Python:
-
-```python
-from api.main import create_app
-from store.repo import MemoryRepo
-from tests.fakes.fake_kb import FakeKB
-app = create_app(kb=FakeKB(), repo=MemoryRepo(), ai=False, seed=True)   # serve with uvicorn.run(app)
-```
-
-With the real KG: `uvicorn api.main:app` (reads `KG_BACKEND`, `DATABASE_URL`, `SEED_ON_START=1` seeds on start). Docker: `docker compose up` (api, postgres, neo4j). Docker was not running on this machine, so the image and Postgres were never started.
+The first test run extracts `kg/build/passages.yaml` from the PDFs in `sources/` (needs `pdftotext`). Backend tests use the real YAML backend with precedents written to a temp file (`tests/conftest.py`: `kb`, `fresh_kb`, `seeds`). Docker: `docker compose up` (api, postgres, neo4j). Docker was not running on this machine, so the image and Postgres were never started.
 
 ## Status per phase
 
@@ -34,7 +26,7 @@ With the real KG: `uvicorn api.main:app` (reads `KG_BACKEND`, `DATABASE_URL`, `S
 | P6 report, signing | `engine/report.py`, `engine/signing.py`, `templates/report.html.j2` | done: JSON + HTML + Ed25519; PDF code present, untested (WeasyPrint needs Pango, only in the Docker image) |
 | P7 store, seed, API, intake | `store/schema.sql`, `store/repo.py`, `store/seed.py`, `engine/intake.py`, `api/main.py`, `api/routes/*` | done with `MemoryRepo`; `PgRepo` written but never run against Postgres |
 | P8 LLM | `llm/client.py`, `llm/tools.py`, `llm/services.py`, `llm/explain.py`, `llm/story.py`, `llm/extract.py`, `llm/agents/*`, `engine/criteria.py`, `api/routes/criteria.py` | done against a scripted fake transport; **never called the real OpenAI API** |
-| P9 real KG | | not started: needs the KG teammate's K11 |
+| P9 real KG | `engine/layouts.py`, `tests/conftest.py` | P9.1 done: all backend tests pass on `KG_BACKEND=yaml`, fake KB removed. P9.2 (`graph`) needs a running Neo4j |
 | P10 TA 167 | | not started (stretch) |
 
 ## Done criteria (BACKEND_IMPLEMENTATION_PLAN.md section 5)
@@ -50,23 +42,24 @@ With the real KG: `uvicorn api.main:app` (reads `KG_BACKEND`, `DATABASE_URL`, `S
 - [~] `POST /criteria/extract` finds the 4 ITSG criteria: logic and scoring tested with scripted LLM answers; a real run with OpenAI is still to do
 - [ ] at least one LLM explanation for a fail, cached for the offline demo: needs one real run with `OPENAI_API_KEY` (cache lands in `data/llm_cache/`)
 - [x] every endpoint the demo storyline uses works and has an `httpx` test (`tests/test_p7_api.py`)
-- [ ] all backend tests pass with `KG_BACKEND=yaml` and `graph`: waits for the KG teammate
+- [~] all backend tests pass with `KG_BACKEND=yaml`; `graph` not run (no Neo4j here)
 
 ## Next steps
 
 1. Run once with a real `OPENAI_API_KEY` (set `OPENAI_MODEL`): `/check` on `s-no-contact`, `/submissions/s-missing-july/report`, `/criteria/extract` on VB 13.4 section 3.12, `/specdiff`. Check the answers, then keep `data/llm_cache/` for the offline demo. Prompts are in `llm/agents/*.py`, `llm/extract.py`, `llm/explain.py`, `llm/story.py`.
 2. Start Docker, `docker compose up postgres`, run `DATABASE_URL=postgresql://eel:eel@localhost:5432/eel uv run python -m store.seed` with a real KG, and fix whatever `PgRepo` gets wrong.
-3. P9: when `kg/yaml_backend.py` exists, point `tests/conftest.py` fixture `kb` at it and fix contract mismatches together (see decisions 2, 3, 6 below).
+3. P9.2: start Neo4j, `python -m kg.build`, run the backend tests with `KG_BACKEND=graph`.
+5. KG side (for the KG teammate): on this machine (`pdftotext` 4.00 from Git for Windows) the PTA table of contents is detected up to page 129, so no PTA section is extracted and `tests/test_kg.py::test_clean_seed_validates` fails on `PTA@2025-2026-v3#5.14`. Not caused by the backend merge.
 4. Commit per phase, PR into `main` (plan/09 section 6). Do not commit `HANDOVER.md` (personal notes; it is in `.gitignore`).
 
 ## Decisions taken while building (check with the team)
 
-1. `tests/fakes/fake_kb.py` is the fake KB of decision D1. Its passages come from `tests/fakes/passages.yaml`, extracted from the real VB 13.3 / 13.4 PDFs (3.12 parts, 3.12.7), BP 13.1 / 13.2 and the BVORERK docx.
-2. `kg.get_kb()` imports `kg.yaml_backend.YamlBackend` and `kg.graph_backend.GraphBackend`. The KG teammate must use these class names (or change the factory). `get_passage` accepts a `SpecRef` or a key string.
+1. The fake KB of decision D1 is gone: tests run on the KG's YAML backend. The engine keeps its own typed test case `Case` (`Case.from_kb` / `to_kb`, loaded with `engine.expected.get_case`); the KG's `TestCase` has dict inputs.
+2. `engine/model.py`: the KG contract part is the KG teammate's file unchanged; the engine models are appended below it. `engine/layouts.py` derives the repeating group (count field, start, length), the DSLW block order and the MM flag per block from the flat KG layouts (MM field `values.J` = "DBxx follows").
 3. Only repeating-group field names drop their `-nn` suffix (`BEGINN-AU-{nn}` -> `BEGINN-AU`). Fixed names such as `DBAP.FIRMA-1` or `DBAE.BRUTTO-1` keep it, otherwise they collide. plan/08 section 1.3 should say this.
 4. `an` values are right-stripped only (`rstrip`), so the writer reproduces the file exactly.
 5. Date fields longer than 8 characters (`DATUM-ERSTELLUNG`, 20 digits) stay strings.
-6. `DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG` and `DBSD.AKTENZEICHEN-VERURSACHER` are compare mode `rule` (C-3, C-2) in the fake KB. plan/08 section 8 lists only the DBID versions: the KG teammate should add both to `compare_modes.yaml`, or `s-variant` stops being an exact match.
+6. `kg/seed/compare_modes.yaml`: added `DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG` (C-3) and `DBSD.AKTENZEICHEN-VERURSACHER` (C-2) as `rule` fields. Both point to other messages like `DBID.REFERENZ-ID`; without them `s-variant` is not an exact match. plan/08 section 8 should list them.
 7. `s-three-periods` drops a middle period (01.12 to 03.12.2025), `s-missing-july` the oldest (14.07 to 15.07.2025). Rule re-check: a missing oldest chained period = bug R41-3 ("go back to the first illness"); any other missing period = correct variant ("as many as possible"). plan/02 does not say which period s-three-periods drops.
 8. `s-wrong-order` is labeled bug F41-8 as plan/02 section 7 says, although F41 rules are format rules (plan/03 section 8 would say invalid). Order is checked by the re-check, not the format check.
 9. A missing 41 is a bug of the rule closest to its boundary (`deciding_rule`: R41-2 for gap-exact, R41-4 for b30).
@@ -78,4 +71,6 @@ With the real KG: `uvicorn api.main:app` (reads `KG_BACKEND`, `DATABASE_URL`, `S
 15. Test runs: round N grades the employer messages of round N with the full checker; the reply is the expected insurer message adapted to the vendor's file (REF-ID, AZVU, BBNR-VU, the vendor's periods in the vendor's order, extras appended).
 16. LLM: `create_app(ai=False)` switches the LLM off. Every LLM call degrades to "no answer" when there is no key and no cache, so the deterministic result always stands. Citations must be passage keys the KB resolves; answers without are retried once, then dropped. An AI proposal sets `resolved_by = ai_proposal` but the label stays `unclear` until the advisor decides.
 17. Criteria pipeline: a draft counts as matched in step 3a when `maps_to_rule` is an approved rule id; parameters are compared by code (`params_ok`). Only drafts without a known rule go to the AI review (3b). A human decision on a 3b proposal is stored on the draft (`CriterionDraft.review`, via `POST /criteria/{id}/approve` with a `review`) and is not sent to the AI again.
-18. Seed: 16 test cases (14 public + 2 hidden), plan/02 M7.2 says 14; the difference is the 2 hidden ones.
+18. Seed: 18 test cases (16 public incl. `ta-167`, `ta-168` with inputs only, + 2 hidden); plan/02 M7.2 says 14. Engine tests skip the `pta` cases.
+19. Advisor decisions are stored as KG precedents in their shape (`abgabegrund`, `field`, `kind`, `justified_by`); `justified_by` keeps only rule ids and passage keys the KG knows, since the YAML backend rejects others. The YAML backend writes them to `kg/seed/precedents.yaml`.
+20. Reports show the VB passage of the rule set version first, a 3.12 part before a field passage.

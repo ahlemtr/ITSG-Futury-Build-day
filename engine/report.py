@@ -62,7 +62,8 @@ def build(result: CheckResult, submission_id: str, files: dict[str, bytes | str]
     checks = []
     for d in result.deviations:
         passage = None
-        for key in d.sources:
+        # the VB passage of the rule set version first, a 3.12 part ("/chaining") before a field passage
+        for key in sorted(d.sources, key=lambda k: (not k.startswith(f"VB@{result.version}#"), "/" not in k, k)):
             try:
                 passage = kb.get_passage(key).text
                 break

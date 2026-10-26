@@ -159,6 +159,7 @@ fields:
   required: m
   format: amount_2dp
 - name: BEGINN-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 115
   end: 122
   length: 8
@@ -166,6 +167,7 @@ fields:
   required: m
   format: date_yyyymmdd
 - name: ENDE-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 123
   end: 130
   length: 8
@@ -173,6 +175,7 @@ fields:
   required: m
   format: date_yyyymmdd
 - name: BEZAZ-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 131
   end: 135
   length: 5
@@ -180,6 +183,7 @@ fields:
   required: m
   format: amount_2dp
 - name: MASTD-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 136
   end: 140
   length: 5
@@ -187,6 +191,7 @@ fields:
   required: m
   format: amount_2dp
 - name: AZ-UNENT-STD-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 141
   end: 145
   length: 5
@@ -194,12 +199,14 @@ fields:
   required: m
   format: amount_2dp
 - name: AZ-UNENT-TAGE-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 146
   end: 147
   length: 2
   type: n
   required: m
 - name: AZ-ENTSCH-STD-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 148
   end: 152
   length: 5
@@ -207,12 +214,14 @@ fields:
   required: m
   format: amount_2dp
 - name: AZ-ENTSCH-TAGE-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 153
   end: 154
   length: 2
   type: n
   required: m
 - name: NETTO-2
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 155
   end: 162
   length: 8
@@ -220,6 +229,7 @@ fields:
   required: m
   format: amount_2dp
 - name: BEGINN-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 163
   end: 170
   length: 8
@@ -227,6 +237,7 @@ fields:
   required: m
   format: date_yyyymmdd
 - name: ENDE-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 171
   end: 178
   length: 8
@@ -234,6 +245,7 @@ fields:
   required: m
   format: date_yyyymmdd
 - name: BEZAZ-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 179
   end: 183
   length: 5
@@ -241,6 +253,7 @@ fields:
   required: m
   format: amount_2dp
 - name: MASTD-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 184
   end: 188
   length: 5
@@ -248,6 +261,7 @@ fields:
   required: m
   format: amount_2dp
 - name: AZ-UNENT-STD-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 189
   end: 193
   length: 5
@@ -255,12 +269,14 @@ fields:
   required: m
   format: amount_2dp
 - name: AZ-UNENT-TAGE-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 194
   end: 195
   length: 2
   type: n
   required: m
 - name: AZ-ENTSCH-STD-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 196
   end: 200
   length: 5
@@ -268,12 +284,14 @@ fields:
   required: m
   format: amount_2dp
 - name: AZ-ENTSCH-TAGE-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 201
   end: 202
   length: 2
   type: n
   required: m
 - name: NETTO-3
+  source: derived, repeat of month 1 (only month 1 is described in the spec)
   start: 203
   end: 210
   length: 8

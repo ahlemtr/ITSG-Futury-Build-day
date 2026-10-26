@@ -56,7 +56,8 @@ def normalise(text: str) -> list[tuple[str, str | None, str | None]]:
     return out
 
 
-def diff_texts(old: str, new: str, prefix: str = "VB-13.3-13.4") -> list[Change]:
+def diff_texts(old: str, new: str, prefix: str = "VB-13.3-13.4", document: str = "VB", old_version: str = "13.3",
+               new_version: str = "13.4") -> list[Change]:
     a, b = normalise(old), normalise(new)
     sm = difflib.SequenceMatcher(a=[x[0] for x in a], b=[x[0] for x in b], autojunk=False)
     out: list[Change] = []
@@ -64,7 +65,8 @@ def diff_texts(old: str, new: str, prefix: str = "VB-13.3-13.4") -> list[Change]
         if tag == "equal":
             continue
         ctx = b[j1] if j1 < len(b) else b[-1]
-        out.append(Change(key=f"{prefix}-{len(out):03d}", tag=tag, block=ctx[1], field=ctx[2],
+        out.append(Change(key=f"{prefix}-{len(out):03d}", document=document, old_version=old_version,
+                          new_version=new_version, tag=tag, block=ctx[1], field=ctx[2],
                           old="\n".join(x[0] for x in a[i1:i2]), new="\n".join(x[0] for x in b[j1:j2])))
     return out
 
@@ -74,7 +76,9 @@ def layout_rows_changed(changes: list[Change]) -> list[Change]:
 
 
 def diff_pdfs(old_pdf: Path, new_pdf: Path, prefix: str) -> list[Change]:
-    return diff_texts(extract_text(old_pdf), extract_text(new_pdf), prefix)
+    """prefix = DOC-OLD-NEW, e.g. VB-13.3-13.4."""
+    doc, old, new = prefix.split("-", 2)[0], *prefix.split("-")[1:3]
+    return diff_texts(extract_text(old_pdf), extract_text(new_pdf), prefix, doc, old, new)
 
 
 def impact(changes: list[Change] | list[str], kb: KnowledgeBase):

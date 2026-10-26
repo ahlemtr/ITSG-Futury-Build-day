@@ -1,0 +1,282 @@
+{
+  "app": {
+    "product": "EEL Review Assistant",
+    "ruleSetContext": "Rule set in force <strong>V13.3</strong> · next <strong>V13.4</strong> from 01.01.2027",
+    "languageSwitch": "Choose language",
+    "user": "ITSG tester",
+    "viewSwitch": "Choose view",
+    "view": {
+      "itsg": "ITSG",
+      "vendor": "Vendor"
+    },
+    "vendorUser": "Vendor (demo)",
+    "vendorContext": "<strong>Lohnwerk Demo GmbH</strong> · test company number 99307001"
+  },
+  "common": {
+    "loading": "Loading …",
+    "error": "The data could not be loaded."
+  },
+  "nav": {
+    "label": "Main navigation",
+    "overview": "Overview",
+    "specChanges": "Spec changes",
+    "testCatalogue": "Test catalogue",
+    "submissions": "Submissions",
+    "advisorQueue": "Advisor queue",
+    "reports": "Reports",
+    "openItems": "{{count}} open",
+    "vendorPortal": "Vendor portal",
+    "myTests": "My test cases",
+    "results": "Results",
+    "vendorReports": "Reports"
+  },
+  "screens": {
+    "overview": {
+      "title": "Overview",
+      "subtitle": "One test catalogue, two rule sets in parallel: checks today under V13.3, preparing 2027 under V13.4."
+    },
+    "specChanges": {
+      "title": "Verfahrensbeschreibung V13.3 → V13.4",
+      "subtitle": "36 changes found, 5 inside the EEL prototype scope. Field layouts unchanged."
+    },
+    "testCatalogue": {
+      "title": "Test catalogue 2027",
+      "subtitle": "Built under V13.4. Hidden variants stay on the ITSG side; vendors only get the story."
+    },
+    "submissions": {
+      "title": "Submissions",
+      "subtitle": "All received TEEL0 files and their result."
+    },
+    "advisorQueue": {
+      "title": "Advisor queue",
+      "subtitle": "Only what catalogue, rules and AI could not settle. Your decision becomes a precedent."
+    },
+    "reports": {
+      "title": "Reports",
+      "subtitle": "Signed reports for ITSG and the vendor."
+    },
+    "myTests": {
+      "title": "My test cases",
+      "subtitle": "Your software produces the files, you upload them. The insurer's replies are built from your own files."
+    },
+    "vendorResults": {
+      "title": "Results",
+      "subtitle": "Your submissions and their result, field by field (public tests only)."
+    },
+    "vendorReports": {
+      "title": "Reports",
+      "subtitle": "Signed test reports to download."
+    }
+  },
+  "placeholder": "This screen is built in a later step.",
+  "status": {
+    "exact": "Exact match",
+    "identical": "Identical",
+    "valid": "Valid",
+    "variant": "Correct variant",
+    "bug": "Bug",
+    "invalid": "Invalid",
+    "unclear": "Unclear",
+    "ignored": "Ignored"
+  },
+  "chips": {
+    "all": "All fields",
+    "identical": "Identical",
+    "valid": "Rule field",
+    "variant": "Correct variant",
+    "bug": "Bug",
+    "invalid": "Invalid",
+    "unclear": "Unclear",
+    "ignored": "Ignored"
+  },
+  "mode": {
+    "compare": "compare",
+    "ignore": "ignore",
+    "rule": "rule"
+  },
+  "modeHint": {
+    "compare": "The value must match the model solution.",
+    "ignore": "Not compared (timestamp or set by someone else).",
+    "rule": "Not compared with the model solution, checked by a rule instead."
+  },
+  "decidedBy": {
+    "diff": "Field comparison",
+    "catalogue": "Known-variant catalogue, step a",
+    "rules": "Rule re-check, step b",
+    "ai_proposal": "AI proposal, confirmed by the system advisor",
+    "advisor": "System advisor"
+  },
+  "result": {
+    "topbar": "Submission <strong>#{{id}}</strong> · rule set <strong>V{{ruleSet}}</strong>",
+    "subtitle": "Round {{round}} of {{total}} · {{kind}} received {{date}} · checked under V{{ruleSet}}",
+    "verdict": "Result:",
+    "openReport": "Open report",
+    "filter": "Filter fields",
+    "onlyDeviations": "Show only deviations",
+    "col": {
+      "block": "Block",
+      "field": "Field",
+      "expected": "Model solution",
+      "actual": "Vendor file",
+      "mode": "Mode",
+      "label": "Label"
+    },
+    "empty": "empty or not present",
+    "vendorField": "vendor: {{field}}",
+    "noRows": "No fields for this filter.",
+    "notFound": "There is no field-by-field view for this submission yet.",
+    "why": "Why this label",
+    "fieldInfo": "Field info",
+    "decidedBy": "Decided by",
+    "rule": "Rule",
+    "specPassage": "Spec passage",
+    "criterion": "ITSG criterion",
+    "reasoning": "Reasoning",
+    "explanation": "Explanation",
+    "source": "Source",
+    "identicalNote": "The value matches the model solution."
+  },
+  "submissions": {
+    "col": {
+      "vendor": "Vendor (demo)",
+      "testCase": "Test case",
+      "round": "Round",
+      "ruleSet": "Rule set",
+      "result": "Result",
+      "received": "Received"
+    }
+  },
+  "overview": {
+    "now": {
+      "title": "Checks now",
+      "subtitle": "Rule set V{{ruleSet}}, valid until {{date}}",
+      "submissions": "submissions in {{month}}",
+      "passed": "passed all rules",
+      "open": "with open deviations"
+    },
+    "next": {
+      "title": "Preparing next year",
+      "subtitle": "Rule set V{{ruleSet}}, valid from {{date}}",
+      "specChanges": "spec changes in scope",
+      "reapprove": "test cases to re-approve",
+      "hidden": "hidden variants ready"
+    },
+    "resolution": {
+      "title": "Who resolved the deviations",
+      "subtitle": "{{count}} deviations this month",
+      "catalogueAndRules": "Catalogue and rules",
+      "aiConfirmedByAdvisor": "AI proposal, advisor confirmed",
+      "waitingForAdvisor": "Waiting for the advisor"
+    },
+    "latest": "Latest submissions"
+  },
+  "myTests": {
+    "col": {
+      "story": "Story",
+      "visibility": "Visibility",
+      "status": "Status"
+    },
+    "status": {
+      "notStarted": "not started",
+      "inRound": "round {{nr}} of {{total}}"
+    }
+  },
+  "run": {
+    "topbar": "Test run <strong>{{id}}</strong> · rule set <strong>V{{ruleSet}}</strong>",
+    "notFound": "This test case does not exist.",
+    "public": "public",
+    "hidden": "spot check",
+    "roundsCount_one": "{{count}} round",
+    "roundsCount_other": "{{count}} rounds",
+    "reset": "Reset run",
+    "story": "Task",
+    "hiddenHint": "Spot check: you only get the story. The result shows passed or failed per rule, never the expected values.",
+    "round": "Round {{nr}}",
+    "stepStatus": {
+      "done": "done",
+      "failed": "failed",
+      "current": "open",
+      "locked": "locked"
+    },
+    "expects": "Expected:",
+    "noMessage": "no message",
+    "reportedNoMessage": "Reported: your software produced no message.",
+    "outcome": "Result of this round",
+    "passed": "passed",
+    "failed": "failed",
+    "next": "Continue to round {{nr}}",
+    "upload": {
+      "drop": "Drag a TEEL0 file here",
+      "dropMany": "Drag TEEL0 files here (several allowed)",
+      "checking": "Reading and checking the file …",
+      "choose": "Choose file",
+      "none": "No message produced"
+    },
+    "receipt": {
+      "title": "Receipt",
+      "accepted": "accepted",
+      "rejected": "rejected",
+      "receivedAt": "Received {{time}}",
+      "file": "File",
+      "records": "Abgabegrund · DATENSATZ-ID",
+      "bytes_one": "{{count}} byte",
+      "bytes_other": "{{count}} bytes",
+      "issues_one": "{{count}} format error: please fix and upload again",
+      "issues_other": "{{count}} format errors: please fix and upload again",
+      "line": "Line",
+      "position": "Position",
+      "message": "Message"
+    },
+    "parsed": {
+      "title": "Record as read",
+      "showEmpty": "Show empty fields",
+      "record": "{{file}} · record {{n}} (line {{line}}) · Abgabegrund",
+      "fields": "{{count}} fields",
+      "period": "Period",
+      "position": "Position",
+      "value": "Value"
+    },
+    "reply": {
+      "blank": "(blank)",
+      "fromYourFile": "REFERENZ-ID and case number come from your own file.",
+      "download": "Download {{file}}",
+      "downloadLater": "The backend creates this file (API mode)."
+    },
+    "verdict": {
+      "title": "Test run finished",
+      "passed": "Passed",
+      "failed": "Not passed",
+      "passedHint_one": "All rules met in {{count}} round.",
+      "passedHint_other": "All rules met in {{count}} rounds.",
+      "failedHint": "Rule {{rule}} not met. The run ends here; reset it to try again."
+    }
+  },
+  "advisor": {
+    "topbar": "<strong>{{count}} open</strong> · system advisor view",
+    "empty": "No open cases. Everything is decided.",
+    "deviation": "Deviation",
+    "aiProposal": "AI proposal",
+    "proposal": {
+      "variant": "likely correct variant",
+      "bug": "likely bug",
+      "invalid": "likely invalid",
+      "unclear": "unclear"
+    },
+    "confidence": "Confidence",
+    "cited": "Cited",
+    "similar": "Similar precedents",
+    "none": "none",
+    "draftOnly": "A proposal only: the AI never decides on its own.",
+    "noProposal": "No AI proposal: a proposal without a cited spec passage is rejected.",
+    "reason": "Reason (required)",
+    "reasonPlaceholder": "e.g. Anlage 3 allows a 41 without DBAP; agreed with ITSG on …",
+    "reasonRequired": "Please give a reason. It is saved with the precedent.",
+    "confirmAs": "Confirm: {{label}}",
+    "markAs": "Mark as {{label}}",
+    "becomesPrecedent": "The decision is saved as a precedent and settles the same deviation automatically next time.",
+    "saved": "Saved as precedent {{id}} ({{label}}). The same deviation will be settled automatically next time.",
+    "decidedToday": "Decided today",
+    "signature": "Signature",
+    "resetDemo": "Reset demo"
+  }
+}

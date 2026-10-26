@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 
 from api.routes.common import kb, real_versions, repo, test_case
-from engine.expected import build_chain, load_scenario
+from engine.expected import build_chain, get_case, load_scenario
 from engine.records import parse_file
 
 router = APIRouter()
@@ -43,7 +43,7 @@ def rules(request: Request, version: str):
 def list_test_cases(request: Request, kind: str | None = None, hidden: bool | None = None):
     items = repo(request).list_test_cases(kind=kind, hidden=hidden)
     if not items:
-        items = [kb(request).get_test_case(t.id) for t in kb(request).get_test_cases(include_hidden=hidden is not False)
+        items = [get_case(kb(request), t.key) for t in kb(request).get_test_cases(include_hidden=hidden is not False)
                  if (kind is None or t.kind == kind) and (hidden is None or t.hidden == hidden)]
     return [{"id": t.id, "kind": t.kind, "origin": t.origin, "status": t.status, "hidden": t.hidden,
              "parent": t.parent, "targets": t.targets, "steps": t.steps} for t in items]

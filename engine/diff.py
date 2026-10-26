@@ -12,7 +12,9 @@ import hashlib
 import itertools
 from typing import Any
 
-from engine.model import Deviation, ExpectedMessage, Layout, Record
+from engine import layouts
+from engine.layouts import LayoutView
+from engine.model import Deviation, ExpectedMessage, Record
 from engine.records import format_value
 from kg.interface import KnowledgeBase
 
@@ -30,10 +32,10 @@ class Differ:
     def __init__(self, kb: KnowledgeBase, version: str):
         self.kb = kb
         self.version = version
-        self.dslw = kb.get_layout("DSLW", version)
+        self.dslw = layouts.get(kb, "DSLW", version)
 
     def _flag_of(self, blk: str) -> str | None:
-        return self.kb.get_layout(blk, self.version).announced_by
+        return self.dslw.flags.get(blk)
 
     def match(self, expected: list[ExpectedMessage], actual: list[Record]):
         """-> (pairs, missing expected, extra actual)."""
@@ -73,7 +75,7 @@ class Differ:
                 best, best_cost = list(perm), cost
         return best
 
-    def _cmp_fields(self, lay: Layout, exp: dict[str, Any], act: dict, base: dict, suffix: str = "",
+    def _cmp_fields(self, lay: LayoutView, exp: dict[str, Any], act: dict, base: dict, suffix: str = "",
                     group_fields: bool = False) -> list[Deviation]:
         out = []
         fields = lay.repeating_group.fields if group_fields else lay.fields
@@ -90,7 +92,7 @@ class Differ:
                                      expected=_show(exp.get(f.name)), actual=_show(fv.value if fv else None)))
         return out
 
-    def _cmp_groups(self, lay: Layout, exp_groups: list[dict], act_groups: list[dict], base: dict) -> list[Deviation]:
+    def _cmp_groups(self, lay: LayoutView, exp_groups: list[dict], act_groups: list[dict], base: dict) -> list[Deviation]:
         out: list[Deviation] = []
 
         def pk(g: dict) -> tuple:
@@ -142,7 +144,7 @@ class Differ:
         for blk, exp in m.blocks.items():
             if blk not in r.blocks:
                 continue
-            lay = self.kb.get_layout(blk, self.version)
+            lay = layouts.get(self.kb, blk, self.version)
             act = r.blocks[blk]
             out += self._cmp_fields(lay, exp, act.fields, base)
             if lay.repeating_group:

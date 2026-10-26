@@ -1,0 +1,124 @@
+/* Advisor queue (screen 5) */
+.queue-layout {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.queue-side {
+  display: grid;
+  gap: 16px;
+}
+
+.queue-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+}
+
+.queue-item {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  border-radius: var(--radius-button);
+  padding: 10px;
+}
+
+.queue-item:hover {
+  background: var(--ground);
+}
+
+.queue-item-selected,
+.queue-item-selected:hover {
+  background: var(--red-faint);
+}
+
+.queue-item-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.decided-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.advisor-detail {
+  display: grid;
+  gap: 12px;
+}
+
+.advisor-detail h2 {
+  font-size: 22px;
+}
+
+.advisor-detail > p {
+  margin: 0;
+}
+
+.compare-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ai-card p {
+  margin: 0 0 6px;
+}
+
+.decision {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.field-label {
+  font-weight: 500;
+}
+
+.reason {
+  width: 100%;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+.reason-missing {
+  border-color: var(--label-bug-fg);
+}
+
+.field-error {
+  margin: 0;
+  color: var(--label-bug-fg);
+  font-size: 13px;
+}
+
+.decision-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.saved-note {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--ink);
+  border-radius: var(--radius-panel);
+  padding: 10px 14px;
+  margin: 0 0 16px;
+  font-weight: 500;
+}

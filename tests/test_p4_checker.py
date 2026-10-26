@@ -8,11 +8,9 @@ from engine.expected import build_chain, load_scenario
 from engine.model import Precedent
 from engine.records import parse_file
 from engine.writer_messages import chain_files
-from tests.fakes.fake_kb import FakeKB
-from tools.make_submissions import build_submissions
+from tools.make_submissions import SEEDS as SEED_TABLE
 
 D = date.fromisoformat
-SEEDS = {s.id: s for s in build_submissions(FakeKB())}
 
 
 def _peter(kb):
@@ -32,9 +30,9 @@ def test_diff_reference_vs_generated(kb, itsg_bytes):
     assert [x.kind for x in d] == ["missing_message"]
 
 
-@pytest.mark.parametrize("sid", list(SEEDS))
-def test_seed_labels(kb, sid):
-    s = SEEDS[sid]
+@pytest.mark.parametrize("sid", [x[0] for x in SEED_TABLE])
+def test_seed_labels(kb, sid, seeds):
+    s = seeds[sid]
     for valid_on, label in s.expected_label.items():
         res = check(kb, s.test_case_id, list(s.files.values()), D(valid_on))
         assert res.label == label, [(d.label, d.rule, d.signature, d.explanation) for d in res.deviations]
@@ -42,13 +40,13 @@ def test_seed_labels(kb, sid):
             assert {d.rule for d in res.deviations if d.label == "bug"} == set(s.expected_rules)
 
 
-def test_invalid_rule(kb):
-    res = check(kb, "peter", list(SEEDS["s-insurer-field"].files.values()), D("2027-01-01"))
+def test_invalid_rule(kb, seeds):
+    res = check(kb, "peter", list(seeds["s-insurer-field"].files.values()), D("2027-01-01"))
     assert {d.rule for d in res.deviations} == {"F41-6"}
 
 
-def test_legacy_rule_set_by_date(kb):
-    files = list(SEEDS["s-legacy-1"].files.values())
+def test_legacy_rule_set_by_date(kb, seeds):
+    files = list(seeds["s-legacy-1"].files.values())
     assert check(kb, "peter-gap-exact", files, D("2026-11-01")).version == "13.3"
     res = check(kb, "peter-gap-exact", files, D("2027-01-01"))
     assert res.version == "13.4" and res.deviations[0].rule == "R41-2"
@@ -72,17 +70,18 @@ def test_letter_in_numeric_is_invalid(kb, itsg_bytes):
     assert res.label == "invalid"
 
 
-def test_precedent_resolves_without_ai(kb):
-    kb.add_precedent(Precedent(key="41|DSLW.MM-ANSPRECH|missing_block", verdict="bug", reason="BP 13.1 sends DBAP",
-                               citations=["BP@13.3#13.1"]))
+def test_precedent_resolves_without_ai(fresh_kb, seeds):
+    kb = fresh_kb
+    kb.add_precedent(Precedent(abgabegrund="41", field="DSLW.MM-ANSPRECH", kind="missing_block", verdict="bug",
+                               reason="BP 13.1 sends DBAP", justified_by=["BP@13.3#13.1"]))
     calls = []
-    res = check(kb, "peter", list(SEEDS["s-no-contact"].files.values()), D("2027-01-01"),
+    res = check(kb, "peter", list(seeds["s-no-contact"].files.values()), D("2027-01-01"),
                 triage=lambda d, v: calls.append(d))
     assert res.label == "bug" and calls == []
     assert res.deviations[0].resolved_by == "catalogue" and res.deviations[0].precedent_key
 
 
-def test_unclear_has_ai_slot(kb):
-    res = check(kb, "peter", list(SEEDS["s-no-contact"].files.values()), D("2027-01-01"))
+def test_unclear_has_ai_slot(kb, seeds):
+    res = check(kb, "peter", list(seeds["s-no-contact"].files.values()), D("2027-01-01"))
     [d] = res.deviations
     assert d.label == "unclear" and d.ai_proposal is None and d.signature == "41|DSLW.MM-ANSPRECH|missing_block"

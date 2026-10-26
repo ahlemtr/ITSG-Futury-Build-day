@@ -31,7 +31,7 @@ def version_on(kb: KnowledgeBase, on_date: date | None, document: str = "VB") ->
     """The real version valid on a date. Never 'latest' (plan/06 section 3)."""
     if on_date is None:
         return None
-    valid = [v for v in kb.get_versions(document) if not v.simulated and v.valid_from and v.valid_from <= on_date]
+    valid = [v for v in kb.get_versions(document) if not v.version.startswith("sim") and v.valid_from and v.valid_from <= on_date]
     if not valid:
         raise LookupError(f"no {document} version valid on {on_date}")
     return max(valid, key=lambda v: v.valid_from).version
