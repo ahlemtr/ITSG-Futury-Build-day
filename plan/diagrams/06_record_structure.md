@@ -21,8 +21,8 @@ Blocks per message type in the prototype:
 
 | Abgabegrund | Blocks |
 |---|---|
-| 41 prior-illness request | DBNA, DBVO, DBAP, DBID |
+| 41 prior-illness request | DBNA, DBVO, DBAP, DBID (ITSG file). Beispielpapier 13.1 also sets MM-ANSCHRIFT = J (DBAN) and MM-ID = N: mandatory blocks per Abgabegrund are in Anlage 3 of the VB, not available yet |
 | 61 insurer answer | DBNA, DBVO, DBAP, DBID |
 | 01 sickness benefit certificate | DBNA, DBAL, DBAE, DBAP, DBID |
-| 88 cancellation | DBSD |
+| 88 cancellation | DBSD only (Beispielpapier 23) |
 | 62 end of benefit | DBNA, DBEE, DBAP, DBID |

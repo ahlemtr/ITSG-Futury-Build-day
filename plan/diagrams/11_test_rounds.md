@@ -3,7 +3,7 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    participant US as Our system (ITSG side)
+    participant US as Our platform (ITSG side)
     participant V as Vendor tester
     participant SW as Vendor payroll software
     US->>V: story (inputs only, no expected results)

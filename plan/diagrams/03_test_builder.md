@@ -3,8 +3,8 @@
 ```mermaid
 flowchart TD
     C["Spec change<br/>change log + section diff"] --> AR["Affected rules<br/>graph traversal"]
-    AR --> P["Rule parameters<br/>e.g. min_total_days 30 to 28"]
-    P --> SC["Scenarios (AI drafts)<br/>boundaries +/- 1, combinations"]
+    AR --> P["Rule parameters<br/>e.g. gap_inclusive false to true (13.4)<br/>or min_total_days 30 to 28 (simulated)"]
+    P --> SC["Scenarios (deterministic)<br/>boundaries +/- 1, hidden variants"]
     BASE["Reference person<br/>e.g. Peter Mustermann"] --> CL["Clone at branch point<br/>change one thing"]
     SC --> CL
     CL --> EX["Expected files<br/>rules engine, deterministic"]
@@ -15,4 +15,4 @@ flowchart TD
     HA -->|rejected| SC
 ```
 
-The LLM never computes expected values. It drafts scenarios and story text only.
+The LLM never computes expected values. Scenarios come from the builder (M5.4, M5.6); the LLM writes the story text (M8.2) and drafts rules from passages (M8.3).

@@ -39,17 +39,19 @@ The major number (13) is the record format. It changes rarely (12 to 13 on 01.01
 |---|---|---|---|
 | **A. New spec version published** | whenever it comes out | diff against the previous version, affected rules, draft new or changed tests, human approval | **new and changed** tests for next year's catalogue |
 | **B. Yearly recertification** | between publication and 1 January | vendors run the new catalogue, ITSG checks their files + hidden spot checks, certificate for the new year | uses the catalogue from A |
-| **C. Monthly quality control** | every month | vendors send files for the permanent test cases, we check them against the rules **valid today** and rotate hidden variants | no new law tests, only fresh hidden variants |
+| **C. Ongoing quality control** | whenever vendors submit (monthly per PTA 8.4; actual upload rhythm to confirm with ITSG) | vendors run the permanent test cases (the same catalogue employees), we check them against the rules **valid on the case date** and rotate hidden variants | same catalogue; on 1 January the permanent cases switch to the new expected answers, and new cases from A join them |
 | **D. New software** | any time | full current catalogue + extended hidden checks | uses the existing catalogue |
 
-## 3. Two tracks in parallel
+## 3. One catalogue, two rule versions in parallel
 
-| | Track 1: monthly checks | Track 2: yearly catalogue |
+There is one catalogue of test employees, not two test sets. Between publication and 1 January its expected answers exist in two versions: today's (used for checks now) and next year's (prepared, approved, used for recertification).
+
+| | Checks now | Preparing next year |
 |---|---|---|
 | Rule set | valid **now** (2026: 13.3) | valid **next year** (2027: 13.4) |
-| Who sends files | all certified vendors, every month | vendors preparing for next year |
+| Who sends files | all certified vendors (permanent test cases) | vendors preparing for next year |
 | Our system | checks files, rotates hidden variants | diffs versions, drafts tests, collects approvals |
-| Ends | 31 December | 1 January, when it becomes Track 1 |
+| Ends | 31 December | 1 January, when next year's answers become the ones used now |
 
 **Every check picks its rule set by validity date, never by "latest version".** In code: `check(submission, valid_on=date)`.
 
@@ -59,7 +61,7 @@ Real timeline:
 01.01.2026   13.3 in force; monthly checks under 13.3 all year (C)
 10.03.2026   13.4 published (valid 01.01.2027)
              (A) diff 13.3 -> 13.4 -> peter-gap-exact changes -> draft -> approve -> catalogue 2027
-Mar-Dec 2026 two catalogues in parallel: monthly under 13.3, preparation under 13.4
+Mar-Dec 2026 one catalogue, two answer versions: checks under 13.3, preparation under 13.4
 before       (B) vendors submit catalogue-2027 results, ITSG checks + hidden spot checks
 01.01.2027   13.4 in force, monthly checks switch to 13.4
 ```
@@ -74,10 +76,11 @@ Example for the 13.4 change:
 
 | | Public `peter-gap-exact` | Hidden variant |
 |---|---|---|
-| Prior illness ends | 11.09.2025 | 31.08.2025 |
-| New sickness starts | 11.03.2026 | 28.02.2026 |
+| Test case id | `peter-gap-exact` | `peter-gap-exact-hidden` |
+| Prior illness | 07.08 to 11.09.2025 | 27.07 to 31.08.2025 |
+| New sickness | 11.03 to 20.03.2026 | 28.02 to 09.03.2026 |
 | Gap | exactly 6 months | exactly 6 months (31.08 + 6 months = 28.02) |
-| Expected under 13.4 | 41 | 41 |
+| Expected under 13.3 / 13.4 | no 41 / 41 | no 41 / 41 |
 | Vendor knows the answer? | yes | no |
 
 What they catch:
@@ -88,6 +91,8 @@ What they catch:
 | rule implemented, date math wrong at month ends | passes | **fails** |
 | claims 13.4 support, still 13.3 logic on other dates | may pass if tuned | **fails** |
 | rule correctly implemented | passes | passes |
+
+Caveat: the month-end case relies on 31.08 + 6 months = 28.02. Confirm with ITSG before failing a real vendor on it (`00` question 10).
 
 **Rules for using them:**
 1. generated per rule (other dates, month ends, leap years, other boundaries), expected results computed by the rules engine
@@ -126,9 +131,9 @@ If the software wrongly sends no message where one is required, that rule fails 
 | 3 | corrected 61: all 4 periods count | 88 cancelling the old 01 + new 01 until 27.03.2026 | 88 target, new date, case number |
 | 4 | 62: benefit ends 31.03.2026 | nothing, import only | no new message sent |
 
-Today eVpT runs the same idea month by month: the vendor sends a month's files, the insurer replies appear the following month.
+Today eVpT does this with reply files prepared in advance, available per test month. Our platform runs the rounds itself: it receives the files, checks them, and builds the insurer's reply from the vendor's own file (REF-ID = their DATENSATZ-ID).
 
 ## 6. What is deliberately not done
 
 - **Vendor pre-check** (vendors run the checker locally before uploading): future feature. Same engine as the ITSG side, so it is packaging, not new logic. The ITSG-side check stays necessary anyway: hidden variants, official verdict, current rule version, advisor decisions, audit history.
-- **Replacing eVpT:** no. Infrastructure (transmission, receipts, test numbers, portal, core check) stays. We replace its weakest parts for EEL: test creation and the preliminary evaluation. Vision: the engine is procedure-agnostic (layouts and rules are data), so other procedures can follow module by module.
+- **Rebuilding the transmission network:** no. We assume the GKV communication server, encryption and test company numbers exist. Everything else eVpT does for EEL is in the platform: intake and receipts, format check, comparison, insurer replies, results portal. Other procedures stay on eVpT until they move over, module by module (layouts and rules are data).

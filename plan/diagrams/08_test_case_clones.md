@@ -8,13 +8,14 @@ flowchart TD
     P --> B["peter-b27 ... peter-b30<br/>total days around the threshold"]
     P --> N["peter-noteless<br/>01.10 period without sick note"]
     P --> H["peter-hidden<br/>whole story shifted by 37 days"]
+    G0 --> GH["peter-gap-exact-hidden<br/>31.08 to 28.02, month end"]
 
     classDef ref fill:#F1EFE8,stroke:#5F5E5A,color:#444441
     classDef clone fill:#E1F5EE,stroke:#0F6E56,color:#085041
     classDef key fill:#FAEEDA,stroke:#854F0B,color:#633806
     class P ref
     class G1,B,N,H clone
-    class G0 key
+    class G0,GH key
 ```
 
 Each clone copies the history up to a branch point, changes one thing, and gets its expected results recomputed by the rules engine. The original's expected results never change.
@@ -30,5 +31,6 @@ Each clone copies the history up to a branch point, changes one thing, and gets 
 | peter-b30 | 41 | 41 | 41 |
 | peter-noteless | no 41 | no 41 | no 41 |
 | peter-hidden | 41 | 41 | 41 |
+| **peter-gap-exact-hidden** | **no 41** | **41** | 41 |
 
 Full definitions: `03_DOMAIN_RULES_VORERKRANKUNG.md`, section 9.
