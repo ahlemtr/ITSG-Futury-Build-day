@@ -74,10 +74,11 @@ Example for the 13.4 change:
 
 | | Public `peter-gap-exact` | Hidden variant |
 |---|---|---|
-| Prior illness ends | 11.09.2025 | 31.08.2025 |
-| New sickness starts | 11.03.2026 | 28.02.2026 |
+| Test case id | `peter-gap-exact` | `peter-gap-exact-hidden` |
+| Prior illness | 07.08 to 11.09.2025 | 27.07 to 31.08.2025 |
+| New sickness | 11.03 to 20.03.2026 | 28.02 to 09.03.2026 |
 | Gap | exactly 6 months | exactly 6 months (31.08 + 6 months = 28.02) |
-| Expected under 13.4 | 41 | 41 |
+| Expected under 13.3 / 13.4 | no 41 / 41 | no 41 / 41 |
 | Vendor knows the answer? | yes | no |
 
 What they catch:
@@ -88,6 +89,8 @@ What they catch:
 | rule implemented, date math wrong at month ends | passes | **fails** |
 | claims 13.4 support, still 13.3 logic on other dates | may pass if tuned | **fails** |
 | rule correctly implemented | passes | passes |
+
+Caveat: the month-end case relies on 31.08 + 6 months = 28.02. Confirm with ITSG before failing a real vendor on it (`00` question 10).
 
 **Rules for using them:**
 1. generated per rule (other dates, month ends, leap years, other boundaries), expected results computed by the rules engine
@@ -127,6 +130,8 @@ If the software wrongly sends no message where one is required, that rule fails 
 | 4 | 62: benefit ends 31.03.2026 | nothing, import only | no new message sent |
 
 Today eVpT runs the same idea month by month: the vendor sends a month's files, the insurer replies appear the following month.
+
+In the prototype, `/runs` plays eVpT's role for these rounds (receive files, return the reply). In production the reply files would be handed to eVpT, which keeps transport and receipts.
 
 ## 6. What is deliberately not done
 

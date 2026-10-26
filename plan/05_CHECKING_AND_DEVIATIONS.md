@@ -66,6 +66,8 @@ Derived from the Verfahrensbeschreibung V13.4, which states for each field who f
 | DSLW | DATUM-ERSTELLUNG | creation time, different every run | VB 3.1.5 |
 | DSLW | DATUM-VERARBEITUNG | set by the data acceptance point when forwarding | VB 3.1.14 |
 | DBID | AKTENZEICHEN-SV | free for the collecting agency (insurer side) | VB 3.19.1 |
+| DBAL, DBAE | salary amounts of the 01 (BRUTTO, NETTO, EZ*, ...) | vendor payroll data, not defined by the scenario; dates and flags stay compared | `02` section 9 |
+| DBNA | positions 065-125 | layout unknown (`starter/layouts/README.md`) | assumption |
 
 ### Rule: not compared to the solution, checked by a rule instead
 
@@ -78,7 +80,7 @@ Derived from the Verfahrensbeschreibung V13.4, which states for each field who f
 | DSLW | ABRECHNUNGSPROGRAMM | 1 payroll, 2 filling aid, 3 time recording | matches the product type | VB 3.1.20 |
 | DBID | AKTENZEICHEN-VERURSACHER | free for the creator (e.g. personnel number) | identical across the case, echoed by the insurer | VB 3.19.2 |
 | DBID | REFERENZ-ID | points to another message | equals the ID of the message answered | VB 3.19.3 |
-| DBAP | all fields | sender's contact person | present when MM-ANSPRECH = J | VB 3.18 (no table, **assumption**) |
+| DBAP | all fields | sender's contact person | present when MM-ANSPRECH = J. Whether it is mandatory per Abgabegrund is in Anlage 3 of the VB (not available) | VB 3.18 (no table, **assumption**) |
 | VOSZ, DSKO, NCSZ | envelope | file numbers, dates, sender | NCSZ record count matches | separate spec |
 
 ### Compare: everything else
@@ -95,13 +97,13 @@ Message types, person data, all dates and periods, flags, amounts, block structu
 | **Invalid** | breaks the format, would already fail the core check | wrong length, letters in a numeric field, insurer-only field filled, MM flag without block | parser, format rules |
 | **Unclear** | no rule or precedent covers it | DBAP missing on a 41 (MM-ANSPRECH = N) | AI proposes, advisor decides |
 
-Result per test case: the worst label found (invalid, bug > unclear > correct variant > exact match). Every label carries: rule ID, ITSG criterion (if any), spec passage, expected and actual value.
+Result per test case: the worst label found (invalid > bug > unclear > correct variant > exact match). Every label carries: rule ID, ITSG criterion (if any), spec passage, expected and actual value.
 
 ## 6. The analysis steps
 
 | Step | Input | Output | Notes |
 |---|---|---|---|
-| a. Known-variant catalogue | deviation signature (record, field, kind of difference) | correct variant, with the catalogue entry as reason | YAML; seeded from variants the Pool-Testaufgaben name explicitly and from advisor precedents |
+| a. Known-variant catalogue | deviation signature (record, field, kind of difference) | correct variant, with the catalogue entry as reason | `kg/seed/variants.yaml`, seeded from variants the Pool-Testaufgaben name explicitly, plus precedents via `kg.find_precedent`. Candidate seed: MM-ANSCHRIFT J + DBAN (Beispielpapier 13.1) vs N (ITSG file), once ITSG confirms |
 | b. Rule re-check | the vendor's value + scenario | correct variant / bug / invalid | deterministic: "does the vendor's file also satisfy the rules?" |
 | c. AI triage | deviation + retrieved spec passages + similar precedents | proposal (likely variant / likely bug / unclear) + citation + confidence | never final; output rejected if it cites no passage |
 | d. System advisor | proposal | final label + reason | stored as a **precedent** |

@@ -5,7 +5,7 @@ flowchart TD
     API["api/ (FastAPI routes)"] --> CHK["engine/checker"]
     API --> BLD["engine/builder"]
     API --> REP["engine/report"]
-    API --> DB["store/ (Supabase)"]
+    API --> DB["store/ (Postgres)"]
     CHK --> DF["engine/diff<br/>3-level diff, compare modes"]
     CHK --> VC["engine/variants<br/>catalogue + precedents"]
     API --> RUN["engine/runs<br/>rounds, replies, verdicts"]
@@ -18,8 +18,8 @@ flowchart TD
     BLD --> LLM
     RUL --> KGI["kg/ interface"]
     PAR --> KGI
-    KGI --> KGY["kg/yaml_backend<br/>layouts/*.yaml, rules/*.yaml"]
-    KGI --> KGG["kg/graph_backend<br/>teammate's graph"]
+    KGI --> KGY["kg/yaml_backend<br/>layouts/*.yaml, kg/seed/*.yaml"]
+    KGI --> KGG["kg/graph_backend<br/>Neo4j (teammate)"]
     REP --> SIG["engine/signing"]
 ```
 

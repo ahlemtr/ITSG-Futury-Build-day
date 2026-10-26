@@ -17,11 +17,13 @@ sequenceDiagram
     KK->>AG: 62 end of benefit 31.03.2026, reason 99 (end of employment)
 ```
 
-What the checker grades (employer messages 1, 3, 6, 7):
+What the checker grades (employer messages 1, 3, 5, 6):
 
 | Step | Checks |
 |---|---|
 | 1 (41) | ITSG criteria f41c7278, 0cefe80e, aade0289, 9c8c9b58 + format of DBVO |
 | 3 (01) | DATUM-EGZBIS = 30.03.2026, AZVU unchanged, new unique DSID |
-| 6 (88) | DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG = DSID of step 3 |
-| 7 (01) | DATUM-EGZBIS = 27.03.2026, new unique DSID, AZVU unchanged |
+| 5 (88) | DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG = DSID of step 3, names and AZVU as in the cancelled 01, only DBSD present |
+| 6 (01) | DATUM-EGZBIS = 27.03.2026, new unique DSID, AZVU unchanged |
+
+Generated insurer replies (2, 4, 7): REF-ID of both 61 = DSID of the 41, 12-MONATSFRIST-AB 14.07.2025; REF-ID of the 62 = DSID of the new 01 (Hinweise table).

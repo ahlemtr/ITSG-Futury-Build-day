@@ -40,6 +40,8 @@ Pitch lines: "We don't replace eVpT. We feed it better tests and make its result
 
 Why not replace eVpT entirely: its infrastructure (transmission, receipts, test numbers, portal, core check) works and covers every procedure, ITSG built it, and the challenge asks to support or replace the **testing processes**, which are test creation and evaluation. Vision: the engine is procedure-agnostic, so other procedures can follow module by module.
 
+Prototype boundary: the round-based test run (`/runs`, see `06_LIFECYCLE_AND_HIDDEN_TESTS.md` section 5) stands in for eVpT's transport and reply step, because the insurer replies must point to the vendor's own DATENSATZ-ID. In production, the generated TEEK0 replies and our verdicts are handed to eVpT as files; eVpT keeps transport, receipts and the core check.
+
 ## 4. Prototype scope
 
 ### In scope
@@ -76,6 +78,9 @@ Why not replace eVpT entirely: its infrastructure (transmission, receipts, test 
 | Pool-Testaufgaben 2025/2026 | today's process (eVpT), TA 167 and 168 as baseline |
 | Rundschreiben Anl. 1 to 3 | legal background, retrieval only |
 | Futury deck | ITSG's objectives, our grading criteria |
+| Translation Assistance (26.10.2026) | glossary German to English for the pitch |
+| workflow.png | ITSG's picture of today's workflow |
+| **missing:** Anlage 3 of the Verfahrensbeschreibung | which data blocks are mandatory or optional per Abgabegrund (VB 2.2.3.2 points to it). Decides whether DBAP or DBAN may be missing on a 41 |
 
 ## 6. Demo storyline
 
@@ -84,7 +89,7 @@ Why not replace eVpT entirely: its infrastructure (transmission, receipts, test 
 3. **Check** the full Peter chain. All green, every verdict linked to its spec passage.
 4. **Break** a file (drop the July period, swap the order, wrong pay end date). The checker says exactly which rule failed and why.
 5. **Deviation analysis:** an eVpT-style diff shows the deviations of several submissions. Our checker labels them: a correct variant (3 of 4 periods), bugs, an invalid file, and one unclear case where the AI proposes a verdict with the spec passage. The advisor confirms, and the decision becomes a precedent that resolves the same case automatically next time.
-6. **Real law change:** diff V13.3 against V13.4. Section 3.12 changed "not at least 6 months" to "not more than 6 months". The builder shows the affected rules, generates `peter-gap-exact` (gap of exactly 6 months), and a legacy vendor that still follows 13.3 fails exactly that case.
+6. **Real law change:** diff V13.3 against V13.4. Section 3.12 changed "not at least 6 months" to "not more than 6 months". The builder shows the affected rules, generates `peter-gap-exact` (gap of exactly 6 months), and a legacy vendor that still follows 13.3 fails exactly that case. Bonus finding for ITSG: the same section still uses the old wording in the insurer paragraph and in 3.12.7, so 13.4 is internally inconsistent. Our diff surfaces it, a human would likely miss it.
 7. **Hidden variant:** the same rule with other dates (31.08 to 28.02, exactly 6 months). A vendor tuned to Peter's dates fails it.
 8. **Approve** the new tests, show the signed report.
 
@@ -96,6 +101,8 @@ Why not replace eVpT entirely: its infrastructure (transmission, receipts, test 
 | Ghassen | parser, rules engine, rule checker |
 | Teammate B | test builder, fixtures generation, LLM services |
 | Teammate C | API wiring, frontend, report rendering, pitch deck |
+
+Milestones per owner (`02_BACKEND_IMPLEMENTATION_PLAN.md` section 4): Ghassen M1 to M4, M8.5, M8.6. Teammate B M5, M8.1 to M8.4. Teammate C M6, M7, frontend. Teammate A M9 and `07_KNOWLEDGE_GRAPH.md` K0 to K8. M0 together on day 1.
 
 ## 8. Files in this plan
 
@@ -109,6 +116,7 @@ Why not replace eVpT entirely: its infrastructure (transmission, receipts, test 
 | `04_SPEC_DIFF_13.3_TO_13.4.md` | the real changes between both versions and what they affect |
 | `05_CHECKING_AND_DEVIATIONS.md` | eVpT's checking stages, our exact-match-first flow, compare modes and ignore list, labels, AI triage, precedents |
 | `06_LIFECYCLE_AND_HIDDEN_TESTS.md` | spec versions and validity, the four events, two parallel tracks, hidden variants, test rounds |
+| `07_KNOWLEDGE_GRAPH.md` | knowledge graph: schema, seed files, build steps, validation, queries, tests, interface changes |
 | `starter/layouts/` | done: YAML layouts for all blocks + a validated parser sketch |
 | `starter/tools/specdiff.py`, `starter/data/` | done: the diff script and its output for 13.3 vs 13.4 |
 
@@ -122,6 +130,10 @@ Why not replace eVpT entirely: its infrastructure (transmission, receipts, test 
 6. Which fields does eVpT's Vorbewertung ignore? (our list: `05_CHECKING_AND_DEVIATIONS.md`, section 4)
 7. Can we see the eVpT user manual (Benutzerhandbuch) chapter on the Vorbewertung and one real deviation report?
 8. Record descriptions for DBNA, DBAN, DBAP (Anlage 1 of the GG, field check catalogue).
+9. Which 6-month wording is authoritative for 2027? VB 13.4 changed only the employer sentence in 3.12 ("nicht mehr als"). The insurer paragraph of 3.12 still says "nicht mindestens 6 Monate", the field description 3.12.7 says "mehr als 6 Monate Arbeitsfähigkeit", and the criteria doc mixes both (`07_KNOWLEDGE_GRAPH.md` section 12).
+10. Month ends: is 31.08 + 6 months = 28.02 (calendar months, § 188 BGB style)? Our hidden variant depends on it.
+11. Anlage 3 of the Verfahrensbeschreibung (Abgabegrund / data block combinations): is DBAP mandatory on a 41? Beispielpapier 13.1 sets MM-ANSCHRIFT = J (DBAN), the ITSG reference file sends N. Which is expected?
+12. Kurz-AU: an uncertified absence directly followed by a certified AU (VB 3.12) is listed how: merged into one period, or as the certified part only?
 
 ## 10. Glossary
 
@@ -142,4 +154,5 @@ Why not replace eVpT entirely: its infrastructure (transmission, receipts, test 
 | Musterlösung | model solution of a test task |
 | Gültigkeitszeitraum | validity period of a spec version (from 1 January) |
 | Hidden variant | same rule, different data, expected results never shown to the vendor |
+| Kurz-AU | short absence without a sick note (allowed by EntgFG), never listed as a prior illness unless a certified AU follows seamlessly |
 | Precedent | an advisor's decision on a deviation, reused automatically next time |

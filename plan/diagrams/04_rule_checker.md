@@ -27,5 +27,5 @@ flowchart TD
     UN --> REP
 ```
 
-Result per test case = worst label (invalid, bug > unclear > correct variant > exact match).
+Result per test case = worst label (invalid > bug > unclear > correct variant > exact match).
 Details: `05_CHECKING_AND_DEVIATIONS.md`.
