@@ -14,7 +14,7 @@ flowchart TD
     RUN --> CHK
     CHK --> PAR["engine/records<br/>parser + writer"]
     CHK --> RUL["engine/rules"]
-    CHK --> LLM["llm/ triage + explanations"]
+    CHK --> LLM["llm/ OpenAI agents + tools<br/>spec update, check, explain, story"]
     BLD --> RUL
     BLD --> PAR
     BLD --> LLM
@@ -25,4 +25,4 @@ flowchart TD
     REP --> SIG["engine/signing"]
 ```
 
-Rule: only `kg/` knows where layouts and rules come from. Switching from YAML to the real graph changes one config value.
+Rule: only `kg/` knows where layouts and rules come from. Switching from YAML to the real graph changes one config value. The agents in `llm/` reach `kg/` and the engine only through tools (`09_TECH_STACK.md` section 3.3).

@@ -108,7 +108,7 @@ Vision: the engine is procedure-agnostic (layouts and rules are data), so other 
 | Teammate B | test builder, fixtures generation, LLM services |
 | Teammate C | API wiring, frontend, report rendering, pitch deck |
 
-Milestones per owner (`02_BACKEND_IMPLEMENTATION_PLAN.md` section 4): Ghassen M1 to M4, M8.5, M8.6. Teammate B M5, M8.1 to M8.4. Teammate C M6, M7, frontend. Teammate A M9 and `07_KNOWLEDGE_GRAPH.md` K0 to K8. M0 together on day 1.
+Milestones per owner (`02_BACKEND_IMPLEMENTATION_PLAN.md` section 4): Ghassen M1 to M4, M8.5, M8.6. Teammate B M5, M8.0 to M8.4, M8.7, M8.8. Teammate C M6, M7, frontend. Teammate A M9 and `08_KG_SEEDING_GUIDE.md` K0 to K11. M0 together on day 1.
 
 ## 8. Files in this plan
 
@@ -122,6 +122,9 @@ Milestones per owner (`02_BACKEND_IMPLEMENTATION_PLAN.md` section 4): Ghassen M1
 | `04_SPEC_DIFF_13.3_TO_13.4.md` | the real changes between both versions and what they affect |
 | `05_CHECKING_AND_DEVIATIONS.md` | eVpT's checking stages, our exact-match-first flow, compare modes and ignore list, labels, AI triage, precedents |
 | `06_LIFECYCLE_AND_HIDDEN_TESTS.md` | spec versions and validity, the four events, one catalogue with today's and next year's answers, hidden variants, test rounds |
+| `07_KNOWLEDGE_GRAPH.md` | why the knowledge graph exists, schema, impact tiers, queries |
+| `08_KG_SEEDING_GUIDE.md` | step-by-step build guide for the knowledge graph: terminology, key formats, seed files, extraction, validation, load, tests |
+| `09_TECH_STACK.md` | every library and service we use, the OpenAI agents and their tools, environment variables |
 | `starter/layouts/` | done: YAML layouts for all blocks + a validated parser sketch |
 | `starter/tools/specdiff.py`, `starter/data/` | done: the diff script and its output for 13.3 vs 13.4 |
 
@@ -155,6 +158,8 @@ Milestones per owner (`02_BACKEND_IMPLEMENTATION_PLAN.md` section 4): Ghassen M1
 | Permanent test cases | the test employees of the catalogue that a certified program keeps processing for ongoing quality control (PTA 8.4) |
 | TA | Testaufgabe, one fake employee in the official exam |
 | Systemberater | ITSG system advisor who reviews deviations |
+| Agent | an OpenAI model that calls our tools (knowledge graph queries, engine functions) and returns a draft (`09_TECH_STACK.md` section 3) |
+| Passage | one piece of spec text with a key like `VB@13.4#3.12/chaining` (`08_KG_SEEDING_GUIDE.md` section 1.3) |
 | Kernprüfung | core check: format and plausibility, same as the real data acceptance points |
 | Vorbewertung | eVpT's preliminary evaluation: comparison with the model solution |
 | Musterlösung | model solution of a test task |

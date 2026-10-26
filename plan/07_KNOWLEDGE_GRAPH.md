@@ -2,6 +2,8 @@
 
 Owner: Teammate A (see `00_PROJECT_OVERVIEW.md` section 7). Read `02_BACKEND_IMPLEMENTATION_PLAN.md` section 5 (interface) and `03_DOMAIN_RULES_VORERKRANKUNG.md` first.
 
+This file explains the design. The exact build steps, terminology and seed formats are in `08_KG_SEEDING_GUIDE.md`; where the two differ in a detail, `08` wins.
+
 ## 1. What the graph is for
 
 The graph is only worth building if it answers the queries of the engine better than the YAML backend. It serves exactly these:
@@ -13,6 +15,7 @@ The graph is only worth building if it answers the queries of the engine better 
 | `get_deviation_context(record, field, abgabegrund, version)` | AI triage (M8.5), advisor view | multi-hop: field -> rules -> passages + precedents + flagged blocks |
 | `add_precedent`, `find_precedent` | advisor decision (M8.6), catalogue step a | precedents attach to the field they are about |
 | `subgraph(node, depth)` | UI, pitch | shows the impact path visually |
+| `search_passages`, `get_changes`, `get_test_cases`, `get_test_case` | OpenAI agents (tools) | the agents fetch exactly the context they need instead of reading whole documents |
 
 Everything else (LLM extraction of rules from all PDFs, Rundschreiben law as entities, salary fields of the 01) stays out.
 
@@ -20,12 +23,13 @@ Everything else (LLM extraction of rules from all PDFs, Rundschreiben law as ent
 
 | Decision | Reason |
 |---|---|
-| **Curated, not extracted.** The graph is loaded from YAML written by hand from the plan docs and from `starter/layouts/`. The LLM only drafts (M8.3, shown on section 3.12, status `draft`) | an LLM-extracted graph from German legal PDFs is noisy and cannot be validated in hackathon time |
+| **Curated, not extracted.** The graph is loaded from YAML written by hand from the plan docs and from `starter/layouts/`; passage text is cut from the documents by script. The LLM only drafts (rules M8.3, changes and test cases M8.7), status `draft` until a human approves | an LLM-extracted graph from German legal PDFs is noisy and cannot be validated in hackathon time |
 | **Every node points back to a passage** (document, version, section, page) | every verdict and AI proposal must cite its source (principle 2 in `02`) |
 | **Version by validity, not by copying.** One `Rule`, one `Parameter` node; values and passages carry `valid_from` | `get_param(name, on_date)` is one lookup, a version change is a data change (principle 3 in `02`) |
 | **Join versions by `valid_from`, never by version number** | Beispielpapier "Version 13.3, gültig ab 01.01.2027" belongs to VB **13.4**, not VB 13.3 |
 | **Neo4j 5 Community on our VM**, app data (submissions, runs, reports) in a plain Postgres container next to it | readable path queries, Neo4j Browser gives the graph visual for free, no Supabase dependency |
 | **YAML backend stays the reference.** `kg/yaml_backend.py` and `kg/graph_backend.py` implement the same interface | if the graph is late or breaks, the engine still runs (`KG_BACKEND=yaml`) |
+| **Passages carry an OpenAI embedding** (`text-embedding-3-small`) with a Neo4j vector index, plus a German full-text index | the agents search by meaning; full-text is the fallback |
 
 ## 3. Schema
 
@@ -37,16 +41,16 @@ Every node has a unique `key`.
 |---|---|---|---|
 | Document | `VB` | title | `kg/seed/documents.yaml` |
 | DocVersion | `VB@13.4` | doc, version, published, valid_from | `kg/seed/documents.yaml` |
-| Passage | `VB@13.4#3.12` | doc, version, section, heading, text, page | keys from all seed files, text from `kg/seed/passages.yaml` (step 2) |
+| Passage | `VB@13.4#3.12` | doc, version, section, part, field, heading, text, page, embedding | generated into `kg/build/passages.yaml` (`08` section 5) |
 | MessageType | `41` | name, sender (employer / insurer / both), in_scope | `kg/seed/message_types.yaml` |
 | Record | `DBVO` | title, section, page, fixed_length | `starter/layouts/*.yaml` |
-| Field | `DBVO.BEGINN-AU` | record, name, start, end, length, type, required, format, repeating, compare_mode | `starter/layouts/*.yaml` + `kg/seed/compare_modes.yaml` |
-| Rule | `R41-2` | title, kind (domain / format / reply / chain) | `kg/seed/rules.yaml` |
+| Field | `DBVO.BEGINN-AU` | record, name, start, end, length, type, required, format, repeating, status, compare_mode | `starter/layouts/*.yaml` + `kg/seed/compare_modes.yaml` |
+| Rule | `R41-2` | title, description, kind (domain / format / reply / chain / efz), status | `kg/seed/rules.yaml` |
 | Criterion | `0cefe80e-...` | text | `kg/seed/rules.yaml` |
 | Parameter | `gap_inclusive` | note | `kg/seed/parameters.yaml` |
 | ParamValue | `gap_inclusive@13.4` | value, version, valid_from, simulated | `kg/seed/parameters.yaml` |
 | Change | `VB-13.3-13.4-DBVO-chaining` | summary, label (editorial...), in_scope, block, field | `starter/data/spec_diff_13.3_13.4.json` + `kg/seed/changes.yaml` |
-| TestCase | `peter-gap-exact` | kind (reference / clone / hidden), origin (itsg / beispielpapier / builder), status, hidden | `kg/seed/test_cases.yaml` |
+| TestCase | `peter-gap-exact` | kind (reference / clone / hidden), origin (itsg / beispielpapier / builder / pta), status, hidden, steps, inputs, expected (per version) | `kg/seed/test_cases.yaml` |
 | Precedent | `41\|DSLW.MM-ANSPRECH\|missing_block` | verdict, reason, advisor, decided | written at runtime by `add_precedent` |
 
 Key formats:
@@ -62,7 +66,8 @@ Key formats:
 | SUCCEEDS | DocVersion -> DocVersion (newer -> older) | | `get_versions` |
 | CONTAINS | DocVersion -> Passage | | `get_passage` |
 | USES_BLOCK | MessageType -> Record | mandatory, flag (e.g. `MM-ANSPRECH`) | format checks F41-3, triage |
-| HAS_FIELD | Record -> Field | | `get_layout` |
+| HAS_FIELD | Record -> Field | order | `get_layout` |
+| CARRIES | Record DSLW -> Record DBxx | order, flag | parser, block order |
 | DESCRIBED_IN | Field, Record, Parameter, TestCase -> Passage | | triage, report |
 | APPLIES_TO | Rule -> MessageType | | `get_rules` |
 | CONSTRAINS | Rule -> Field | | triage |
@@ -71,6 +76,7 @@ Key formats:
 | USES_PARAM | Rule -> Parameter | | impact (recompute tier) |
 | HAS_VALUE | Parameter -> ParamValue | | `get_param` |
 | MODIFIES_OLD, MODIFIES_NEW | Change -> Passage | | impact (review tier) |
+| DERIVED_FROM | curated Change -> raw Change | | traceability to the diff |
 | CHANGES_PARAM | Change -> Parameter | | impact (recompute tier) |
 | TARGETS | TestCase -> Rule | | impact -> tests to recompute |
 | CLONE_OF, HIDDEN_OF | TestCase -> TestCase | | builder lineage |
@@ -79,31 +85,33 @@ Key formats:
 
 ## 4. Build process
 
-Code lives in `kg/` as planned in `02` section 3. Seed files in `kg/seed/`.
+Code lives in `kg/` as planned in `02` section 3. Seed files in `kg/seed/`. The table below is the overview; the exact instructions for every step are in `08_KG_SEEDING_GUIDE.md` (steps K0 to K11 there).
 
 | Step | Implement | Test / how |
 |---|---|---|
 | K0 | VM: `docker run -d --name neo4j -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/<password> -v neo4j_data:/data neo4j:5-community`. Env: `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, `KG_BACKEND` | Neo4j Browser opens on port 7474 |
 | K1 | **seed files by hand** (section 5) | every rule of `03` sections 3 to 7 is in `rules.yaml` |
-| K2 | **passage text**: `pdftotext -layout` on each PDF in `sources/`, split at section headings (regex `^\s*\d+(\.\d+)+\s+\S`), skip table of contents lines (dot leaders + page number), write `kg/seed/passages.yaml` as `key -> {heading, text, page}`. Split 3.12 further into sub-passages (section 7) | `VB@13.3#3.12` contains "nicht mindestens 6 Monate", `VB@13.4#3.12` contains "nicht mehr als 6 Monate" |
+| K2 | **passage text**: `pdftotext -enc UTF-8 -layout` on each PDF, `python-docx` on each Word file, split into sections, field sub-sections and the 3.12 parts (`08` section 5), write `kg/build/passages.yaml` | `VB@13.3#3.12/chaining` contains "nicht mindestens 6 Monate", `VB@13.4#3.12/chaining` contains "nicht mehr als 6 Monate" |
 | K3 | **build in memory** (`kg/seed_graph.py`): read seed + layouts + spec diff into node and edge lists, normalize keys | node counts printed per label |
 | K4 | **validate before loading** (section 6). Exit code 1 on errors | break a rule's source key: build fails with the rule id |
 | K5 | **load** (`kg/load.py`): unique constraint per label, `UNWIND $rows MERGE` for nodes and edges, full-text index on passages | load twice: identical node and edge counts |
 | K6 | **backend** (`kg/graph_backend.py`): one query per interface method (section 8) | all engine tests pass with `KG_BACKEND=graph` (M9.2) |
 | K7 | **tests** (section 9) | `pytest tests/test_kg.py` green against the VM |
 | K8 | **demo queries** saved as favorites in Neo4j Browser (section 10) | impact path renders in one click |
+| K9 | **embeddings**: OpenAI `text-embedding-3-small` per passage, cached, Neo4j vector index (`08` section 12.4) | `search_passages("Vorerkrankung 6 Monate")` returns `3.12/chaining` in the top 3 |
 
 ## 5. Seed files and where each fact comes from
 
 | File | Content | Source |
 |---|---|---|
-| `documents.yaml` | VB 13.3 (published 24.11.2025, valid 01.01.2026), VB 13.4 (10.03.2026, valid 01.01.2027), GG 13.1, BP 13.3 (valid 01.01.2027), HINWEISE, BVORERK, RS Anl. 1 to 3. Optional list of named passages with headings | `06` section 1, file names in `sources/`. BP, HINWEISE, BVORERK and RS are in the claude.ai project only: copy them into `sources/` before K2 |
+| `documents.yaml` | VB 13.3 (published 24.11.2025, valid 01.01.2026), VB 13.4 (10.03.2026, valid 01.01.2027), GG 13.1, PTA, BP 13.3 (valid 01.01.2027), HINWEISE, BVORERK, RS Anl. 1 to 3 | `06` section 1, file names in `sources/` (`08` section 1) |
 | `message_types.yaml` | 01, 41, 61, 62, 88 with `in_scope: true`, the others with `false`. Blocks per message type with `mandatory` and `flag` | `06` section 1; flags from `announced_by` in the layouts (e.g. DBVO by `MM-VOER`); DBAP optional on a 41 via `MM-ANSPRECH` (Beispielpapier 13.1) |
 | `parameters.yaml` | `min_total_days`, `gap_months`, `gap_inclusive`, `sum_window_months`, `open_end_days`, `efz_days`, one value per version, `sim-13.5` marked `simulated: true` | `03` section 2 |
 | `rules.yaml` | criteria (4 UUIDs) and rules R41-1..6, F41-1..10, K61-1..7, K62-1..2, E-1..3, C-1..8, each with `applies_to`, `fields`, `params`, `sources`, `criterion` | `03` sections 3 to 7 |
 | `compare_modes.yaml` | ignore list and rule list with VB section | `05` section 4 |
 | `changes.yaml` | curated layer on top of the raw diff: which change touches which parameter (`CHANGES_PARAM`), `in_scope`, summary | `04` sections 1 and 2 |
-| `test_cases.yaml` | id, kind, parent, targets | `02` section 7, `03` section 9 |
+| `test_cases.yaml` | id, kind, parent, targets, inputs, expected per version | `02` section 7, `03` section 9 |
+| `precedents.yaml` | empty list at start, appended at runtime by the YAML backend | advisor decisions |
 | from `starter/layouts/*.yaml` | Record (section, page from `spec`), Field (start, end, length, type, required, format), repeating group, `announced_by` flag | already extracted |
 | from `starter/data/spec_diff_13.3_13.4.json` | 67 raw changes (`tag, block, field, old, new`), linked by `block` to the record's section passage | already computed |
 
@@ -138,10 +146,14 @@ A first build with 3.12 as one passage returned **17 rules** as affected by the 
 
 | Passage key | Content | Cited by |
 |---|---|---|
-| `VB@13.x#3.12/conditions` | when a 41 may be sent (certified AU, 30 days, open end + 1 week) | R41-1, R41-4, R41-6 |
-| `VB@13.x#3.12/chaining` | "nicht mindestens" (13.3) / "nicht mehr als" (13.4) 6 Monate, back to the first illness | R41-2, R41-3 |
-| `VB@13.x#3.12.7` | periods newest first, more than 6 months not requested | F41-8, R41-3 |
-| `VB@13.x#3.12/fields` | field table, insurer-only fields | F41-4..7, F41-9, K61-* |
+| `VB@13.x#3.12/conditions` | when a 41 may be sent (certified AU, 6 months, 30 days, open end + 1 week) | R41-1, R41-4, R41-6 |
+| `VB@13.x#3.12/chaining` | "nicht mindestens" (13.3) / "nicht mehr als" (13.4) 6 Monate, back to the first illness, Kurz-AU | R41-2, R41-3, R41-5 |
+| `VB@13.x#3.12/scope` | who asks whom, exclusions | none |
+| `VB@13.x#3.12/insurer` | what the insurer returns, its own 6-month wording | K61-3 |
+| `VB@13.x#3.12/uebergangsgeld` | Abgabegrund 11/12 case | none |
+| `VB@13.x#3.12.1` to `3.12.14` | one passage per field (3.12.7 = periods newest first, more than 6 months not requested) | F41-4..9, K61-4..7, R41-3 |
+
+The anchor sentences for the parts and the numbering rule for field passages are in `08` section 5.2.
 
 Pitch line: "We tell ITSG which tests must be regenerated, and which passages a human should reread."
 
@@ -237,7 +249,9 @@ MATCH p = (r:Rule {key:'R41-2'})-[*1]-() RETURN p
 | `get_param(name, version=None, on_date=None)` | both lookup modes, simulated values only by version |
 | `get_deviation_context(record, field, abgabegrund, version)` | new, used by M8.5 |
 | `add_precedent(...)`, `find_precedent(...)` | new, used by M8.6 and catalogue step a |
-| `search_passages(text)` | new, full-text search for the advisor |
+| `search_passages(text, k)` | new, vector search with full-text fallback, for the advisor and the agents |
+| `get_changes(document, old_version, new_version, in_scope_only)` | new, used by the spec-update agent (M8.7) |
+| `get_test_cases(rule_id, include_hidden)`, `get_test_case(key)` | new, used by the spec-update agent and the builder |
 | `subgraph(label, key, depth)` | new, for the UI |
 
 `kg/yaml_backend.py` implements the same methods so both backends stay interchangeable.
