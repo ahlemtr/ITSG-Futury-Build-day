@@ -1,0 +1,65 @@
+record: DBTK
+title: Zusatzdaten für die Berechnung der Entgeltersatzleistungen bei Bezug von Transfer-Kurzarbeitergeld
+spec:
+  document: Verfahrensbeschreibung DTA EEL
+  version: '13.4'
+  valid_from: '2027-01-01'
+  section: '3.17'
+  page: 160
+announced_by:
+  record: DSLW
+  field: MM-TRAKUG
+  value_if_present: J
+status: extracted
+fixed_length: 52
+fields:
+- name: KENNUNG
+  start: 1
+  end: 4
+  length: 4
+  type: an
+  required: M
+  constant: DBTK
+  source: structure
+- name: BRUTTO-SOLL
+  start: 5
+  end: 12
+  length: 8
+  type: n
+  required: M
+  format: amount_2dp
+- name: NETTO-SOLL
+  start: 13
+  end: 20
+  length: 8
+  type: n
+  required: M
+  format: amount_2dp
+- name: TRANSFER-KUG
+  start: 21
+  end: 28
+  length: 8
+  type: n
+  required: M
+  format: amount_2dp
+- name: BRUTTO-IST
+  start: 29
+  end: 36
+  length: 8
+  type: n
+  required: m
+  format: amount_2dp
+- name: NETTO-IST
+  start: 37
+  end: 44
+  length: 8
+  type: n
+  required: m
+  format: amount_2dp
+- name: AUFSTOCKUNGSBETRAG
+  start: 45
+  end: 52
+  length: 8
+  type: n
+  required: m
+  format: amount_2dp

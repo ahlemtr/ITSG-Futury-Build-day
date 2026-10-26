@@ -1,0 +1,28 @@
+services:
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://eel:eel@postgres:5432/eel
+      NEO4J_URI: bolt://neo4j:7687
+    ports: ["8000:8000"]
+    volumes: ["./data:/app/data"]
+    depends_on: [postgres]
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: eel
+      POSTGRES_PASSWORD: eel
+      POSTGRES_DB: eel
+    ports: ["5432:5432"]
+    volumes: ["pg_data:/var/lib/postgresql/data"]
+  neo4j:  # filled by the KG teammate (plan/08 K0)
+    image: neo4j:5.26-community
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-changeme}
+      NEO4J_PLUGINS: '["apoc"]'
+    ports: ["7474:7474", "7687:7687"]
+    volumes: ["neo4j_data:/data"]
+volumes:
+  pg_data:
+  neo4j_data:

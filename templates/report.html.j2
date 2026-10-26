@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Prüfbericht {{ r.submission_id }}</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 2rem; color: #1d2733; }
+  h1 { font-size: 1.4rem; margin-bottom: .2rem; }
+  .meta { color: #5b6673; margin-bottom: 1.2rem; }
+  .label { display: inline-block; padding: .15rem .6rem; border-radius: 1rem; font-weight: 600; }
+  .exact_match { background: #dff3e4; color: #1c6b34; }
+  .correct_variant { background: #e3eefc; color: #1d4f91; }
+  .bug { background: #fde3e1; color: #9b1c13; }
+  .invalid { background: #f8dcef; color: #85155e; }
+  .unclear { background: #fff1cc; color: #7a5300; }
+  table { border-collapse: collapse; width: 100%; margin-top: 1rem; font-size: .9rem; }
+  th, td { border-bottom: 1px solid #dde3ea; padding: .4rem .5rem; text-align: left; vertical-align: top; }
+  th { background: #f3f6f9; }
+  .passage { font-size: .8rem; color: #444; background: #f7f7f2; padding: .4rem; margin-top: .3rem; }
+  .timeline span { display: inline-block; margin-right: .4rem; padding: .1rem .5rem; border: 1px solid #c7d0da; border-radius: .3rem; }
+  .sig { font-family: monospace; font-size: .75rem; word-break: break-all; color: #5b6673; }
+</style>
+</head>
+<body>
+<h1>Prüfbericht: Testfall {{ r.test_case_id }}</h1>
+<div class="meta">Einreichung {{ r.submission_id }}{% if r.vendor %} · Hersteller {{ r.vendor }}{% endif %}{% if r.product_id %} · Produkt {{ r.product_id }}{% endif %}<br>
+Regelwerk VB {{ r.rule_set_version }} (gültig am {{ r.valid_on }}) · erstellt {{ r.created }}</div>
+<p>Ergebnis: <span class="label {{ r.label }}">{{ r.label }}</span>
+ · erwartete Meldungen {{ r.expected_messages }}, eingereicht {{ r.actual_messages }}</p>
+{% if r.chain %}<p class="timeline">{% for c in r.chain %}<span>{{ c }}</span>{% endfor %}</p>{% endif %}
+<p>Abweichungen: {% for k, v in r.counts.items() %}{{ k }} {{ v }}{% if not loop.last %}, {% endif %}{% else %}keine{% endfor %}</p>
+{% if r.checks %}
+<table>
+<tr><th>Schritt</th><th>Feld</th><th>Ergebnis</th><th>Erwartet</th><th>Ist</th><th>Regel / Quelle</th><th>Begründung</th></tr>
+{% for c in r.checks %}
+<tr>
+  <td>{{ c.step or "" }} {{ c.abgabegrund or "" }}</td>
+  <td>{{ c.record }}{% if c.field %}.{{ c.field }}{% endif %}<br><small>{{ c.kind }}</small></td>
+  <td><span class="label {{ c.outcome }}">{{ c.outcome }}</span></td>
+  <td>{{ c.expected or "" }}</td>
+  <td>{{ c.actual or "" }}</td>
+  <td>{{ c.rule or "" }}{% if c.criterion %}<br><small>{{ c.criterion }}</small>{% endif %}<br><small>{{ c.sources | join(", ") }}</small></td>
+  <td>{{ c.explanation }}{% if c.ai_proposal %}<br><em>KI-Vorschlag: {{ c.ai_proposal.proposal }} ({{ c.ai_proposal.citations | join(", ") }})</em>{% endif %}{% if c.passage and c.outcome in ("bug", "invalid", "unclear") %}<div class="passage">{{ c.passage[:900] }}</div>{% endif %}</td>
+</tr>
+{% endfor %}
+</table>
+{% else %}<p>Alle verglichenen Felder identisch, alle Regelfelder gültig.</p>{% endif %}
+<h2>Eingabedateien</h2>
+<ul>{% for f in r.files %}<li>{{ f.name }}: <span class="sig">{{ f.sha256 }}</span></li>{% endfor %}</ul>
+{% if sig %}<h2>Signatur</h2>
+<p class="sig">{{ sig.algorithm }} · SHA-256 {{ sig.json_sha256 }}<br>{{ sig.value }}<br>Public key {{ sig.public_key }}</p>{% endif %}
+</body>
+</html>

@@ -1,0 +1,58 @@
+# Chain-only extras for Peter Mustermann (decision D3). The case facts (AU periods, report date,
+# employment end) come from the knowledge base (`kb.get_test_case`). Clones and Beispielpapier
+# cases without an own file inherit this one.
+#
+# Values marked "ITSG file" are read from fixtures/itsg/TEEL0-Test1-DBVO, "Hinweise" from
+# sources/Hinweise_DTA-EEL-Bespiel_Vorerkrankung_Testkonstellation.docx. "derived" = our assumption,
+# not given by ITSG (plan/02 section 9).
+person:
+  vsnr: 17241280Q497            # ITSG file
+  geburtsdat: 1980-12-24        # ITSG file
+  familienname: Mustermann
+  vorname: Peter
+employer:
+  verfahren: LEIST
+  absendernummer: "99302811"    # ITSG file (test company number)
+  empfaengernummer: "00000000"
+  version_nr: 13
+  bbnr_vu: "99302811"
+  bbnr_kk: "00000000"
+  produkt_identifier: "7654321"
+  modifikations_identifier: 66666XXX
+  abrechnungsprogramm: 1
+  contact:                      # DBAP, ITSG file
+    NAME: Mia Testfrau
+    TELEFON: 069-8700
+    EMAIL: systemuntersuchung@itsg.de
+    FIRMA-1: Testfirma Qualitätskontrolle
+    FIRMA-2: Einzugsstellen-SVT
+    FIRMA-3: ITSG GmbH
+    PLZ: "63067"
+    ORT: Offenbach
+    STRASSE: Kaiserleistrasse
+    HAUSNUMMER: 10-16
+azvu: 1234-5678-007             # Hinweise
+created: "20260214094108000000" # ITSG file; ignored by the diff
+ids:                            # DATENSATZ-IDs per chain step (Hinweise table); insurer ids derived
+  "1": 11111111-2222-AAAA-EEEE-111111111111
+  "2": 61616161-0001-4000-8000-000000000001
+  "3": AAAAAAAA-EEEE-2222-4444-BBBBBBBBBBBB
+  "4": 61616161-0002-4000-8000-000000000002
+  "5": BBBBBBBB-8888-5555-CCCC-121212121212
+  "6": 11112222-FFFF-3333-5555-CCCCCCCCCCCC
+  "7": 62626262-0001-4000-8000-000000000001
+insurer:
+  # first 61: the paper note 01.03-03.03 is not known to the insurer (Hinweise): KZ-NACHWEIS 4.
+  # KZ-AU 3 (further check, interim) for that period is derived.
+  first_61:
+    "2026-03-01": {kz_nachweis: 4, kz_au: 3}
+  # corrected 61: the employee hands in the note, every period counts (Hinweise)
+  corrected_61: {}
+  default_flags: {kz_nachweis: 1, kz_au: 1}
+  eel_ende_grund: 99            # Hinweise
+salary:                         # 01 certificate (DBAE): vendor payroll data, ignored by the diff (derived)
+  eaz_beginn: 2026-02-01
+  eaz_ende: 2026-02-28
+  brutto: "3500.00"
+  netto: "2300.00"
+  entgart: 2
