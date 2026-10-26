@@ -120,6 +120,46 @@ export type RoundOutcome = {
   replyValues?: { REF: string; AZVU: string };
 };
 
+// ---------- Advisor queue (doc 05, steps c and d) ----------
+
+/** AI triage output. Never final; dropped when it cites no passage. */
+export type AiProposal = {
+  label: Exclude<Label, "exact">;
+  /** 0..1 */
+  confidence: number;
+  reasoning: Localized;
+  citations: SpecRef[];
+  /** ids of similar precedents */
+  precedents: string[];
+};
+
+export type AdvisorItem = {
+  id: string;
+  title: Localized;
+  vendor: string;
+  testCaseId: string;
+  ruleSet: string;
+  /** signature parts, used to find the same deviation again */
+  record: string;
+  field: string;
+  kind: string;
+  expected: Localized;
+  actual: Localized;
+  proposal?: AiProposal;
+};
+
+export type Precedent = {
+  id: string;
+  /** record.field.kind */
+  signature: string;
+  label: Exclude<Label, "exact" | "unclear">;
+  reason: string;
+  advisor: string;
+  /** ISO timestamp */
+  at: string;
+  itemTitle: Localized;
+};
+
 /** Figures for the Overview: one catalogue, today's and next year's rule version (06, section 3). */
 export type OverviewData = {
   checksNow: {

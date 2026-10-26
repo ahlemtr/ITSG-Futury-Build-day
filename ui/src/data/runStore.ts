@@ -23,8 +23,26 @@ export type RunState = {
   status: "running" | "passed" | "failed";
 };
 
-const states = new Map<string, RunState>();
+// Kept in the browser (localStorage), so a page reload does not lose a run.
+const STORAGE_KEY = "eel-ui-runs";
+const states = new Map<string, RunState>(Object.entries(load()));
 const listeners = new Set<() => void>();
+
+function load(): Record<string, RunState> {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(Object.fromEntries(states)));
+  } catch {
+    // storage blocked or full: the run still works until the next reload
+  }
+}
 
 function fresh(def: RunDef): RunState {
   return { current: 0, rounds: def.rounds.map(() => ({})), status: "running" };
@@ -37,12 +55,15 @@ export function getRunDef(id: string): RunDef | undefined {
 function getState(id: string): RunState | undefined {
   const def = getRunDef(id);
   if (!def) return undefined;
-  if (!states.has(id)) states.set(id, fresh(def));
+  const saved = states.get(id);
+  // A saved run from an older version of the test definition is started fresh.
+  if (!saved || saved.rounds?.length !== def.rounds.length) states.set(id, fresh(def));
   return states.get(id);
 }
 
 function update(id: string, next: RunState) {
   states.set(id, next);
+  save();
   listeners.forEach((l) => l());
 }
 

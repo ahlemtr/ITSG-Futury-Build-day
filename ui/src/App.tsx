@@ -4,6 +4,7 @@ import { TopBarProvider } from "./components/TopBarContext";
 import { SideNav } from "./components/SideNav";
 import { PlaceholderScreen } from "./screens/PlaceholderScreen";
 import { OverviewScreen } from "./screens/OverviewScreen";
+import { AdvisorQueueScreen } from "./screens/AdvisorQueueScreen";
 import { SubmissionsScreen } from "./screens/SubmissionsScreen";
 import { SubmissionResultScreen } from "./screens/SubmissionResultScreen";
 import { MyTestsScreen } from "./screens/vendor/MyTestsScreen";
@@ -23,7 +24,7 @@ export function App() {
             <Route path="/test-catalogue" element={<PlaceholderScreen screen="testCatalogue" />} />
             <Route path="/submissions" element={<SubmissionsScreen />} />
             <Route path="/submissions/:id" element={<SubmissionResultScreen />} />
-            <Route path="/advisor-queue" element={<PlaceholderScreen screen="advisorQueue" />} />
+            <Route path="/advisor-queue" element={<AdvisorQueueScreen />} />
             <Route path="/reports" element={<PlaceholderScreen screen="reports" />} />
             <Route path="/vendor" element={<MyTestsScreen />} />
             <Route path="/vendor/runs/:id" element={<TestRunScreen />} />

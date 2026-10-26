@@ -250,5 +250,33 @@
       "passedHint_other": "Alle Regeln in {{count}} Runden erfüllt.",
       "failedHint": "Regel {{rule}} nicht erfüllt. Der Lauf endet hier; setzen Sie ihn zurück, um es erneut zu versuchen."
     }
+  },
+  "advisor": {
+    "topbar": "<strong>{{count}} offen</strong> · Ansicht Systemberater",
+    "empty": "Keine offenen Klärungsfälle. Alles ist entschieden.",
+    "deviation": "Abweichung",
+    "aiProposal": "KI-Vorschlag",
+    "proposal": {
+      "variant": "wahrscheinlich zulässige Variante",
+      "bug": "wahrscheinlich Fehler",
+      "invalid": "wahrscheinlich ungültig",
+      "unclear": "unklar"
+    },
+    "confidence": "Konfidenz",
+    "cited": "Zitiert",
+    "similar": "Ähnliche Präzedenzfälle",
+    "none": "keine",
+    "draftOnly": "Nur ein Vorschlag: die KI entscheidet nie selbst.",
+    "noProposal": "Kein KI-Vorschlag: ein Vorschlag ohne zitierte Spec-Passage wird verworfen.",
+    "reason": "Begründung (Pflicht)",
+    "reasonPlaceholder": "z. B. Anlage 3 lässt DBAP auf der 41 weg; mit ITSG abgestimmt am …",
+    "reasonRequired": "Bitte eine Begründung angeben. Sie wird mit dem Präzedenzfall gespeichert.",
+    "confirmAs": "Bestätigen: {{label}}",
+    "markAs": "Als {{label}} markieren",
+    "becomesPrecedent": "Die Entscheidung wird als Präzedenzfall gespeichert und klärt dieselbe Abweichung künftig automatisch.",
+    "saved": "Gespeichert als Präzedenzfall {{id}} ({{label}}). Dieselbe Abweichung wird künftig automatisch geklärt.",
+    "decidedToday": "Heute entschieden",
+    "signature": "Signatur",
+    "resetDemo": "Demo zurücksetzen"
   }
 }

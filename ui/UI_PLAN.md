@@ -48,6 +48,8 @@ Taken from ITSG's own deck. All values are defined once as named tokens, so they
 
 ### Result labels: always text plus color
 
+**Changed (team feedback, coloured backgrounds looked unprofessional):** labels are neutral (ink text, grey border, white background). Only a small dot in front of the text carries a colour, and only two colours are used: **green** for Exact match (also Identical, Valid, Passed, Approved) and **red** for Bug (also Failed, Not passed). All other labels get a grey dot.
+
 | Label | Also used for | Background / text (read from the image, fine-tune when building) |
 |---|---|---|
 | Exact match | Identical, Passed, Approved, Valid | `#E6F4EA` / `#1E7B45` |

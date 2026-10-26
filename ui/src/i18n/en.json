@@ -250,5 +250,33 @@
       "passedHint_other": "All rules met in {{count}} rounds.",
       "failedHint": "Rule {{rule}} not met. The run ends here; reset it to try again."
     }
+  },
+  "advisor": {
+    "topbar": "<strong>{{count}} open</strong> · system advisor view",
+    "empty": "No open cases. Everything is decided.",
+    "deviation": "Deviation",
+    "aiProposal": "AI proposal",
+    "proposal": {
+      "variant": "likely correct variant",
+      "bug": "likely bug",
+      "invalid": "likely invalid",
+      "unclear": "unclear"
+    },
+    "confidence": "Confidence",
+    "cited": "Cited",
+    "similar": "Similar precedents",
+    "none": "none",
+    "draftOnly": "A proposal only: the AI never decides on its own.",
+    "noProposal": "No AI proposal: a proposal without a cited spec passage is rejected.",
+    "reason": "Reason (required)",
+    "reasonPlaceholder": "e.g. Anlage 3 allows a 41 without DBAP; agreed with ITSG on …",
+    "reasonRequired": "Please give a reason. It is saved with the precedent.",
+    "confirmAs": "Confirm: {{label}}",
+    "markAs": "Mark as {{label}}",
+    "becomesPrecedent": "The decision is saved as a precedent and settles the same deviation automatically next time.",
+    "saved": "Saved as precedent {{id}} ({{label}}). The same deviation will be settled automatically next time.",
+    "decidedToday": "Decided today",
+    "signature": "Signature",
+    "resetDemo": "Reset demo"
   }
 }

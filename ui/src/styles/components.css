@@ -36,22 +36,35 @@
   border-color: var(--red-dark);
 }
 
-/* Badges: text plus colour */
+/* Badges: neutral text label; only a small dot carries the colour (team feedback:
+   coloured backgrounds looked unprofessional). To drop the dot too, delete .badge::before. */
 .badge {
-  display: inline-block;
-  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 8px;
+  border: 1px solid var(--border);
   border-radius: var(--radius-button);
+  background: var(--surface);
+  color: var(--ink);
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
 }
 
-.badge-exact { background: var(--label-exact-bg); color: var(--label-exact-fg); }
-.badge-variant { background: var(--label-variant-bg); color: var(--label-variant-fg); }
-.badge-bug { background: var(--label-bug-bg); color: var(--label-bug-fg); }
-.badge-invalid { background: var(--label-invalid-bg); color: var(--label-invalid-fg); }
-.badge-unclear { background: var(--label-unclear-bg); color: var(--label-unclear-fg); }
-.badge-neutral { background: var(--label-neutral-bg); color: var(--label-neutral-fg); }
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dot, var(--label-neutral-fg));
+  flex-shrink: 0;
+}
+
+/* Only two colours (team decision): green for exact match / passed, red for bug / failed.
+   All other labels keep the neutral grey dot; the text says what they are. */
+.badge-exact { --dot: var(--label-exact-fg); }
+.badge-bug { --dot: var(--label-bug-fg); }
 
 /* Page header with actions on the right */
 .page-header-split {
@@ -300,9 +313,9 @@ abbr[title] {
   font-variant-numeric: tabular-nums;
 }
 
-/* Status, not brand: uses the Bug tone, never --itsg-red */
+/* Neutral like the rest (team feedback); the resolution bar keeps its colours as a chart */
 .figure-attention {
-  color: var(--label-bug-fg);
+  color: var(--ink);
 }
 
 .figure-label {

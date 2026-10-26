@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { getOverview, getSubmissions } from "../data/dataSource";
+import { useAdvisorState } from "../data/advisorStore";
 import type { OverviewData } from "../data/types";
 import { useData } from "../data/useData";
 import { SubmissionsTable } from "../components/SubmissionsTable";
@@ -11,6 +12,11 @@ export function OverviewScreen() {
   const { t } = useTranslation();
   const overview = useData(getOverview, []);
   const submissions = useData(getSubmissions, []);
+  const advisor = useAdvisorState();
+  const live =
+    overview.status === "ready"
+      ? withAdvisor(overview.data, advisor.open.length, advisor.decided.length)
+      : undefined;
 
   return (
     <>
@@ -21,10 +27,10 @@ export function OverviewScreen() {
 
       {overview.status === "loading" && <p className="page-subtitle">{t("common.loading")}</p>}
       {overview.status === "error" && <div className="placeholder">{t("common.error")}</div>}
-      {overview.status === "ready" && <OverviewCards data={overview.data} />}
+      {live && <OverviewCards data={live} />}
 
       <div className="overview-bottom">
-        {overview.status === "ready" && <ResolutionCard data={overview.data.resolution} />}
+        {live && <ResolutionCard data={live.resolution} />}
         <section className="panel panel-flush">
           <h2 className="panel-title">{t("overview.latest")}</h2>
           {submissions.status === "ready" && (
@@ -35,6 +41,19 @@ export function OverviewScreen() {
       </div>
     </>
   );
+}
+
+/** The mock figures assume the advisor queue as seeded; each decision moves one deviation from waiting to confirmed. */
+function withAdvisor(data: OverviewData, open: number, decided: number): OverviewData {
+  return {
+    ...data,
+    checksNow: { ...data.checksNow, withOpenDeviations: open },
+    resolution: {
+      ...data.resolution,
+      waitingForAdvisor: open,
+      aiConfirmedByAdvisor: data.resolution.aiConfirmedByAdvisor + decided,
+    },
+  };
 }
 
 function monthName(isoMonth: string, lang: string): string {

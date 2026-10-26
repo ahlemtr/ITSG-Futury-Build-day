@@ -105,10 +105,11 @@
   color: var(--ink-muted);
 }
 
+/* Neutral steps: the state is in the text below the label (done / failed / open) */
 .step-current { border-color: var(--ink); }
 .step-current .step-nr { background: var(--ink); color: var(--surface); }
-.step-done .step-nr { background: var(--label-exact-bg); color: var(--label-exact-fg); }
-.step-failed .step-nr { background: var(--label-bug-bg); color: var(--label-bug-fg); }
+.step-done .step-nr,
+.step-failed .step-nr { background: var(--surface); color: var(--ink); border: 1px solid var(--ink); }
 .step-locked { color: var(--ink-muted); }
 
 /* Round card and its parts */
@@ -228,13 +229,11 @@
 }
 
 /* Final verdict */
+/* Neutral verdict: "Bestanden" / "Nicht bestanden" in large ink type */
 .verdict-card {
   margin-bottom: 16px;
-  border-left-width: 4px;
+  border-left: 4px solid var(--ink);
 }
-
-.verdict-passed { border-left-color: var(--label-exact-fg); }
-.verdict-failed { border-left-color: var(--label-bug-fg); }
 
 .verdict-text {
   font-family: var(--font-heading);
@@ -242,6 +241,3 @@
   font-size: 32px;
   margin: 0;
 }
-
-.verdict-passed .verdict-text { color: var(--label-exact-fg); }
-.verdict-failed .verdict-text { color: var(--label-bug-fg); }
