@@ -1,0 +1,49 @@
+# Step K7 (08 section 10): curated layer on top of the raw diff (kg/seed/spec_diff_13.3_13.4.json).
+# `raw_match` is resolved by the build against the raw changes (all given conditions must hold):
+#   block, field_prefix, old_contains, new_contains.
+# Out of scope (raw changes stay in_scope: false, label unknown): seafarers (DBAE, DBFR, DBSF),
+# DBAE BRUTTO-1 hourly workers, DBFR home care, DSLW ABRECHNUNGSPROGRAMM wording (04 section 2).
+document: VB
+old_version: "13.3"
+new_version: "13.4"
+changes:
+  - key: VB-13.3-13.4-DBVO-chaining
+    raw_match: {block: DBVO, old_contains: nicht mindestens 6 Monate}
+    summary: 6-month chaining wording, "nicht mindestens" became "nicht mehr als"; a gap of exactly 6 months now chains
+    label: editorial
+    in_scope: true
+    changes_param: [gap_inclusive]
+    modifies_old: [VB@13.3#3.12/chaining]
+    modifies_new: [VB@13.4#3.12/chaining]
+  - key: VB-13.3-13.4-BBNR-VU
+    raw_match: {block: DSLW, field_prefix: BBNR-VU}
+    summary: insurer replies carry the employer's BBNR-VU
+    label: clarification
+    in_scope: true
+    changes_param: []
+    modifies_old: [VB@13.3#3.1.10]
+    modifies_new: [VB@13.4#3.1.10]
+  - key: VB-13.3-13.4-DBID-AZVU
+    raw_match: {block: DBID, field_prefix: AKTENZEICHEN-VERUR}
+    summary: AKTENZEICHEN-VERURSACHER returned unchanged, blank if the employer sent none
+    label: clarification
+    in_scope: true
+    changes_param: []
+    modifies_old: [VB@13.3#3.19.2]
+    modifies_new: [VB@13.4#3.19.2]
+  - key: VB-13.3-13.4-DBSD-names
+    raw_match: {block: DBSD, new_contains: in der zu stornierenden Meldung angegebene}
+    summary: VORNAME and FAMILIENNAME of the 88 are the names in the cancelled record
+    label: clarification
+    in_scope: true
+    changes_param: []
+    modifies_old: [VB@13.3#3.20]
+    modifies_new: [VB@13.4#3.20]
+  - key: VB-13.3-13.4-DBEE-end
+    raw_match: {block: DBEE, field_prefix: EEL-ENDE}
+    summary: if benefit continues after employment ends, confirm only up to the end of employment
+    label: clarification
+    in_scope: true
+    changes_param: []
+    modifies_old: [VB@13.3#3.7.3]
+    modifies_new: [VB@13.4#3.7.3]

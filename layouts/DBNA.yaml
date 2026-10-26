@@ -1,0 +1,48 @@
+record: DBNA
+title: Name
+spec:
+  document: Verfahrensbeschreibung DTA EEL
+  version: '13.4'
+  valid_from: '2027-01-01'
+  section: '3.2'
+  page: 50
+announced_by:
+  record: DSLW
+  field: MM-NAME
+  value_if_present: J
+status: partial
+fixed_length: 125
+notes:
+- Not commented in the Verfahrensbeschreibung ("keine Kommentierung vorgesehen"). Total length 125 measured in the
+  TEEL0 sample. Positions 065-125 are empty in the sample; their split (e.g. Vorsatzwort, Namenszusatz, Titel) must
+  come from the record description in the GG annexes.
+fields:
+- name: KENNUNG
+  start: 1
+  end: 4
+  length: 4
+  type: an
+  required: M
+  constant: DBNA
+  source: structure
+- name: FAMILIENNAME
+  start: 5
+  end: 34
+  length: 30
+  type: an
+  required: M
+  source: TEEL0 sample
+- name: VORNAME
+  start: 35
+  end: 64
+  length: 30
+  type: an
+  required: M
+  source: TEEL0 sample
+- name: UNKLAR
+  start: 65
+  end: 125
+  length: 61
+  type: an
+  required: m
+  source: TEEL0 sample, content empty

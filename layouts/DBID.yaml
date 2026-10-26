@@ -1,0 +1,41 @@
+record: DBID
+title: Identifikationsdaten
+spec:
+  document: Verfahrensbeschreibung DTA EEL
+  version: '13.4'
+  valid_from: '2027-01-01'
+  section: '3.19'
+  page: 164
+announced_by:
+  record: DSLW
+  field: MM-ID
+  value_if_present: J
+status: extracted
+fixed_length: 80
+fields:
+- name: KENNUNG
+  start: 1
+  end: 4
+  length: 4
+  type: an
+  required: M
+  constant: DBID
+  source: structure
+- name: AKTENZEICHEN-SV
+  start: 5
+  end: 24
+  length: 20
+  type: an
+  required: m
+- name: AKTENZEICHEN-VERURSACHER
+  start: 25
+  end: 44
+  length: 20
+  type: an
+  required: m
+- name: REFERENZ-ID
+  start: 45
+  end: 80
+  length: 36
+  type: an
+  required: m

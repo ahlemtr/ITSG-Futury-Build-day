@@ -1,0 +1,45 @@
+# Step K6 (08 section 9.1), values from 03 section 2.
+# sim-13.5 is simulated: returned only when asked by version, never by date.
+parameters:
+  - name: min_total_days
+    note: prior days in the window + current days must reach this
+    values:
+      - {version: "13.3",     valid_from: 2026-01-01, value: 30}
+      - {version: "13.4",     valid_from: 2027-01-01, value: 30}
+      - {version: "sim-13.5", valid_from: null,       value: 28, simulated: true}
+    sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions]
+  - name: gap_months
+    note: largest gap in calendar months between two AU periods that still chains
+    values:
+      - {version: "13.3",     valid_from: 2026-01-01, value: 6}
+      - {version: "13.4",     valid_from: 2027-01-01, value: 6}
+      - {version: "sim-13.5", valid_from: null,       value: 6, simulated: true}
+    sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions, VB@13.3#3.12/chaining, VB@13.4#3.12/chaining]
+  - name: gap_inclusive
+    note: a gap of exactly gap_months still chains ("nicht mehr als" in 13.4, "nicht mindestens" in 13.3)
+    values:
+      - {version: "13.3",     valid_from: 2026-01-01, value: false}
+      - {version: "13.4",     valid_from: 2027-01-01, value: true}
+      - {version: "sim-13.5", valid_from: null,       value: true, simulated: true}
+    sources: [VB@13.3#3.12/chaining, VB@13.4#3.12/chaining]
+  - name: sum_window_months
+    note: prior AU days are summed over this many calendar months before the current AU
+    values:
+      - {version: "13.3",     valid_from: 2026-01-01, value: 12}
+      - {version: "13.4",     valid_from: 2027-01-01, value: 12}
+      - {version: "sim-13.5", valid_from: null,       value: 12, simulated: true}
+    sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions]
+  - name: open_end_days
+    note: an open-ended current AU counts until report date + open_end_days - 1
+    values:
+      - {version: "13.3",     valid_from: 2026-01-01, value: 7}
+      - {version: "13.4",     valid_from: 2027-01-01, value: 7}
+      - {version: "sim-13.5", valid_from: null,       value: 7, simulated: true}
+    sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions, BP@13.3#13.5]
+  - name: efz_days
+    note: days of continued pay by the employer (EntgFG § 3, 6 weeks)
+    values:
+      - {version: "13.3",     valid_from: 2026-01-01, value: 42}
+      - {version: "13.4",     valid_from: 2027-01-01, value: 42}
+      - {version: "sim-13.5", valid_from: null,       value: 42, simulated: true}
+    sources: [VB@13.3#3.12.5, VB@13.4#3.12.5]
