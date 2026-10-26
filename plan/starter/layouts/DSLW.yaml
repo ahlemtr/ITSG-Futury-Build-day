@@ -1,0 +1,356 @@
+record: DSLW
+title: Datensatz Leistungswesen
+spec:
+  document: Verfahrensbeschreibung DTA EEL
+  version: '13.4'
+  valid_from: '2027-01-01'
+  section: '3.1'
+  page: 36
+block_order:
+- DBNA
+- DBAN
+- DBAL
+- DBAE
+- DBZA
+- DBEE
+- DBAW
+- DBFR
+- DBUN
+- DBMU
+- DBVO
+- DBHE
+- DBBE
+- DBLT
+- DBSF
+- DBTK
+- DBAP
+- DBID
+- DBSD
+status: extracted
+fixed_length: 224
+notes:
+- Positions 206-224 (MM-* flags) are not described in the Verfahrensbeschreibung. Names and order taken from the
+  Beispielpapier, confirmed against the TEEL0 sample (flags J exactly for the blocks present). The data blocks follow
+  position 224 in this order.
+fields:
+- name: KENNUNG
+  start: 1
+  end: 4
+  length: 4
+  type: an
+  required: M
+  constant: DSLW
+  source: structure
+- name: VERFAHREN
+  start: 5
+  end: 9
+  length: 5
+  type: an
+  required: M
+- name: ABSENDERNUMMER
+  start: 10
+  end: 24
+  length: 15
+  type: an
+  required: M
+- name: EMPFAENGERNUMMER
+  start: 25
+  end: 39
+  length: 15
+  type: an
+  required: M
+- name: VERSION-NR
+  start: 40
+  end: 41
+  length: 2
+  type: n
+  required: M
+- name: DATUM-ERSTELLUNG
+  start: 42
+  end: 61
+  length: 20
+  type: n
+  required: M
+  format: date_yyyymmdd
+- name: FEHLER-KENNZ
+  start: 62
+  end: 62
+  length: 1
+  type: n
+  required: M
+- name: FEHLER-ANZAHL
+  start: 63
+  end: 63
+  length: 1
+  type: n
+  required: M
+- name: VSNR
+  start: 64
+  end: 75
+  length: 12
+  type: an
+  required: m
+- name: GEBURTSDAT
+  start: 76
+  end: 83
+  length: 8
+  type: n
+  required: M
+  format: date_yyyymmdd
+- name: BBNR-VU
+  start: 84
+  end: 98
+  length: 15
+  type: an
+  required: M
+- name: DATENSATZ-ID
+  start: 99
+  end: 134
+  length: 36
+  type: an
+  required: M
+- name: PRODUKT-IDENTIFIER
+  start: 135
+  end: 141
+  length: 7
+  type: an
+  required: m
+- name: MODIFIKATIONS-IDENTIFIER
+  start: 142
+  end: 149
+  length: 8
+  type: an
+  required: m
+- name: DATUM-VERARBEITUNG
+  start: 150
+  end: 169
+  length: 20
+  type: an
+  required: m
+  format: date_yyyymmdd
+- name: BBNR-KK
+  start: 170
+  end: 184
+  length: 15
+  type: an
+  required: m
+- name: BBNR-ABRECHNUNGSSTELLE
+  start: 185
+  end: 199
+  length: 15
+  type: an
+  required: m
+- name: RUECKMELDUNG-ENTGELTERSATZLEISTUNG
+  start: 200
+  end: 200
+  length: 1
+  type: an
+  required: M
+- name: ABGABEGRUND
+  start: 201
+  end: 202
+  length: 2
+  type: n
+  required: M
+- name: KORR-ABGABEGRUND
+  start: 203
+  end: 204
+  length: 2
+  type: n
+  required: m
+- name: ABRECHNUNGSPROGRAMM
+  start: 205
+  end: 205
+  length: 1
+  type: n
+  required: M
+- name: MM-NAME
+  start: 206
+  end: 206
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBNA follows
+    N: DBNA absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-ANSCHRIFT
+  start: 207
+  end: 207
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBAN follows
+    N: DBAN absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-ALLGEMEIN
+  start: 208
+  end: 208
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBAL follows
+    N: DBAL absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-ENTGELT
+  start: 209
+  end: 209
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBAE follows
+    N: DBAE absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-ZEITKG
+  start: 210
+  end: 210
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBZA follows
+    N: DBZA absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-EELENDE
+  start: 211
+  end: 211
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBEE follows
+    N: DBEE absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-FEHLZEIT
+  start: 212
+  end: 212
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBAW follows
+    N: DBAW absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-FREISTELL
+  start: 213
+  end: 213
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBFR follows
+    N: DBFR absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-UNFALL
+  start: 214
+  end: 214
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBUN follows
+    N: DBUN absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-ENTMU
+  start: 215
+  end: 215
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBMU follows
+    N: DBMU absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-VOER
+  start: 216
+  end: 216
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBVO follows
+    N: DBVO absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-HOEENT
+  start: 217
+  end: 217
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBHE follows
+    N: DBHE absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-BEIEIN
+  start: 218
+  end: 218
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBBE follows
+    N: DBBE absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-UEGLTA
+  start: 219
+  end: 219
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBLT follows
+    N: DBLT absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-ENTSEE
+  start: 220
+  end: 220
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBSF follows
+    N: DBSF absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-TRAKUG
+  start: 221
+  end: 221
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBTK follows
+    N: DBTK absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-ANSPRECH
+  start: 222
+  end: 222
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBAP follows
+    N: DBAP absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-ID
+  start: 223
+  end: 223
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBID follows
+    N: DBID absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)
+- name: MM-SD
+  start: 224
+  end: 224
+  length: 1
+  type: an
+  required: M
+  values:
+    J: DBSD follows
+    N: DBSD absent
+  source: Beispielpapier V13.3 field list + TEEL0 sample (positions 206-224 are not commented in the Verfahrensbeschreibung)

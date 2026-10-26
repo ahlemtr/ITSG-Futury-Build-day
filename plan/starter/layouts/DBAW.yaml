@@ -1,0 +1,41 @@
+record: DBAW
+title: Abwesenheitszeiten ohne Arbeitsentgelt
+spec:
+  document: Verfahrensbeschreibung DTA EEL
+  version: '13.4'
+  valid_from: '2027-01-01'
+  section: '3.8'
+  page: 95
+announced_by:
+  record: DSLW
+  field: MM-FEHLZEIT
+  value_if_present: J
+status: extracted
+fixed_length: 10
+fields:
+- name: KENNUNG
+  start: 1
+  end: 4
+  length: 4
+  type: an
+  required: M
+  constant: DBAW
+  source: structure
+- name: TAGE-1
+  start: 5
+  end: 6
+  length: 2
+  type: n
+  required: M
+- name: TAGE-2
+  start: 7
+  end: 8
+  length: 2
+  type: n
+  required: M
+- name: TAGE-3
+  start: 9
+  end: 10
+  length: 2
+  type: n
+  required: M
