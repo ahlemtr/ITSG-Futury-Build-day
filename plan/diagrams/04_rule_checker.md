@@ -2,7 +2,7 @@
 
 ```mermaid
 flowchart TD
-    IN["Submission<br/>vendor TEEL0 files + test case"] --> PA["Parse by version<br/>YAML layouts"]
+    IN["Upload<br/>vendor TEEL0 files + test case"] --> PA["Intake<br/>receipt, parse, format check"]
     SOL["Model solution<br/>published or generated"] --> DIFF
     PA --> DIFF["Diff on 3 levels<br/>messages, matching, fields<br/>(compare modes: compare / rule / ignore)"]
     DIFF --> Q{"Any deviation?"}

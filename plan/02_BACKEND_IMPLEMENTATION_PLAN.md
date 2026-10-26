@@ -8,7 +8,7 @@ Read `00_PROJECT_OVERVIEW.md` first for context and `03_DOMAIN_RULES_VORERKRANKU
 2. **Every verdict cites its source**: rule ID, ITSG criterion (if any), spec document, version, section.
 3. **Rules and layouts are data.** Parameters and layouts live in YAML (later the knowledge graph). A version change is a data change.
 4. **Only `kg/` knows where rules and layouts come from.** The rest of the code calls the interface in section 5.
-5. **Integrate through files.** Input and output are TEEL0/TEEK0 files plus JSON. No eVpT API.
+5. **Files in, files out.** The vendor uploads TEEL0 files and gets receipts, TEEK0 replies and signed reports back. Transport (GKV communication server) is assumed; no eVpT connection.
 
 ## 2. Tech stack
 
@@ -34,6 +34,7 @@ eel-review/
 ├── layouts/                   # DONE: DSLW.yaml, DBxx.yaml (V13.3 and V13.4 identical)
 ├── engine/
 │   ├── records.py             # parser + writer (fixed width <-> dict)
+│   ├── intake.py              # upload -> stored files + hash + receipt (format check)
 │   ├── model.py               # Pydantic: AuPeriod, Scenario, Message, Verdict ...
 │   ├── rules/
 │   │   ├── params.py          # get_param(name, on_date | version)
@@ -160,6 +161,7 @@ See `05_CHECKING_AND_DEVIATIONS.md` for the flow, compare modes and labels.
 | M7.1 | `store/schema.sql` per `diagrams/07_data_model.md` (app data only, rules and spec stay behind `kg/`) | applies cleanly on the Postgres container |
 | M7.2 | `store/seed.py`: section 7 seed data | after seed: 14 test cases, 10 submissions; `kg` returns 2 spec versions and the rule set |
 | M7.3 | API endpoints (section 6) | `httpx` tests for each endpoint against seeded data |
+| M7.4 | **intake**: `POST /submissions` stores the files with SHA-256, parses them and returns a receipt `{accepted / rejected, issues[]}`, like eVpT's processing confirmation | corrupt file -> rejected with the parse issue; valid file -> accepted and checkable |
 
 ### M8 LLM services
 
@@ -227,6 +229,7 @@ This is the final contract (agreed with `07_KNOWLEDGE_GRAPH.md` section 11). Pre
 | POST | `/test-cases/{id}/approve` | `{approver, decision}` | updated status |
 | GET | `/passages/{doc}/{version}/{section}` | | passage text |
 | GET | `/passages/search?q=` | | full-text search for the advisor |
+| POST | `/submissions` | files, `test_case_id`, `valid_on` | receipt: accepted, or rejected with format issues |
 | GET | `/submissions` | `?test_case_id=` | list for the results view |
 | POST | `/builder/hidden` | `{test_case_id, seed}` | hidden variant (stored, never exported) |
 | GET | `/test-cases/{id}/package` | | zip with scenario, expected TEEL0/TEEK0, story (refused for hidden tests) |
@@ -275,7 +278,7 @@ Vorerkrankung rule set (`03_DOMAIN_RULES_VORERKRANKUNG.md`) with parameters per 
 |---|---|---|
 | Spec diff | 13.3 vs 13.4 text | `POST /specdiff` |
 | Result diff | `s-legacy-1` checked under 13.3 vs 13.4 | `POST /check` twice |
-| Checking diff | all submissions: eVpT-style diff (deviation count) vs our labels | `GET /submissions/{id}/diff`, `POST /check` |
+| Checking diff | all submissions: plain diff like today's (deviation count) vs our labels | `GET /submissions/{id}/diff`, `POST /check` |
 
 ## 8. Prototype done when
 
@@ -290,6 +293,7 @@ Vorerkrankung rule set (`03_DOMAIN_RULES_VORERKRANKUNG.md`) with parameters per 
 - [ ] signed HTML report for one fail and one pass submission
 - [ ] at least one LLM explanation shown for a fail, cached for offline demo
 - [ ] frontend can call every endpoint used in the demo storyline
+- [ ] in the vendor view, a vendor uploads a file, gets a receipt, receives the next insurer reply and downloads the signed report
 
 ## 9. Assumptions and risks
 

@@ -4,7 +4,7 @@
 sequenceDiagram
     autonumber
     participant AG as Payroll software (employer)
-    participant KK as Insurer (eVpT / generated TEEK0)
+    participant KK as Insurer (simulated by our platform)
     Note over AG: Sick from 11.03.2026, 4 prior periods,<br/>25 + 10 = 35 days, gaps under 6 months
     AG->>KK: 41 DBVO request, DSID 1111..., AZVU 1234-5678-007
     KK->>AG: 61 answer, REF-ID = DSID of 41,<br/>period 01.03 to 03.03 flagged 4 (note missing)
