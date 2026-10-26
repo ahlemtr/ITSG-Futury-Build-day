@@ -8,6 +8,8 @@ flowchart TD
     API --> DB["store/ (Postgres)"]
     CHK --> DF["engine/diff<br/>3-level diff, compare modes"]
     CHK --> VC["engine/variants<br/>catalogue + precedents"]
+    API --> INT["engine/intake<br/>receipt, hash, format check"]
+    INT --> PAR
     API --> RUN["engine/runs<br/>rounds, replies, verdicts"]
     RUN --> CHK
     CHK --> PAR["engine/records<br/>parser + writer"]
