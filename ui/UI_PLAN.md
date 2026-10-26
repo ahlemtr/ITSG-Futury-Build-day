@@ -17,7 +17,12 @@ Source of truth: the Miro mockups in `ui/mockups/`. This plan follows them scree
 
 ## 1. What we build
 
-The **ITSG side** only (prototype). The vendor side (local pre-check) is future work and will reuse screens 4 and 6.
+**Changed (plan update by Ghassen, "change of plans"):** the platform now replaces eVpT for EEL. The portal has two views:
+
+- **ITSG view:** the 6 mockup screens below
+- **Vendor view:** story, upload, receipt, insurer replies, result, signed report. No mockups yet, see section 4b (draft)
+
+The local vendor pre-check stays future work.
 
 ```
 1 Overview ──open submission──> 4 Submission result ──unclear──> 5 Advisor queue
@@ -74,12 +79,12 @@ Taken from ITSG's own deck. All values are defined once as named tokens, so they
 
 ## 4. Screens
 
-### 1 Overview: first screen of the day
+### 1 Overview: first screen of the day (built)
 | Widget | Content |
 |---|---|
-| Header | "Overview", subtitle about the two tracks. The **Upload submission** button is left out for now (Slim designs the upload flow later) |
-| Track 1 card | Monthly checks, V13.3 valid until 31.12.2026: submissions this month, passed all rules, with open deviations |
-| Track 2 card | Catalogue 2027, V13.4 valid from 01.01.2027: spec changes in scope, test cases to re-approve, hidden variants ready |
+| Header | "Overview", subtitle: one catalogue, two rule sets in parallel. No upload button: uploading happens in the vendor view |
+| "Checks now" card | V13.3 valid until 31.12.2026: submissions this month, passed all rules, with open deviations (was "Track 1 · Monthly checks") |
+| "Preparing next year" card | V13.4 valid from 01.01.2027: spec changes in scope, test cases to re-approve, hidden variants ready (was "Track 2 · Catalogue 2027") |
 | Resolution bar | stacked bar + legend: catalogue and rules / AI proposal + advisor / waiting for advisor (the pitch metric) |
 | Latest submissions | vendor, test case, rule set, result badge, received date. Clicking a row opens screen 4 |
 
@@ -123,6 +128,57 @@ Taken from ITSG's own deck. All values are defined once as named tokens, so they
 | Verdict card | Passed / Not passed, large type, one-line reason |
 | Signature card | SHA-256 hash, Ed25519 signature status (Valid) |
 | Rule table | rule, what it checks, public test result, hidden variant result (pass/fail only, never expected values), spec passage |
+
+## 4b. Vendor view (built, decisions taken by Claude on Slim's request)
+
+Decisions: switch in the top bar; vendor sees the field-by-field result for public tests, never for hidden ones; built from this text without Miro mockups. Upload really reads the file in the browser (layouts from `plan/starter/layouts`, SHA-256, DATENSATZ-ID, format issues). The verdict per round is a stand-in until the backend checker exists: it only checks that the expected messages arrived.
+
+Why: demo steps 2 and 3 (`plan/00_PROJECT_OVERVIEW.md` section 6) and the done-criterion "a vendor uploads a file, gets a receipt, receives the next insurer reply and downloads the signed report" (`plan/02` section 8).
+
+Same look as the ITSG view (section 2). No mockups exist; this section replaces them until the team draws them.
+
+### Switching views
+- A **"ITSG | Hersteller"** switch in the top bar (demo only, no login). The avatar changes to IT or HS.
+- Vendor pages live under `/vendor/...`, so both views can be open in two tabs during the demo.
+- The vendor sees only its own data, and never expected values of hidden tests.
+
+### Vendor nav
+| Item | Content |
+|---|---|
+| Meine Testfälle | the catalogue as the vendor sees it: test case, story title, rule set, status (not started / round 2 of 4 / done) |
+| Testlauf | the run of one test case, round by round (main page, below) |
+| Ergebnisse | results per submission: screen 4 for public tests, pass/fail per rule only for hidden tests |
+| Berichte | signed reports (screen 6) |
+
+### Main page: test run (`/vendor/runs/:id`)
+```
+┌ Story (Aufgabe) ───────────────┐ ┌ Round 1 · 2 · 3 · 4 (stepper) ─────────────────┐
+│ Peter Mustermann, 4 prior      │ │ What to enter now: "AU from 11.03.2026 ..."    │
+│ periods, sick from 11.03.2026, │ │ [ Drop TEEL0 file(s) here ]  <- primary button │
+│ job ends 31.03.2026            │ │ Receipt: accepted / rejected, issues, SHA-256  │
+└────────────────────────────────┘ │ Parsed record: fields by name per block (open) │
+                                   │ Result of this round: label + "details"        │
+                                   │ Insurer reply: TEEK0 (61) ready -> download    │
+                                   └────────────────────────────────────────────────┘
+```
+States of a round: **waiting for upload → checking → receipt → result → reply ready → next round unlocked**. Round 3 accepts two files (88 + new 01). Round 4 has no upload ("import only"). If a required message is missing, the run ends with the failed rule.
+
+**Receipt** (replaces eVpT's processing confirmation): accepted or rejected, list of format issues (record, field, position, message), SHA-256 of each file, received at, DATENSATZ-IDs found.
+
+**Parsed record** (demo step 2): every field of the uploaded file by name, grouped by block (DSLW, DBNA, DBVO, DBAP, DBID), DBVO periods as rows.
+
+### Data
+| Mode | Behaviour |
+|---|---|
+| mock | the upload is accepted and returns a prepared receipt, parsed record and reply for the demo files (no parsing in the browser) |
+| api | `POST /runs`, `POST /runs/{id}/submit`, `GET /runs/{id}/verdict`, `POST /submissions` (receipt), `GET /test-cases/{id}/package` |
+
+The ITSG reference file stays in `sources/` (never committed). It is uploaded live during the demo.
+
+### Open questions for the vendor view
+1. Switch in the top bar, or two separate start pages?
+2. Does the vendor see the field-by-field diff (screen 4) for public tests, or only the label per rule? The plan says public tests come with expected results, so I propose: yes for public, never for hidden.
+3. Should the team draw this in Miro first, or is this text enough to start?
 
 ## 5. Stack (decided: React)
 
@@ -203,8 +259,9 @@ Screen → API endpoint (for later):
 | 1. Setup | `npm run dev` in `ui/` opens an empty page in the browser |
 | 2. App shell + design tokens + language | top bar with DE / EN switch, left nav with badges, colors and fonts as in the mockups |
 | 3. Mock data | JSON for all 6 screens |
-| 4. Screen 4 Submission result | the core of the demo: diff table, chips, explanation panel |
-| 5. Screen 1 Overview | cards, resolution bar, table opens screen 4 |
+| 4. Screen 4 Submission result | the core of the demo: diff table, chips, explanation panel (**done**) |
+| 5. Screen 1 Overview | cards, resolution bar, table opens screen 4 (**done**) |
+| 5b. Vendor view (section 4b) | switch, my test cases, test run with upload, receipt, parsed record, reply (**done**, reply download waits for the backend) |
 | 6. Screen 5 Advisor queue | decide button stores a precedent (in mock mode: in memory) |
 | 7. Screen 6 Signed report | verdict, signature, rule table, JSON download |
 | 8. Screen 2 Spec changes | change list, highlighted passages, impact table |

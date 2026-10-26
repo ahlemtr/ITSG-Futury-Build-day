@@ -7,6 +7,7 @@ import { useData } from "../data/useData";
 import { Badge } from "../components/Badge";
 import { SpecRefText } from "../components/SpecRefText";
 import { useSetTopBar } from "../components/TopBarContext";
+import { useView, viewBase } from "../components/useView";
 import { formatDate, pick } from "../format";
 
 const CHIP_ORDER: FieldStatus[] = ["identical", "variant", "bug", "invalid", "unclear", "ignored", "valid"];
@@ -35,6 +36,7 @@ export function SubmissionResultScreen() {
 
 function ResultView({ result }: { result: SubmissionResult }) {
   const { t, i18n } = useTranslation();
+  const view = useView();
   const [filter, setFilter] = useState<FieldStatus | "all">("all");
   const [onlyDeviations, setOnlyDeviations] = useState(false);
   const firstDeviation = result.fields.find(isDeviation) ?? result.fields[0];
@@ -72,7 +74,7 @@ function ResultView({ result }: { result: SubmissionResult }) {
           <span className="verdict">
             {t("result.verdict")} <Badge value={result.verdict} />
           </span>
-          <Link className="button button-primary" to="/reports">
+          <Link className="button button-primary" to={`${viewBase(view)}/reports`}>
             {t("result.openReport")}
           </Link>
         </div>

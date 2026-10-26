@@ -41,14 +41,14 @@
   color: var(--ink);
 }
 
-.lang-switch {
+.segmented {
   display: flex;
   border: 1px solid var(--border);
   border-radius: var(--radius-button);
   overflow: hidden;
 }
 
-.lang-switch button {
+.segmented button {
   border: 0;
   background: var(--surface);
   color: var(--ink-muted);
@@ -56,7 +56,7 @@
   font-weight: 500;
 }
 
-.lang-switch button[aria-pressed="true"] {
+.segmented button[aria-pressed="true"] {
   background: var(--ink);
   color: var(--surface);
 }

@@ -75,11 +75,12 @@ const MM_FLAGS: [string, string][] = [
 ];
 
 // Prior periods of the expected 41, newest first. The vendor left out number 2.
+// Field suffixes are unpadded (BEGINN-AU-1), as in the Beispielpapier.
 const PERIODS = [
-  { nr: "01", start: "01.03.2026", end: "03.03.2026", vendorNr: "01" },
-  { nr: "02", start: "01.12.2025", end: "03.12.2025", vendorNr: null },
-  { nr: "03", start: "01.10.2025", end: "17.10.2025", vendorNr: "02" },
-  { nr: "04", start: "14.07.2025", end: "15.07.2025", vendorNr: "03" },
+  { nr: "1", start: "01.03.2026", end: "03.03.2026", vendorNr: "1" },
+  { nr: "2", start: "01.12.2025", end: "03.12.2025", vendorNr: null },
+  { nr: "3", start: "01.10.2025", end: "17.10.2025", vendorNr: "2" },
+  { nr: "4", start: "14.07.2025", end: "15.07.2025", vendorNr: "3" },
 ];
 
 function periodRows(): FieldRow[] {
@@ -157,8 +158,8 @@ const peterRound1: SubmissionResult = {
       "99301347",
       "99307001",
       {
-        de: "Betriebsnummer des Erstellers. Jeder Hersteller hat eine eigene eVpT-Testnummer. Regel: gleich der Testnummer des Herstellers.",
-        en: "Creator's company number. Each vendor has its own eVpT test number. Rule: equals the vendor's test number.",
+        de: "Betriebsnummer des Erstellers. Jeder Hersteller hat eine eigene Testbetriebsnummer. Regel: gleich der Testnummer des Herstellers.",
+        en: "Creator's company number. Each vendor has its own test company number. Rule: equals the vendor's test number.",
       },
       "3.1.2",
     ),
@@ -303,13 +304,29 @@ const peterRound1: SubmissionResult = {
 
 export const SUBMISSION_RESULTS: SubmissionResult[] = [peterRound1];
 
-export const SUBMISSIONS: SubmissionSummary[] = SUBMISSION_RESULTS.map((s) => ({
-  id: s.id,
-  testCaseId: s.testCaseId,
-  vendor: s.vendor,
-  round: s.round,
-  roundsTotal: s.roundsTotal,
-  ruleSet: s.ruleSet,
-  receivedOn: s.receivedOn,
-  verdict: s.verdict,
-}));
+// Submissions listed on the Overview, one per seed case of the backend plan (02, section 7).
+// Their field-by-field results are added in later steps.
+const SUMMARIES_ONLY: SubmissionSummary[] = [
+  // s-itsg-ref: reference chain, exact match
+  { id: "2026-10-024", testCaseId: "peter", vendor: "Payroll Nord Demo", round: 1, roundsTotal: 4, ruleSet: "13.3", receivedOn: "2026-10-24", verdict: "exact" },
+  // s-no-contact: 41 without DBAP, waiting for the advisor
+  { id: "2026-10-023", testCaseId: "peter", vendor: "Abrechnung Süd Demo", round: 1, roundsTotal: 4, ruleSet: "13.3", receivedOn: "2026-10-23", verdict: "unclear" },
+  // s-stale-efz: second 01 still says 30.03, no 88
+  { id: "2026-10-022", testCaseId: "peter", vendor: "Gehalt 24 Demo", round: 3, roundsTotal: 4, ruleSet: "13.3", receivedOn: "2026-10-22", verdict: "bug" },
+  // s-insurer-field: AU-AB-SV filled by the employer
+  { id: "2026-10-020", testCaseId: "peter", vendor: "Lohnbüro West Demo", round: 1, roundsTotal: 4, ruleSet: "13.3", receivedOn: "2026-10-20", verdict: "invalid" },
+];
+
+export const SUBMISSIONS: SubmissionSummary[] = [
+  ...SUBMISSION_RESULTS.map((s) => ({
+    id: s.id,
+    testCaseId: s.testCaseId,
+    vendor: s.vendor,
+    round: s.round,
+    roundsTotal: s.roundsTotal,
+    ruleSet: s.ruleSet,
+    receivedOn: s.receivedOn,
+    verdict: s.verdict,
+  })),
+  ...SUMMARIES_ONLY,
+].sort((a, b) => b.receivedOn.localeCompare(a.receivedOn));

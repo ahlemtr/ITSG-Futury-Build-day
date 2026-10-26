@@ -3,7 +3,14 @@
     "product": "EEL Review Assistant",
     "ruleSetContext": "Regelwerk in Kraft <strong>V13.3</strong> · nächstes <strong>V13.4</strong> ab 01.01.2027",
     "languageSwitch": "Sprache wählen",
-    "user": "ITSG-Prüfer"
+    "user": "ITSG-Prüfer",
+    "viewSwitch": "Ansicht wählen",
+    "view": {
+      "itsg": "ITSG",
+      "vendor": "Hersteller"
+    },
+    "vendorUser": "Hersteller (Demo)",
+    "vendorContext": "<strong>Lohnwerk Demo GmbH</strong> · Testbetriebsnummer 99307001"
   },
   "common": {
     "loading": "Wird geladen …",
@@ -17,12 +24,16 @@
     "submissions": "Einreichungen",
     "advisorQueue": "Klärungsfälle",
     "reports": "Prüfberichte",
-    "openItems": "{{count}} offen"
+    "openItems": "{{count}} offen",
+    "vendorPortal": "Hersteller-Portal",
+    "myTests": "Meine Testfälle",
+    "results": "Ergebnisse",
+    "vendorReports": "Berichte"
   },
   "screens": {
     "overview": {
       "title": "Übersicht",
-      "subtitle": "Zwei Spuren laufen parallel: monatliche Prüfungen unter V13.3, Katalog 2027 unter V13.4."
+      "subtitle": "Ein Testkatalog, zwei Regelwerke parallel: Prüfungen heute unter V13.3, Vorbereitung 2027 unter V13.4."
     },
     "specChanges": {
       "title": "Verfahrensbeschreibung V13.3 → V13.4",
@@ -43,6 +54,18 @@
     "reports": {
       "title": "Prüfberichte",
       "subtitle": "Signierte Berichte für ITSG und Hersteller."
+    },
+    "myTests": {
+      "title": "Meine Testfälle",
+      "subtitle": "Ihre Software erzeugt die Dateien, Sie laden sie hoch. Die Antworten der Krankenkasse entstehen aus Ihren eigenen Dateien."
+    },
+    "vendorResults": {
+      "title": "Ergebnisse",
+      "subtitle": "Ihre Einreichungen und ihr Ergebnis, Feld für Feld (nur öffentliche Tests)."
+    },
+    "vendorReports": {
+      "title": "Berichte",
+      "subtitle": "Signierte Prüfberichte zum Herunterladen."
     }
   },
   "placeholder": "Dieser Bildschirm wird in einem späteren Schritt gebaut.",
@@ -101,7 +124,7 @@
     "empty": "leer oder nicht vorhanden",
     "vendorField": "beim Hersteller: {{field}}",
     "noRows": "Keine Felder für diesen Filter.",
-    "notFound": "Diese Einreichung wurde nicht gefunden.",
+    "notFound": "Für diese Einreichung gibt es noch keine Feld-für-Feld-Ansicht.",
     "why": "Warum dieses Label",
     "fieldInfo": "Feld-Info",
     "decidedBy": "Entschieden durch",
@@ -121,6 +144,111 @@
       "ruleSet": "Regelwerk",
       "result": "Ergebnis",
       "received": "Eingegangen"
+    }
+  },
+  "overview": {
+    "now": {
+      "title": "Prüfungen heute",
+      "subtitle": "Regelwerk V{{ruleSet}}, gültig bis {{date}}",
+      "submissions": "Einreichungen im {{month}}",
+      "passed": "alle Regeln erfüllt",
+      "open": "mit offenen Abweichungen"
+    },
+    "next": {
+      "title": "Vorbereitung nächstes Jahr",
+      "subtitle": "Regelwerk V{{ruleSet}}, gültig ab {{date}}",
+      "specChanges": "Spec-Änderungen im Umfang",
+      "reapprove": "Testfälle neu freizugeben",
+      "hidden": "versteckte Varianten bereit"
+    },
+    "resolution": {
+      "title": "Wer die Abweichungen geklärt hat",
+      "subtitle": "{{count}} Abweichungen in diesem Monat",
+      "catalogueAndRules": "Katalog und Regeln",
+      "aiConfirmedByAdvisor": "KI-Vorschlag, vom Systemberater bestätigt",
+      "waitingForAdvisor": "Wartet auf den Systemberater"
+    },
+    "latest": "Neueste Einreichungen"
+  },
+  "myTests": {
+    "col": {
+      "story": "Geschichte",
+      "visibility": "Sichtbarkeit",
+      "status": "Status"
+    },
+    "status": {
+      "notStarted": "nicht begonnen",
+      "inRound": "Runde {{nr}} von {{total}}"
+    }
+  },
+  "run": {
+    "topbar": "Testlauf <strong>{{id}}</strong> · Regelwerk <strong>V{{ruleSet}}</strong>",
+    "notFound": "Diesen Testfall gibt es nicht.",
+    "public": "öffentlich",
+    "hidden": "Stichprobe",
+    "roundsCount_one": "{{count}} Runde",
+    "roundsCount_other": "{{count}} Runden",
+    "reset": "Lauf zurücksetzen",
+    "story": "Aufgabe",
+    "hiddenHint": "Stichprobe: Sie erhalten nur die Geschichte. Das Ergebnis zeigt je Regel nur bestanden oder nicht bestanden, nie die erwarteten Werte.",
+    "round": "Runde {{nr}}",
+    "stepStatus": {
+      "done": "erledigt",
+      "failed": "nicht bestanden",
+      "current": "offen",
+      "locked": "gesperrt"
+    },
+    "expects": "Erwartet:",
+    "noMessage": "keine Meldung",
+    "reportedNoMessage": "Gemeldet: Ihre Software hat keine Meldung erzeugt.",
+    "outcome": "Ergebnis dieser Runde",
+    "passed": "bestanden",
+    "failed": "nicht bestanden",
+    "next": "Weiter zu Runde {{nr}}",
+    "upload": {
+      "drop": "TEEL0-Datei hierher ziehen",
+      "dropMany": "TEEL0-Dateien hierher ziehen (mehrere möglich)",
+      "checking": "Datei wird gelesen und geprüft …",
+      "choose": "Datei auswählen",
+      "none": "Keine Meldung erzeugt"
+    },
+    "receipt": {
+      "title": "Eingangsbestätigung",
+      "accepted": "angenommen",
+      "rejected": "abgelehnt",
+      "receivedAt": "Eingegangen am {{time}}",
+      "file": "Datei",
+      "records": "Abgabegrund · DATENSATZ-ID",
+      "bytes_one": "{{count}} Byte",
+      "bytes_other": "{{count}} Bytes",
+      "issues_one": "{{count}} Formatfehler: bitte korrigieren und neu hochladen",
+      "issues_other": "{{count}} Formatfehler: bitte korrigieren und neu hochladen",
+      "line": "Zeile",
+      "position": "Stelle",
+      "message": "Meldung"
+    },
+    "parsed": {
+      "title": "Gelesener Datensatz",
+      "showEmpty": "Leere Felder zeigen",
+      "record": "{{file}} · Datensatz {{n}} (Zeile {{line}}) · Abgabegrund",
+      "fields": "{{count}} Felder",
+      "period": "Zeitraum",
+      "position": "Stelle",
+      "value": "Wert"
+    },
+    "reply": {
+      "blank": "(leer)",
+      "fromYourFile": "REFERENZ-ID und Aktenzeichen stammen aus Ihrer eigenen Datei.",
+      "download": "{{file}} herunterladen",
+      "downloadLater": "Die Datei erzeugt das Backend (API-Modus)."
+    },
+    "verdict": {
+      "title": "Testlauf abgeschlossen",
+      "passed": "Bestanden",
+      "failed": "Nicht bestanden",
+      "passedHint_one": "Alle Regeln in {{count}} Runde erfüllt.",
+      "passedHint_other": "Alle Regeln in {{count}} Runden erfüllt.",
+      "failedHint": "Regel {{rule}} nicht erfüllt. Der Lauf endet hier; setzen Sie ihn zurück, um es erneut zu versuchen."
     }
   }
 }

@@ -9,6 +9,7 @@ import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/shell.css";
 import "./styles/components.css";
+import "./styles/vendor.css";
 import "./i18n";
 
 import { App } from "./App";

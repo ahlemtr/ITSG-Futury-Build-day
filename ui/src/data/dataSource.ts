@@ -1,8 +1,9 @@
 // The only place the UI gets data from.
 // mode "mock": demo data from ./mock. mode "api": the backend (later).
 import navCounts from "./mock/navCounts.json";
+import { OVERVIEW } from "./mock/overview";
 import { SUBMISSIONS, SUBMISSION_RESULTS } from "./mock/submissions";
-import type { SubmissionResult, SubmissionSummary } from "./types";
+import type { OverviewData, SubmissionResult, SubmissionSummary } from "./types";
 
 export type NavCounts = { specChanges: number; advisorQueue: number };
 
@@ -17,12 +18,17 @@ export async function getNavCounts(): Promise<NavCounts> {
   return navCounts;
 }
 
+export async function getOverview(): Promise<OverviewData> {
+  if (MODE === "api") notBuilt();
+  return OVERVIEW;
+}
+
 export async function getSubmissions(): Promise<SubmissionSummary[]> {
   if (MODE === "api") notBuilt();
   return SUBMISSIONS;
 }
 
-/** Returns null when no submission has this id. */
+/** Returns null when there is no field-by-field result for this id. */
 export async function getSubmissionResult(id: string): Promise<SubmissionResult | null> {
   if (MODE === "api") notBuilt();
   return SUBMISSION_RESULTS.find((s) => s.id === id) ?? null;

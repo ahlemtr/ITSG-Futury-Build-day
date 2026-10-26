@@ -18,6 +18,7 @@ Stop with `Ctrl + C`.
 |---|---|
 | `npm run build` | type check + production build into `dist/` |
 | `npm run check:i18n` | lists texts missing in `de.json` or `en.json` |
+| `npm run build:layouts` | converts `plan/starter/layouts/*.yaml` into `src/records/layouts.generated.json` (run again when the layouts change) |
 
 ## Where things are
 

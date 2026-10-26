@@ -3,7 +3,14 @@
     "product": "EEL Review Assistant",
     "ruleSetContext": "Rule set in force <strong>V13.3</strong> · next <strong>V13.4</strong> from 01.01.2027",
     "languageSwitch": "Choose language",
-    "user": "ITSG tester"
+    "user": "ITSG tester",
+    "viewSwitch": "Choose view",
+    "view": {
+      "itsg": "ITSG",
+      "vendor": "Vendor"
+    },
+    "vendorUser": "Vendor (demo)",
+    "vendorContext": "<strong>Lohnwerk Demo GmbH</strong> · test company number 99307001"
   },
   "common": {
     "loading": "Loading …",
@@ -17,12 +24,16 @@
     "submissions": "Submissions",
     "advisorQueue": "Advisor queue",
     "reports": "Reports",
-    "openItems": "{{count}} open"
+    "openItems": "{{count}} open",
+    "vendorPortal": "Vendor portal",
+    "myTests": "My test cases",
+    "results": "Results",
+    "vendorReports": "Reports"
   },
   "screens": {
     "overview": {
       "title": "Overview",
-      "subtitle": "Two tracks run in parallel: monthly checks under V13.3, catalogue 2027 under V13.4."
+      "subtitle": "One test catalogue, two rule sets in parallel: checks today under V13.3, preparing 2027 under V13.4."
     },
     "specChanges": {
       "title": "Verfahrensbeschreibung V13.3 → V13.4",
@@ -43,6 +54,18 @@
     "reports": {
       "title": "Reports",
       "subtitle": "Signed reports for ITSG and the vendor."
+    },
+    "myTests": {
+      "title": "My test cases",
+      "subtitle": "Your software produces the files, you upload them. The insurer's replies are built from your own files."
+    },
+    "vendorResults": {
+      "title": "Results",
+      "subtitle": "Your submissions and their result, field by field (public tests only)."
+    },
+    "vendorReports": {
+      "title": "Reports",
+      "subtitle": "Signed test reports to download."
     }
   },
   "placeholder": "This screen is built in a later step.",
@@ -101,7 +124,7 @@
     "empty": "empty or not present",
     "vendorField": "vendor: {{field}}",
     "noRows": "No fields for this filter.",
-    "notFound": "This submission was not found.",
+    "notFound": "There is no field-by-field view for this submission yet.",
     "why": "Why this label",
     "fieldInfo": "Field info",
     "decidedBy": "Decided by",
@@ -121,6 +144,111 @@
       "ruleSet": "Rule set",
       "result": "Result",
       "received": "Received"
+    }
+  },
+  "overview": {
+    "now": {
+      "title": "Checks now",
+      "subtitle": "Rule set V{{ruleSet}}, valid until {{date}}",
+      "submissions": "submissions in {{month}}",
+      "passed": "passed all rules",
+      "open": "with open deviations"
+    },
+    "next": {
+      "title": "Preparing next year",
+      "subtitle": "Rule set V{{ruleSet}}, valid from {{date}}",
+      "specChanges": "spec changes in scope",
+      "reapprove": "test cases to re-approve",
+      "hidden": "hidden variants ready"
+    },
+    "resolution": {
+      "title": "Who resolved the deviations",
+      "subtitle": "{{count}} deviations this month",
+      "catalogueAndRules": "Catalogue and rules",
+      "aiConfirmedByAdvisor": "AI proposal, advisor confirmed",
+      "waitingForAdvisor": "Waiting for the advisor"
+    },
+    "latest": "Latest submissions"
+  },
+  "myTests": {
+    "col": {
+      "story": "Story",
+      "visibility": "Visibility",
+      "status": "Status"
+    },
+    "status": {
+      "notStarted": "not started",
+      "inRound": "round {{nr}} of {{total}}"
+    }
+  },
+  "run": {
+    "topbar": "Test run <strong>{{id}}</strong> · rule set <strong>V{{ruleSet}}</strong>",
+    "notFound": "This test case does not exist.",
+    "public": "public",
+    "hidden": "spot check",
+    "roundsCount_one": "{{count}} round",
+    "roundsCount_other": "{{count}} rounds",
+    "reset": "Reset run",
+    "story": "Task",
+    "hiddenHint": "Spot check: you only get the story. The result shows passed or failed per rule, never the expected values.",
+    "round": "Round {{nr}}",
+    "stepStatus": {
+      "done": "done",
+      "failed": "failed",
+      "current": "open",
+      "locked": "locked"
+    },
+    "expects": "Expected:",
+    "noMessage": "no message",
+    "reportedNoMessage": "Reported: your software produced no message.",
+    "outcome": "Result of this round",
+    "passed": "passed",
+    "failed": "failed",
+    "next": "Continue to round {{nr}}",
+    "upload": {
+      "drop": "Drag a TEEL0 file here",
+      "dropMany": "Drag TEEL0 files here (several allowed)",
+      "checking": "Reading and checking the file …",
+      "choose": "Choose file",
+      "none": "No message produced"
+    },
+    "receipt": {
+      "title": "Receipt",
+      "accepted": "accepted",
+      "rejected": "rejected",
+      "receivedAt": "Received {{time}}",
+      "file": "File",
+      "records": "Abgabegrund · DATENSATZ-ID",
+      "bytes_one": "{{count}} byte",
+      "bytes_other": "{{count}} bytes",
+      "issues_one": "{{count}} format error: please fix and upload again",
+      "issues_other": "{{count}} format errors: please fix and upload again",
+      "line": "Line",
+      "position": "Position",
+      "message": "Message"
+    },
+    "parsed": {
+      "title": "Record as read",
+      "showEmpty": "Show empty fields",
+      "record": "{{file}} · record {{n}} (line {{line}}) · Abgabegrund",
+      "fields": "{{count}} fields",
+      "period": "Period",
+      "position": "Position",
+      "value": "Value"
+    },
+    "reply": {
+      "blank": "(blank)",
+      "fromYourFile": "REFERENZ-ID and case number come from your own file.",
+      "download": "Download {{file}}",
+      "downloadLater": "The backend creates this file (API mode)."
+    },
+    "verdict": {
+      "title": "Test run finished",
+      "passed": "Passed",
+      "failed": "Not passed",
+      "passedHint_one": "All rules met in {{count}} round.",
+      "passedHint_other": "All rules met in {{count}} rounds.",
+      "failedHint": "Rule {{rule}} not met. The run ends here; reset it to try again."
     }
   }
 }

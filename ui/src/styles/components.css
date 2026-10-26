@@ -251,3 +251,96 @@ abbr[title] {
   text-underline-offset: 3px;
   cursor: help;
 }
+
+/* Overview */
+.overview-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.overview-bottom {
+  display: grid;
+  grid-template-columns: minmax(280px, 2fr) 3fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.card-title {
+  font-size: 18px;
+}
+
+.card-subtitle {
+  margin: 2px 0 16px;
+  color: var(--ink-muted);
+}
+
+.panel-title {
+  font-size: 18px;
+  padding: 16px 16px 4px;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+}
+
+.figure-value {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status, not brand: uses the Bug tone, never --itsg-red */
+.figure-attention {
+  color: var(--label-bug-fg);
+}
+
+.figure-label {
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.stacked-bar {
+  display: flex;
+  height: 18px;
+  border-radius: var(--radius-button);
+  overflow: hidden;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.bar-ink { background: var(--ink); }
+.bar-grey { background: #8a94a3; }
+.bar-waiting { background: var(--label-bug-fg); }
+
+.legend-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.legend-table td {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.legend-table td:last-child {
+  text-align: right;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 2px;
+}
