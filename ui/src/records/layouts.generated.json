@@ -1,0 +1,1753 @@
+{
+ "DBAE": {
+  "record": "DBAE",
+  "title": "Arbeitsentgelt",
+  "status": "extracted",
+  "fixedLength": 165,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "WAEHREEL-BRUTTO",
+    "start": 5,
+    "end": 12,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "DATUM-AE-BIS",
+    "start": 13,
+    "end": 20,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "EAZ-BEGINN-1",
+    "start": 21,
+    "end": 28,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "EAZ-ENDE-1",
+    "start": 29,
+    "end": 36,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BRUTTO-1",
+    "start": 37,
+    "end": 44,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "NETTO-1",
+    "start": 45,
+    "end": 52,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "UMGEWAE",
+    "start": 53,
+    "end": 60,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "ENTGART",
+    "start": 61,
+    "end": 61,
+    "type": "n"
+   },
+   {
+    "name": "BRUTTOAE",
+    "start": 62,
+    "end": 69,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "NETTOAE",
+    "start": 70,
+    "end": 77,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "EAZ-BEGINN-2",
+    "start": 78,
+    "end": 85,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "EAZ-ENDE-2",
+    "start": 86,
+    "end": 93,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BRUTTO-2",
+    "start": 94,
+    "end": 101,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "NETTO-2",
+    "start": 102,
+    "end": 109,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "EAZ-BEGINN-3",
+    "start": 110,
+    "end": 117,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "EAZ-ENDE-3",
+    "start": 118,
+    "end": 125,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BRUTTO-3",
+    "start": 126,
+    "end": 133,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "NETTO-3",
+    "start": 134,
+    "end": 141,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "EZKV",
+    "start": 142,
+    "end": 149,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "EZRV",
+    "start": 150,
+    "end": 157,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "EZALV",
+    "start": 158,
+    "end": 165,
+    "type": "n",
+    "format": "amount_2dp"
+   }
+  ]
+ },
+ "DBAL": {
+  "record": "DBAL",
+  "title": "Allgemeines",
+  "status": "extracted",
+  "fixedLength": 91,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "DATUM-AB",
+    "start": 5,
+    "end": 12,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "AE-ERSTTAG",
+    "start": 13,
+    "end": 13,
+    "type": "n"
+   },
+   {
+    "name": "DATUM-EGZBIS",
+    "start": 14,
+    "end": 21,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "ENDE-BV-AM",
+    "start": 22,
+    "end": 29,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "ENDE-BV-ZUM",
+    "start": 30,
+    "end": 37,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "GRUNDBEEND",
+    "start": 38,
+    "end": 39,
+    "type": "n"
+   },
+   {
+    "name": "PFLZUSCHLAG",
+    "start": 40,
+    "end": 40,
+    "type": "an"
+   },
+   {
+    "name": "KINDER-UNTER-25",
+    "start": 41,
+    "end": 41,
+    "type": "n"
+   },
+   {
+    "name": "ARBZEITMOD",
+    "start": 42,
+    "end": 42,
+    "type": "an"
+   },
+   {
+    "name": "MM-KUG",
+    "start": 43,
+    "end": 43,
+    "type": "n"
+   },
+   {
+    "name": "KUG-BEGINN",
+    "start": 44,
+    "end": 51,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "KUG-ENDE",
+    "start": 52,
+    "end": 59,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "LAG-BEGINN-1",
+    "start": 60,
+    "end": 67,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "LAG-ENDE-1",
+    "start": 68,
+    "end": 75,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "LAG-BEGINN-2",
+    "start": 76,
+    "end": 83,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "LAG-ENDE-2",
+    "start": 84,
+    "end": 91,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   }
+  ]
+ },
+ "DBAN": {
+  "record": "DBAN",
+  "title": "Anschrift",
+  "status": "missing",
+  "fixedLength": 4,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   }
+  ]
+ },
+ "DBAP": {
+  "record": "DBAP",
+  "title": "Ansprechpartner",
+  "status": "inferred",
+  "fixedLength": 320,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "NAME",
+    "start": 5,
+    "end": 34,
+    "type": "an"
+   },
+   {
+    "name": "TELEFON",
+    "start": 35,
+    "end": 54,
+    "type": "an"
+   },
+   {
+    "name": "FAX",
+    "start": 55,
+    "end": 74,
+    "type": "an"
+   },
+   {
+    "name": "EMAIL",
+    "start": 75,
+    "end": 144,
+    "type": "an"
+   },
+   {
+    "name": "FIRMA-1",
+    "start": 145,
+    "end": 174,
+    "type": "an"
+   },
+   {
+    "name": "FIRMA-2",
+    "start": 175,
+    "end": 204,
+    "type": "an"
+   },
+   {
+    "name": "FIRMA-3",
+    "start": 205,
+    "end": 234,
+    "type": "an"
+   },
+   {
+    "name": "PLZ",
+    "start": 235,
+    "end": 244,
+    "type": "an"
+   },
+   {
+    "name": "ORT",
+    "start": 245,
+    "end": 278,
+    "type": "an"
+   },
+   {
+    "name": "STRASSE",
+    "start": 279,
+    "end": 311,
+    "type": "an"
+   },
+   {
+    "name": "HAUSNUMMER",
+    "start": 312,
+    "end": 320,
+    "type": "an"
+   }
+  ]
+ },
+ "DBAW": {
+  "record": "DBAW",
+  "title": "Abwesenheitszeiten ohne Arbeitsentgelt",
+  "status": "extracted",
+  "fixedLength": 10,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "TAGE-1",
+    "start": 5,
+    "end": 6,
+    "type": "n"
+   },
+   {
+    "name": "TAGE-2",
+    "start": 7,
+    "end": 8,
+    "type": "n"
+   },
+   {
+    "name": "TAGE-3",
+    "start": 9,
+    "end": 10,
+    "type": "n"
+   }
+  ]
+ },
+ "DBBE": {
+  "record": "DBBE",
+  "title": "Höhe der beitragspflichtigen Einnahmen (§ 23c SGB IV)",
+  "status": "extracted",
+  "fixedLength": 28,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "ZAHL-BEGINN",
+    "start": 5,
+    "end": 12,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BEITRPFL-BRUTTO",
+    "start": 13,
+    "end": 20,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "BEITRPFL-NETTO",
+    "start": 21,
+    "end": 28,
+    "type": "n",
+    "format": "amount_2dp"
+   }
+  ]
+ },
+ "DBEE": {
+  "record": "DBEE",
+  "title": "Ende Entgeltersatzleistung",
+  "status": "extracted",
+  "fixedLength": 30,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "EEL-ABAG",
+    "start": 5,
+    "end": 12,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "EEL-ABSV",
+    "start": 13,
+    "end": 20,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "EEL-ENDE",
+    "start": 21,
+    "end": 28,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "EEL-ENDE-GRUND",
+    "start": 29,
+    "end": 30,
+    "type": "n"
+   }
+  ]
+ },
+ "DBFR": {
+  "record": "DBFR",
+  "title": "Angaben zur Freistellung bei Erkrankung/Verletzung des Kindes",
+  "status": "extracted",
+  "fixedLength": 70,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "ENDE-BV-ZUM",
+    "start": 5,
+    "end": 12,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "FREIST-VOM",
+    "start": 13,
+    "end": 20,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "FREIST-BIS",
+    "start": 21,
+    "end": 28,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "VAE-ERSTTAG",
+    "start": 29,
+    "end": 29,
+    "type": "an"
+   },
+   {
+    "name": "TAGE",
+    "start": 30,
+    "end": 31,
+    "type": "n"
+   },
+   {
+    "name": "KEINEFREIST",
+    "start": 32,
+    "end": 32,
+    "type": "n"
+   },
+   {
+    "name": "BEGRZFREIST",
+    "start": 33,
+    "end": 34,
+    "type": "n"
+   },
+   {
+    "name": "BEZFREIST-VOM",
+    "start": 35,
+    "end": 42,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BEZFREIST-BIS",
+    "start": 43,
+    "end": 50,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BEZFREIST-JAHR",
+    "start": 51,
+    "end": 52,
+    "type": "n"
+   },
+   {
+    "name": "FREISTBRUTTO",
+    "start": 53,
+    "end": 60,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "FREISTNETTO",
+    "start": 61,
+    "end": 68,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "FREISTEZ",
+    "start": 69,
+    "end": 69,
+    "type": "an"
+   },
+   {
+    "name": "KINDER-UNTER-25",
+    "start": 70,
+    "end": 70,
+    "type": "n"
+   }
+  ]
+ },
+ "DBHE": {
+  "record": "DBHE",
+  "title": "Höhe der Entgeltersatzleistung",
+  "status": "extracted",
+  "fixedLength": 28,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "ZAHL-BEGINN",
+    "start": 5,
+    "end": 12,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "EEL-BRUTTO",
+    "start": 13,
+    "end": 20,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "EEL-NETTO",
+    "start": 21,
+    "end": 28,
+    "type": "n",
+    "format": "amount_2dp"
+   }
+  ]
+ },
+ "DBID": {
+  "record": "DBID",
+  "title": "Identifikationsdaten",
+  "status": "extracted",
+  "fixedLength": 80,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "AKTENZEICHEN-SV",
+    "start": 5,
+    "end": 24,
+    "type": "an"
+   },
+   {
+    "name": "AKTENZEICHEN-VERURSACHER",
+    "start": 25,
+    "end": 44,
+    "type": "an"
+   },
+   {
+    "name": "REFERENZ-ID",
+    "start": 45,
+    "end": 80,
+    "type": "an"
+   }
+  ]
+ },
+ "DBLT": {
+  "record": "DBLT",
+  "title": "Zusatzdaten für die Berechnung des Übergangsgeldes bei Leistungen zur Teilhabe",
+  "status": "extracted",
+  "fixedLength": 76,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "BV-SEIT",
+    "start": 5,
+    "end": 12,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BV-BIS",
+    "start": 13,
+    "end": 20,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BV-ALS",
+    "start": 21,
+    "end": 50,
+    "type": "an"
+   },
+   {
+    "name": "AUSBVERH",
+    "start": 51,
+    "end": 51,
+    "type": "an"
+   },
+   {
+    "name": "VORER",
+    "start": 52,
+    "end": 52,
+    "type": "an"
+   },
+   {
+    "name": "VWL",
+    "start": 53,
+    "end": 58,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "BRUTTO-SB",
+    "start": 59,
+    "end": 66,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "NETTO-SB",
+    "start": 67,
+    "end": 74,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AE-UEBERGANGSBEREICH",
+    "start": 75,
+    "end": 75,
+    "type": "an"
+   },
+   {
+    "name": "RECHTSKREIS",
+    "start": 76,
+    "end": 76,
+    "type": "an"
+   }
+  ]
+ },
+ "DBMU": {
+  "record": "DBMU",
+  "title": "Entgeltbescheinigung zur Berechnung von Mutterschaftsgeld",
+  "status": "extracted",
+  "fixedLength": 214,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "SCHUTZFR-BEGINN",
+    "start": 5,
+    "end": 12,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BV-BEGINN",
+    "start": 13,
+    "end": 20,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "LETZTTAG",
+    "start": 21,
+    "end": 28,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "ENDE-BV-AM",
+    "start": 29,
+    "end": 36,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "ENDE-BV-ZUM",
+    "start": 37,
+    "end": 44,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BV-GEKUEND",
+    "start": 45,
+    "end": 46,
+    "type": "n"
+   },
+   {
+    "name": "WAEHREEL-NETTO",
+    "start": 47,
+    "end": 54,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "DATUM-AE-BIS",
+    "start": 55,
+    "end": 62,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "FEHLZEIT",
+    "start": 63,
+    "end": 64,
+    "type": "n"
+   },
+   {
+    "name": "AE-UEBER",
+    "start": 65,
+    "end": 65,
+    "type": "an"
+   },
+   {
+    "name": "ENTGART",
+    "start": 66,
+    "end": 66,
+    "type": "n"
+   },
+   {
+    "name": "BEGINN-1",
+    "start": 67,
+    "end": 74,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "ENDE-1",
+    "start": 75,
+    "end": 82,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BEZAZ-1",
+    "start": 83,
+    "end": 87,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "MASTD-1",
+    "start": 88,
+    "end": 92,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZ-UNENT-STD-1",
+    "start": 93,
+    "end": 97,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZ-UNENT-TAGE-1",
+    "start": 98,
+    "end": 99,
+    "type": "n"
+   },
+   {
+    "name": "AZ-ENTSCH-STD-1",
+    "start": 100,
+    "end": 104,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZ-ENTSCH-TAGE-1",
+    "start": 105,
+    "end": 106,
+    "type": "n"
+   },
+   {
+    "name": "NETTO-1",
+    "start": 107,
+    "end": 114,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "BEGINN-2",
+    "start": 115,
+    "end": 122,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "ENDE-2",
+    "start": 123,
+    "end": 130,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BEZAZ-2",
+    "start": 131,
+    "end": 135,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "MASTD-2",
+    "start": 136,
+    "end": 140,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZ-UNENT-STD-2",
+    "start": 141,
+    "end": 145,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZ-UNENT-TAGE-2",
+    "start": 146,
+    "end": 147,
+    "type": "n"
+   },
+   {
+    "name": "AZ-ENTSCH-STD-2",
+    "start": 148,
+    "end": 152,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZ-ENTSCH-TAGE-2",
+    "start": 153,
+    "end": 154,
+    "type": "n"
+   },
+   {
+    "name": "NETTO-2",
+    "start": 155,
+    "end": 162,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "BEGINN-3",
+    "start": 163,
+    "end": 170,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "ENDE-3",
+    "start": 171,
+    "end": 178,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BEZAZ-3",
+    "start": 179,
+    "end": 183,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "MASTD-3",
+    "start": 184,
+    "end": 188,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZ-UNENT-STD-3",
+    "start": 189,
+    "end": 193,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZ-UNENT-TAGE-3",
+    "start": 194,
+    "end": 195,
+    "type": "n"
+   },
+   {
+    "name": "AZ-ENTSCH-STD-3",
+    "start": 196,
+    "end": 200,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZ-ENTSCH-TAGE-3",
+    "start": 201,
+    "end": 202,
+    "type": "n"
+   },
+   {
+    "name": "NETTO-3",
+    "start": 203,
+    "end": 210,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZ-WOECH",
+    "start": 211,
+    "end": 214,
+    "type": "n",
+    "format": "amount_2dp"
+   }
+  ]
+ },
+ "DBNA": {
+  "record": "DBNA",
+  "title": "Name",
+  "status": "partial",
+  "fixedLength": 125,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "FAMILIENNAME",
+    "start": 5,
+    "end": 34,
+    "type": "an"
+   },
+   {
+    "name": "VORNAME",
+    "start": 35,
+    "end": 64,
+    "type": "an"
+   },
+   {
+    "name": "UNKLAR",
+    "start": 65,
+    "end": 125,
+    "type": "an"
+   }
+  ]
+ },
+ "DBSD": {
+  "record": "DBSD",
+  "title": "Stornierungsdaten",
+  "status": "extracted",
+  "fixedLength": 120,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "DATENSATZ-ID-URSPRUNGSMELDUNG",
+    "start": 5,
+    "end": 40,
+    "type": "an"
+   },
+   {
+    "name": "VORNAME",
+    "start": 41,
+    "end": 70,
+    "type": "an"
+   },
+   {
+    "name": "FAMILIENNAME",
+    "start": 71,
+    "end": 100,
+    "type": "an"
+   },
+   {
+    "name": "AKTENZEICHEN-VERURSACHER",
+    "start": 101,
+    "end": 120,
+    "type": "an"
+   }
+  ]
+ },
+ "DBSF": {
+  "record": "DBSF",
+  "title": "Zusatzdaten für die Berechnung der Entgeltersatzleistungen für Seeleute",
+  "status": "extracted",
+  "fixedLength": 58,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "AU-BORD",
+    "start": 5,
+    "end": 12,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "AU-INLAND",
+    "start": 13,
+    "end": 20,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "U-ANSPRUCH",
+    "start": 21,
+    "end": 22,
+    "type": "n"
+   },
+   {
+    "name": "VERLAENG-VON",
+    "start": 23,
+    "end": 30,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "VERLAENG-BIS",
+    "start": 31,
+    "end": 38,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "KZDHEU",
+    "start": 39,
+    "end": 42,
+    "type": "n"
+   },
+   {
+    "name": "DHEU",
+    "start": 43,
+    "end": 50,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "HEU-NETTO",
+    "start": 51,
+    "end": 58,
+    "type": "n",
+    "format": "amount_2dp"
+   }
+  ]
+ },
+ "DBTK": {
+  "record": "DBTK",
+  "title": "Zusatzdaten für die Berechnung der Entgeltersatzleistungen bei Bezug von Transfer-Kurzarbeitergeld",
+  "status": "extracted",
+  "fixedLength": 52,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "BRUTTO-SOLL",
+    "start": 5,
+    "end": 12,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "NETTO-SOLL",
+    "start": 13,
+    "end": 20,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "TRANSFER-KUG",
+    "start": 21,
+    "end": 28,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "BRUTTO-IST",
+    "start": 29,
+    "end": 36,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "NETTO-IST",
+    "start": 37,
+    "end": 44,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AUFSTOCKUNGSBETRAG",
+    "start": 45,
+    "end": 52,
+    "type": "n",
+    "format": "amount_2dp"
+   }
+  ]
+ },
+ "DBUN": {
+  "record": "DBUN",
+  "title": "Arbeits-/Schul-/Kindergartenunfall",
+  "status": "extracted",
+  "fixedLength": 87,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "UNFALLAZ",
+    "start": 5,
+    "end": 24,
+    "type": "an"
+   },
+   {
+    "name": "V-TAG",
+    "start": 25,
+    "end": 32,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "IKUV",
+    "start": 33,
+    "end": 47,
+    "type": "n"
+   },
+   {
+    "name": "ZUSCHL-1",
+    "start": 48,
+    "end": 55,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "ZUSCHL-2",
+    "start": 56,
+    "end": 63,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "ZUSCHL-3",
+    "start": 64,
+    "end": 71,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "FREISTZUSCHL",
+    "start": 72,
+    "end": 79,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "EZUV",
+    "start": 80,
+    "end": 87,
+    "type": "n",
+    "format": "amount_2dp"
+   }
+  ]
+ },
+ "DBVO": {
+  "record": "DBVO",
+  "title": "Vorerkrankungszeiten",
+  "status": "extracted",
+  "fixedLength": 32,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "GRUNDAV",
+    "start": 5,
+    "end": 5,
+    "type": "n"
+   },
+   {
+    "name": "AU-AB-AG",
+    "start": 6,
+    "end": 13,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "AU-AB-SV",
+    "start": 14,
+    "end": 21,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "KZ-AK-AU",
+    "start": 22,
+    "end": 22,
+    "type": "n"
+   },
+   {
+    "name": "12-MONATSFRIST-AB",
+    "start": 23,
+    "end": 30,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "ANZAHL-AU",
+    "start": 31,
+    "end": 32,
+    "type": "n"
+   }
+  ],
+  "repeatingGroup": {
+   "countField": "ANZAHL-AU",
+   "startsAt": 33,
+   "groupLength": 50,
+   "fields": [
+    {
+     "name": "BEGINN-AU-{nn}",
+     "start": 33,
+     "end": 40,
+     "type": "n",
+     "format": "date_yyyymmdd",
+     "offset": 1,
+     "length": 8
+    },
+    {
+     "name": "ENDE-AU-{nn}",
+     "start": 41,
+     "end": 48,
+     "type": "n",
+     "format": "date_yyyymmdd",
+     "offset": 9,
+     "length": 8
+    },
+    {
+     "name": "KZ-NACHWEIS-{nn}",
+     "start": 49,
+     "end": 49,
+     "type": "n",
+     "offset": 17,
+     "length": 1
+    },
+    {
+     "name": "TEIL-NACHWEIS-AU-BEGINN-{nn}",
+     "start": 50,
+     "end": 57,
+     "type": "n",
+     "format": "date_yyyymmdd",
+     "offset": 18,
+     "length": 8
+    },
+    {
+     "name": "TEIL-NACHWEIS-AU-ENDE-{nn}",
+     "start": 58,
+     "end": 65,
+     "type": "n",
+     "format": "date_yyyymmdd",
+     "offset": 26,
+     "length": 8
+    },
+    {
+     "name": "KZ-AU-{nn}",
+     "start": 66,
+     "end": 66,
+     "type": "n",
+     "offset": 34,
+     "length": 1
+    },
+    {
+     "name": "TEIL-ANR-AU-BEGINN-{nn}",
+     "start": 67,
+     "end": 74,
+     "type": "n",
+     "format": "date_yyyymmdd",
+     "offset": 35,
+     "length": 8
+    },
+    {
+     "name": "TEIL-ANR-AU-ENDE-{nn}",
+     "start": 75,
+     "end": 82,
+     "type": "n",
+     "format": "date_yyyymmdd",
+     "offset": 43,
+     "length": 8
+    }
+   ]
+  }
+ },
+ "DBZA": {
+  "record": "DBZA",
+  "title": "Arbeitszeit",
+  "status": "extracted",
+  "fixedLength": 60,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "ANZAHL-STD",
+    "start": 5,
+    "end": 9,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "REG-AZ",
+    "start": 10,
+    "end": 13,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "MAZR-1",
+    "start": 14,
+    "end": 18,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZBEGINN-2",
+    "start": 19,
+    "end": 26,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "AZENDE-2",
+    "start": 27,
+    "end": 34,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "MAZR-2",
+    "start": 35,
+    "end": 39,
+    "type": "n",
+    "format": "amount_2dp"
+   },
+   {
+    "name": "AZBEGINN-3",
+    "start": 40,
+    "end": 47,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "AZENDE-3",
+    "start": 48,
+    "end": 55,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "MAZR-3",
+    "start": 56,
+    "end": 60,
+    "type": "n",
+    "format": "amount_2dp"
+   }
+  ]
+ },
+ "DSLW": {
+  "record": "DSLW",
+  "title": "Datensatz Leistungswesen",
+  "status": "extracted",
+  "fixedLength": 224,
+  "fields": [
+   {
+    "name": "KENNUNG",
+    "start": 1,
+    "end": 4,
+    "type": "an"
+   },
+   {
+    "name": "VERFAHREN",
+    "start": 5,
+    "end": 9,
+    "type": "an"
+   },
+   {
+    "name": "ABSENDERNUMMER",
+    "start": 10,
+    "end": 24,
+    "type": "an"
+   },
+   {
+    "name": "EMPFAENGERNUMMER",
+    "start": 25,
+    "end": 39,
+    "type": "an"
+   },
+   {
+    "name": "VERSION-NR",
+    "start": 40,
+    "end": 41,
+    "type": "n"
+   },
+   {
+    "name": "DATUM-ERSTELLUNG",
+    "start": 42,
+    "end": 61,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "FEHLER-KENNZ",
+    "start": 62,
+    "end": 62,
+    "type": "n"
+   },
+   {
+    "name": "FEHLER-ANZAHL",
+    "start": 63,
+    "end": 63,
+    "type": "n"
+   },
+   {
+    "name": "VSNR",
+    "start": 64,
+    "end": 75,
+    "type": "an"
+   },
+   {
+    "name": "GEBURTSDAT",
+    "start": 76,
+    "end": 83,
+    "type": "n",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BBNR-VU",
+    "start": 84,
+    "end": 98,
+    "type": "an"
+   },
+   {
+    "name": "DATENSATZ-ID",
+    "start": 99,
+    "end": 134,
+    "type": "an"
+   },
+   {
+    "name": "PRODUKT-IDENTIFIER",
+    "start": 135,
+    "end": 141,
+    "type": "an"
+   },
+   {
+    "name": "MODIFIKATIONS-IDENTIFIER",
+    "start": 142,
+    "end": 149,
+    "type": "an"
+   },
+   {
+    "name": "DATUM-VERARBEITUNG",
+    "start": 150,
+    "end": 169,
+    "type": "an",
+    "format": "date_yyyymmdd"
+   },
+   {
+    "name": "BBNR-KK",
+    "start": 170,
+    "end": 184,
+    "type": "an"
+   },
+   {
+    "name": "BBNR-ABRECHNUNGSSTELLE",
+    "start": 185,
+    "end": 199,
+    "type": "an"
+   },
+   {
+    "name": "RUECKMELDUNG-ENTGELTERSATZLEISTUNG",
+    "start": 200,
+    "end": 200,
+    "type": "an"
+   },
+   {
+    "name": "ABGABEGRUND",
+    "start": 201,
+    "end": 202,
+    "type": "n"
+   },
+   {
+    "name": "KORR-ABGABEGRUND",
+    "start": 203,
+    "end": 204,
+    "type": "n"
+   },
+   {
+    "name": "ABRECHNUNGSPROGRAMM",
+    "start": 205,
+    "end": 205,
+    "type": "n"
+   },
+   {
+    "name": "MM-NAME",
+    "start": 206,
+    "end": 206,
+    "type": "an"
+   },
+   {
+    "name": "MM-ANSCHRIFT",
+    "start": 207,
+    "end": 207,
+    "type": "an"
+   },
+   {
+    "name": "MM-ALLGEMEIN",
+    "start": 208,
+    "end": 208,
+    "type": "an"
+   },
+   {
+    "name": "MM-ENTGELT",
+    "start": 209,
+    "end": 209,
+    "type": "an"
+   },
+   {
+    "name": "MM-ZEITKG",
+    "start": 210,
+    "end": 210,
+    "type": "an"
+   },
+   {
+    "name": "MM-EELENDE",
+    "start": 211,
+    "end": 211,
+    "type": "an"
+   },
+   {
+    "name": "MM-FEHLZEIT",
+    "start": 212,
+    "end": 212,
+    "type": "an"
+   },
+   {
+    "name": "MM-FREISTELL",
+    "start": 213,
+    "end": 213,
+    "type": "an"
+   },
+   {
+    "name": "MM-UNFALL",
+    "start": 214,
+    "end": 214,
+    "type": "an"
+   },
+   {
+    "name": "MM-ENTMU",
+    "start": 215,
+    "end": 215,
+    "type": "an"
+   },
+   {
+    "name": "MM-VOER",
+    "start": 216,
+    "end": 216,
+    "type": "an"
+   },
+   {
+    "name": "MM-HOEENT",
+    "start": 217,
+    "end": 217,
+    "type": "an"
+   },
+   {
+    "name": "MM-BEIEIN",
+    "start": 218,
+    "end": 218,
+    "type": "an"
+   },
+   {
+    "name": "MM-UEGLTA",
+    "start": 219,
+    "end": 219,
+    "type": "an"
+   },
+   {
+    "name": "MM-ENTSEE",
+    "start": 220,
+    "end": 220,
+    "type": "an"
+   },
+   {
+    "name": "MM-TRAKUG",
+    "start": 221,
+    "end": 221,
+    "type": "an"
+   },
+   {
+    "name": "MM-ANSPRECH",
+    "start": 222,
+    "end": 222,
+    "type": "an"
+   },
+   {
+    "name": "MM-ID",
+    "start": 223,
+    "end": 223,
+    "type": "an"
+   },
+   {
+    "name": "MM-SD",
+    "start": 224,
+    "end": 224,
+    "type": "an"
+   }
+  ],
+  "blockOrder": [
+   "DBNA",
+   "DBAN",
+   "DBAL",
+   "DBAE",
+   "DBZA",
+   "DBEE",
+   "DBAW",
+   "DBFR",
+   "DBUN",
+   "DBMU",
+   "DBVO",
+   "DBHE",
+   "DBBE",
+   "DBLT",
+   "DBSF",
+   "DBTK",
+   "DBAP",
+   "DBID",
+   "DBSD"
+  ]
+ }
+}

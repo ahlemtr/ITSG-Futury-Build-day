@@ -1,0 +1,156 @@
+.shell {
+  display: grid;
+  grid-template-rows: var(--topbar-height) 1fr;
+  grid-template-columns: var(--nav-width) 1fr;
+  grid-template-areas:
+    "top top"
+    "nav main";
+  min-height: 100%;
+}
+
+/* Top bar */
+.topbar {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.wordmark {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--itsg-red);
+  letter-spacing: -0.5px;
+}
+
+.product {
+  font-weight: 500;
+}
+
+.topbar-context {
+  margin-left: auto;
+  color: var(--ink-muted);
+}
+
+.topbar-context strong {
+  color: var(--ink);
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+  overflow: hidden;
+}
+
+.segmented button {
+  border: 0;
+  background: var(--surface);
+  color: var(--ink-muted);
+  padding: 4px 10px;
+  font-weight: 500;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--surface);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Left nav */
+.nav {
+  grid-area: nav;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 12px;
+}
+
+.nav-section {
+  color: var(--ink-muted);
+  font-size: 12px;
+  padding: 0 10px 10px;
+}
+
+.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: var(--radius-button);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav a:hover {
+  background: var(--ground);
+}
+
+.nav a.active {
+  background: var(--red-faint);
+  color: var(--red-dark);
+}
+
+.nav-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--label-bug-fg);
+  color: var(--surface);
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+}
+
+/* Content */
+.main {
+  grid-area: main;
+  padding: 28px var(--page-margin);
+  min-width: 0;
+}
+
+.page-header {
+  margin-bottom: 20px;
+}
+
+.page-subtitle {
+  color: var(--ink-muted);
+  margin-top: 4px;
+}
+
+.placeholder {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  padding: 32px;
+  color: var(--ink-muted);
+}
+
+/* Domain term kept in German, English meaning on hover */
+.term[title] {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: help;
+}

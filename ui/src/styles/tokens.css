@@ -1,0 +1,35 @@
+/* Design tokens from ui/mockups/00_look_and_feel.png. Change values here only. */
+:root {
+  /* Brand: wordmark and the one primary action per screen. Never for status. */
+  --itsg-red: #d50032;
+  --red-dark: #a8002a;   /* active nav text */
+  --red-faint: #fbeaee;  /* selected row, active nav */
+
+  --ground: #eef2f6;     /* app background */
+  --surface: #ffffff;    /* panels, top bar */
+  --ink: #1c2430;        /* text, headings */
+  --ink-muted: #5b6573;
+  --border: #dde3ea;     /* quiet 1 px border */
+
+  /* Result labels: always text plus colour (values read from the mockup) */
+  --label-exact-bg: #e6f4ea;   --label-exact-fg: #1e7b45;
+  --label-variant-bg: #e8f0fb; --label-variant-fg: #1f5fad;
+  --label-bug-bg: #fdebe9;     --label-bug-fg: #b42318;
+  --label-invalid-bg: #f0e9f9; --label-invalid-fg: #6b2fa3;
+  --label-unclear-bg: #fdf1e1; --label-unclear-fg: #9a5b00;
+  --label-neutral-bg: #eef0f3; --label-neutral-fg: #4b5563;
+
+  /* Type */
+  --font-heading: "Fira Sans Condensed", "Arial Narrow", sans-serif;
+  --font-ui: "Fira Sans", system-ui, sans-serif;
+  --font-size-base: 14px;
+
+  /* Shape */
+  --radius-panel: 6px;
+  --radius-button: 4px;
+
+  /* Layout */
+  --topbar-height: 56px;
+  --nav-width: 208px;
+  --page-margin: 32px;
+}
