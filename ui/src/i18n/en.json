@@ -1,0 +1,45 @@
+{
+  "app": {
+    "product": "EEL Review Assistant",
+    "ruleSetContext": "Rule set in force <strong>V13.3</strong> · next <strong>V13.4</strong> from 01.01.2027",
+    "languageSwitch": "Choose language",
+    "user": "ITSG tester"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "overview": "Overview",
+    "specChanges": "Spec changes",
+    "testCatalogue": "Test catalogue",
+    "submissions": "Submissions",
+    "advisorQueue": "Advisor queue",
+    "reports": "Reports",
+    "openItems": "{{count}} open"
+  },
+  "screens": {
+    "overview": {
+      "title": "Overview",
+      "subtitle": "Two tracks run in parallel: monthly checks under V13.3, catalogue 2027 under V13.4."
+    },
+    "specChanges": {
+      "title": "Verfahrensbeschreibung V13.3 → V13.4",
+      "subtitle": "36 changes found, 5 inside the EEL prototype scope. Field layouts unchanged."
+    },
+    "testCatalogue": {
+      "title": "Test catalogue 2027",
+      "subtitle": "Built under V13.4. Hidden variants stay on the ITSG side; vendors only get the story."
+    },
+    "submissions": {
+      "title": "Submissions",
+      "subtitle": "All received TEEL0 files and their result."
+    },
+    "advisorQueue": {
+      "title": "Advisor queue",
+      "subtitle": "Only what catalogue, rules and AI could not settle. Your decision becomes a precedent."
+    },
+    "reports": {
+      "title": "Reports",
+      "subtitle": "Signed reports for ITSG and the vendor."
+    }
+  },
+  "placeholder": "This screen is built in a later step."
+}

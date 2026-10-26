@@ -1,0 +1,45 @@
+{
+  "app": {
+    "product": "EEL Review Assistant",
+    "ruleSetContext": "Regelwerk in Kraft <strong>V13.3</strong> · nächstes <strong>V13.4</strong> ab 01.01.2027",
+    "languageSwitch": "Sprache wählen",
+    "user": "ITSG-Prüfer"
+  },
+  "nav": {
+    "label": "Hauptnavigation",
+    "overview": "Übersicht",
+    "specChanges": "Spec-Änderungen",
+    "testCatalogue": "Testkatalog",
+    "submissions": "Einreichungen",
+    "advisorQueue": "Klärungsfälle",
+    "reports": "Prüfberichte",
+    "openItems": "{{count}} offen"
+  },
+  "screens": {
+    "overview": {
+      "title": "Übersicht",
+      "subtitle": "Zwei Spuren laufen parallel: monatliche Prüfungen unter V13.3, Katalog 2027 unter V13.4."
+    },
+    "specChanges": {
+      "title": "Verfahrensbeschreibung V13.3 → V13.4",
+      "subtitle": "36 Änderungen gefunden, 5 davon im EEL-Prototyp-Umfang. Feldlayouts unverändert."
+    },
+    "testCatalogue": {
+      "title": "Testkatalog 2027",
+      "subtitle": "Erstellt unter V13.4. Versteckte Varianten bleiben bei der ITSG; Hersteller erhalten nur die Geschichte."
+    },
+    "submissions": {
+      "title": "Einreichungen",
+      "subtitle": "Alle eingegangenen TEEL0-Dateien und ihr Ergebnis."
+    },
+    "advisorQueue": {
+      "title": "Klärungsfälle",
+      "subtitle": "Nur was Katalog, Regeln und KI nicht klären konnten. Ihre Entscheidung wird zum Präzedenzfall."
+    },
+    "reports": {
+      "title": "Prüfberichte",
+      "subtitle": "Signierte Berichte für ITSG und Hersteller."
+    }
+  },
+  "placeholder": "Dieser Bildschirm wird in einem späteren Schritt gebaut."
+}
