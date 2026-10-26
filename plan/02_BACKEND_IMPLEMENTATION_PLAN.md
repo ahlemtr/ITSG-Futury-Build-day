@@ -4,7 +4,7 @@ Read `00_PROJECT_OVERVIEW.md` first for context and `03_DOMAIN_RULES_VORERKRANKU
 
 ## 1. Principles
 
-1. **The LLM never computes expected values or verdicts.** It extracts, drafts and explains. Rules are deterministic Python.
+1. **The LLM decides and drafts, the engine calculates.** OpenAI agents decide which tests to update or create and propose deviation labels and reports. Every date, day count and rule result comes from a tool call into deterministic Python (`09_TECH_STACK.md` section 3). Agent output is a draft until a human approves it.
 2. **Every verdict cites its source**: rule ID, ITSG criterion (if any), spec document, version, section.
 3. **Rules and layouts are data.** Parameters and layouts live in YAML (later the knowledge graph). A version change is a data change.
 4. **Only `kg/` knows where rules and layouts come from.** The rest of the code calls the interface in section 5.
@@ -12,20 +12,18 @@ Read `00_PROJECT_OVERVIEW.md` first for context and `03_DOMAIN_RULES_VORERKRANKU
 
 ## 2. Tech stack
 
+Full list with versions, environment variables and the agent tools: `09_TECH_STACK.md`. In short:
+
 | Purpose | Choice |
 |---|---|
-| Language | Python 3.12 |
-| API | FastAPI + Uvicorn, Pydantic v2 |
-| Data files | PyYAML |
-| Dates | python-dateutil (`relativedelta`) |
-| Database + file storage | Postgres 16 in Docker on the team VM (app data: test cases, submissions, verdicts, runs, reports), `psycopg`; files on the VM disk under `data/` |
-| Knowledge graph | Neo4j 5 Community in Docker on the same VM (`07_KNOWLEDGE_GRAPH.md`), YAML backend as fallback |
-| LLM | Anthropic SDK (Claude), JSON output validated with Pydantic |
-| Signing | `cryptography` (Ed25519), `hashlib` (SHA-256) |
-| Report HTML | Jinja2 |
-| PDF text | `pdftotext` (poppler) for the spec diff, pdfplumber as fallback |
-| Tests | pytest |
-| Run | Docker Compose on the team VM (api + postgres + neo4j), `.env` for keys |
+| Backend | Python 3.12, FastAPI, Pydantic v2, PyYAML, python-dateutil |
+| Database + file storage | Postgres 16 (app data: test cases, submissions, verdicts, runs, reports), files on the VM disk under `data/` |
+| Knowledge graph | Neo4j 5 Community with full-text and vector index (`07`, `08`), YAML backend as fallback |
+| LLM | OpenAI SDK: Structured Outputs (Pydantic), function calling, `text-embedding-3-small` |
+| Documents | `pdftotext` (poppler), pdfplumber, python-docx |
+| Report and signing | Jinja2, WeasyPrint, `cryptography` (Ed25519), SHA-256 |
+| Frontend | React + TypeScript + Vite + Tailwind |
+| Tests and run | pytest, Docker Compose on the team VM |
 
 ## 3. Repository structure
 
@@ -50,17 +48,22 @@ eel-review/
 │   ├── specdiff.py            # version diff -> changed sections -> rules
 │   ├── report.py              # JSON + HTML report
 │   └── signing.py
-├── kg/
+├── kg/                        # exact layout: 08_KG_SEEDING_GUIDE.md section 2
 │   ├── interface.py           # the contract (section 5)
-│   ├── yaml_backend.py        # reads layouts/ + kg/seed/ (reference backend)
-│   ├── graph_backend.py       # teammate's Neo4j graph, same interface
-│   ├── seed_graph.py, load.py # build and load the graph (07, K3 to K5)
-│   └── seed/                  # ONE set of hand-written seed files, read by both backends:
-│                              # documents, message_types, parameters, rules (with criteria),
-│                              # compare_modes, variants, changes, test_cases, passages,
-│                              # sections (spec text per passage, from pdftotext)
+│   ├── yaml_backend.py        # reads layouts/ + kg/seed/ + kg/build/passages.yaml (reference backend)
+│   ├── graph_backend.py       # Neo4j backend, same interface
+│   ├── build.py               # extract -> build -> validate -> load -> embed (08)
+│   ├── extract/, seed_graph.py, validate.py, load.py, embed.py
+│   ├── seed/                  # ONE set of hand-written seed files, read by both backends:
+│   │                          # documents, message_types, parameters, rules (with criteria),
+│   │                          # compare_modes, variants, changes, test_cases, precedents
+│   └── build/                 # generated, not committed: passage text, embeddings cache
 ├── llm/
-│   ├── client.py
+│   ├── client.py              # OpenAI client, Structured Outputs, cache by input hash
+│   ├── tools.py               # tool definitions: kg/interface methods + engine tools (09 section 3.3)
+│   ├── agents/
+│   │   ├── spec_update.py     # spec change -> no change / update test / new test (drafts)
+│   │   └── check.py           # deviations -> proposed labels + draft report
 │   ├── explain.py             # fail verdict -> plain explanation with citation
 │   ├── story.py               # scenario -> readable test story (TA style)
 │   └── extract.py             # spec passage -> draft rule (shown on 3.12)
@@ -88,7 +91,7 @@ Each task lists what to implement, what to test and how to test it. A milestone 
 
 | Task | Implement | Test / how |
 |---|---|---|
-| M0.1 | repo, `pyproject.toml`, ruff, pytest, `.env.example` (ANTHROPIC_API_KEY, DATABASE_URL, NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, KG_BACKEND=yaml, SIGNING_KEY_PATH). No default rule set: every check passes `valid_on` (M4.7) | `pytest` runs (0 tests), `uvicorn api.main:app` serves `/health` |
+| M0.1 | repo, `pyproject.toml`, ruff, pytest, `.env.example` (all variables in `09_TECH_STACK.md` section 7, `KG_BACKEND=yaml`). No default rule set: every check passes `valid_on` (M4.7) | `pytest` runs (0 tests), `uvicorn api.main:app` serves `/health` |
 | M0.2 | copy `layouts/` and `fixtures/itsg/TEEL0-Test1-DBVO` | file present, YAML loads |
 
 ### M1 Records: parser and writer
@@ -104,7 +107,7 @@ Each task lists what to implement, what to test and how to test it. A milestone 
 
 | Task | Implement | Test / how |
 |---|---|---|
-| M2.1 | `kg/seed/rules.yaml` + `kg/seed/parameters.yaml` (format in `07_KNOWLEDGE_GRAPH.md` section 5): rules R41-1..6, F41-1..10, K61-1..7, K62-1..2, E-1..3, C-1..8 with `id, title, criterion, sources[], params[], fields[]`. Parameter values per version (13.3, 13.4, sim-13.5) with `valid_from` | YAML loads into Pydantic models |
+| M2.1 | `kg/seed/rules.yaml` + `kg/seed/parameters.yaml` (format in `08_KG_SEEDING_GUIDE.md` section 9): rules R41-1..6, F41-1..10, K61-1..7, K62-1..2, E-1..3, C-1..8 with `id, title, criterion, sources[], params[], fields[]`. Parameter values per version (13.3, 13.4, sim-13.5) with `valid_from` | YAML loads into Pydantic models |
 | M2.2 | `params.get(name, version)` and `params.get(name, on_date)` | `gap_inclusive` is False for 13.3, True for 13.4; by date: False on 2026-11-01, True on 2027-01-01 |
 | M2.3 | `select_chain`, `must_send_41` exactly as in rules doc section 3 | **all rows** of rules doc section 9 (Beispielpapier 13.1 to 13.5, Peter and clones) under 13.3, 13.4 and sim-13.5 as a parametrized pytest. BP 13.5 trace counts the open AU until 08.09 (23 days) |
 | M2.4 | `efz_end(current_start, groups_61, params)` | first 61 -> 2026-03-30, corrected 61 -> 2026-03-27 |
@@ -163,23 +166,26 @@ See `05_CHECKING_AND_DEVIATIONS.md` for the flow, compare modes and labels.
 | M7.3 | API endpoints (section 6) | `httpx` tests for each endpoint against seeded data |
 | M7.4 | **intake**: `POST /submissions` stores the files with SHA-256, parses them and returns a receipt `{accepted / rejected, issues[]}`, like eVpT's processing confirmation | corrupt file -> rejected with the parse issue; valid file -> accepted and checkable |
 
-### M8 LLM services
+### M8 LLM services (OpenAI)
 
 | Task | Implement | Test / how |
 |---|---|---|
+| M8.0 | `llm/client.py` (Structured Outputs, retry once on invalid JSON) and `llm/tools.py`: every `kg/interface` method (except `add_precedent`, `subgraph`) and the engine tools of `09_TECH_STACK.md` section 3.3 as OpenAI function tools | an agent call that needs `gap_inclusive` on 2027-01-01 gets `true` through `get_param` |
 | M8.1 | `explain(verdict, passage)`: 2 to 4 sentences, German or English, must quote the rule id and section; reject output without them | for the July-period fail, text mentions R41-3 and 3.12 |
 | M8.2 | `story(scenario)`: TA-style month-by-month description for the test package | Peter story lists the 4 prior periods and 11.03.2026 |
 | M8.3 | `extract(passage)`: draft a rule (condition + parameters) from the 3.12 text, shown next to the approved rule | draft for the chaining sentence contains a 6-month parameter |
 | M8.4 | cache LLM outputs by input hash, so the demo works offline after one run | second run makes no API call |
 | M8.5 | **AI deviation triage**: input = deviation + context from `kg.get_deviation_context` (rules, passages, precedents, flagged blocks); output JSON `{proposal: likely_variant / likely_bug / unclear, reasoning, citations[], confidence}`; rejected if no citation; never sets a final label | `s-no-contact` (41 without DBAP): proposal "likely bug", cites Beispielpapier 13.1 where every 41 carries MM-ANSPRECH = J |
 | M8.6 | **advisor decision -> precedent**: `POST /deviations/{id}/decide` stores label + reason, adds the signature to the catalogue | re-check `s-no-contact`: resolved by precedent, no AI call |
+| M8.7 | **spec-update agent**: input = old and new version; uses `get_changes`, `get_affected_rules`, `get_test_cases`, `expected_result`; output per change `{decision: no_change / update_test / new_test, test_case draft, reasoning, citations[]}`, stored as `draft` | 13.3 -> 13.4: `update_test` for `peter-gap-exact` and `peter-gap-exact-hidden`, `no_change` for `peter`, cites `VB@13.4#3.12/chaining` |
+| M8.8 | **check agent report draft**: input = check result with labels; output = report text per deviation with citations, status `draft` until the advisor confirms | report draft for `s-missing-july` names R41-3 and `VB@13.4#3.12/chaining` |
 
 ### M9 Knowledge graph integration
 
 | Task | Implement | Test / how |
 |---|---|---|
 | M9.1 | `kg/interface.py` (section 5) + `yaml_backend` | all engine tests pass using yaml_backend |
-| M9.2 | `graph_backend` (teammate) behind the same interface, switch via `KG_BACKEND=graph` | same tests pass with graph_backend |
+| M9.2 | `graph_backend` behind the same interface, built per `08_KG_SEEDING_GUIDE.md`, switch via `KG_BACKEND=graph` | same tests pass with graph_backend |
 
 ## 5. Knowledge graph interface (contract with the teammate)
 
@@ -190,7 +196,10 @@ class KnowledgeBase(Protocol):
     def get_param(self, name: str, version: str | None = None, on_date: date | None = None) -> Any: ...
         # by date: real versions only; simulated values (sim-13.5) only by version
     def get_passage(self, ref: SpecRef) -> Passage: ...          # doc, version, section, text, page
-    def search_passages(self, text: str) -> list[Passage]: ...
+    def search_passages(self, text: str, k: int = 5) -> list[Passage]: ...   # vector search, full-text fallback
+    def get_changes(self, document: str, old_version: str, new_version: str, in_scope_only: bool = True) -> list[Change]: ...
+    def get_test_cases(self, rule_id: str | None = None, include_hidden: bool = False) -> list[TestCaseRef]: ...
+    def get_test_case(self, key: str) -> TestCase: ...   # inputs + expected per version
     def get_affected_rules(self, changes: list[str]) -> Impact: ...
         # Impact = {recompute: [Rule], review: [Rule], tests: [TestCaseRef]}; builder uses recompute only
     def get_deviation_context(self, record: str, field: str, abgabegrund: str, version: str) -> DeviationContext: ...
@@ -200,9 +209,9 @@ class KnowledgeBase(Protocol):
     def subgraph(self, label: str, key: str, depth: int = 1) -> Graph: ...   # UI only
 ```
 
-This is the final contract (agreed with `07_KNOWLEDGE_GRAPH.md` section 11). Precedents live behind this interface: the graph backend stores `Precedent` nodes, the YAML backend appends to `kg/seed/precedents.yaml`.
+This is the final contract (agreed with `07_KNOWLEDGE_GRAPH.md` section 11 and `08_KG_SEEDING_GUIDE.md` section 13). The same methods are the knowledge graph tools of the OpenAI agents (M8.0), except `add_precedent` and `subgraph`. Precedents live behind this interface: the graph backend stores `Precedent` nodes, the YAML backend appends to `kg/seed/precedents.yaml`.
 
-`Layout`, `Rule`, `Passage`, `SpecRef`, `Version` are Pydantic models in `engine/model.py`. The YAML backend is the reference implementation and must stay working.
+`Layout`, `Rule`, `Passage`, `SpecRef`, `Version`, `Change`, `TestCase`, `TestCaseRef` are Pydantic models in `engine/model.py`. The YAML backend is the reference implementation and must stay working.
 
 ## 6. API
 

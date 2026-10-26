@@ -26,7 +26,7 @@ This is the rule set the prototype implements. Every rule has an ID, a source an
 
 **The real change between V13.3 and V13.4** (VB 3.12, change log entry of 10.03.2026, labeled "editorial"): a prior illness is chained if "not at least 6 months" (13.3) resp. "not more than 6 months" (13.4) have passed. For a gap of exactly 6 months the result flips: excluded under 13.3, included under 13.4.
 
-Stored in `kg/seed/parameters.yaml` as a list of `{name, value, valid_from}`. The engine always asks for the value valid on a given date.
+Stored in `kg/seed/parameters.yaml`, one entry per parameter with a list of `{version, valid_from, value}` (format: `08_KG_SEEDING_GUIDE.md` section 9.1). The engine always asks for the value valid on a given date.
 
 ## 3. When must the employer send a 41?
 
@@ -106,7 +106,7 @@ Insurer reply 62 (end of benefit):
 | ID | Field | Value |
 |---|---|---|
 | K62-1 | DBID.REFERENZ-ID | DATENSATZ-ID of the latest valid 01 (Peter: the new 01 of step 6, Hinweise table) |
-| K62-2 | DBEE.EEL-ENDE, GRUNDBEENDEEL | 31.03.2026 and 99 for Peter (Hinweise table), never after the end of employment (C-6) |
+| K62-2 | DBEE.EEL-ENDE, DBEE.EEL-ENDE-GRUND | 31.03.2026 and 99 for Peter (Hinweise table), never after the end of employment (C-6) |
 
 ## 6. EFZ end (employer-paid period) after a 61
 
@@ -153,9 +153,9 @@ The checker first compares with the model solution (exact match on comparable fi
 | a format rule is violated (F41 rules, wrong length, non-numeric, MM flag without block) | invalid |
 | fields in the ignore list (DATUM-ERSTELLUNG, DATUM-VERARBEITUNG, AKTENZEICHEN-SV) | not compared |
 | fields checked by rule only (DATENSATZ-ID, PRODUKT-IDENTIFIER, ABSENDERNUMMER, AKTENZEICHEN-VERURSACHER, REFERENZ-ID ...) | not compared to the solution, rule checked |
+| no rule or precedent covers the deviation | unclear: AI proposal, advisor decides, decision stored as precedent |
 
 Worst label wins per test case: invalid > bug > unclear > correct variant > exact match.
-| no rule or precedent covers the deviation | unclear: AI proposal, advisor decides, decision stored as precedent |
 
 ## 9. Test cases for the rules engine
 
