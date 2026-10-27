@@ -200,6 +200,7 @@ def decide(request: Request, dev_id: str, body: DecideBody):
     d.label, d.resolved_by, d.precedent_key = body.label, "advisor", p.key
     d.explanation = f"advisor {body.advisor}: {body.reason}"
     repo(request).update_deviation(sid, d)
+    repo(request).add_event("precedent", {"signature": p.key, "label": body.label, "advisor": body.advisor})
     return {"deviation": d.model_dump(mode="json"), "precedent": p.model_dump(mode="json")}
 
 

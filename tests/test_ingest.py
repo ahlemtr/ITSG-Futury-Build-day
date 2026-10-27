@@ -77,6 +77,8 @@ def test_upload_vb_13_4(baseline):
     exact = repo.get_test_case("peter-gap-exact")
     assert isinstance(exact, Case) and exact.status == "draft"
     assert repo.list_events()[0]["parameters_changed"] == ["gap_inclusive"]
+    graph_tests = {t.key for t in seen[-1].get_test_cases("R41-2", include_hidden=True)}
+    assert {"peter-gap-exact", "peter-gap-exact-hidden"} <= graph_tests  # the graph grew with the new tests
 
 
 def test_upload_rejects_a_known_version(baseline):

@@ -854,3 +854,47 @@ export async function trackJob(job: ApiJob): Promise<ApiJob> {
     job = await getJson<ApiJob>(`/jobs/${encodeURIComponent(job.id)}`);
   }
 }
+
+// ---------- Knowledge graph tab (SPEC_UPDATE_WORKFLOW.md W6) ----------
+
+export type KgStats = {
+  backend: "neo4j" | "yaml";
+  nodes: Record<string, number>;
+  total_nodes: number;
+  edges: number | null;
+  embedded_chunks: number;
+  versions: string[];
+};
+
+export type KgEvent = {
+  at: string;
+  kind: string;
+  document?: string;
+  version?: string;
+  valid_from?: string;
+  passages?: number;
+  changes?: number;
+  in_scope?: number;
+  parameters_changed?: string[];
+  tests_flipped?: string[];
+  drafts?: string[];
+  signature?: string;
+  label?: string;
+  test_cases?: number;
+};
+
+export type KgNode = { label: string; key: string; props: Record<string, unknown> };
+export type KgEdge = { type: string; from_label: string; from_key: string; to_label: string; to_key: string };
+
+export type KgAnswer = {
+  query: string;
+  results: { passage: { key: string; heading: string; snippet: string | null }; rules: string[]; changes: string[]; tests: string[] }[];
+};
+
+export const getKgStats = () => getJson<KgStats>("/kg/stats");
+export const getKgEvents = () => getJson<KgEvent[]>("/kg/events");
+export const getSubgraph = (label: string, key: string, depth = 1) =>
+  getJson<{ nodes: KgNode[]; edges: KgEdge[] }>(
+    `/graph/subgraph?label=${encodeURIComponent(label)}&key=${encodeURIComponent(key)}&depth=${depth}`,
+  );
+export const askGraph = (q: string) => getJson<KgAnswer>(`/kg/ask?q=${encodeURIComponent(q)}`);

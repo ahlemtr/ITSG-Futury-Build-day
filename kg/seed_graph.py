@@ -147,6 +147,11 @@ def load_overlays(seed: Seed, folder: Path) -> None:
         if (d / "changes.yaml").exists():
             with open(d / "diff.json", encoding="utf-8") as f:
                 seed.extra_changes.append((load_yaml(d / "changes.yaml"), json.load(f)))
+        if (d / "tests.yaml").exists():  # test cases the upload made (drafts until ITSG approves them)
+            known = {tc["id"] for tc in seed.test_cases}
+            for tc in load_yaml(d / "tests.yaml") or []:
+                if tc["id"] not in known:
+                    seed.test_cases.append({k: v for k, v in tc.items() if k != "key"})
         if (d / "expected.yaml").exists():
             expected = load_yaml(d / "expected.yaml") or {}
             for tc in seed.test_cases:

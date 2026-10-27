@@ -279,6 +279,12 @@ class Pipeline:
                 h = builder.hidden(self.kb, tc)
                 self.repo.upsert_test_case(h)
                 drafts.append(h.id)
+        # the test cases this upload made become part of the knowledge graph (TestCase nodes, TARGETS rules)
+        made = [self.repo.get_test_case(t) for t in dict.fromkeys(drafts)]
+        dump_yaml([t.to_kb().model_dump(mode="json") | {"id": t.id} for t in made if t is not None],
+                  self.folder / "tests.yaml")
+        if made:
+            self.on_kb(self._reload_kb())
         rechecked = 0
         if self.valid_from <= self.today:  # the rule set in force changes now: re-check the submissions
             for s in self.repo.list_submissions():
@@ -303,6 +309,13 @@ class Pipeline:
         known = next((d for d in load_yaml(ROOT / "kg" / "seed" / "documents.yaml")["documents"]
                       if d["code"] == self.doc), None)
         return known["title"] if known else self.doc
+
+    def _reload_kb(self):
+        kb = _new_kb()
+        if env("KG_BACKEND", "yaml") == "graph":
+            _push_to_neo4j()
+        self.kb = kb
+        return kb
 
     def _rules_using(self, param: str):
         seen = {}

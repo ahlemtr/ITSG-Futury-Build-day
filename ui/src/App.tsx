@@ -5,6 +5,7 @@ import { SideNav } from "./components/SideNav";
 import { AiOverlay } from "./components/AiOverlay";
 import { ReportScreen } from "./screens/ReportScreen";
 import { ReportsScreen } from "./screens/ReportsScreen";
+import { KnowledgeGraphScreen } from "./screens/KnowledgeGraphScreen";
 import { SpecChangesScreen } from "./screens/SpecChangesScreen";
 import { TestCatalogueScreen } from "./screens/TestCatalogueScreen";
 import { OverviewScreen } from "./screens/OverviewScreen";
@@ -27,6 +28,7 @@ export function App() {
             <Route path="/" element={<OverviewScreen />} />
             <Route path="/spec-changes" element={<SpecChangesScreen />} />
             <Route path="/test-catalogue" element={<TestCatalogueScreen />} />
+            <Route path="/knowledge-graph" element={<KnowledgeGraphScreen />} />
             <Route path="/submissions" element={<SubmissionsScreen />} />
             <Route path="/submissions/:id" element={<SubmissionResultScreen />} />
             <Route path="/advisor-queue" element={<AdvisorQueueScreen />} />

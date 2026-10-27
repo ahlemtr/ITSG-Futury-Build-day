@@ -29,7 +29,8 @@
     "vendorPortal": "Vendor portal",
     "myTests": "My test cases",
     "results": "Results",
-    "vendorReports": "Reports"
+    "vendorReports": "Reports",
+    "knowledgeGraph": "Knowledge graph"
   },
   "screens": {
     "overview": {
@@ -441,6 +442,45 @@
       "story": "AI writes the task",
       "check": "Check with AI assessment",
       "report": "AI explains the deviations"
+    }
+  },
+  "kg": {
+    "title": "Knowledge graph",
+    "subtitle": "The AI's memory: versions, passages, rules, parameters, changes, test cases and decisions, all linked. Every new version, test and decision extends it; the more it holds, the more precisely search finds the passages, rules and test cases a change touches.",
+    "count": {
+      "DocVersion": "document versions",
+      "Passage": "passages",
+      "Chunk": "search chunks",
+      "Rule": "rules",
+      "Parameter": "parameters",
+      "ParamValue": "parameter values",
+      "Change": "changes",
+      "TestCase": "test cases",
+      "Precedent": "precedents"
+    },
+    "statsLine": "{{nodes}} nodes, {{edges}} links, {{embedded}} search chunks embedded · {{backend}} · versions: {{versions}}",
+    "graphTitle": "Around {{key}}",
+    "graphHint": "click a node to bring it to the centre",
+    "depth2": "Two steps out",
+    "growth": "How the graph grew",
+    "noEvents": "No entries yet: the graph is at its starting point.",
+    "event": {
+      "upload": "{{doc}} V{{version}} uploaded: +{{passages}} passages, {{changes}} changes touching rules, parameters changed: {{params}}, {{tests}} new test cases",
+      "precedent": "Precedent stored: {{signature}} ({{label}})",
+      "baseline": "Starting point: {{doc}} V{{version}}, {{tests}} test case"
+    },
+    "ask": {
+      "title": "Ask the graph",
+      "hint": "A question or a changed sentence: the graph returns the matching passages with the sentence that matched, the rules built on them and the test cases on those rules.",
+      "placeholder": "e.g. gap of exactly 6 months between two periods of incapacity",
+      "submit": "Ask",
+      "running": "Searching …",
+      "none": "Nothing found.",
+      "passage": "Passage",
+      "rules": "Rules",
+      "tests": "Test cases",
+      "changed_one": "{{count}} change touches this passage",
+      "changed_other": "{{count}} changes touch this passage"
     }
   }
 }

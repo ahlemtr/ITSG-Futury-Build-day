@@ -593,3 +593,95 @@ abbr[title] {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Knowledge graph tab */
+.kg-figures {
+  flex-wrap: wrap;
+}
+
+.kg-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+  margin: 16px 0;
+  align-items: start;
+}
+
+.kg-graph-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-right: 16px;
+}
+
+.kg-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  flex-wrap: wrap;
+}
+
+.kg-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.kg-canvas {
+  height: 460px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.kg-events {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.kg-events li {
+  display: grid;
+  gap: 2px;
+  border-left: 2px solid var(--border);
+  padding-left: 10px;
+}
+
+.kg-ask-form {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.kg-ask-form input {
+  flex: 1;
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+}
+
+.link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--ink);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 1100px) {
+  .kg-layout {
+    grid-template-columns: 1fr;
+  }
+}

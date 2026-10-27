@@ -29,7 +29,8 @@
     "vendorPortal": "Hersteller-Portal",
     "myTests": "Meine Testfälle",
     "results": "Ergebnisse",
-    "vendorReports": "Berichte"
+    "vendorReports": "Berichte",
+    "knowledgeGraph": "Wissensgraph"
   },
   "screens": {
     "overview": {
@@ -441,6 +442,45 @@
       "story": "KI schreibt die Aufgabe",
       "check": "Prüfung mit KI-Einschätzung",
       "report": "KI erklärt die Abweichungen"
+    }
+  },
+  "kg": {
+    "title": "Wissensgraph",
+    "subtitle": "Das Gedächtnis der KI: Fassungen, Passagen, Regeln, Parameter, Änderungen, Testfälle und Entscheidungen, alle miteinander verknüpft. Jede neue Fassung, jeder Test und jede Entscheidung erweitert ihn; je mehr er enthält, desto genauer findet die Suche die Passagen, Regeln und Testfälle, die eine Änderung betrifft.",
+    "count": {
+      "DocVersion": "Dokumentfassungen",
+      "Passage": "Passagen",
+      "Chunk": "Suchabschnitte",
+      "Rule": "Regeln",
+      "Parameter": "Parameter",
+      "ParamValue": "Parameterwerte",
+      "Change": "Änderungen",
+      "TestCase": "Testfälle",
+      "Precedent": "Präzedenzfälle"
+    },
+    "statsLine": "{{nodes}} Knoten, {{edges}} Verknüpfungen, {{embedded}} Suchabschnitte eingebettet · {{backend}} · Fassungen: {{versions}}",
+    "graphTitle": "Umgebung von {{key}}",
+    "graphHint": "Knoten anklicken, um ihn in die Mitte zu holen",
+    "depth2": "Zwei Schritte weit",
+    "growth": "Wie der Graph gewachsen ist",
+    "noEvents": "Noch keine Einträge: der Graph steht am Ausgangspunkt.",
+    "event": {
+      "upload": "{{doc}} V{{version}} hochgeladen: +{{passages}} Passagen, {{changes}} Änderungen mit Regelbezug, Parameter geändert: {{params}}, {{tests}} neue Testfälle",
+      "precedent": "Präzedenzfall gespeichert: {{signature}} ({{label}})",
+      "baseline": "Ausgangspunkt: {{doc}} V{{version}}, {{tests}} Testfall"
+    },
+    "ask": {
+      "title": "Den Graphen fragen",
+      "hint": "Eine Frage oder ein geänderter Satz: der Graph liefert die passenden Passagen mit dem treffenden Satz, die Regeln darauf und die Testfälle zu diesen Regeln.",
+      "placeholder": "z. B. Lücke von genau 6 Monaten zwischen zwei Arbeitsunfähigkeiten",
+      "submit": "Fragen",
+      "running": "Sucht …",
+      "none": "Nichts gefunden.",
+      "passage": "Passage",
+      "rules": "Regeln",
+      "tests": "Testfälle",
+      "changed_one": "{{count}} Änderung betrifft diese Passage",
+      "changed_other": "{{count}} Änderungen betreffen diese Passage"
     }
   }
 }

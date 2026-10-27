@@ -194,3 +194,11 @@ def test_report_list(client):
 def test_test_cases_flag_result_changes(client):
     tcs = {t["id"]: t for t in client.get("/test-cases").json()}
     assert tcs["peter-gap-exact"]["result_changes"] == ["13.4"] and tcs["peter"]["result_changes"] == []
+
+
+def test_kg_stats_and_ask(client):
+    s = client.get("/kg/stats").json()
+    assert s["nodes"]["Passage"] > 500 and s["nodes"]["Chunk"] >= s["nodes"]["Passage"] and "VB@13.4" in s["versions"]
+    r = client.get("/kg/ask", params={"q": "Vorerkrankung 6 Monate"}).json()["results"]
+    chaining = next(x for x in r if x["passage"]["key"].endswith("#3.12/chaining"))
+    assert "R41-2" in chaining["rules"] and "peter-gap-exact" in chaining["tests"] and chaining["passage"]["snippet"]

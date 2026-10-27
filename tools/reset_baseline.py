@@ -45,7 +45,12 @@ def main() -> None:
         repo.conn.execute(f"TRUNCATE {', '.join(TABLES)} CASCADE")
         print("postgres: tables emptied")
     ai = get_ai(kb)
-    print("seeded:", seed(kb, repo, root=data, triage=ai.triage if ai else None))
+    counts = seed(kb, repo, root=data, triage=ai.triage if ai else None)
+    baseline = os.environ.get("SPEC_BASELINE", "")
+    if baseline:
+        doc, version = baseline.split("@")
+        repo.add_event("baseline", {"document": doc, "version": version, "test_cases": counts["test_cases"]})
+    print("seeded:", counts)
 
 
 if __name__ == "__main__":
