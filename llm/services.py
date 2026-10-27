@@ -12,8 +12,8 @@ from engine.model import Case, CheckResult, CriterionReview, Deviation
 from kg.interface import KnowledgeBase
 from llm import explain as explain_mod
 from llm import story as story_mod
+from llm.agents import change_analysis, spec_update
 from llm.agents import check as check_agent
-from llm.agents import spec_update
 from llm.client import LLMClient, LLMInvalid, LLMUnavailable
 from llm.extract import LLMExtractor
 from llm.tools import ToolBox
@@ -71,6 +71,10 @@ class AIServices:
     # P8.4
     def story(self, tc: Case) -> str | None:
         return self._safe(story_mod.story, self.client, tc)
+
+    # spec upload: what one change of a new version does to the rules (None = no usable answer)
+    def analyse_change(self, change: dict, rules: list[dict], params: dict[str, dict]):
+        return self._safe(change_analysis.run, self.client, self.tools, change, rules, params, self.cites_ok)
 
     # P8.7
     def spec_update(self, document: str, old: str, new: str) -> dict | None:

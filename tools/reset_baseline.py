@@ -5,7 +5,7 @@ python -m tools.reset_baseline    (stop the API first; uses DATABASE_URL, KG_BAC
 - Postgres: every app table emptied, then the test case catalogue and the 10 seed submissions are seeded again
   (checked, with the AI triage when OpenAI is available).
 - Knowledge graph: advisor precedents removed (Neo4j nodes, or DATA_DIR/precedents.yaml for the YAML backend).
-- DATA_DIR: uploaded submission files and the signing key stay out of git; uploads are removed. The LLM cache
+- DATA_DIR: uploaded submission files and uploaded spec versions (data/ingested) are removed. The LLM cache
   (data/llm_cache/) is kept, so the demo runs offline after one rehearsal.
 """
 
@@ -15,7 +15,7 @@ import os
 import shutil
 from pathlib import Path
 
-TABLES = ["criterion_draft", "approval", "report", "run_step", "run", "check_result", "verdict", "submission_file",
+TABLES = ["kg_event", "ingest_job", "criterion_draft", "approval", "report", "run_step", "run", "check_result", "verdict", "submission_file",
           "submission", "expected_field", "test_step", "test_case"]
 
 
@@ -32,6 +32,7 @@ def main() -> None:
     from store.seed import seed
 
     shutil.rmtree(data / "submissions", ignore_errors=True)
+    shutil.rmtree(data / "ingested", ignore_errors=True)  # uploaded spec versions: back to the baseline only
     (data / "precedents.yaml").unlink(missing_ok=True)
 
     kb = get_kb()

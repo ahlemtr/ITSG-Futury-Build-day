@@ -113,3 +113,21 @@ CREATE TABLE IF NOT EXISTS criterion_draft (
     status text NOT NULL DEFAULT 'draft',
     doc    jsonb NOT NULL
 );
+
+-- Spec upload (SPEC_UPDATE_WORKFLOW.md): one row per uploaded document version and its pipeline job
+CREATE TABLE IF NOT EXISTS ingest_job (
+    id         text PRIMARY KEY,
+    document   text NOT NULL,
+    version    text NOT NULL,
+    status     text NOT NULL,          -- running / done / failed
+    created    timestamptz NOT NULL DEFAULT now(),
+    doc        jsonb NOT NULL          -- file, sha256, valid_from, stages with counts, result
+);
+
+-- What each upload or decision added to the knowledge graph (knowledge graph tab)
+CREATE TABLE IF NOT EXISTS kg_event (
+    id    serial PRIMARY KEY,
+    at    timestamptz NOT NULL DEFAULT now(),
+    kind  text NOT NULL,               -- baseline / spec_upload / precedent / tests
+    doc   jsonb NOT NULL
+);

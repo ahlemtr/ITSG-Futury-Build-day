@@ -45,6 +45,8 @@ class MemoryRepo:
         self.runs: dict[str, dict] = {}
         self.reports: dict[str, dict] = {}
         self.criteria: dict[str, CriterionDraft] = {}
+        self.jobs: dict[str, dict] = {}
+        self.events: list[dict] = []
 
     # test cases
     def upsert_test_case(self, tc: Case) -> None:
@@ -116,6 +118,22 @@ class MemoryRepo:
 
     def list_criteria(self) -> list[CriterionDraft]:
         return list(self.criteria.values())
+
+    # spec upload jobs and knowledge graph events
+    def save_job(self, job_id: str, doc: dict) -> None:
+        self.jobs[job_id] = doc
+
+    def get_job(self, job_id: str) -> dict | None:
+        return self.jobs.get(job_id)
+
+    def list_jobs(self) -> list[dict]:
+        return sorted(self.jobs.values(), key=lambda j: j["created"], reverse=True)
+
+    def add_event(self, kind: str, doc: dict) -> None:
+        self.events.append({"at": datetime.now(UTC).isoformat(), "kind": kind, **doc})
+
+    def list_events(self) -> list[dict]:
+        return list(reversed(self.events))
 
 
 def _j(model: BaseModel | dict) -> str:
@@ -242,6 +260,25 @@ class PgRepo:
 
     def list_criteria(self) -> list[CriterionDraft]:
         return [CriterionDraft.model_validate(r[0]) for r in self._all("SELECT doc FROM criterion_draft ORDER BY id")]
+
+    def save_job(self, job_id: str, doc: dict) -> None:
+        self.conn.execute("""INSERT INTO ingest_job (id, document, version, status, doc) VALUES (%s,%s,%s,%s,%s)
+                             ON CONFLICT (id) DO UPDATE SET status=EXCLUDED.status, doc=EXCLUDED.doc""",
+                          (job_id, doc["document"], doc["version"], doc["status"], _j(doc)))
+
+    def get_job(self, job_id: str) -> dict | None:
+        row = self._one("SELECT doc FROM ingest_job WHERE id=%s", job_id)
+        return row[0] if row else None
+
+    def list_jobs(self) -> list[dict]:
+        return [r[0] for r in self._all("SELECT doc FROM ingest_job ORDER BY created DESC")]
+
+    def add_event(self, kind: str, doc: dict) -> None:
+        self.conn.execute("INSERT INTO kg_event (kind, doc) VALUES (%s,%s)", (kind, _j(doc)))
+
+    def list_events(self) -> list[dict]:
+        return [{"at": at.isoformat(), "kind": kind, **doc}
+                for at, kind, doc in self._all("SELECT at, kind, doc FROM kg_event ORDER BY id DESC")]
 
 
 def get_repo():

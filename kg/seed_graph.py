@@ -13,6 +13,7 @@ from kg.common import (
     BUILD_DIR,
     LAYOUT_DIR,
     OPTIONAL_DOCS,
+    ROOT,
     SEED_DIR,
     env,
     field_key,
@@ -111,9 +112,45 @@ class Seed:
         self.precedents = load_yaml(seed_dir / "precedents.yaml") or []
         with open(seed_dir / DIFF_FILE, encoding="utf-8") as f:
             self.diff = json.load(f)
+        self.extra_changes: list[tuple[dict, list]] = []  # change sets of uploaded versions
         baseline = env("SPEC_BASELINE", "")
         if baseline:
             start_from_baseline(self, baseline, (env("BASELINE_TEST_CASES", "peter") or "peter").split(","))
+            load_overlays(self, ingested_dir())
+
+
+def ingested_dir() -> Path:
+    """Where the spec upload writes what it learned (one folder per uploaded document version)."""
+    data = Path(env("DATA_DIR", "data") or "data")
+    return (data if data.is_absolute() else ROOT / data) / "ingested"
+
+
+def load_overlays(seed: Seed, folder: Path) -> None:
+    """Add every uploaded version (in valid-from order): document, passages, raw diff and curated changes,
+    parameter values, expected results of test cases. Written by kg.ingest."""
+    if not folder.exists():
+        return
+    found = []
+    for d in folder.iterdir():
+        if (d / "document.yaml").exists():
+            found.append((load_yaml(d / "document.yaml"), d))
+    for doc, d in sorted(found, key=lambda x: str(x[0]["valid_from"])):
+        seed.documents.append({**doc, "present": True})
+        seed.passages += load_yaml(d / "passages.yaml") or []
+        values = (load_yaml(d / "parameters.yaml") or []) if (d / "parameters.yaml").exists() else []
+        for v in values:
+            prm = next((p for p in seed.parameters if p["name"] == v["name"]), None)
+            if prm is not None:
+                prm["values"] = [x for x in prm["values"] if str(x["version"]) != str(v["version"])] + [
+                    {k: v[k] for k in ("version", "valid_from", "value")}]
+        if (d / "changes.yaml").exists():
+            with open(d / "diff.json", encoding="utf-8") as f:
+                seed.extra_changes.append((load_yaml(d / "changes.yaml"), json.load(f)))
+        if (d / "expected.yaml").exists():
+            expected = load_yaml(d / "expected.yaml") or {}
+            for tc in seed.test_cases:
+                if tc["id"] in expected:
+                    tc.setdefault("expected", {})[str(doc["version"])] = expected[tc["id"]]
 
 
 def start_from_baseline(seed: Seed, baseline: str, test_cases: list[str]) -> None:
@@ -272,7 +309,9 @@ def build_from(seed: Seed) -> dict:
             g.edge("IMPLEMENTS", "Rule", r["id"], "Criterion", uuid)
 
     # --- K7: spec changes
-    _changes(seed, g, vb_versions)
+    _changes(seed.changes, seed.diff, seed, g)
+    for cur, diff in seed.extra_changes:
+        _changes(cur, diff, seed, g)
 
     # --- K8: test cases
     for order, tc in enumerate(seed.test_cases, start=1):
@@ -362,15 +401,15 @@ def _narrowest(candidates: list[dict], text: str, block_sections: set[str], bloc
     return None
 
 
-def _changes(seed: Seed, g: GraphBuilder, vb_versions: list[str]) -> None:
-    cur = seed.changes
+def _changes(cur: dict, diff: list, seed: Seed, g: GraphBuilder) -> None:
+    """One change set: raw changes of a diff plus the curated changes on top (seed or uploaded version)."""
     if not cur:  # at the baseline: no newer version yet
         return
     doc, old_v, new_v = cur.get("document", "VB"), str(cur["old_version"]), str(cur["new_version"])
     by_version = {v: [p for p in seed.passages if p["doc"] == doc and str(p["version"]) == v] for v in (old_v, new_v)}
     block_sections = {str(lay["spec"]["section"]) for lay in seed.layouts.values()}
     raws = []
-    for i, c in enumerate(seed.diff):
+    for i, c in enumerate(diff):
         key = f"{doc}-{old_v}-{new_v}-{i:03d}"
         raw = {"key": key, "tag": c["tag"], "block": c.get("block"), "field": c.get("field"),
                "old": "\n".join(c.get("old") or []), "new": "\n".join(c.get("new") or [])}
@@ -393,7 +432,10 @@ def _changes(seed: Seed, g: GraphBuilder, vb_versions: list[str]) -> None:
 
     for c in cur.get("changes", []):
         match = c.get("raw_match") or {}
-        derived = [r for r in raws if _raw_matches(r, match)]
+        if c.get("raw_keys"):  # written by the spec upload: the raw changes the AI analysed
+            derived = [r for r in raws if r["key"] in c["raw_keys"]]
+        else:
+            derived = [r for r in raws if _raw_matches(r, match)]
         if not derived:
             g.warn(f"{c['key']}: raw_match {match} found no raw change")
         first = derived[0] if derived else {}
