@@ -17,7 +17,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--skip-extract", action="store_true", help="reuse kg/build/passages.yaml")
     ap.add_argument("--skip-load", action="store_true", help="no Neo4j (implies --skip-embed)")
     ap.add_argument("--skip-embed", action="store_true", help="no OpenAI embeddings")
-    ap.add_argument("--fresh", action="store_true", help="empty Neo4j before loading (e.g. DEMO_START=1 after a full load)")
+    ap.add_argument("--fresh", action="store_true", help="empty Neo4j before loading (e.g. SPEC_BASELINE=VB@13.3 after a full load)")
     args = ap.parse_args(argv)
 
     if args.skip_extract and (BUILD_DIR / "passages.yaml").exists():

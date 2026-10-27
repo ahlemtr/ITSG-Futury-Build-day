@@ -35,7 +35,7 @@ def seed(kb: KnowledgeBase, repo, root: Path | None = None, check: bool = True, 
     `triage` (the AI services' triage) fills the AI proposal of unclear deviations."""
     for ref in kb.get_test_cases(include_hidden=True):
         repo.upsert_test_case(get_case(kb, ref.key))
-    if os.environ.get("DEMO_START") == "1":  # the demo starts without submissions; vendors upload live
+    if os.environ.get("SPEC_BASELINE"):  # the starting point has no submissions; vendors upload live
         return {"test_cases": len(repo.list_test_cases()), "submissions": 0}
     subs = build_submissions(kb)
     for s in subs:

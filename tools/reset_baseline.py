@@ -1,6 +1,6 @@
-"""Put the demo back to its start: seed data only, no test runs, no advisor decisions.
+"""Put the platform back to its starting point: seed data only, no test runs, no advisor decisions.
 
-python -m tools.demo_reset    (stop the API first; uses DATABASE_URL, KG_BACKEND, NEO4J_*, DATA_DIR)
+python -m tools.reset_baseline    (stop the API first; uses DATABASE_URL, KG_BACKEND, NEO4J_*, DATA_DIR)
 
 - Postgres: every app table emptied, then the test case catalogue and the 10 seed submissions are seeded again
   (checked, with the AI triage when OpenAI is available).

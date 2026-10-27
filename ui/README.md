@@ -9,10 +9,10 @@ The UI needs the backend: Postgres and Neo4j in Docker, the API on port 8000. Vi
 ```
 # once: Docker Desktop running, then from the repo root
 docker compose up -d postgres neo4j
-DEMO_START=1 uv run python -m kg.build --skip-extract --fresh   # demo graph: VB 13.3 only, embedded
+SPEC_BASELINE=VB@13.3 uv run python -m kg.build --skip-extract --fresh   # starting point: VB 13.3, embedded
 
 # terminal 1, repo root: the API on Postgres and Neo4j
-DEMO_START=1 SEED_ON_START=0 uv run uvicorn api.main:app --port 8000   # .env has DATABASE_URL, KG_BACKEND=graph, NEO4J_*
+SPEC_BASELINE=VB@13.3 SEED_ON_START=0 uv run uvicorn api.main:app --port 8000   # .env has DATABASE_URL, KG_BACKEND=graph, NEO4J_*
 
 # terminal 2
 cd ui
@@ -20,9 +20,9 @@ npm install        # first time only
 npm run dev        # opens http://127.0.0.1:5173
 ```
 
-Stop with `Ctrl + C`. Before a rehearsal, stop the API and run `DEMO_START=1 uv run python -m tools.demo_reset`: Postgres goes back to the demo start (Peter only, no submissions), advisor precedents are removed from the graph. Files to upload in the demo: `demo/files/` (see its README).
+Stop with `Ctrl + C`. To start over, stop the API and run `SPEC_BASELINE=VB@13.3 uv run python -m tools.reset_baseline`: Postgres goes back to the starting point (Peter only, no submissions), advisor precedents are removed from the graph. Sample vendor files to upload: `samples/vendor_uploads/` (see its README).
 
-`DEMO_START=1` = the platform knows only VB 13.3 and the Peter test case from the Hinweise document (`kg/seed_graph.py`, `demo_start`). Without it, the full seed (13.3 and 13.4, 18 test cases, 10 submissions) is loaded; the tests use the full seed. Graph tests write to Neo4j and run only with `NEO4J_TESTS=1` against a full graph. The LLM cache (`data/llm_cache/`) is kept, so the demo works offline after one run.
+`SPEC_BASELINE=VB@13.3` = the starting point: the platform knows VB 13.3 and the Peter test case from the Hinweise document (`kg/seed_graph.py`, `start_from_baseline`); newer versions arrive through the spec upload. Without it, the full seed (13.3 and 13.4, 18 test cases, 10 submissions) is loaded; the tests use the full seed. Graph tests write to Neo4j and run only with `NEO4J_TESTS=1` against a full graph. The LLM cache (`data/llm_cache/`) is kept, so it works offline after one run.
 
 Without Docker: leave out `DATABASE_URL` and `KG_BACKEND` (in-memory store and the YAML knowledge base), e.g. `DATABASE_URL= uv run uvicorn api.main:app --port 8000`.
 

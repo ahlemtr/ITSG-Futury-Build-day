@@ -111,32 +111,30 @@ class Seed:
         self.precedents = load_yaml(seed_dir / "precedents.yaml") or []
         with open(seed_dir / DIFF_FILE, encoding="utf-8") as f:
             self.diff = json.load(f)
-        if env("DEMO_START", "0") == "1":
-            demo_start(self, (env("DEMO_TEST_CASES", "peter") or "peter").split(","))
+        baseline = env("SPEC_BASELINE", "")
+        if baseline:
+            start_from_baseline(self, baseline, (env("BASELINE_TEST_CASES", "peter") or "peter").split(","))
 
 
-HIDDEN_AT_DEMO_START = "VB@13.4"  # arrives on stage through the spec upload (DEMO_PLAN.md)
-
-
-def demo_start(seed: Seed, test_cases: list[str]) -> None:
-    """The platform as the demo starts: no VB 13.4 (document, passages, changes, parameter values,
-    expectations) and only the given test cases (Peter from the Hinweise document). References to a
-    13.4 passage fall back to the same section of 13.3 when it exists."""
-    hidden = HIDDEN_AT_DEMO_START
-    doc, version = hidden.split("@")
-    seed.documents = [d for d in seed.documents if not (d["doc"] == doc and d["version"] == version)]
-    for d in seed.documents:
-        if d.get("succeeds") == version and d["doc"] == doc:
-            d["succeeds"] = None
-    seed.passages = [p for p in seed.passages if not p["key"].startswith(hidden + "#")]
+def start_from_baseline(seed: Seed, baseline: str, test_cases: list[str]) -> None:
+    """The platform's starting point: the document up to the baseline version (SPEC_BASELINE=VB@13.3), newer
+    versions arrive through the spec upload. Newer versions leave with their passages, curated changes,
+    parameter values and expectations; references to them fall back to the same section of the baseline.
+    Only the given test cases are kept (Peter from the Hinweise document)."""
+    doc, version = baseline.split("@")
+    base = next(d for d in seed.documents if d["doc"] == doc and d["version"] == version)
+    newer = {d["version"] for d in seed.documents
+             if d["doc"] == doc and d["version"] != version and str(d["valid_from"]) > str(base["valid_from"])}
+    seed.documents = [d for d in seed.documents if not (d["doc"] == doc and d["version"] in newer)]
+    hidden = tuple(f"{doc}@{v}#" for v in newer)
+    seed.passages = [p for p in seed.passages if not p["key"].startswith(hidden)] if hidden else seed.passages
     present = {p["key"] for p in seed.passages}
-    older = f"{doc}@{next((d['version'] for d in seed.documents if d['doc'] == doc), version)}"
 
     def sources(keys: list[str] | None) -> list[str]:
         out = []
         for k in keys or []:
-            if k and k.startswith(hidden + "#"):
-                k = k.replace(hidden, older, 1)
+            if k and hidden and k.startswith(hidden):
+                k = f"{baseline}#{k.split('#', 1)[1]}"
                 if k not in present:
                     continue
             if k not in out:
@@ -144,7 +142,7 @@ def demo_start(seed: Seed, test_cases: list[str]) -> None:
         return out
 
     for prm in seed.parameters:
-        prm["values"] = [v for v in prm["values"] if str(v["version"]) != version]
+        prm["values"] = [v for v in prm["values"] if str(v["version"]) not in newer]
         prm["sources"] = sources(prm.get("sources"))
     for r in seed.rules:
         r["sources"] = sources(r.get("sources"))
@@ -154,10 +152,11 @@ def demo_start(seed: Seed, test_cases: list[str]) -> None:
                 entry["source"] = (sources([entry["source"]]) or [None])[0]
     seed.test_cases = [tc for tc in seed.test_cases if tc["id"] in test_cases]
     for tc in seed.test_cases:
-        tc["expected"] = {v: e for v, e in (tc.get("expected") or {}).items() if str(v) != version}
+        tc["expected"] = {v: e for v, e in (tc.get("expected") or {}).items() if str(v) not in newer}
         tc["sources"] = sources(tc.get("sources"))
-    seed.changes = {}
-    seed.diff = []
+    if str(seed.changes.get("new_version")) in newer:
+        seed.changes = {}
+        seed.diff = []
     seed.precedents = []
 
 
@@ -365,7 +364,7 @@ def _narrowest(candidates: list[dict], text: str, block_sections: set[str], bloc
 
 def _changes(seed: Seed, g: GraphBuilder, vb_versions: list[str]) -> None:
     cur = seed.changes
-    if not cur:  # demo start: no newer version yet
+    if not cur:  # at the baseline: no newer version yet
         return
     doc, old_v, new_v = cur.get("document", "VB"), str(cur["old_version"]), str(cur["new_version"])
     by_version = {v: [p for p in seed.passages if p["doc"] == doc and str(p["version"]) == v] for v in (old_v, new_v)}
