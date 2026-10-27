@@ -143,3 +143,18 @@ def test_passages_and_graph(client):
 
 def test_criteria_needs_llm(client):
     assert client.post("/criteria/extract", json={"version": "13.4", "section": "3.12"}).status_code == 503
+
+
+def test_overview(client):
+    o = client.get("/overview", params={"today": "2026-10-27"}).json()
+    assert o["checksNow"]["ruleSet"] == "13.3" and o["checksNow"]["validUntil"] == "2026-12-31"
+    assert o["checksNow"]["submissions"] == 10 and o["checksNow"]["withOpenDeviations"] == 1
+    assert o["nextYear"]["ruleSet"] == "13.4" and o["nextYear"]["specChangesInScope"] > 0
+    assert o["nextYear"]["testsToReapprove"] == 2
+    assert o["resolution"]["waitingForAdvisor"] == 1
+
+
+def test_seed_is_checked(client):
+    subs = {s["id"]: s for s in client.get("/submissions").json()}
+    assert subs["s-missing-july"]["label"] == "bug" and subs["s-three-periods"]["label"] == "correct_variant"
+    assert subs["s-no-contact"]["vendor"] == "Abrechnung Süd Demo"

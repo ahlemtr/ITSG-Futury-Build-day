@@ -11,14 +11,19 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from api.routes import builder, catalogue, checking, criteria, runs
+from api.routes import builder, catalogue, checking, criteria, overview, runs
 
 
 def create_app(kb=None, repo=None, ai=None, data_root: Path | None = None, seed: bool = False) -> FastAPI:
     load_dotenv()
     app = FastAPI(title="EEL review assistant", version="0.1.0")
     if kb is None:
+        import os
+
         from kg import get_kb
+
+        # advisor decisions go to DATA_DIR, not into the committed seed file; delete data/ to reset the demo
+        os.environ.setdefault("PRECEDENTS_PATH", str(Path(os.environ.get("DATA_DIR", "data")) / "precedents.yaml"))
 
         kb = get_kb()
     if repo is None:
@@ -40,7 +45,7 @@ def create_app(kb=None, repo=None, ai=None, data_root: Path | None = None, seed:
     def health():
         return {"status": "ok"}
 
-    for r in (catalogue.router, checking.router, builder.router, runs.router, criteria.router):
+    for r in (catalogue.router, checking.router, builder.router, runs.router, criteria.router, overview.router):
         app.include_router(r)
     return app
 
