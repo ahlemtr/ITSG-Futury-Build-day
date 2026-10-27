@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from itertools import pairwise
+
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 
 from api.routes.common import kb, real_versions, repo, test_case
@@ -49,7 +51,7 @@ def list_test_cases(request: Request, kind: str | None = None, hidden: bool | No
 
     def result_changes(t) -> list[str]:
         """Versions whose expected 41 decision differs from the version before (needs re-approval)."""
-        return [new for old, new in zip(versions, versions[1:])
+        return [new for old, new in pairwise(versions)
                 if old in t.expected and new in t.expected and t.expected[old] != t.expected[new]]
 
     return [{"id": t.id, "kind": t.kind, "origin": t.origin, "status": t.status, "hidden": t.hidden,
