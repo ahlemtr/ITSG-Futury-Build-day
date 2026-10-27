@@ -189,39 +189,53 @@ class GraphBackend:
         return found[0]
 
     def search_passages(self, text: str, k: int = 5) -> list[Passage]:
-        """Hybrid search: full-text and vector (needs embeddings and OPENAI_API_KEY) ranks merged by reciprocal
-        rank fusion, so exact terms ("6 Monate") and meaning both count. Full-text alone without embeddings."""
+        """Hybrid search on chunks (W7): full-text and vector (needs embeddings and OPENAI_API_KEY) ranks merged by
+        reciprocal rank fusion, full-text weighted higher; a passage scores with its best chunk and comes back with
+        the sentence that matched."""
         from neo4j.exceptions import Neo4jError
 
         from kg import embed
+        from kg.chunks import snippet
 
-        pool = max(50, k * 10)
+        pool = max(60, k * 12)
         query = " ".join(_lucene_term(t) for t in text.split())
-        lists: list[tuple[float, list[dict]]] = []  # (weight, ranked passages)
+        lists: list[tuple[float, list[dict]]] = []  # (weight, ranked chunks)
         if query:
+            rows = self._q("CALL db.index.fulltext.queryNodes('chunk_text', $q, {limit: $limit}) YIELD node, score "
+                           "RETURN node.passage AS passage, node.text AS text, score", q=query, limit=pool)
+            lists.append((FULLTEXT_WEIGHT, rows))
+            # whole passages too: a section about the topic beats a list that only names it
             rows = self._q("CALL db.index.fulltext.queryNodes('passage_text', $q, {limit: $limit}) YIELD node, score "
-                           f"RETURN node {PASSAGE_PROPS} AS p, score", q=query, limit=pool)
-            lists.append((FULLTEXT_WEIGHT, [r["p"] for r in sorted(
-                rows, key=lambda r: (-r["score"] * (NARROW_BOOST if r["p"].get("part") or r["p"].get("field")
-                                                    else 1.0), r["p"]["key"]))]))
-        stored = self._q("MATCH (p:Passage) WHERE p.embedding IS NOT NULL RETURN size(p.embedding) AS n LIMIT 1")
+                           "RETURN node.key AS passage, node.text AS text, score", q=query, limit=pool)
+            lists.append((FULLTEXT_WEIGHT, rows))
+        stored = self._q("MATCH (c:Chunk) WHERE c.embedding IS NOT NULL RETURN size(c.embedding) AS n LIMIT 1")
         if embed.available() and stored and text.strip():
             vector = embed.embed_query(text)
             if len(vector) == stored[0]["n"]:  # a different embedding model would not fit the index
                 try:
-                    rows = self._q("CALL db.index.vector.queryNodes('passage_embedding', $k, $v) YIELD node, score "
-                                   f"RETURN node {PASSAGE_PROPS} AS p, score ORDER BY score DESC", k=pool, v=vector)
-                    lists.append((1.0, [r["p"] for r in rows]))
+                    lists.append((1.0, self._q(
+                        "CALL db.index.vector.queryNodes('chunk_embedding', $k, $v) YIELD node, score "
+                        "RETURN node.passage AS passage, node.text AS text, score ORDER BY score DESC",
+                        k=pool, v=vector)))
                 except Neo4jError:
                     pass  # no usable vector index: full-text only
         fused: dict[str, float] = {}
-        props: dict[str, dict] = {}
+        best_text: dict[str, tuple[float, str]] = {}
         for weight, ranked in lists:
-            for rank, p in enumerate(ranked):
-                fused[p["key"]] = fused.get(p["key"], 0.0) + weight / (RRF_K + rank + 1)
-                props[p["key"]] = p
-        best = sorted(fused, key=lambda key: (-fused[key], key))[:k]
-        return [Passage(**props[key]) for key in best]
+            for rank, row in enumerate(ranked):
+                score = weight / (RRF_K + rank + 1)
+                fused[row["passage"]] = max(fused.get(row["passage"], 0.0), 0.0) + score
+                if score > best_text.get(row["passage"], (0.0, ""))[0] and len(row["text"] or "") <= 4000:
+                    best_text[row["passage"]] = (score, row["text"])
+        if not fused:
+            return []
+        keys = sorted(fused, key=lambda key: (-fused[key], key))[: k * 3]
+        rows = self._q(f"MATCH (p:Passage) WHERE p.key IN $keys RETURN p {PASSAGE_PROPS} AS p", keys=keys)
+        props = {r["p"]["key"]: r["p"] for r in rows}
+        boost = {key: NARROW_BOOST if props[key].get("part") or props[key].get("field") else 1.0 for key in props}
+        best = sorted(props, key=lambda key: (-fused[key] * boost[key], key))[:k]
+        return [Passage(**props[key], snippet=snippet(best_text.get(key, (0, props[key].get("text") or ""))[1], text))
+                for key in best]
 
     def get_versions(self, document: str) -> list[Version]:
         rows = self._q("MATCH (:Document {key: $doc})-[:HAS_VERSION]->(v:DocVersion) "

@@ -78,17 +78,17 @@ def embed_query(text: str) -> list[float]:
     return list(_query_vector(text[:MAX_CHARS], model()))
 
 
-def ensure_index(session, dimensions: int) -> None:
+def ensure_index(session, dimensions: int, name: str = "chunk_embedding", label: str = "Chunk") -> None:
     """Vector index sized for the vectors actually stored; an index of another size is recreated."""
     rows = [r.data() for r in session.run(
-        "SHOW INDEXES YIELD name, options WHERE name = 'passage_embedding' RETURN options")]
+        "SHOW INDEXES YIELD name, options WHERE name = $name RETURN options", name=name)]
     if rows:
         config = (rows[0]["options"] or {}).get("indexConfig", {})
         if config.get("vector.dimensions") == dimensions:
             return
-        session.run("DROP INDEX passage_embedding IF EXISTS")
+        session.run(f"DROP INDEX {name} IF EXISTS")
     session.run(
-        "CREATE VECTOR INDEX passage_embedding IF NOT EXISTS FOR (p:Passage) ON p.embedding "
+        f"CREATE VECTOR INDEX {name} IF NOT EXISTS FOR (p:{label}) ON p.embedding "
         f"OPTIONS {{indexConfig: {{`vector.dimensions`: {int(dimensions)}, "
         "`vector.similarity_function`: 'cosine'}}"
     )
@@ -99,14 +99,15 @@ def run(driver) -> None:
         if not available():
             print("embed: skipped, OPENAI_API_KEY not set (search falls back to the full-text index)")
             return
-        rows = [r.data() for r in s.run("MATCH (p:Passage) RETURN p.key AS key, p.heading AS heading, p.text AS text")]
+        rows = [r.data() for r in s.run("MATCH (c:Chunk) WHERE c.embedding IS NULL "
+                                         "RETURN c.key AS key, c.heading AS heading, c.text AS text")]
         rows = [r for r in rows if (r["heading"] or r["text"])]
         vectors = embed_texts([passage_input(r["heading"], r["text"]) for r in rows])
-        if not vectors:
-            return
         data = [{"key": r["key"], "vector": v} for r, v in zip(rows, vectors, strict=True)]
         for i in range(0, len(data), 500):
-            s.run("UNWIND $rows AS r MATCH (p:Passage {key: r.key}) SET p.embedding = r.vector", rows=data[i:i + 500])
-        ensure_index(s, len(vectors[0]))  # the model (OPENAI_EMBED_MODEL) decides the size, not a constant
-        s.run("CALL db.awaitIndexes(300)")
-        print(f"embed: {len(data)} passages, model {model()}, {len(vectors[0])} dimensions")
+            s.run("UNWIND $rows AS r MATCH (c:Chunk {key: r.key}) SET c.embedding = r.vector", rows=data[i:i + 500])
+        stored = s.run("MATCH (c:Chunk) WHERE c.embedding IS NOT NULL RETURN size(c.embedding) AS n LIMIT 1").single()
+        if stored:  # the model (OPENAI_EMBED_MODEL) decides the size, not a constant
+            ensure_index(s, stored["n"])
+            s.run("CALL db.awaitIndexes(300)")
+        print(f"embed: {len(data)} new chunks, model {model()}")

@@ -432,7 +432,8 @@
       "flipped": "Ergebnis geändert",
       "drafts": "Entwürfe",
       "rechecked": "neu geprüft",
-      "skipped": "übersprungen:"
+      "skipped": "übersprungen:",
+      "chunks": "Chunks"
     },
     "title": {
       "specUpload": "Neue Fassung wird verarbeitet: {{doc}} V{{version}}",

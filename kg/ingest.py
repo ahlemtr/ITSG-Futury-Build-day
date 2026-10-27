@@ -128,7 +128,10 @@ class Pipeline:
         warnings: list[str] = []
         dv = {"doc": self.doc, "version": self.version, "file": str(self.file)}
         self.passages = extract_document(dv, load_layouts(), self.folder / "text", warnings.append)
-        self.stage("chunk", "running", passages=len(self.passages),
+        from kg.chunks import passage_chunks
+
+        self.chunks = [c for p in self.passages for c in passage_chunks(p)]
+        self.stage("chunk", "running", passages=len(self.passages), chunks=len(self.chunks),
                    sections=len({p["section"] for p in self.passages}), warnings=len(warnings))
 
     def do_embed(self) -> None:
@@ -137,7 +140,7 @@ class Pipeline:
         if not embed.available():
             self.stage("embed", "running", skipped="no OPENAI_API_KEY: full-text search only")
             return
-        texts = [embed.passage_input(p.get("heading"), p.get("text")) for p in self.passages if p.get("text")]
+        texts = [embed.passage_input(c["heading"], c["text"]) for c in self.chunks]
         embed.embed_texts(texts)  # cached by content; Neo4j gets the vectors in the apply stage
         self.stage("embed", "running", vectors=len(texts), model=embed.model())
 

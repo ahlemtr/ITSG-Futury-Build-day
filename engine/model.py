@@ -69,6 +69,7 @@ class Passage(BaseModel):
     text: str = ""
     page: int | None = None
     field: str | None = None
+    snippet: str | None = None  # search results only: the sentence that matched (W7)
 
 
 class Rule(BaseModel):

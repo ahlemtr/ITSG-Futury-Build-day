@@ -11,11 +11,11 @@ from kg.common import env, to_date
 
 # Labels and relationship types come from this whitelist (07 section 3), never from input data.
 LABELS = ["Document", "DocVersion", "Passage", "MessageType", "Record", "Field", "Rule", "Criterion",
-          "Parameter", "ParamValue", "Change", "TestCase", "Precedent"]
+          "Parameter", "ParamValue", "Change", "TestCase", "Precedent", "Chunk"]
 REL_TYPES = ["HAS_VERSION", "SUCCEEDS", "CONTAINS", "USES_BLOCK", "HAS_FIELD", "CARRIES", "DESCRIBED_IN",
              "APPLIES_TO", "CONSTRAINS", "SOURCED_FROM", "IMPLEMENTS", "USES_PARAM", "HAS_VALUE", "MODIFIES_OLD",
              "MODIFIES_NEW", "DERIVED_FROM", "CHANGES_PARAM", "TARGETS", "CLONE_OF", "HIDDEN_OF", "ABOUT",
-             "JUSTIFIED_BY"]
+             "JUSTIFIED_BY", "HAS_CHUNK"]
 DATE_PROPS = {"published", "valid_from", "decided"}  # stored as Neo4j date() (08 section 1.5)
 BATCH = 500
 
@@ -79,6 +79,10 @@ def load(graph: dict, driver) -> None:
                 )
         s.run(
             "CREATE FULLTEXT INDEX passage_text IF NOT EXISTS FOR (p:Passage) ON EACH [p.text, p.heading] "
+            "OPTIONS {indexConfig: {`fulltext.analyzer`: 'german'}}"
+        )
+        s.run(
+            "CREATE FULLTEXT INDEX chunk_text IF NOT EXISTS FOR (c:Chunk) ON EACH [c.text, c.heading] "
             "OPTIONS {indexConfig: {`fulltext.analyzer`: 'german'}}"
         )
         s.run("CALL db.awaitIndexes(300)")

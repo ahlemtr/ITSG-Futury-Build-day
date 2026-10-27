@@ -9,6 +9,7 @@ from pathlib import Path
 
 import yaml
 
+from kg.chunks import passage_chunks
 from kg.common import (
     BUILD_DIR,
     LAYOUT_DIR,
@@ -234,6 +235,9 @@ def build_from(seed: Seed) -> dict:
                part=p.get("part"), field=p.get("field"), heading=p.get("heading") or "", text=p.get("text") or "",
                page=p.get("page"))
         g.edge("CONTAINS", "DocVersion", f"{p['doc']}@{p['version']}", "Passage", p["key"])
+        for c in passage_chunks(p):  # W7: retrieval runs on chunks, results are grouped per passage
+            g.node("Chunk", c["key"], passage=p["key"], n=c["n"], heading=c["heading"], text=c["text"])
+            g.edge("HAS_CHUNK", "Passage", p["key"], "Chunk", c["key"])
 
     # --- K3: records and fields
     field_passages: dict[str, list[str]] = {}

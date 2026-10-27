@@ -62,7 +62,7 @@ function ActivityCard({ activity }: { activity: Activity }) {
 }
 
 const SHOWN_COUNTS = [
-  "passages", "sections", "vectors", "changes", "candidates", "rules", "analysed", "param_changes",
+  "passages", "chunks", "sections", "vectors", "changes", "candidates", "rules", "analysed", "param_changes",
   "parameters_changed", "in_scope", "flipped", "drafts", "rechecked", "skipped",
 ];
 

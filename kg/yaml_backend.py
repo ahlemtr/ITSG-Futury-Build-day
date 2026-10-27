@@ -91,7 +91,7 @@ class YamlBackend:
     # ---------------------------------------------------------------- index
     def _load(self, graph: dict) -> None:
         self.nodes: dict[tuple[str, str], dict] = {}
-        self._search_docs: list[tuple[str, dict, str]] | None = None
+        self._search_docs: list[tuple[str, dict, str, str]] | None = None
         self.out: dict[tuple[str, str], list[dict]] = defaultdict(list)
         self.inn: dict[tuple[str, str], list[dict]] = defaultdict(list)
         for n in graph["nodes"]:
@@ -204,23 +204,28 @@ class YamlBackend:
         return self._passage(resolve_passage_key(key, self.vb_versions))
 
     def search_passages(self, text: str, k: int = 5) -> list[Passage]:
+        from kg.chunks import snippet
+
         tokens = list(dict.fromkeys(t.lower() for t in _TOKEN.findall(text)))
-        if self._search_docs is None:
-            self._search_docs = [(key, p, f"{p.get('heading') or ''}\n{p.get('text') or ''}".lower())
-                                 for key, p in self._labelled("Passage")]
+        if self._search_docs is None:  # W7: one search document per chunk, scored per passage by its best chunk
+            self._search_docs = [(c["passage"], self.nodes[("Passage", c["passage"])],
+                                  f"{c.get('heading') or ''}\n{c.get('text') or ''}".lower(), c.get("text") or "")
+                                 for _key, c in self._labelled("Chunk")]
         docs = self._search_docs
         if not tokens or not docs:
             return []
         patterns = search_patterns(tokens)
-        df = [sum(1 for _, _, body in docs if pat.search(body)) for pat in patterns]
-        avg_len = sum(len(body) for _, _, body in docs) / len(docs)
-        scored = []
-        for key, p, body in docs:
+        df = [sum(1 for _, _, body, _ in docs if pat.search(body)) for pat in patterns]
+        avg_len = sum(len(body) for _, _, body, _ in docs) / len(docs)
+        best: dict[str, tuple[float, str]] = {}
+        for key, p, body, raw in docs:
             s = search_score(patterns, body, df, len(docs), avg_len)
             if s > 0:
-                scored.append((s * (NARROW_BOOST if p.get("part") or p.get("field") else 1.0), key))
-        scored.sort(key=lambda s: (-s[0], s[1]))
-        return [self._passage(key) for _, key in scored[:k]]
+                s *= NARROW_BOOST if p.get("part") or p.get("field") else 1.0
+                if s > best.get(key, (0.0, ""))[0]:
+                    best[key] = (s, raw)
+        ranked = sorted(best, key=lambda key: (-best[key][0], key))[:k]
+        return [self._passage(key).model_copy(update={"snippet": snippet(best[key][1], text)}) for key in ranked]
 
     def get_versions(self, document: str) -> list[Version]:
         out = []

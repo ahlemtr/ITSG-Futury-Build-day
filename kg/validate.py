@@ -11,6 +11,7 @@ KEY_FORMATS = {
     "Document": r"[A-Z][A-Z0-9]*(-[A-Z0-9]+)*",
     "DocVersion": r"[A-Z][A-Z0-9-]*@[A-Za-z0-9.-]+",
     "Passage": r"[A-Z][A-Z0-9-]*@[A-Za-z0-9.-]+#[A-Za-z0-9.-]+(/[a-z_]+)?",
+    "Chunk": r"[A-Z][A-Z0-9-]*@[A-Za-z0-9.-]+#[A-Za-z0-9.-]+(/[a-z_]+)?~\d+",
     "Record": r"D[A-Z]{3}",
     "Field": r"D[A-Z]{3}\.[A-Z0-9][A-Z0-9-]*",
     "MessageType": r"\d{2}",
