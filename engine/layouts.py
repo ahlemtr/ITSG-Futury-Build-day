@@ -67,7 +67,12 @@ def view(layout: Layout) -> LayoutView:
 _CACHE: dict[tuple[int, str, str], LayoutView] = {}
 
 
-def get(kb: KnowledgeBase, record: str, version: str) -> LayoutView:
+def get(kb: KnowledgeBase, record: str, version: str | None) -> LayoutView:
+    """`version` None = the newest version the knowledge base knows."""
+    if version is None:
+        from engine.rules.params import latest
+
+        version = latest(kb)
     key = (id(kb), record, version)
     if key not in _CACHE:
         _CACHE[key] = view(kb.get_layout(record, version))

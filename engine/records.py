@@ -18,7 +18,7 @@ from engine.model import Block, FieldDef, FieldValue, ParsedFile, ParseIssue, Re
 from kg.interface import KnowledgeBase
 
 ENVELOPE = {"VOSZ", "DSKO", "NCSZ"}
-DEFAULT_VERSION = "13.4"  # layouts are identical in 13.3 and 13.4 (plan/04)
+DEFAULT_VERSION = None  # = the newest version the knowledge base knows (layouts are identical in 13.3 and 13.4)
 
 
 # ---------------------------------------------------------------- decoding
@@ -91,9 +91,11 @@ def format_value(f: FieldDef, value: Any) -> str:
 
 
 class Parser:
-    def __init__(self, kb: KnowledgeBase, version: str = DEFAULT_VERSION):
+    def __init__(self, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION):
+        from engine.rules.params import latest
+
         self.kb = kb
-        self.version = version
+        self.version = version = version or latest(kb)
         self.dslw = layouts.get(kb, "DSLW", version)
 
     def _cut(self, line: str, f: FieldDef, base: int, rec: str, issues: list[ParseIssue], line_no: int) -> FieldValue:
@@ -167,7 +169,7 @@ class Parser:
         return rec, issues
 
 
-def parse_file(text: str | bytes, kb: KnowledgeBase, version: str = DEFAULT_VERSION) -> ParsedFile:
+def parse_file(text: str | bytes, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION) -> ParsedFile:
     encoding = "utf-8"
     if isinstance(text, bytes):
         text, encoding = decode(text)
@@ -187,7 +189,7 @@ def parse_file(text: str | bytes, kb: KnowledgeBase, version: str = DEFAULT_VERS
 
 
 def write_dslw(head: dict[str, Any], blocks: dict[str, dict[str, Any]], kb: KnowledgeBase,
-               version: str = DEFAULT_VERSION) -> str:
+               version: str | None = DEFAULT_VERSION) -> str:
     """Build one DSLW line. MM flags are set from the blocks present. `blocks[name]` is a
     field -> value dict; DBVO carries `groups: [ {BEGINN-AU: date, ...}, ... ]`. Missing fields:
     constants for `KENNUNG`, else zeros / spaces."""
@@ -226,7 +228,7 @@ def record_to_dicts(rec: Record) -> tuple[dict[str, Any], dict[str, dict[str, An
     return head, blocks
 
 
-def write_file(parsed: ParsedFile, kb: KnowledgeBase, version: str = DEFAULT_VERSION) -> str:
+def write_file(parsed: ParsedFile, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION) -> str:
     """Write a parsed file back: envelope lines raw, DSLW lines rebuilt from their values."""
     out = []
     for rec in parsed.records:

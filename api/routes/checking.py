@@ -174,7 +174,7 @@ def _justifications(k, refs: list[str]) -> list[str]:
         try:
             if "#" in ref:
                 k.get_passage(ref)
-            elif not any(r.id == ref for ag in ("41", "61", "62", "01", "88") for r in k.get_rules(ag, "13.4")):
+            elif not any(r.id == ref for ag in ("41", "61", "62", "01", "88") for r in k.get_rules(ag, params_mod.latest(k))):
                 continue
             out.append(ref)
         except KeyError:

@@ -19,9 +19,6 @@ from engine.rules.vorerkrankung import add_months, days, days_in_window, must_se
 from engine.writer_messages import chain_files, write_file
 from kg.interface import KnowledgeBase
 
-VERSIONS = ("13.3", "13.4", "sim-13.5")
-
-
 # ---------------------------------------------------------------- expectations
 
 
@@ -32,8 +29,8 @@ def outcome(kb: KnowledgeBase, tc: Case, version: str) -> ExpectedOutcome:
                            total_days=d.total_days if d.send else None)
 
 
-def with_expected(kb: KnowledgeBase, tc: Case, versions=VERSIONS) -> Case:
-    tc.expected = {v: outcome(kb, tc, v) for v in versions}
+def with_expected(kb: KnowledgeBase, tc: Case, versions: list[str] | None = None) -> Case:
+    tc.expected = {v: outcome(kb, tc, v) for v in (versions or params_mod.all_versions(kb))}
     return tc
 
 
@@ -83,7 +80,7 @@ def boundaries(kb: KnowledgeBase, rule: str, base: str | Case) -> list[Case]:
     """
     b = get_case(kb, base) if isinstance(base, str) else base
     cur = b.inputs.current
-    pv = [params_mod.load(kb, version=v) for v in VERSIONS]
+    pv = [params_mod.load(kb, version=v) for v in params_mod.all_versions(kb)]
     out: list[Case] = []
     if rule == "R41-4":
         p = pv[0]
@@ -142,7 +139,7 @@ def hidden(kb: KnowledgeBase, test_case: str | Case, seed: int = 0) -> Case:
     of days, keeping every decision unchanged."""
     b = get_case(kb, test_case) if isinstance(test_case, str) else test_case
     i = b.inputs
-    gap = params_mod.load(kb, version="13.4").gap_months
+    gap = params_mod.load(kb, version=params_mod.latest(kb)).gap_months
     hid = f"{b.id}-hidden" + (f"-{seed}" if seed else "")
     if "R41-2" in b.targets and len(i.priors) == 1 and i.current.end:
         prior = i.priors[0]
@@ -160,7 +157,7 @@ def hidden(kb: KnowledgeBase, test_case: str | Case, seed: int = 0) -> Case:
                   "employment_end": (i.employment_end + shift) if i.employment_end else None}
     else:
         rng = random.Random(seed)
-        base_exp = {v: outcome(kb, b, v).send_41 for v in VERSIONS}
+        base_exp = {v: outcome(kb, b, v).send_41 for v in params_mod.all_versions(kb)}
         for _ in range(50):
             sh = timedelta(days=rng.randint(20, 90))
             mv = lambda d, sh=sh: d + sh if d else None
@@ -169,7 +166,7 @@ def hidden(kb: KnowledgeBase, test_case: str | Case, seed: int = 0) -> Case:
                                   "certified": i.current.certified},
                       "report_date": mv(i.report_date), "employment_end": mv(i.employment_end)}
             probe = clone(kb, b, None, change)
-            if {v: probe.expected[v].send_41 for v in VERSIONS} == base_exp:
+            if {v: probe.expected[v].send_41 for v in params_mod.all_versions(kb)} == base_exp:
                 break
     tc = clone(kb, b, None, change, hid, b.targets)
     tc.kind, tc.hidden = "hidden", True

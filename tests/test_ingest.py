@@ -84,3 +84,20 @@ def test_upload_rejects_a_known_version(baseline):
     job = ingest.new_job(repo, "VB", "13.3", date(2026, 1, 1), "x.pdf", "x")
     job = ingest.Pipeline(job, Path(VB_13_4), kb, repo, None, lambda k: None).run()
     assert job["status"] == "failed" and "already known" in job["error"]
+
+
+@pytest.mark.skipif(not VB_13_4.exists(), reason="VB 13.4 PDF missing")
+def test_version_valid_now_rechecks_submissions(baseline, tmp_path):
+    """A version valid today changes the rule set in force: open submissions are checked again under it."""
+    kb, repo = baseline
+    from engine.intake import receive
+
+    sub = receive(kb, repo, {"TEEL0-r1": (ROOT / "fixtures" / "itsg" / "TEEL0-Test1-DBVO").read_bytes()}, "peter",
+                  valid_on=date(2027, 1, 1), vendor="Lohnwerk", root=tmp_path)
+    job = ingest.new_job(repo, "VB", "13.4", date(2027, 1, 1), VB_13_4.name, "x")
+    seen = []
+    job = ingest.Pipeline(job, VB_13_4, kb, repo, lambda staged: ScriptedAI(), seen.append,
+                          today=date(2027, 2, 1)).run()
+    assert job["status"] == "done", job.get("trace")
+    assert job["result"]["track"] == "now" and job["result"]["rechecked"] == 1
+    assert repo.get_check(sub.submission_id).version == "13.4"
