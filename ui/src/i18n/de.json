@@ -1,7 +1,7 @@
 {
   "app": {
     "product": "EEL Review Assistant",
-    "ruleSetContext": "Regelwerk in Kraft <strong>V13.3</strong> · nächstes <strong>V13.4</strong> ab 01.01.2027",
+    "ruleSetContext": "Regelwerk in Kraft <strong>V{{now}}</strong> · nächstes <strong>V{{next}}</strong> ab {{from}}",
     "languageSwitch": "Sprache wählen",
     "user": "ITSG-Prüfer",
     "viewSwitch": "Ansicht wählen",
@@ -10,7 +10,8 @@
       "vendor": "Hersteller"
     },
     "vendorUser": "Hersteller (Demo)",
-    "vendorContext": "<strong>Lohnwerk Demo GmbH</strong> · Testbetriebsnummer 99307001"
+    "vendorContext": "<strong>Lohnwerk Demo GmbH</strong> · Testbetriebsnummer 99307001",
+    "ruleSetContextOne": "Regelwerk in Kraft <strong>V{{now}}</strong>"
   },
   "common": {
     "loading": "Wird geladen …",
@@ -33,7 +34,7 @@
   "screens": {
     "overview": {
       "title": "Übersicht",
-      "subtitle": "Ein Testkatalog, zwei Regelwerke parallel: Prüfungen heute unter V13.3, Vorbereitung 2027 unter V13.4."
+      "subtitle": "Ein Testkatalog für das Regelwerk in Kraft; eine neue Fassung wird parallel vorbereitet, sobald sie hochgeladen ist."
     },
     "specChanges": {
       "title": "Verfahrensbeschreibung V13.3 → V13.4",
@@ -159,14 +160,17 @@
       "subtitle": "Regelwerk V{{ruleSet}}, gültig bis {{date}}",
       "submissions": "Einreichungen im {{month}}",
       "passed": "alle Regeln erfüllt",
-      "open": "mit offenen Abweichungen"
+      "open": "mit offenen Abweichungen",
+      "subtitleOpen": "Regelwerk V{{ruleSet}}, in Kraft"
     },
     "next": {
       "title": "Vorbereitung nächstes Jahr",
       "subtitle": "Regelwerk V{{ruleSet}}, gültig ab {{date}}",
       "specChanges": "Spec-Änderungen im Umfang",
       "reapprove": "Testfälle neu freizugeben",
-      "hidden": "versteckte Varianten bereit"
+      "hidden": "versteckte Varianten bereit",
+      "none": "Keine neuere Verfahrensbeschreibung bekannt.",
+      "upload": "Neue Fassung hochladen"
     },
     "resolution": {
       "title": "Wer die Abweichungen geklärt hat",

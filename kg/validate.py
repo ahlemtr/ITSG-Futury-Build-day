@@ -94,13 +94,15 @@ def validate(graph: dict) -> tuple[list[str], list[str]]:
         if "APPLIES_TO" not in types:
             errors.append(f"rule {key}: no APPLIES_TO")
 
-    # parameters: values for 13.3 and 13.4
+    # parameters: a value for every loaded VB version (13.3 and 13.4; 13.3 only at the demo start)
+    vb_versions = sorted(props["version"] for (label, _key), props in nodes.items()
+                         if label == "DocVersion" and props.get("doc") == "VB")
     for (label, key) in nodes:
         if label != "Parameter":
             continue
         versions = {nodes[("ParamValue", e["to_key"])]["version"] for e in out_edges[(label, key)]
                     if e["type"] == "HAS_VALUE" and ("ParamValue", e["to_key"]) in nodes}
-        for v in ("13.3", "13.4"):
+        for v in vb_versions:
             if v not in versions:
                 errors.append(f"parameter {key}: no value for {v}")
 

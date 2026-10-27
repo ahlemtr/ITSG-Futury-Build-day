@@ -1,5 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
+import { getOverview } from "../data/api";
+import { useData } from "../data/useData";
+import { formatDate } from "../format";
 import { LANGUAGES, setLanguage } from "../i18n";
 import { useTopBarContent } from "./TopBarContext";
 import { useView, type View } from "./useView";
@@ -14,7 +17,16 @@ export function TopBar() {
   const navigate = useNavigate();
   const view = useView();
   const screenContext = useTopBarContent();
-  const defaultContext = view === "vendor" ? "app.vendorContext" : "app.ruleSetContext";
+  // rule sets from the backend: before the 13.4 upload only the one in force is known
+  const overview = useData(getOverview, []);
+  const sets = overview.status === "ready" ? overview.data : undefined;
+  const defaultContext =
+    view === "vendor" ? "app.vendorContext" : sets?.nextYear ? "app.ruleSetContext" : "app.ruleSetContextOne";
+  const contextValues = {
+    now: sets?.checksNow.ruleSet ?? "",
+    next: sets?.nextYear?.ruleSet ?? "",
+    from: sets?.nextYear ? formatDate(sets.nextYear.validFrom) : "",
+  };
 
   return (
     <header className="topbar">
@@ -28,7 +40,7 @@ export function TopBar() {
         ))}
       </div>
       <span className="topbar-context">
-        {screenContext ?? <Trans i18nKey={defaultContext} components={{ strong: <strong /> }} />}
+        {screenContext ?? (sets || view === "vendor" ? <Trans i18nKey={defaultContext} values={contextValues} components={{ strong: <strong /> }} /> : null)}
       </span>
       <div className="segmented" role="group" aria-label={t("app.languageSwitch")}>
         {LANGUAGES.map((lang) => (

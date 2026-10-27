@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getOverview, getSubmissions } from "../data/dataSource";
 import type { OverviewData } from "../data/types";
@@ -54,7 +55,9 @@ function OverviewCards({ data }: { data: OverviewData }) {
       <section className="panel">
         <h2 className="card-title">{t("overview.now.title")}</h2>
         <p className="card-subtitle">
-          {t("overview.now.subtitle", { ruleSet: now.ruleSet, date: formatDate(now.validUntil) })}
+          {now.validUntil
+            ? t("overview.now.subtitle", { ruleSet: now.ruleSet, date: formatDate(now.validUntil) })
+            : t("overview.now.subtitleOpen", { ruleSet: now.ruleSet })}
         </p>
         <div className="figures">
           <Figure value={now.submissions} label={t("overview.now.submissions", { month: monthName(now.month, i18n.language) })} />
@@ -64,14 +67,25 @@ function OverviewCards({ data }: { data: OverviewData }) {
       </section>
       <section className="panel">
         <h2 className="card-title">{t("overview.next.title")}</h2>
-        <p className="card-subtitle">
-          {t("overview.next.subtitle", { ruleSet: next.ruleSet, date: formatDate(next.validFrom) })}
-        </p>
-        <div className="figures">
-          <Figure value={next.specChangesInScope} label={t("overview.next.specChanges")} />
-          <Figure value={next.testsToReapprove} label={t("overview.next.reapprove")} />
-          <Figure value={next.hiddenVariantsReady} label={t("overview.next.hidden")} />
-        </div>
+        {next ? (
+          <>
+            <p className="card-subtitle">
+              {t("overview.next.subtitle", { ruleSet: next.ruleSet, date: formatDate(next.validFrom) })}
+            </p>
+            <div className="figures">
+              <Figure value={next.specChangesInScope} label={t("overview.next.specChanges")} />
+              <Figure value={next.testsToReapprove} label={t("overview.next.reapprove")} />
+              <Figure value={next.hiddenVariantsReady} label={t("overview.next.hidden")} />
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="card-subtitle">{t("overview.next.none")}</p>
+            <Link className="button" to="/spec-changes">
+              {t("overview.next.upload")}
+            </Link>
+          </>
+        )}
       </section>
     </div>
   );

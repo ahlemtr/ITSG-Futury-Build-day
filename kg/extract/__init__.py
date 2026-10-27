@@ -20,8 +20,12 @@ CHECKS_3_12 = [
 
 
 def check_3_12(passages: dict[str, dict]) -> list[str]:
+    """Only for loaded versions: at the demo start VB 13.4 is not there yet."""
     errors = []
+    loaded = {k.split("#")[0] for k in passages}
     for key, needle, wanted in CHECKS_3_12:
+        if key.split("#")[0] not in loaded:
+            continue
         p = passages.get(key)
         if p is None:
             errors.append(f"{key}: passage missing")

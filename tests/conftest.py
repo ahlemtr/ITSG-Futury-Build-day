@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
@@ -22,7 +23,10 @@ def passages_built():
 
 @pytest.fixture(scope="session")
 def neo4j_driver():
-    """A driver to the Neo4j of .env with the graph loaded, or skip."""
+    """A driver to the Neo4j of .env with the full graph loaded, or skip. The tests load the full seed into
+    that database, so they run only with NEO4J_TESTS=1 (never against the demo graph of DEMO_START=1)."""
+    if os.environ.get("NEO4J_TESTS") != "1":
+        pytest.skip("graph tests need NEO4J_TESTS=1 and a Neo4j with the full graph (they write to it)")
     try:
         from kg import load
 

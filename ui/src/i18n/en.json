@@ -1,7 +1,7 @@
 {
   "app": {
     "product": "EEL Review Assistant",
-    "ruleSetContext": "Rule set in force <strong>V13.3</strong> · next <strong>V13.4</strong> from 01.01.2027",
+    "ruleSetContext": "Rule set in force <strong>V{{now}}</strong> · next <strong>V{{next}}</strong> from {{from}}",
     "languageSwitch": "Choose language",
     "user": "ITSG tester",
     "viewSwitch": "Choose view",
@@ -10,7 +10,8 @@
       "vendor": "Vendor"
     },
     "vendorUser": "Vendor (demo)",
-    "vendorContext": "<strong>Lohnwerk Demo GmbH</strong> · test company number 99307001"
+    "vendorContext": "<strong>Lohnwerk Demo GmbH</strong> · test company number 99307001",
+    "ruleSetContextOne": "Rule set in force <strong>V{{now}}</strong>"
   },
   "common": {
     "loading": "Loading …",
@@ -33,7 +34,7 @@
   "screens": {
     "overview": {
       "title": "Overview",
-      "subtitle": "One test catalogue, two rule sets in parallel: checks today under V13.3, preparing 2027 under V13.4."
+      "subtitle": "One test catalogue for the rule set in force; a new version is prepared in parallel once it is uploaded."
     },
     "specChanges": {
       "title": "Verfahrensbeschreibung V13.3 → V13.4",
@@ -159,14 +160,17 @@
       "subtitle": "Rule set V{{ruleSet}}, valid until {{date}}",
       "submissions": "submissions in {{month}}",
       "passed": "passed all rules",
-      "open": "with open deviations"
+      "open": "with open deviations",
+      "subtitleOpen": "Rule set V{{ruleSet}}, in force"
     },
     "next": {
       "title": "Preparing next year",
       "subtitle": "Rule set V{{ruleSet}}, valid from {{date}}",
       "specChanges": "spec changes in scope",
       "reapprove": "test cases to re-approve",
-      "hidden": "hidden variants ready"
+      "hidden": "hidden variants ready",
+      "none": "No newer Verfahrensbeschreibung known yet.",
+      "upload": "Upload a new version"
     },
     "resolution": {
       "title": "Who resolved the deviations",

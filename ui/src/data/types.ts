@@ -163,14 +163,15 @@ export type Precedent = {
 export type OverviewData = {
   checksNow: {
     ruleSet: string;
-    /** ISO date */
-    validUntil: string;
+    /** ISO date; null while no newer version is known */
+    validUntil: string | null;
     /** ISO month, e.g. 2026-10 */
     month: string;
     submissions: number;
     passedAllRules: number;
     withOpenDeviations: number;
   };
+  /** null until a newer Verfahrensbeschreibung has been uploaded */
   nextYear: {
     ruleSet: string;
     /** ISO date */
@@ -178,7 +179,7 @@ export type OverviewData = {
     specChangesInScope: number;
     testsToReapprove: number;
     hiddenVariantsReady: number;
-  };
+  } | null;
   /** Who settled this month's deviations (the pitch metric, doc 05 section 6). */
   resolution: {
     catalogueAndRules: number;

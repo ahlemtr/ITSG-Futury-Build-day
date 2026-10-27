@@ -98,24 +98,11 @@ export function mainSource(sources: string[]): string | undefined {
 
 // ---------- Overview ----------
 
-export async function getOverview(): Promise<OverviewData> {
-  type Api = Omit<OverviewData, "nextYear"> & { nextYear: OverviewData["nextYear"] | null };
-  const o = await getJson<Api>("/overview");
-  return {
-    ...o,
-    nextYear: o.nextYear ?? {
-      ruleSet: "–",
-      validFrom: o.checksNow.validUntil,
-      specChangesInScope: 0,
-      testsToReapprove: 0,
-      hiddenVariantsReady: 0,
-    },
-  };
-}
+export const getOverview = () => getJson<OverviewData>("/overview");
 
 export async function getNavCounts(): Promise<{ specChanges: number; advisorQueue: number }> {
   const [o, queue] = await Promise.all([getOverview(), getJson<unknown[]>("/advisor/queue")]);
-  return { specChanges: o.nextYear.specChangesInScope > 0 ? 1 : 0, advisorQueue: queue.length };
+  return { specChanges: o.nextYear && o.nextYear.specChangesInScope > 0 ? 1 : 0, advisorQueue: queue.length };
 }
 
 // ---------- Rules (titles for rule ids) ----------
