@@ -30,6 +30,8 @@ from kg.common import MAX_SUBGRAPH_DEPTH, norm_field, resolve_passage_key, resol
 
 PASSAGE_PROPS = "{.key, .doc, .version, .section, .part, .heading, .text, .page, .field}"
 NARROW_BOOST = 1.25  # same re-ranking as the YAML backend: a part or field beats its section
+RRF_K = 60  # reciprocal rank fusion constant (Cormack et al. 2009)
+FULLTEXT_WEIGHT = 2.0  # spec queries quote the legal wording: exact terms count more than meaning
 LUCENE_SPECIAL = re.compile(r'([+\-&|!(){}\[\]^"~*?:\\/])')
 LUCENE_OPERATORS = {"AND", "OR", "NOT", "TO"}
 
@@ -187,30 +189,39 @@ class GraphBackend:
         return found[0]
 
     def search_passages(self, text: str, k: int = 5) -> list[Passage]:
-        """Vector search first (needs embeddings and OPENAI_API_KEY), full-text index as fallback."""
+        """Hybrid search: full-text and vector (needs embeddings and OPENAI_API_KEY) ranks merged by reciprocal
+        rank fusion, so exact terms ("6 Monate") and meaning both count. Full-text alone without embeddings."""
         from neo4j.exceptions import Neo4jError
 
         from kg import embed
 
+        pool = max(50, k * 10)
+        query = " ".join(_lucene_term(t) for t in text.split())
+        lists: list[tuple[float, list[dict]]] = []  # (weight, ranked passages)
+        if query:
+            rows = self._q("CALL db.index.fulltext.queryNodes('passage_text', $q, {limit: $limit}) YIELD node, score "
+                           f"RETURN node {PASSAGE_PROPS} AS p, score", q=query, limit=pool)
+            lists.append((FULLTEXT_WEIGHT, [r["p"] for r in sorted(
+                rows, key=lambda r: (-r["score"] * (NARROW_BOOST if r["p"].get("part") or r["p"].get("field")
+                                                    else 1.0), r["p"]["key"]))]))
         stored = self._q("MATCH (p:Passage) WHERE p.embedding IS NOT NULL RETURN size(p.embedding) AS n LIMIT 1")
         if embed.available() and stored and text.strip():
             vector = embed.embed_query(text)
             if len(vector) == stored[0]["n"]:  # a different embedding model would not fit the index
                 try:
                     rows = self._q("CALL db.index.vector.queryNodes('passage_embedding', $k, $v) YIELD node, score "
-                                   f"RETURN node {PASSAGE_PROPS} AS p, score ORDER BY score DESC", k=k, v=vector)
-                    if rows:
-                        return [Passage(**r["p"]) for r in rows]
+                                   f"RETURN node {PASSAGE_PROPS} AS p, score ORDER BY score DESC", k=pool, v=vector)
+                    lists.append((1.0, [r["p"] for r in rows]))
                 except Neo4jError:
-                    pass  # no usable vector index: fall back to full-text
-        query = " ".join(_lucene_term(t) for t in text.split())
-        if not query:
-            return []
-        rows = self._q("CALL db.index.fulltext.queryNodes('passage_text', $q, {limit: $limit}) YIELD node, score "
-                       f"RETURN node {PASSAGE_PROPS} AS p, score", q=query, limit=max(50, k * 10))
-        ranked = sorted(rows, key=lambda r: (-r["score"] * (NARROW_BOOST if r["p"].get("part") or r["p"].get("field")
-                                                            else 1.0), r["p"]["key"]))
-        return [Passage(**r["p"]) for r in ranked[:k]]
+                    pass  # no usable vector index: full-text only
+        fused: dict[str, float] = {}
+        props: dict[str, dict] = {}
+        for weight, ranked in lists:
+            for rank, p in enumerate(ranked):
+                fused[p["key"]] = fused.get(p["key"], 0.0) + weight / (RRF_K + rank + 1)
+                props[p["key"]] = p
+        best = sorted(fused, key=lambda key: (-fused[key], key))[:k]
+        return [Passage(**props[key]) for key in best]
 
     def get_versions(self, document: str) -> list[Version]:
         rows = self._q("MATCH (:Document {key: $doc})-[:HAS_VERSION]->(v:DocVersion) "
