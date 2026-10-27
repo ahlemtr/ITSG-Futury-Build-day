@@ -511,7 +511,6 @@
     "company": "Hersteller",
     "itsgRow": "Testkatalog und Stichtag",
     "today": "Heute {{date}}",
-    "certifiedUntil": "zertifiziert bis {{date}}",
     "firstCertification": "Erstzertifizierung",
     "dueOn": "fällig am {{date}}",
     "openRun": "Zum Testlauf",
@@ -532,23 +531,23 @@
     "kind": {
       "round": "Runde {{round}} von {{rounds}} · {{testCase}}",
       "permanent": "Dauertestfälle {{month}}",
-      "recert": "Rezertifizierung V{{version}}",
       "catalogue": "Testkatalog V{{version}} freigeben",
-      "switch": "V{{version}} tritt in Kraft"
+      "switch": "V{{version}} tritt in Kraft",
+      "update": "Neue Testfälle V{{version}} · {{passed}}/{{tests}} bestanden"
     },
     "code": {
       "round": "R{{round}}",
       "permanent": "Dauertest",
-      "recert": "Rezert.",
       "catalogue": "Katalog",
-      "switch": "Stichtag"
+      "switch": "Stichtag",
+      "update": "Update"
     },
     "legend": {
       "round": "Testlauf-Runde",
-      "recert": "Rezertifizierung",
       "permanent": "Dauertestfälle (PTA 8.4)",
       "catalogue": "Katalog-Freigabe",
-      "switch": "Stichtag"
+      "switch": "Stichtag",
+      "update": "Neue/geänderte Testfälle"
     },
     "status": {
       "overdue": "überfällig"
@@ -581,7 +580,9 @@
     "upcoming": "Nächste Fristen",
     "all": "Alle Fristen",
     "vendors_one": "{{count}} Hersteller",
-    "vendors_other": "{{count}} Hersteller"
+    "vendors_other": "{{count}} Hersteller",
+    "certifiedFor": "zertifiziert für V{{version}}",
+    "firstCertificationProgress": "Erstzertifizierung · {{passed}}/{{tests}} Testfälle"
   },
   "admin": {
     "menu": "Benutzermenü",

@@ -26,7 +26,7 @@ export function deadlineTitle(t: TFunction, d: Deadline, lang: string): string {
     case "permanent":
       return t("calendar.kind.permanent", { month: monthLabel(p.month ?? d.due.slice(0, 7), lang) });
     default:
-      return t(`calendar.kind.${d.kind}`, { version: p.version });
+      return t(`calendar.kind.${d.kind}`, { version: p.version, passed: p.passed ?? 0, tests: p.tests ?? 0 });
   }
 }
 

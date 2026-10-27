@@ -922,7 +922,7 @@ export const askGraph = (q: string) => getJson<KgAnswer>(`/kg/ask?q=${encodeURIC
 
 // ---------- Calendar (deadlines per vendor company) ----------
 
-export type DeadlineKind = "round" | "recert" | "permanent" | "catalogue" | "switch";
+export type DeadlineKind = "round" | "update" | "permanent" | "catalogue" | "switch";
 export type DeadlineStatus = "done" | "overdue" | "soon" | "open";
 
 export type Company = {
@@ -930,7 +930,10 @@ export type Company = {
   name: string;
   product: string | null;
   certified_until: string | null;
+  /** null: new software, not certified yet */
   certified_for: string | null;
+  /** progress over the approved catalogue while not certified */
+  first_certification: { tests: number; passed: number } | null;
 };
 
 export type Deadline = {
@@ -941,7 +944,7 @@ export type Deadline = {
   due: string;
   opened: string | null;
   ref: string | null;
-  params: { round?: number; rounds?: number; test_case?: string; hidden?: boolean; version?: string; month?: string; drafts?: number };
+  params: { round?: number; rounds?: number; test_case?: string; hidden?: boolean; version?: string; month?: string; drafts?: number; tests?: number; passed?: number };
   done: boolean;
   done_on: string | null;
   status: DeadlineStatus;

@@ -197,7 +197,7 @@
   border: 2px solid var(--ink);
 }
 
-.tl-mark-recert .tl-glyph {
+.tl-mark-update .tl-glyph {
   background: var(--ink);
 }
 
@@ -279,7 +279,7 @@
   background: var(--label-variant-bg);
 }
 
-.tl-swatch-recert { background: var(--ink); }
+.tl-swatch-update { background: var(--ink); }
 .tl-swatch-permanent { border-radius: 50%; border-color: var(--ink-muted); }
 .tl-swatch-catalogue { transform: rotate(45deg) scale(0.85); }
 .tl-swatch-switch { transform: rotate(45deg) scale(0.85); background: var(--ink); }

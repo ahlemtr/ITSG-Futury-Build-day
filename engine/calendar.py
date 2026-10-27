@@ -4,8 +4,12 @@ Stored deadlines come from events: starting a test run opens round 1, every acce
 deadline and opens the next one. Rule-set deadlines are derived on read from the knowledge base and the
 companies' certificates, so they always match the versions the platform knows:
 
-- recertification: a certified company re-certifies by the end of its certificate (`certified_until`),
-  under the rule set valid on the day after; done once a run of that company under it passed;
+- update tests: a certified company does not run the whole catalogue again when a new Verfahrensbeschreibung
+  comes. It passes the new and changed test cases of that version (the catalogue's cases on the rules the
+  changes recompute, plus the tests the upload drafted) by the day before the version takes effect; done once
+  it passed a run of each of them under the new version. Overdue after the switch until it has;
+- first certification: a company without a certificate (new software) runs the full catalogue of the rule set
+  in force, with no fixed date (plan/06 event D); `view` reports its progress per company;
 - permanent test cases (PTA 8.4): certified companies send them every month, due on the last day;
   done once a submission of that company arrived in the month;
 - ITSG: next year's catalogue approved CATALOGUE_LEAD_DAYS before the switch date; the switch date itself.
@@ -23,22 +27,22 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from engine.rules import params as params_mod
+from engine import specdiff
 
 ROUND_DAYS = 14  # round N is due 14 days after the insurer reply of round N-1 (round 1: after the start)
 CATALOGUE_LEAD_DAYS = 60  # vendors get two months with the approved catalogue before the switch
 PERMANENT_MONTHS = 3  # this month and the next two
 SOON_DAYS = 7  # due within a week: shown as a reminder
 
-Kind = Literal["round", "recert", "permanent", "catalogue", "switch"]
+Kind = Literal["round", "update", "permanent", "catalogue", "switch"]
 
 
 class Company(BaseModel):
     id: str
     name: str
     product: str | None = None
-    certified_until: date | None = None  # None: new software, not certified yet
-    certified_for: str | None = None  # rule set of the current certificate
+    certified_until: date | None = None
+    certified_for: str | None = None  # rule set of the current certificate; None: new software, not certified yet
 
 
 class Deadline(BaseModel):
@@ -105,18 +109,45 @@ def _add_month(d: date) -> date:
     return (d.replace(day=1) + timedelta(days=32)).replace(day=1)
 
 
+def _versions(kb) -> list:
+    return sorted((v for v in kb.get_versions("VB") if not v.version.startswith("sim") and v.valid_from),
+                  key=lambda v: v.valid_from)
+
+
+def update_tests(kb, repo, old: str, new: str) -> list[str]:
+    """The new and changed test cases of a rule set update: the catalogue's cases on the rules the changes
+    recompute, plus the tests the upload of the new version drafted."""
+    rules = {r.id for r in specdiff.impact(kb.get_changes("VB", old, new, in_scope_only=True), kb).recompute}
+    ids = {t.id for t in repo.list_test_cases() if rules & set(t.targets)}
+    for job in repo.list_jobs():
+        if job.get("document") == "VB" and job.get("version") == new and job.get("status") == "done":
+            ids |= set((job.get("result") or {}).get("drafts") or [])
+    return sorted(ids)
+
+
+def passed_tests(runs: list[dict], company_id: str, version: str | None = None) -> set[str]:
+    return {r["test_case"]["id"] for r in runs if r.get("status") == "passed" and slug(r.get("vendor") or "") == company_id
+            and (version is None or r.get("version") == version)}
+
+
 def derived(kb, repo, today: date) -> list[Deadline]:
     out: list[Deadline] = []
     runs = repo.list_runs()
     subs = repo.list_submissions()
+    versions = _versions(kb)
     for c in repo.list_companies():
-        if c.certified_until is None:
+        if c.certified_for is None:
             continue
-        target = params_mod.version_on(kb, c.certified_until + timedelta(days=1))
-        passed = any(r.get("status") == "passed" and r.get("version") == target and slug(r.get("vendor") or "") == c.id
-                     for r in runs)
-        out.append(Deadline(id=f"recert-{c.id}-{target}", company_id=c.id, kind="recert", due=c.certified_until,
-                            ref=target, params={"version": target}, done=passed))
+        since = next((v.valid_from for v in versions if v.version == c.certified_for), None)
+        for v in versions:
+            if since is None or v.valid_from <= since:
+                continue
+            tests = update_tests(kb, repo, c.certified_for, v.version)
+            passed = passed_tests(runs, c.id, v.version) & set(tests)
+            out.append(Deadline(id=f"update-{c.id}-{v.version}", company_id=c.id, kind="update", ref=v.version,
+                                due=v.valid_from - timedelta(days=1),
+                                params={"version": v.version, "tests": len(tests), "passed": len(passed)},
+                                done=bool(tests) and len(passed) == len(tests)))
         month = today.replace(day=1)
         for _ in range(PERMANENT_MONTHS):
             sent = [s.created.date() for s in subs if slug(s.vendor or "") == c.id
@@ -126,8 +157,8 @@ def derived(kb, repo, today: date) -> list[Deadline]:
                                 done=bool(sent), done_on=min(sent) if sent else None))
             month = _add_month(month)
     drafts = sum(1 for t in repo.list_test_cases() if t.status == "draft")
-    for v in kb.get_versions("VB"):
-        if v.version.startswith("sim") or not v.valid_from or v.valid_from <= today:
+    for v in versions:
+        if v.valid_from <= today:
             continue
         out.append(Deadline(id=f"catalogue-{v.version}", kind="catalogue", ref=v.version,
                             due=v.valid_from - timedelta(days=CATALOGUE_LEAD_DAYS),
@@ -171,7 +202,15 @@ def view(kb, repo, today: date, company: str | None = None) -> dict:
                  if d.company_id in ids or (company is None and d.company_id is None)]
     rows = [d.model_dump(mode="json") | {"status": status(d, today), "days": (d.due - today).days}
             for d in sorted(deadlines, key=lambda d: (d.due, d.id))]
+    runs = repo.list_runs()
+    catalogue = [t.id for t in repo.list_test_cases() if t.status == "approved"]
+
+    def first(c: Company) -> dict | None:  # progress of a first certification over the approved catalogue
+        if c.certified_for is not None:
+            return None
+        return {"tests": len(catalogue), "passed": len(passed_tests(runs, c.id) & set(catalogue))}
+
     return {"today": today.isoformat(),
-            "companies": [c.model_dump(mode="json") for c in companies],
+            "companies": [c.model_dump(mode="json") | {"first_certification": first(c)} for c in companies],
             "deadlines": rows,
             "history": history(repo) if company is None else []}

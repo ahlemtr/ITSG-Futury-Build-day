@@ -511,7 +511,6 @@
     "company": "Vendor",
     "itsgRow": "Test catalogue and switch date",
     "today": "Today {{date}}",
-    "certifiedUntil": "certified until {{date}}",
     "firstCertification": "first certification",
     "dueOn": "due on {{date}}",
     "openRun": "Open test run",
@@ -532,23 +531,23 @@
     "kind": {
       "round": "Round {{round}} of {{rounds}} · {{testCase}}",
       "permanent": "Permanent test cases {{month}}",
-      "recert": "Recertification V{{version}}",
       "catalogue": "Approve test catalogue V{{version}}",
-      "switch": "V{{version}} takes effect"
+      "switch": "V{{version}} takes effect",
+      "update": "New test cases V{{version}} · {{passed}}/{{tests}} passed"
     },
     "code": {
       "round": "R{{round}}",
       "permanent": "Permanent",
-      "recert": "Recert.",
       "catalogue": "Catalogue",
-      "switch": "Switch"
+      "switch": "Switch",
+      "update": "Update"
     },
     "legend": {
       "round": "Test run round",
-      "recert": "Recertification",
       "permanent": "Permanent test cases (PTA 8.4)",
       "catalogue": "Catalogue approval",
-      "switch": "Switch date"
+      "switch": "Switch date",
+      "update": "New/changed test cases"
     },
     "status": {
       "overdue": "overdue"
@@ -581,7 +580,9 @@
     "upcoming": "Next deadlines",
     "all": "All deadlines",
     "vendors_one": "{{count}} vendor",
-    "vendors_other": "{{count}} vendors"
+    "vendors_other": "{{count}} vendors",
+    "certifiedFor": "certified for V{{version}}",
+    "firstCertificationProgress": "first certification · {{passed}}/{{tests}} test cases"
   },
   "admin": {
     "menu": "User menu",

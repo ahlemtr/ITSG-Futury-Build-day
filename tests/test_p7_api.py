@@ -217,10 +217,15 @@ def test_calendar_rounds_and_rule_set_deadlines(client, itsg_bytes):
 
     cal = client.get("/calendar", params={"today": "2026-10-27"}).json()
     kinds = {(d["company_id"], d["kind"]) for d in cal["deadlines"]}
-    assert ("lohnwerk-demo-gmbh", "recert") in kinds and (None, "switch") in kinds and (None, "catalogue") in kinds
-    assert ("abrechnung-sud-demo", "recert") not in kinds  # new software: no certificate to renew
+    assert ("lohnwerk-demo-gmbh", "update") in kinds and (None, "switch") in kinds and (None, "catalogue") in kinds
+    assert ("abrechnung-sud-demo", "update") not in kinds  # new software: full catalogue, no update deadline
+    update = next(d for d in cal["deadlines"] if d["company_id"] == "lohnwerk-demo-gmbh" and d["kind"] == "update")
+    assert update["due"] == "2026-12-31" and update["params"]["version"] == "13.4"
+    assert update["params"]["tests"] > 0 and update["params"]["passed"] == 0
+    new = next(c for c in cal["companies"] if c["id"] == "abrechnung-sud-demo")
+    assert new["first_certification"]["tests"] > 0 and new["first_certification"]["passed"] == 0
     late = client.get("/calendar", params={"today": "2027-01-05", "company": vendor}).json()["deadlines"]
-    assert next(d for d in late if d["kind"] == "recert")["status"] == "overdue"
+    assert next(d for d in late if d["kind"] == "update")["status"] == "overdue"  # not passed by the switch
     assert client.get("/calendar", params={"company": vendor}).json()["history"] == []
 
 

@@ -197,7 +197,7 @@ function rowClass(row: Row, inRange: (iso: string) => boolean): string {
 }
 
 /** Deadlines of one row on the same day share one mark; the weightiest kind gives it its shape. */
-const WEIGHT: Record<string, number> = { switch: 0, catalogue: 1, recert: 2, permanent: 3 };
+const WEIGHT: Record<string, number> = { switch: 0, catalogue: 1, update: 2, permanent: 3 };
 function marks(deadlines: Deadline[]): Deadline[][] {
   const byDay = new Map<string, Deadline[]>();
   for (const d of deadlines) byDay.set(d.due, [...(byDay.get(d.due) ?? []), d]);
@@ -221,7 +221,7 @@ function Mark({ group, left }: { group: Deadline[]; left: number }) {
 
 function Legend({ kinds }: { kinds: Set<string> }) {
   const { t } = useTranslation();
-  const order = ["round", "recert", "permanent", "catalogue", "switch"].filter((k) => kinds.has(k));
+  const order = ["round", "update", "permanent", "catalogue", "switch"].filter((k) => kinds.has(k));
   return (
     <ul className="tl-legend">
       {order.map((k) => (
@@ -239,10 +239,9 @@ function Legend({ kinds }: { kinds: Set<string> }) {
 }
 
 function companySub(t: (k: string, o?: Record<string, unknown>) => string, c: Company): string {
-  const cert = c.certified_until
-    ? t("calendar.certifiedUntil", { date: formatDate(c.certified_until) })
-    : t("calendar.firstCertification");
-  return cert;
+  if (c.certified_for) return t("calendar.certifiedFor", { version: c.certified_for });
+  const f = c.first_certification;
+  return f ? t("calendar.firstCertificationProgress", { passed: f.passed, tests: f.tests }) : t("calendar.firstCertification");
 }
 
 // ---------- List ----------
