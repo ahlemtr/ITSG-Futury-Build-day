@@ -26,6 +26,18 @@ import type { ReplyFile, RoundState, RunState } from "./runStore";
 
 const BASE = "/api";
 
+// Screens load in effects, which React StrictMode runs twice in development. An AI call made while an identical
+// one is still running joins it instead of reaching the model (and the overlay) a second time.
+const inflight = new Map<string, Promise<unknown>>();
+function shared<T>(key: string, start: () => Promise<T>): Promise<T> {
+  let p = inflight.get(key) as Promise<T> | undefined;
+  if (!p) {
+    p = start().finally(() => inflight.delete(key));
+    inflight.set(key, p);
+  }
+  return p;
+}
+
 export class ApiError extends Error {
   constructor(
     readonly status: number,
@@ -679,7 +691,7 @@ export const reportHtmlUrl = (id: string) => `${BASE}${reportPath(id)}?format=ht
 export async function getReport(id: string): Promise<ReportView | null> {
   let signed: SignedReport;
   try {
-    signed = await withAi(both("ai.title.report"), getJson<SignedReport>(reportPath(id)));
+    signed = await shared(`report:${id}`, () => withAi(both("ai.title.report"), getJson<SignedReport>(reportPath(id))));
   } catch (e) {
     if (e instanceof ApiError && e.status === 404) return null;
     throw e;
@@ -766,12 +778,14 @@ export type SpecDiff = {
 /** 13.3 vs 13.4: in-scope changes, rules and tests they touch, and the spec-update agent's drafts. */
 export async function getSpecDiff(oldVersion = "13.3", newVersion = "13.4"): Promise<SpecDiff> {
   const [d, oldRules, newRules] = await Promise.all([
-    withAi(both("ai.title.specDiff"), postJson<{
-      changes: SpecChange[];
-      recomputed: Recomputed[];
-      changed_tests: string[];
-      agent?: { decisions: AgentDecision[] } | null;
-    }>("/specdiff", { document: "VB", old_version: oldVersion, new_version: newVersion })),
+    shared(`specdiff:${oldVersion}:${newVersion}`, () =>
+      withAi(both("ai.title.specDiff"), postJson<{
+        changes: SpecChange[];
+        recomputed: Recomputed[];
+        changed_tests: string[];
+        agent?: { decisions: AgentDecision[] } | null;
+      }>("/specdiff", { document: "VB", old_version: oldVersion, new_version: newVersion })),
+    ),
     getJson<{ params: Record<string, unknown> }>(`/rules?version=${oldVersion}`),
     getJson<{ params: Record<string, unknown> }>(`/rules?version=${newVersion}`),
   ]);

@@ -34,3 +34,6 @@ Thumbs.db
 
 # Sample vendor uploads (round 1 = ITSG's TEEL0 file): generate with python -m tools.make_vendor_uploads
 samples/vendor_uploads/
+
+# Knowledge bundles for teammates (python -m tools.kg_bundle export): contain extracted ITSG text, never commit
+bundles/

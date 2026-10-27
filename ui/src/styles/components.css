@@ -634,10 +634,70 @@ abbr[title] {
   color: var(--ink-muted);
 }
 
+.kg-canvas-wrap {
+  position: relative;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 65%),
+    radial-gradient(circle, #dde3ea 1px, transparent 1.2px) 0 0 / 18px 18px,
+    #f6f8fb;
+}
+
 .kg-canvas {
   height: 460px;
-  border-top: 1px solid var(--border);
-  margin-top: 8px;
+}
+
+.kg-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.kg-loading::after {
+  content: "";
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid #d50032;
+  border-top-color: transparent;
+  animation: kg-spin 0.8s linear infinite;
+}
+
+.kg-tip {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 8px));
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #1c2430;
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: kg-tip-in 0.15s ease-out;
+}
+
+@keyframes kg-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes kg-tip-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kg-loading::after,
+  .kg-tip {
+    animation: none;
+  }
 }
 
 .kg-events {

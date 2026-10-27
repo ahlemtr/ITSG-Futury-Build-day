@@ -119,70 +119,188 @@ function EventRow({ event }: { event: KgEvent }) {
   );
 }
 
+const prefersReducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+
 function GraphView({ focus, onFocus }: { focus: { label: string; key: string }; onFocus: (f: { label: string; key: string }) => void }) {
   const { t } = useTranslation();
   const box = useRef<HTMLDivElement>(null);
   const cy = useRef<Core | null>(null);
   const [depth, setDepth] = useState(1);
+  const [tip, setTip] = useState<{ text: string; x: number; y: number } | null>(null);
   const graph = useData(() => getSubgraph(focus.label, focus.key, depth), [focus.label, focus.key, depth]);
 
   useEffect(() => {
     if (!box.current || graph.status !== "ready") return;
+    const still = prefersReducedMotion();
     const nodes = graph.data.nodes.filter((n) => n.label !== "Chunk");
     const keep = new Set(nodes.map((n) => `${n.label}:${n.key}`));
     const edges = graph.data.edges.filter((e) => keep.has(`${e.from_label}:${e.from_key}`) && keep.has(`${e.to_label}:${e.to_key}`));
+    const degree = new Map<string, number>();
+    for (const e of edges)
+      for (const id of [`${e.from_label}:${e.from_key}`, `${e.to_label}:${e.to_key}`]) degree.set(id, (degree.get(id) ?? 0) + 1);
+    const color = (kind: string) => KIND_COLORS[kind] ?? "#8a94a3";
+
     cy.current?.destroy();
-    cy.current = cytoscape({
+    const c = cytoscape({
       container: box.current,
       elements: [
-        ...nodes.map((n: KgNode) => ({
-          data: { id: `${n.label}:${n.key}`, label: shortLabel(n), kind: n.label, key: n.key, focus: n.key === focus.key ? 1 : 0 },
-        })),
+        ...nodes.map((n: KgNode) => {
+          const id = `${n.label}:${n.key}`;
+          return { data: { id, label: shortLabel(n), kind: n.label, key: n.key, focus: n.key === focus.key ? 1 : 0, deg: degree.get(id) ?? 0 } };
+        }),
         ...edges.map((e: KgEdge, i) => ({
-          data: { id: `e${i}`, source: `${e.from_label}:${e.from_key}`, target: `${e.to_label}:${e.to_key}`, type: e.type },
+          data: {
+            id: `e${i}`,
+            source: `${e.from_label}:${e.from_key}`,
+            target: `${e.to_label}:${e.to_key}`,
+            type: e.type,
+            colors: `${color(e.from_label)} ${color(e.to_label)}`,
+          },
         })),
       ],
       style: [
         {
           selector: "node",
           style: {
-            "background-color": (el) => KIND_COLORS[el.data("kind")] ?? "#8a94a3",
+            "background-color": (el: cytoscape.NodeSingular) => color(el.data("kind")),
             label: "data(label)",
             "font-size": 10,
             "font-family": "Fira Sans, sans-serif",
             color: "#1c2430",
             "text-valign": "bottom",
-            "text-margin-y": 4,
-            width: 14,
-            height: 14,
+            "text-margin-y": 5,
+            "text-outline-color": "#ffffff",
+            "text-outline-width": 2,
+            "text-outline-opacity": 0.85,
+            "min-zoomed-font-size": 7,
+            width: "mapData(deg, 0, 12, 12, 30)",
+            height: "mapData(deg, 0, 12, 12, 30)",
+            "border-width": 2,
+            "border-color": "#ffffff",
+            "underlay-color": (el: cytoscape.NodeSingular) => color(el.data("kind")),
+            "underlay-padding": 0,
+            "underlay-opacity": 0,
+            "underlay-shape": "ellipse",
+            "transition-property": "opacity, underlay-padding, underlay-opacity",
+            "transition-duration": 250,
           },
         },
-        { selector: "node[focus = 1]", style: { width: 24, height: 24, "border-width": 3, "border-color": "#d50032" } },
+        {
+          selector: "node[focus = 1]",
+          style: {
+            width: 34,
+            height: 34,
+            "border-width": 3,
+            "border-color": "#d50032",
+            "underlay-color": "#d50032",
+            "underlay-padding": 8,
+            "underlay-opacity": 0.18,
+            "font-size": 12,
+            "font-weight": "bold",
+            "z-index": 10,
+          },
+        },
+        { selector: "node.entering", style: { opacity: 0 } },
+        { selector: "node.hover", style: { "underlay-padding": 7, "underlay-opacity": 0.22, "z-index": 20 } },
+        { selector: "node.dim", style: { opacity: 0.15 } },
         {
           selector: "edge",
           style: {
-            width: 1,
-            "line-color": "#c9d1db",
-            "target-arrow-color": "#c9d1db",
+            width: 1.5,
+            "line-fill": "linear-gradient",
+            "line-gradient-stop-colors": (el: cytoscape.EdgeSingular) => el.data("colors"),
+            "line-opacity": 0.35,
             "target-arrow-shape": "triangle",
+            "target-arrow-color": "#b8c1cc",
+            "arrow-scale": 0.7,
             "curve-style": "bezier",
-            label: "data(type)",
-            "font-size": 7,
-            color: "#8a94a3",
-            "text-rotation": "autorotate",
+            "transition-property": "line-opacity, width",
+            "transition-duration": 250,
           },
         },
-      ],
-      layout: { name: "cose", animate: true, animationDuration: 600, nodeRepulsion: () => 9000, idealEdgeLength: () => 90 },
+        { selector: "edge.flow", style: { "line-style": "dashed", "line-dash-pattern": [6, 4], "line-opacity": 0.8, width: 2 } },
+        { selector: "edge.dim", style: { "line-opacity": 0.05 } },
+      ] as unknown as cytoscape.Stylesheet[], // the bundled typings predate underlay-* and gradient edges
+      layout: {
+        name: "cose",
+        animate: !still,
+        animationDuration: 900,
+        animationEasing: "ease-out-cubic",
+        nodeRepulsion: () => 11000,
+        idealEdgeLength: () => 85,
+        padding: 30,
+      } as cytoscape.LayoutOptions,
       wheelSensitivity: 0.3,
     });
-    cy.current.on("tap", "node", (ev) => {
+    cy.current = c;
+
+    // Nodes fade in one after another, from the focus node outward.
+    const root = c.nodes("[focus = 1]");
+    const order = root.nonempty() ? c.elements().bfs({ roots: root }).path.nodes() : c.nodes();
+    const timers: number[] = [];
+    if (!still)
+      order.union(c.nodes()).difference(root).forEach((n, i) => {
+        n.addClass("entering");
+        timers.push(window.setTimeout(() => n.removeClass("entering"), 60 + Math.min(i * 30, 900)));
+      });
+
+    // Edges at the focus node carry a slow flowing dash; a hovered neighbourhood joins in.
+    root.connectedEdges().addClass("flow");
+    let frame = 0;
+    let offset = 0;
+    const tick = () => {
+      offset = (offset - 0.35) % 1000;
+      c.edges(".flow").style("line-dash-offset", offset);
+      frame = requestAnimationFrame(tick);
+    };
+    if (!still) frame = requestAnimationFrame(tick);
+
+    // Breathing halo on the focus node.
+    const breathe = (up: boolean) => {
+      if (c.destroyed() || root.empty()) return;
+      root
+        .first()
+        .animation({
+          style: { "underlay-padding": up ? 14 : 6, "underlay-opacity": up ? 0.08 : 0.24 },
+          duration: 1400,
+          easing: "ease-in-out-sine",
+        } as unknown as Parameters<cytoscape.NodeSingular["animation"]>[0])
+        .play()
+        .promise()
+        .then(() => breathe(!up));
+    };
+    if (!still) breathe(true);
+
+    c.on("mouseover", "node", (ev) => {
+      setTip(null);
+      const hood = ev.target.closedNeighborhood();
+      c.elements().not(hood).addClass("dim");
+      ev.target.addClass("hover");
+      hood.edges().addClass("flow");
+      if (box.current) box.current.style.cursor = "pointer";
+    });
+    c.on("mouseout", "node", (ev) => {
+      c.elements().removeClass("dim");
+      ev.target.removeClass("hover");
+      c.edges().not(root.connectedEdges()).removeClass("flow").removeStyle("line-dash-offset");
+      if (box.current) box.current.style.cursor = "";
+    });
+    // Relation names stay off the canvas; hovering an edge shows its type.
+    c.on("mouseover", "edge", (ev) => {
+      const p = ev.target.renderedMidpoint();
+      setTip({ text: ev.target.data("type") as string, x: p.x, y: p.y });
+    });
+    c.on("mouseout", "edge", () => setTip(null));
+    c.on("tap", "node", (ev) => {
       const kind = ev.target.data("kind") as string;
       if (["Rule", "Passage", "Parameter", "TestCase", "Change", "Precedent", "Criterion"].includes(kind))
         onFocus({ label: kind, key: ev.target.data("key") as string });
     });
     return () => {
-      cy.current?.destroy();
+      cancelAnimationFrame(frame);
+      timers.forEach(clearTimeout);
+      setTip(null);
+      c.destroy();
       cy.current = null;
     };
   }, [graph, focus.key, onFocus]);
@@ -206,7 +324,15 @@ function GraphView({ focus, onFocus }: { focus: { label: string; key: string }; 
         </ul>
       </div>
       {graph.status === "error" && <p className="empty">{t("common.error")}</p>}
-      <div ref={box} className="kg-canvas" role="img" aria-label={t("kg.graphTitle", { key: focus.key })} />
+      <div className="kg-canvas-wrap">
+        <div ref={box} className="kg-canvas" role="img" aria-label={t("kg.graphTitle", { key: focus.key })} />
+        {graph.status === "loading" && <div className="kg-loading" aria-hidden="true" />}
+        {tip && (
+          <span className="kg-tip" style={{ left: tip.x, top: tip.y }}>
+            {tip.text}
+          </span>
+        )}
+      </div>
     </>
   );
 }
