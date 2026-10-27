@@ -6,9 +6,8 @@ from datetime import date, timedelta
 
 from fastapi import APIRouter, Request
 
-from api.routes.common import kb, repo
+from api.routes.common import catalogue_on_rules, kb, repo
 from engine import builder, specdiff
-from engine.expected import get_case
 from engine.rules import params as params_mod
 
 router = APIRouter()
@@ -41,8 +40,8 @@ def overview(request: Request, today: date | None = None):
     next_year = None
     if nxt is not None:
         changes = k.get_changes("VB", now, nxt.version, in_scope_only=True)
-        tests = specdiff.impact(changes, k).tests
-        flips = [x for x in builder.recompute(k, [get_case(k, t.key) for t in tests], now, nxt.version) if x.differs]
+        rules = [r.id for r in specdiff.impact(changes, k).recompute]
+        flips = [x for x in builder.recompute(k, catalogue_on_rules(request, rules), now, nxt.version) if x.differs]
         cases = r.list_test_cases()
         next_year = {"ruleSet": nxt.version, "validFrom": nxt.valid_from.isoformat(),
                      "specChangesInScope": len(changes),

@@ -394,3 +394,202 @@ abbr[title] {
 .chip-alert {
   color: var(--label-bug-fg);
 }
+
+/* AI activity overlay: pinned to the top while a background AI job runs; the screen stays usable */
+.ai-overlay {
+  position: fixed;
+  top: calc(var(--topbar-height) + 12px);
+  right: 24px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+}
+
+.ai-card-overlay {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--ink);
+  border-radius: var(--radius-panel);
+  padding: 12px 14px;
+  box-shadow: 0 6px 24px rgba(28, 36, 48, 0.14);
+  animation: ai-in 0.25s ease-out;
+}
+
+.ai-card-overlay.ai-done {
+  border-left-color: var(--label-exact-fg);
+}
+
+.ai-card-overlay.ai-failed {
+  border-left-color: var(--label-bug-fg);
+}
+
+.ai-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-title {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-elapsed {
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
+.ai-progress {
+  position: relative;
+  height: 3px;
+  margin: 10px 0 4px;
+  overflow: hidden;
+  background: var(--ground);
+  border-radius: 2px;
+}
+
+.ai-progress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 35%;
+  background: var(--ink);
+  border-radius: 2px;
+  animation: ai-sweep 1.4s ease-in-out infinite;
+}
+
+.ai-stages {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.ai-stage {
+  display: grid;
+  grid-template-columns: 14px auto 1fr;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--ink-muted);
+}
+
+.ai-stage .cell-hint {
+  text-align: right;
+}
+
+.ai-stage-running,
+.ai-stage-done {
+  color: var(--ink);
+}
+
+.ai-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  align-self: center;
+}
+
+.ai-stage-running .ai-dot {
+  border-color: var(--ink);
+  background: var(--ink);
+  animation: ai-pulse 1s ease-in-out infinite;
+}
+
+.ai-stage-done .ai-dot {
+  border-color: var(--label-exact-fg);
+  background: var(--label-exact-fg);
+}
+
+.ai-stage-failed .ai-dot {
+  border-color: var(--label-bug-fg);
+  background: var(--label-bug-fg);
+}
+
+.neural line {
+  stroke: var(--border);
+  stroke-width: 1.4;
+}
+
+.neural circle {
+  fill: var(--ink);
+}
+
+.neural-running line {
+  animation: ai-link 1.6s ease-in-out infinite;
+}
+
+.neural-running circle {
+  animation: ai-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes ai-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+@keyframes ai-pulse {
+  0%, 100% { opacity: 1; transform-box: fill-box; transform-origin: center; transform: scale(1); }
+  50% { opacity: 0.45; transform-box: fill-box; transform-origin: center; transform: scale(0.75); }
+}
+
+@keyframes ai-link {
+  0%, 100% { stroke: var(--border); }
+  50% { stroke: var(--itsg-red); }
+}
+
+@keyframes ai-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-progress::after,
+  .ai-stage-running .ai-dot,
+  .neural-running line,
+  .neural-running circle,
+  .ai-card-overlay {
+    animation: none;
+  }
+}
+
+/* Spec changes: upload a new version */
+.upload-card {
+  margin-bottom: 16px;
+}
+
+.upload-form {
+  display: grid;
+  grid-template-columns: 1.4fr 1.6fr 0.8fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+  margin: 12px 0;
+}
+
+.upload-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.upload-form select,
+.upload-form input:not([type="file"]) {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+  background: var(--surface);
+}
+
+@media (max-width: 1100px) {
+  .upload-form {
+    grid-template-columns: 1fr 1fr;
+  }
+}

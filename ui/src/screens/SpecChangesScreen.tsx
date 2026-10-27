@@ -1,64 +1,184 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { draftAffectedTests, getSpecDiff, toSpecRef, type SpecChange, type SpecDiff } from "../data/api";
+import {
+  getJobs,
+  getSpecDiff,
+  getVersions,
+  toSpecRef,
+  trackJob,
+  uploadSpec,
+  type ApiJob,
+  type SpecChange,
+  type SpecDiff,
+} from "../data/api";
 import { useData } from "../data/useData";
 import { wordDiff, type DiffPart } from "../records/wordDiff";
 import { SpecRefText } from "../components/SpecRefText";
 import { formatDate } from "../format";
 
-/** Screen 2: a new Verfahrensbeschreibung is published. What changed, which rules and tests it touches. */
+/** Documents a new version can be uploaded for: the Verfahrensbeschreibung, the Gemeinsame Grundsätze and the
+ * insurers' Rundschreiben (calculation rules). */
+const DOCUMENTS = ["VB", "GG", "RS-ANL1", "RS-ANL2", "RS-ANL3"];
+
+/** Screen 2: a new specification arrives. Upload it; the platform chunks, embeds, diffs and analyses it, the
+ * knowledge graph grows and the test catalogue is recomputed. Then: what changed and what it touches. */
 export function SpecChangesScreen() {
   const { t } = useTranslation();
-  const state = useData(() => getSpecDiff(), []);
-  const navigate = useNavigate();
-  const [drafting, setDrafting] = useState(false);
-  const [failed, setFailed] = useState(false);
-
-  async function draft(diff: SpecDiff) {
-    setDrafting(true);
-    setFailed(false);
-    try {
-      await draftAffectedTests(diff);
-      navigate("/test-catalogue");
-    } catch {
-      setFailed(true);
-    } finally {
-      setDrafting(false);
-    }
-  }
+  const [reload, setReload] = useState(0);
+  const versions = useData(() => getVersions("VB"), [reload]);
+  const vb =
+    versions.status === "ready"
+      ? [...versions.data].sort((a, b) => String(a.valid_from).localeCompare(String(b.valid_from)))
+      : [];
+  const pair = vb.length >= 2 ? [vb[vb.length - 2].version, vb[vb.length - 1].version] : null;
+  const diff = useData(() => (pair ? getSpecDiff(pair[0], pair[1]) : Promise.resolve(null)), [pair?.join("-")]);
+  const [showUpload, setShowUpload] = useState(false);
+  const known = versions.status === "ready";
 
   return (
     <>
       <div className="page-header page-header-split">
         <div>
-          <h1>{t("screens.specChanges.title")}</h1>
+          <h1>{pair ? t("spec.titlePair", { old: pair[0], new: pair[1] }) : t("spec.titleNone")}</h1>
           <p className="page-subtitle">
-            {state.status === "ready" && state.data
-              ? t("spec.subtitle", { count: state.data.changes.length, tests: state.data.changedTests.length })
-              : t("spec.subtitleLoading")}
+            {!known
+              ? t("common.loading")
+              : !pair
+                ? t("spec.subtitleNone", { version: vb[0]?.version ?? "–" })
+                : diff.status === "ready" && diff.data
+                  ? t("spec.subtitle", { count: diff.data.changes.length, tests: diff.data.changedTests.length })
+                  : t("spec.subtitleLoading")}
           </p>
         </div>
-        <div className="header-actions">
-          <button
-            type="button"
-            className="button button-primary"
-            disabled={drafting || state.status !== "ready" || !state.data}
-            onClick={() => state.status === "ready" && state.data && draft(state.data)}
-          >
-            {t(drafting ? "spec.drafting" : "spec.draft")}
-          </button>
-        </div>
+        {pair && (
+          <div className="header-actions">
+            <button type="button" className="button" onClick={() => setShowUpload((v) => !v)}>
+              {t("spec.upload.open")}
+            </button>
+            <Link className="button button-primary" to="/test-catalogue">
+              {t("spec.toCatalogue")}
+            </Link>
+          </div>
+        )}
       </div>
-      {failed && (
+
+      {known && (!pair || showUpload) && <UploadCard onDone={() => setReload((n) => n + 1)} />}
+
+      {pair && diff.status === "loading" && <p className="page-subtitle">{t("spec.loading")}</p>}
+      {pair && diff.status === "error" && <div className="placeholder">{t("common.error")}</div>}
+      {diff.status === "ready" && diff.data && <SpecDiffView diff={diff.data} />}
+    </>
+  );
+}
+
+function UploadCard({ onDone }: { onDone: () => void }) {
+  const { t } = useTranslation();
+  const [file, setFile] = useState<File | null>(null);
+  const [document, setDocument] = useState("VB");
+  const [version, setVersion] = useState("");
+  const [validFrom, setValidFrom] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [last, setLast] = useState<ApiJob | null>(null);
+  const jobs = useData(getJobs, [last?.status]);
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!file) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const started = await uploadSpec(file, { document, version: version || undefined, validFrom: validFrom || undefined });
+      const job = await trackJob(started);
+      setLast(job);
+      if (job.status === "done") onDone();
+      else setError(job.error);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="panel upload-card">
+      <h2 className="card-title">{t("spec.upload.title")}</h2>
+      <p className="card-subtitle">{t("spec.upload.hint")}</p>
+      <form className="upload-form" onSubmit={submit}>
+        <label>
+          <span className="field-label">{t("spec.upload.document")}</span>
+          <select value={document} onChange={(e) => setDocument(e.target.value)} disabled={busy}>
+            {DOCUMENTS.map((d) => (
+              <option key={d} value={d}>
+                {t(`spec.doc.${d}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span className="field-label">{t("spec.upload.file")}</span>
+          <input
+            type="file"
+            accept="application/pdf,.pdf"
+            disabled={busy}
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+        </label>
+        <label>
+          <span className="field-label">{t("spec.upload.version")}</span>
+          <input value={version} placeholder={t("spec.upload.auto")} onChange={(e) => setVersion(e.target.value)} disabled={busy} />
+        </label>
+        <label>
+          <span className="field-label">{t("spec.upload.validFrom")}</span>
+          <input type="date" value={validFrom} onChange={(e) => setValidFrom(e.target.value)} disabled={busy} />
+        </label>
+        <button type="submit" className="button button-primary" disabled={!file || busy}>
+          {t(busy ? "spec.upload.running" : "spec.upload.submit")}
+        </button>
+      </form>
+      {error && (
         <p className="field-error" role="alert">
-          {t("common.error")}
+          {error}
         </p>
       )}
-      {state.status === "loading" && <p className="page-subtitle">{t("spec.loading")}</p>}
-      {state.status === "error" && <div className="placeholder">{t("common.error")}</div>}
-      {state.status === "ready" && state.data && <SpecDiffView diff={state.data} />}
-    </>
+      {last?.status === "done" && (
+        <p className="saved-note" role="status">
+          {t(last.result.track === "now" ? "spec.upload.doneNow" : "spec.upload.doneNext", {
+            version: last.version,
+            date: formatDate(last.valid_from),
+            drafts: last.result.drafts?.length ?? 0,
+            flipped: last.result.flipped?.length ?? 0,
+          })}
+        </p>
+      )}
+      {jobs.status === "ready" && jobs.data.length > 0 && (
+        <table className="list-table compact">
+          <thead>
+            <tr>
+              <th>{t("spec.upload.document")}</th>
+              <th>{t("spec.upload.version")}</th>
+              <th>{t("spec.upload.validFrom")}</th>
+              <th>{t("myTests.col.status")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {jobs.data.map((j) => (
+              <tr key={j.id}>
+                <td>{j.document}</td>
+                <td>V{j.version}</td>
+                <td>{formatDate(j.valid_from)}</td>
+                <td>
+                  <span className={`badge badge-${j.status === "done" ? "exact" : j.status === "failed" ? "bug" : "unclear"}`}>
+                    {t(`spec.upload.status.${j.status}`)}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
   );
 }
 

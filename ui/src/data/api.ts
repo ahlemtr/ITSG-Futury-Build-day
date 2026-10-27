@@ -18,7 +18,9 @@ import type {
   SubmissionResult,
   SubmissionSummary,
 } from "./types";
+import i18n from "../i18n";
 import { parseText } from "../records/parse";
+import { upsertActivity, withAi, type ActivityStage } from "./aiActivity";
 import type { ReplyFile, RoundState, RunState } from "./runStore";
 
 const BASE = "/api";
@@ -61,6 +63,11 @@ export function postForm<T>(path: string, fields: Record<string, string | undefi
 }
 
 // ---------- shared mapping helpers ----------
+
+/** A UI text in both languages (the AI overlay keeps it and follows the language switch). */
+export function both(key: string, values?: Record<string, unknown>): Localized {
+  return { de: i18n.getFixedT("de")(key, values), en: i18n.getFixedT("en")(key, values) };
+}
 
 /** Backend explanations are English only; shown as is in both languages. */
 export const same = (text: string): Localized => ({ de: text, en: text });
@@ -418,16 +425,16 @@ type ApiReceipt = {
 };
 
 export const startRun = (testCaseId: string, validOn: string, vendor: string) =>
-  postJson<ApiRun>("/runs", { test_case_id: testCaseId, valid_on: validOn, vendor });
+  withAi(both("ai.title.story"), postJson<ApiRun>("/runs", { test_case_id: testCaseId, valid_on: validOn, vendor }));
 
 export const getRun = (runId: string) => getJson<ApiRun>(`/runs/${encodeURIComponent(runId)}`);
 
 export const submitRun = (runId: string, files: File[]) =>
-  postForm<{ status: string; receipt: ApiReceipt | null; rejected?: boolean }>(
+  withAi(both("ai.title.check"), postForm<{ status: string; receipt: ApiReceipt | null; rejected?: boolean }>(
     `/runs/${encodeURIComponent(runId)}/submit`,
     {},
     files,
-  );
+  ));
 
 const codes = (list: string[]) => list.join(" + ");
 
@@ -660,7 +667,7 @@ export const reportHtmlUrl = (id: string) => `${BASE}${reportPath(id)}?format=ht
 export async function getReport(id: string): Promise<ReportView | null> {
   let signed: SignedReport;
   try {
-    signed = await getJson<SignedReport>(reportPath(id));
+    signed = await withAi(both("ai.title.report"), getJson<SignedReport>(reportPath(id)));
   } catch (e) {
     if (e instanceof ApiError && e.status === 404) return null;
     throw e;
@@ -747,12 +754,12 @@ export type SpecDiff = {
 /** 13.3 vs 13.4: in-scope changes, rules and tests they touch, and the spec-update agent's drafts. */
 export async function getSpecDiff(oldVersion = "13.3", newVersion = "13.4"): Promise<SpecDiff> {
   const [d, oldRules, newRules] = await Promise.all([
-    postJson<{
+    withAi(both("ai.title.specDiff"), postJson<{
       changes: SpecChange[];
       recomputed: Recomputed[];
       changed_tests: string[];
       agent?: { decisions: AgentDecision[] } | null;
-    }>("/specdiff", { document: "VB", old_version: oldVersion, new_version: newVersion }),
+    }>("/specdiff", { document: "VB", old_version: oldVersion, new_version: newVersion })),
     getJson<{ params: Record<string, unknown> }>(`/rules?version=${oldVersion}`),
     getJson<{ params: Record<string, unknown> }>(`/rules?version=${newVersion}`),
   ]);
@@ -793,20 +800,57 @@ export const approveTestCase = (id: string, decision: "approved" | "rejected", a
 
 export const draftHidden = (id: string) => postJson<{ id: string }>("/builder/hidden", { test_case_id: id, seed: 0 });
 
-/** Test builder after a spec change: boundary tests around every recomputed rule (where the builder knows the
- * rule) and a hidden variant of every public test whose result flips. All come back as drafts. */
-export async function draftAffectedTests(diff: SpecDiff, base = "peter"): Promise<string[]> {
-  const ids: string[] = [];
-  for (const rule of new Set(diff.changes.flatMap((c) => c.recompute))) {
-    try {
-      const made = await postJson<{ id: string }[]>("/builder/boundaries", { rule_id: rule, base_test_case_id: base, version: diff.newVersion });
-      ids.push(...made.map((t) => t.id));
-    } catch (e) {
-      if (!(e instanceof ApiError && e.status === 422)) throw e; // no boundary builder for this rule
-    }
+
+// ---------- Spec upload (SPEC_UPDATE_WORKFLOW.md) ----------
+
+export type ApiJob = {
+  id: string;
+  document: string;
+  version: string;
+  valid_from: string;
+  previous?: string | null;
+  file: string;
+  status: "running" | "done" | "failed";
+  created: string;
+  stages: { name: string; title: string; status: ActivityStage["status"]; counts: Record<string, unknown> }[];
+  result: { flipped?: string[]; drafts?: string[]; rules?: string[]; rechecked?: number; track?: "now" | "next" };
+  error: string | null;
+};
+
+export type SpecVersion = { document: string; version: string; valid_from: string | null; succeeds: string | null };
+
+export const getVersions = (document = "VB") => getJson<SpecVersion[]>(`/versions?document=${encodeURIComponent(document)}`);
+export const getJobs = () => getJson<ApiJob[]>("/jobs");
+
+export function uploadSpec(file: File, fields: { document: string; version?: string; validFrom?: string }) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  form.append("document", fields.document);
+  if (fields.version) form.append("version", fields.version);
+  if (fields.validFrom) form.append("valid_from", fields.validFrom);
+  return request<ApiJob>("/spec-versions", { method: "POST", body: form });
+}
+
+const STAGE_KEYS: Record<string, string> = {
+  store: "spec.stage.store", chunk: "spec.stage.chunk", embed: "spec.stage.embed", diff: "spec.stage.diff",
+  map: "spec.stage.map", analyse: "spec.stage.analyse", apply: "spec.stage.apply", catalogue: "spec.stage.catalogue",
+};
+
+/** Polls the job and mirrors it in the AI overlay until it is done; resolves with the final job. */
+export async function trackJob(job: ApiJob): Promise<ApiJob> {
+  const startedAt = Date.parse(job.created) || Date.now();
+  const title = both("ai.title.specUpload", { doc: job.document, version: job.version });
+  for (;;) {
+    upsertActivity({
+      id: job.id,
+      title,
+      startedAt,
+      status: job.status,
+      error: job.error ?? undefined,
+      stages: job.stages.map((st) => ({ name: st.name, title: both(STAGE_KEYS[st.name] ?? st.title), status: st.status, counts: st.counts })),
+    });
+    if (job.status !== "running") return job;
+    await new Promise((r) => setTimeout(r, 1000));
+    job = await getJson<ApiJob>(`/jobs/${encodeURIComponent(job.id)}`);
   }
-  const cases = await getTestCases();
-  for (const id of diff.changedTests)
-    if (cases.some((c) => c.id === id && !c.hidden)) ids.push((await draftHidden(id)).id);
-  return [...new Set(ids)];
 }

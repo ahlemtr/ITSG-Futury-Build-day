@@ -33,3 +33,11 @@ def test_case(request: Request, id_: str) -> Case:
 
 def real_versions(request: Request) -> list[str]:
     return [v.version for v in kb(request).get_versions("VB") if not v.version.startswith("sim")]
+
+
+def catalogue_on_rules(request: Request, rules: list[str]) -> list[Case]:
+    """The catalogue's test cases (store first, KB otherwise) that target one of the rules."""
+    wanted = set(rules)
+    cases = repo(request).list_test_cases() or [get_case(kb(request), t.key) for t in
+                                                kb(request).get_test_cases(include_hidden=True)]
+    return [t for t in cases if wanted & set(t.targets)]

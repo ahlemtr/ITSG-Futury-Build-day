@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { TopBar } from "./components/TopBar";
 import { TopBarProvider } from "./components/TopBarContext";
 import { SideNav } from "./components/SideNav";
+import { AiOverlay } from "./components/AiOverlay";
 import { ReportScreen } from "./screens/ReportScreen";
 import { ReportsScreen } from "./screens/ReportsScreen";
 import { SpecChangesScreen } from "./screens/SpecChangesScreen";
@@ -20,6 +21,7 @@ export function App() {
       <div className="shell">
         <TopBar />
         <SideNav />
+        <AiOverlay />
         <main className="main">
           <Routes>
             <Route path="/" element={<OverviewScreen />} />

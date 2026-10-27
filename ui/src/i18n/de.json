@@ -338,8 +338,46 @@
       "update_test": "Test anpassen",
       "new_test": "Neuer Test"
     },
-    "draft": "Betroffene Tests entwerfen",
-    "drafting": "Tests werden entworfen …"
+    "titlePair": "Verfahrensbeschreibung V{{old}} → V{{new}}",
+    "titleNone": "Spec-Änderungen",
+    "subtitleNone": "Bekannt ist nur V{{version}}. Laden Sie eine neue Fassung hoch: sie wird in Passagen zerlegt, eingebettet, mit V{{version}} verglichen und von der KI ausgewertet; der Wissensgraph wächst und der Testkatalog wird neu berechnet.",
+    "toCatalogue": "Betroffene Tests im Katalog",
+    "upload": {
+      "open": "Neue Fassung hochladen",
+      "title": "Neue Fassung hochladen",
+      "hint": "PDF einer Verfahrensbeschreibung, der Gemeinsamen Grundsätze oder eines Rundschreibens der Krankenkassen. Version und Gültigkeit werden aus der Datei gelesen, wenn Sie sie leer lassen.",
+      "document": "Dokument",
+      "file": "Datei (PDF)",
+      "version": "Version",
+      "validFrom": "Gültig ab",
+      "auto": "aus der Datei",
+      "submit": "Hochladen und auswerten",
+      "running": "Wird verarbeitet …",
+      "doneNext": "V{{version}} gilt ab {{date}}: der Katalog für das nächste Jahr ist vorbereitet ({{flipped}} Testfälle mit neuem Ergebnis, {{drafts}} Entwürfe zur Freigabe). Die Prüfungen heute bleiben beim Regelwerk in Kraft.",
+      "doneNow": "V{{version}} gilt seit {{date}}: das Regelwerk in Kraft ist aktualisiert, offene Einreichungen wurden neu geprüft ({{flipped}} Testfälle mit neuem Ergebnis, {{drafts}} Entwürfe zur Freigabe).",
+      "status": {
+        "running": "läuft",
+        "done": "fertig",
+        "failed": "fehlgeschlagen"
+      }
+    },
+    "doc": {
+      "VB": "Verfahrensbeschreibung DTA EEL",
+      "GG": "Gemeinsame Grundsätze EEL",
+      "RS-ANL1": "Rundschreiben Anlage 1",
+      "RS-ANL2": "Rundschreiben Anlage 2",
+      "RS-ANL3": "Rundschreiben Anlage 3"
+    },
+    "stage": {
+      "store": "Datei gespeichert",
+      "chunk": "In Passagen zerlegt",
+      "embed": "Passagen eingebettet",
+      "diff": "Mit der vorigen Fassung verglichen",
+      "map": "Änderungen den Regeln zugeordnet",
+      "analyse": "KI wertet die Änderungen aus",
+      "apply": "Wissensgraph aktualisiert",
+      "catalogue": "Testkatalog neu berechnet"
+    }
   },
   "catalogue": {
     "title": "Testkatalog 2027",
@@ -375,5 +413,33 @@
     "weSend": "Wir senden",
     "noMessages": "Unter V{{version}} entsteht keine Meldung.",
     "footnote": "Erwartete Dateien berechnet die Regel-Engine. Quelle:"
+  },
+  "ai": {
+    "thinking": "KI arbeitet …",
+    "done": "Fertig",
+    "failed": "Fehlgeschlagen",
+    "count": {
+      "passages": "Passagen",
+      "sections": "Abschnitte",
+      "vectors": "Vektoren",
+      "changes": "Änderungen",
+      "candidates": "mit Regelbezug",
+      "rules": "Regeln",
+      "analysed": "analysiert",
+      "param_changes": "Parameter geändert",
+      "parameters_changed": "Parameter geändert",
+      "in_scope": "im Umfang",
+      "flipped": "Ergebnis geändert",
+      "drafts": "Entwürfe",
+      "rechecked": "neu geprüft",
+      "skipped": "übersprungen:"
+    },
+    "title": {
+      "specUpload": "Neue Fassung wird verarbeitet: {{doc}} V{{version}}",
+      "specDiff": "KI bewertet die Auswirkungen auf die Testfälle",
+      "story": "KI schreibt die Aufgabe",
+      "check": "Prüfung mit KI-Einschätzung",
+      "report": "KI erklärt die Abweichungen"
+    }
   }
 }

@@ -338,8 +338,46 @@
       "update_test": "Update test",
       "new_test": "New test"
     },
-    "draft": "Draft affected tests",
-    "drafting": "Drafting tests …"
+    "titlePair": "Verfahrensbeschreibung V{{old}} → V{{new}}",
+    "titleNone": "Spec changes",
+    "subtitleNone": "Only V{{version}} is known. Upload a new version: it is chunked into passages, embedded, compared with V{{version}} and analysed by the AI; the knowledge graph grows and the test catalogue is recomputed.",
+    "toCatalogue": "Affected tests in the catalogue",
+    "upload": {
+      "open": "Upload a new version",
+      "title": "Upload a new version",
+      "hint": "PDF of a Verfahrensbeschreibung, the Gemeinsame Grundsätze or a Rundschreiben of the insurers. Version and validity are read from the file when left empty.",
+      "document": "Document",
+      "file": "File (PDF)",
+      "version": "Version",
+      "validFrom": "Valid from",
+      "auto": "from the file",
+      "submit": "Upload and analyse",
+      "running": "Processing …",
+      "doneNext": "V{{version}} applies from {{date}}: next year's catalogue is prepared ({{flipped}} test cases with a new result, {{drafts}} drafts to approve). Today's checks stay on the rule set in force.",
+      "doneNow": "V{{version}} applies since {{date}}: the rule set in force is updated, open submissions were re-checked ({{flipped}} test cases with a new result, {{drafts}} drafts to approve).",
+      "status": {
+        "running": "running",
+        "done": "done",
+        "failed": "failed"
+      }
+    },
+    "doc": {
+      "VB": "Verfahrensbeschreibung DTA EEL",
+      "GG": "Gemeinsame Grundsätze EEL",
+      "RS-ANL1": "Rundschreiben Anlage 1",
+      "RS-ANL2": "Rundschreiben Anlage 2",
+      "RS-ANL3": "Rundschreiben Anlage 3"
+    },
+    "stage": {
+      "store": "File stored",
+      "chunk": "Chunked into passages",
+      "embed": "Passages embedded",
+      "diff": "Compared with the previous version",
+      "map": "Changes mapped to rules",
+      "analyse": "AI analyses the changes",
+      "apply": "Knowledge graph updated",
+      "catalogue": "Test catalogue recomputed"
+    }
   },
   "catalogue": {
     "title": "Test catalogue 2027",
@@ -375,5 +413,33 @@
     "weSend": "We send",
     "noMessages": "Under V{{version}} no message is produced.",
     "footnote": "Expected files computed by the rules engine. Source:"
+  },
+  "ai": {
+    "thinking": "AI is working …",
+    "done": "Done",
+    "failed": "Failed",
+    "count": {
+      "passages": "passages",
+      "sections": "sections",
+      "vectors": "vectors",
+      "changes": "changes",
+      "candidates": "touching rules",
+      "rules": "rules",
+      "analysed": "analysed",
+      "param_changes": "parameters changed",
+      "parameters_changed": "parameters changed",
+      "in_scope": "in scope",
+      "flipped": "result changed",
+      "drafts": "drafts",
+      "rechecked": "re-checked",
+      "skipped": "skipped:"
+    },
+    "title": {
+      "specUpload": "Processing new version: {{doc}} V{{version}}",
+      "specDiff": "AI assesses the impact on the test cases",
+      "story": "AI writes the task",
+      "check": "Check with AI assessment",
+      "report": "AI explains the deviations"
+    }
   }
 }

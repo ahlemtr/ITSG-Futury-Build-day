@@ -9,9 +9,8 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
 from pydantic import BaseModel
 
-from api.routes.common import ai, kb, real_versions, repo, test_case
+from api.routes.common import ai, catalogue_on_rules, kb, real_versions, repo, test_case
 from engine import builder, specdiff
-from engine.expected import get_case
 
 router = APIRouter()
 
@@ -56,7 +55,8 @@ def spec_diff(request: Request, body: SpecdiffBody):
     k = kb(request)
     changes = k.get_changes(body.document, body.old_version, body.new_version, in_scope_only=True)
     imp = specdiff.impact(changes, k)
-    rec = builder.recompute(k, [get_case(k, t.key) for t in imp.tests], body.old_version, body.new_version)
+    rec = builder.recompute(k, catalogue_on_rules(request, [r.id for r in imp.recompute]), body.old_version,
+                            body.new_version)
     per_change = {c.key: specdiff.impact([c], k) for c in changes}
     out = {"changes": [c.model_dump() | {"recompute": [r.id for r in per_change[c.key].recompute],
                                          "review": [r.id for r in per_change[c.key].review]} for c in changes],
