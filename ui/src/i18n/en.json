@@ -211,7 +211,8 @@
       "dropMany": "Drag TEEL0 files here (several allowed)",
       "checking": "Reading and checking the file …",
       "choose": "Choose file",
-      "none": "No message produced"
+      "none": "No message produced",
+      "channelHint": "In the prototype, upload stands in for the GKV communication server; in production the same files arrive over the existing network."
     },
     "receipt": {
       "title": "Receipt",
@@ -241,7 +242,8 @@
       "blank": "(blank)",
       "fromYourFile": "REFERENZ-ID and case number come from your own file.",
       "download": "Download {{file}}",
-      "downloadLater": "The backend creates this file (API mode)."
+      "downloadLater": "The backend creates this file (API mode).",
+      "importHint": "Import this file into your payroll software, then go on with the next round."
     },
     "verdict": {
       "title": "Test run finished",

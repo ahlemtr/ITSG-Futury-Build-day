@@ -11,10 +11,15 @@ import type {
   Localized,
   OverviewData,
   Precedent,
+  Receipt,
+  RoundOutcome,
+  RunDef,
   SpecRef,
   SubmissionResult,
   SubmissionSummary,
 } from "./types";
+import { fieldValue, parseText } from "../records/parse";
+import type { ReplyFile, RoundState, RunState } from "./runStore";
 
 const BASE = "/api";
 
@@ -384,4 +389,205 @@ export async function decideDeviation(
     at: new Date().toISOString(),
     itemTitle: item.title,
   };
+}
+
+// ---------- Vendor test runs (06 section 5) ----------
+
+type ApiOutcome = { rule: string; outcome: "pass" | "fail" | "review"; message?: string };
+
+export type ApiRoundResult = {
+  round: number;
+  outcomes: ApiOutcome[];
+  reply_name?: string | null;
+  reply?: string | null;
+  ended: boolean;
+};
+
+export type ApiRun = {
+  run_id: string;
+  test_case_id: string;
+  hidden: boolean;
+  version: string;
+  valid_on: string;
+  vendor: string | null;
+  story: string;
+  round: number;
+  last_round: number;
+  status: "open" | "passed" | "failed";
+  plan: { round: number; expects?: string[]; replies?: string[] }[];
+  results: ApiRoundResult[];
+};
+
+type ApiReceipt = {
+  submission_id: string;
+  status: string;
+  files: { name: string; sha256: string; messages: string[] }[];
+  issues: { file: string; record: string; field?: string | null; pos?: number | null; line?: number | null; message: string }[];
+};
+
+export const startRun = (testCaseId: string, validOn: string, vendor: string) =>
+  postJson<ApiRun>("/runs", { test_case_id: testCaseId, valid_on: validOn, vendor });
+
+export const getRun = (runId: string) => getJson<ApiRun>(`/runs/${encodeURIComponent(runId)}`);
+
+export const submitRun = (runId: string, files: File[]) =>
+  postForm<{ status: string; receipt: ApiReceipt | null; rejected?: boolean }>(
+    `/runs/${encodeURIComponent(runId)}/submit`,
+    {},
+    files,
+  );
+
+const codes = (list: string[]) => list.join(" + ");
+
+function genericInstruction(expects: string[] | undefined, hidden: boolean): Localized {
+  if (hidden || expects === undefined)
+    return {
+      de: "Erfassen Sie den Fall laut Aufgabe. Laden Sie die erzeugte Datei hoch, oder melden Sie, dass Ihre Software keine Meldung erzeugt.",
+      en: "Enter the case as described. Upload the file your software produces, or report that it produces no message.",
+    };
+  if (expects.length === 0)
+    return {
+      de: "Importieren Sie die Antwort der Krankenkasse. Ihre Software darf keine weitere Meldung erzeugen.",
+      en: "Import the insurer's reply. Your software must not produce another message.",
+    };
+  return {
+    de: `Erfassen Sie den Fall in Ihrer Software und laden Sie die erzeugte Datei hoch (erwartet: ${codes(expects)}).`,
+    en: `Enter the case in your software and upload the file it produces (expected: ${codes(expects)}).`,
+  };
+}
+
+/** The run as the screens know it: curated texts (mock/runs.ts) where they exist, backend plan and rules otherwise. */
+export async function runDef(run: ApiRun, curated?: RunDef): Promise<RunDef> {
+  const rules = [...(await getRules(run.version)).values()].map((r) => ({ id: r.id, text: same(r.title) }));
+  return {
+    testCaseId: run.test_case_id,
+    title: curated?.title ?? { de: `Testfall ${run.test_case_id}`, en: `Test case ${run.test_case_id}` },
+    ruleSet: run.version,
+    hidden: run.hidden,
+    story: curated?.story ?? same(run.story),
+    facts: curated?.facts ?? [],
+    rounds: run.plan.map((p) => {
+      const c = curated?.rounds[p.round - 1];
+      const own = c?.rules ?? [];
+      const replies = p.replies ?? [];
+      return {
+        nr: p.round,
+        instruction: c?.instruction ?? genericInstruction(p.expects, run.hidden),
+        expects: p.expects ?? c?.expects ?? [],
+        rules: [...own, ...rules.filter((r) => !own.some((o) => o.id === r.id))],
+        reply:
+          run.hidden || replies.length === 0
+            ? undefined
+            : (c?.reply ?? {
+                abgabegrund: codes(replies),
+                fileName: `TEEK0-r${p.round}`,
+                title: { de: `Antwort der Krankenkasse (${codes(replies)})`, en: `Insurer reply (${codes(replies)})` },
+                rows: [],
+              }),
+      };
+    }),
+  };
+}
+
+export const toRunStatus = (s: ApiRun["status"]): RunState["status"] => (s === "open" ? "running" : s);
+
+export function toReply(r: ApiRoundResult): ReplyFile | undefined {
+  if (!r.reply || !r.reply_name) return undefined;
+  return { name: r.reply_name, text: r.reply, parsed: parseText(r.reply) };
+}
+
+export function toOutcome(r: ApiRoundResult, hidden: boolean, reply?: ReplyFile): RoundOutcome {
+  const failedOnes = r.outcomes.filter((o) => o.outcome === "fail");
+  const review = r.outcomes.some((o) => o.outcome === "review");
+  const last = reply?.parsed.records[reply.parsed.records.length - 1];
+  return {
+    passed: failedOnes.length === 0,
+    label: failedOnes.length ? "bug" : review ? "unclear" : "exact",
+    rules: r.outcomes.map((o) => ({ id: o.rule, passed: o.outcome !== "fail" })),
+    message: hidden
+      ? undefined
+      : failedOnes.length
+        ? same(failedOnes.map((o) => `${o.rule}: ${o.message || "failed"}`).join(" · "))
+        : { de: "Alle geprüften Regeln erfüllt.", en: "All checked rules passed." },
+    replyValues: last
+      ? { REF: fieldValue(last, "DBID", "REFERENZ-ID"), AZVU: fieldValue(last, "DBID", "AKTENZEICHEN-VERURSACHER") }
+      : undefined,
+  };
+}
+
+/** Backend receipt; sizes and DATENSATZ-IDs from the browser's own reading of the same files. */
+export function toReceipt(r: ApiReceipt, local?: Receipt): Receipt {
+  return {
+    accepted: r.status === "accepted",
+    receivedAt: new Date().toISOString(),
+    files: r.files.map((f) => {
+      const mine = local?.files.find((x) => x.name === f.name);
+      return {
+        name: f.name,
+        size: mine?.size ?? 0,
+        sha256: f.sha256,
+        records: mine?.records ?? f.messages.map((m) => ({ abgabegrund: m, datensatzId: "" })),
+      };
+    }),
+    issues: r.issues.map((i) => ({
+      file: i.file,
+      line: i.line ?? 0,
+      record: i.record,
+      field: i.field ?? undefined,
+      position: i.pos ?? undefined,
+      message: same(i.message),
+    })),
+  };
+}
+
+/** Backend run -> screen state; receipts of this browser are kept (the backend does not return them). */
+export function runState(run: ApiRun, def: RunDef, prev?: RunState): RunState {
+  const rounds: RoundState[] = def.rounds.map((_, i) => {
+    const result = run.results[i];
+    const ui = prev?.rounds[i] ?? {};
+    if (!result) return { receipt: ui.receipt };
+    const reply = toReply(result);
+    return { ...ui, files: undefined, outcome: toOutcome(result, run.hidden, reply), reply };
+  });
+  const last = def.rounds.length - 1;
+  const current =
+    prev !== undefined
+      ? Math.min(prev.current, last)
+      : run.status === "open"
+        ? Math.min(run.round, last)
+        : Math.max(run.round - 1, 0);
+  return { runId: run.run_id, current, rounds, status: toRunStatus(run.status) };
+}
+
+// ---------- Test catalogue ----------
+
+export type ApiTestCase = {
+  id: string;
+  kind: "reference" | "clone" | "hidden";
+  origin: string;
+  status: "draft" | "approved" | "rejected";
+  hidden: boolean;
+  parent: string | null;
+  targets: string[];
+  steps: "single" | "chain";
+};
+
+export const getTestCases = () => getJson<ApiTestCase[]>("/test-cases");
+
+/** Test runs the vendor can start: approved cases, curated texts where they exist. The PTA exam tasks
+ * (TA 167, 168) carry inputs only and are not runnable yet (P10). */
+export async function getVendorRuns(curated: RunDef[]): Promise<RunDef[]> {
+  const cases = (await getTestCases()).filter((t) => t.status === "approved" && t.origin !== "pta");
+  return cases.map(
+    (t) =>
+      curated.find((r) => r.testCaseId === t.id) ?? {
+        testCaseId: t.id,
+        title: { de: `Testfall ${t.id}`, en: `Test case ${t.id}` },
+        ruleSet: "13.4",
+        hidden: t.hidden,
+        story: { de: "", en: "" },
+        facts: [],
+        rounds: [],
+      },
+  );
 }

@@ -1,7 +1,8 @@
 import { useRef, useState, type DragEvent } from "react";
 import { useParams } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
-import { getRunDef, nextRound, resetRun, submitRound, useRunState, type RoundState, type RunState } from "../../data/runStore";
+import { isApi } from "../../data/dataSource";
+import { nextRound, resetRun, submitRound, useRun, type ReplyFile, type RoundState, type RunState } from "../../data/runStore";
 import type { RoundDef, RunDef } from "../../data/types";
 import { Badge } from "../../components/Badge";
 import { PassFail } from "../../components/PassFail";
@@ -13,14 +14,16 @@ import { pick } from "../../format";
 export function TestRunScreen() {
   const { id = "" } = useParams();
   const { t, i18n } = useTranslation();
-  const def = getRunDef(id);
-  const state = useRunState(id);
+  const view = useRun(id);
+  const def = view.status === "ready" ? view.def : undefined;
+  const state = view.status === "ready" ? view.state : undefined;
 
   useSetTopBar(
     def ? <Trans i18nKey="run.topbar" values={{ id, ruleSet: def.ruleSet }} components={{ strong: <strong /> }} /> : null,
-    [id],
+    [id, def?.ruleSet],
   );
 
+  if (view.status === "loading") return <p className="page-subtitle">{t("common.loading")}</p>;
   if (!def || !state) return <div className="placeholder">{t("run.notFound")}</div>;
   const lang = i18n.language;
 
@@ -129,6 +132,7 @@ function RoundCard(props: {
       <p>{pick(round.instruction, lang)}</p>
 
       {open && <UploadZone runId={runId} primaryUpload={!expectsNothing} multiple={round.expects.length > 1} />}
+      {open && isApi && <p className="cell-hint">{t("run.upload.channelHint")}</p>}
       {rs.noMessage && <p className="hint-box">{t("run.reportedNoMessage")}</p>}
       {rs.receipt && <ReceiptCard receipt={rs.receipt} />}
       {rs.files && rs.receipt?.accepted !== false && <ParsedRecordView files={rs.files} />}
@@ -153,13 +157,13 @@ function RoundCard(props: {
         </section>
       )}
 
-      {rs.outcome?.passed && round.reply && !def.hidden && (
+      {round.reply && !def.hidden && (isApi ? rs.reply : rs.outcome?.passed) && (
         <section className="sub-card reply">
           <div className="sub-card-head">
             <h3>{pick(round.reply.title, lang)}</h3>
-            <span className="mono muted">{round.reply.fileName}</span>
+            <span className="mono muted">{rs.reply?.name ?? round.reply.fileName}</span>
           </div>
-          <table className="list-table compact">
+          {!rs.reply && round.reply.rows.length > 0 && <table className="list-table compact">
             <tbody>
               {round.reply.rows.map((row) => (
                 <tr key={row.field}>
@@ -169,15 +173,23 @@ function RoundCard(props: {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table>}
+          {rs.reply && <ParsedRecordView files={[rs.reply]} />}
           <p className="cell-hint">{t("run.reply.fromYourFile")}</p>
-          <button type="button" className="button" disabled title={t("run.reply.downloadLater")}>
-            {t("run.reply.download", { file: round.reply.fileName })}
-          </button>
+          {rs.reply ? (
+            <button type="button" className="button" onClick={() => download(rs.reply!)}>
+              {t("run.reply.download", { file: rs.reply.name })}
+            </button>
+          ) : (
+            <button type="button" className="button" disabled title={t("run.reply.downloadLater")}>
+              {t("run.reply.download", { file: round.reply.fileName })}
+            </button>
+          )}
+          {rs.reply && <p className="cell-hint">{t("run.reply.importHint")}</p>}
         </section>
       )}
 
-      {isCurrent && running && rs.outcome?.passed && !isLast && (
+      {isCurrent && running && rs.outcome && (isApi || rs.outcome.passed) && !isLast && (
         <div className="round-next">
           <button type="button" className="button button-primary" onClick={() => nextRound(runId)}>
             {t("run.next", { nr: round.nr + 1 })}
@@ -186,6 +198,16 @@ function RoundCard(props: {
       )}
     </section>
   );
+}
+
+/** Saves the insurer reply (TEEK0) so the vendor can import it into the payroll software. */
+function download(reply: ReplyFile) {
+  const url = URL.createObjectURL(new Blob([reply.text], { type: "text/plain;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = reply.name;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function fillReply(value: string, rs: RoundState): string {

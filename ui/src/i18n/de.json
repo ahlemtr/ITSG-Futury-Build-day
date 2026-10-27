@@ -211,7 +211,8 @@
       "dropMany": "TEEL0-Dateien hierher ziehen (mehrere möglich)",
       "checking": "Datei wird gelesen und geprüft …",
       "choose": "Datei auswählen",
-      "none": "Keine Meldung erzeugt"
+      "none": "Keine Meldung erzeugt",
+      "channelHint": "Der Upload ersetzt im Prototyp den GKV-Kommunikationsserver; im Betrieb kommen dieselben Dateien über das bestehende Netz."
     },
     "receipt": {
       "title": "Eingangsbestätigung",
@@ -241,7 +242,8 @@
       "blank": "(leer)",
       "fromYourFile": "REFERENZ-ID und Aktenzeichen stammen aus Ihrer eigenen Datei.",
       "download": "{{file}} herunterladen",
-      "downloadLater": "Die Datei erzeugt das Backend (API-Modus)."
+      "downloadLater": "Die Datei erzeugt das Backend (API-Modus).",
+      "importHint": "Importieren Sie diese Datei in Ihre Entgeltabrechnung und fahren Sie mit der nächsten Runde fort."
     },
     "verdict": {
       "title": "Testlauf abgeschlossen",
