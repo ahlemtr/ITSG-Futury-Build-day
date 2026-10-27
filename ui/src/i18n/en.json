@@ -37,7 +37,7 @@
     },
     "specChanges": {
       "title": "Verfahrensbeschreibung V13.3 → V13.4",
-      "subtitle": "36 changes found, 5 inside the EEL prototype scope. Field layouts unchanged."
+      "subtitle": "Comparing both versions."
     },
     "testCatalogue": {
       "title": "Test catalogue 2027",
@@ -306,5 +306,32 @@
       "checks": "What it checks"
     },
     "verdict": "Verdict"
+  },
+  "spec": {
+    "subtitle": "{{count}} changes in the EEL scope, {{tests}} test cases change their result. Field layouts unchanged.",
+    "subtitleLoading": "Comparing both versions.",
+    "loading": "Comparing the versions (the spec-update agent needs up to a minute the first time) …",
+    "toCatalogue": "Affected tests in the catalogue",
+    "ruleChange": "Rule change",
+    "label": {
+      "editorial": "editorial",
+      "clarification": "clarification",
+      "law_change": "law change",
+      "unknown": "unknown"
+    },
+    "old": "Old (V{{version}})",
+    "new": "New (V{{version}})",
+    "impact": "Impact",
+    "recompute": "Rules to recompute",
+    "review": "Rules to review",
+    "param": "Changed parameter",
+    "flips": "Test case with a new result",
+    "no41": "no 41",
+    "agent": "Draft by the spec-update agent",
+    "decision": {
+      "no_change": "No change",
+      "update_test": "Update test",
+      "new_test": "New test"
+    }
   }
 }

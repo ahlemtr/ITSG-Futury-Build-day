@@ -712,3 +712,68 @@ export function downloadJson(name: string, data: unknown) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+// ---------- Spec changes (screen 2) ----------
+
+export type SpecChange = {
+  key: string;
+  block: string | null;
+  field: string | null;
+  old: string | null;
+  new: string | null;
+  label: string;
+  summary: string | null;
+  changes_param: string[];
+  modifies_old: string[];
+  modifies_new: string[];
+  recompute: string[];
+  review: string[];
+};
+
+export type Recomputed = {
+  id: string;
+  old: { send_41: boolean; periods: [string, string][]; total_days: number | null };
+  new: { send_41: boolean; periods: [string, string][]; total_days: number | null };
+  differs: boolean;
+};
+
+export type AgentDecision = {
+  change_key: string;
+  test_case_id: string | null;
+  decision: "no_change" | "update_test" | "new_test";
+  reasoning: string;
+  citations: string[];
+};
+
+export type SpecDiff = {
+  oldVersion: string;
+  newVersion: string;
+  changes: SpecChange[];
+  recomputed: Recomputed[];
+  changedTests: string[];
+  params: { old: Record<string, unknown>; new: Record<string, unknown> };
+  agent: AgentDecision[] | null;
+};
+
+/** 13.3 vs 13.4: in-scope changes, rules and tests they touch, and the spec-update agent's drafts. */
+export async function getSpecDiff(oldVersion = "13.3", newVersion = "13.4"): Promise<SpecDiff> {
+  const [d, oldRules, newRules] = await Promise.all([
+    postJson<{
+      changes: SpecChange[];
+      recomputed: Recomputed[];
+      changed_tests: string[];
+      agent?: { decisions: AgentDecision[] } | null;
+    }>("/specdiff", { document: "VB", old_version: oldVersion, new_version: newVersion }),
+    getJson<{ params: Record<string, unknown> }>(`/rules?version=${oldVersion}`),
+    getJson<{ params: Record<string, unknown> }>(`/rules?version=${newVersion}`),
+  ]);
+  return {
+    oldVersion,
+    newVersion,
+    changes: d.changes,
+    recomputed: d.recomputed,
+    changedTests: d.changed_tests,
+    params: { old: oldRules.params, new: newRules.params },
+    agent: d.agent?.decisions ?? null,
+  };
+}

@@ -57,7 +57,9 @@ def spec_diff(request: Request, body: SpecdiffBody):
     changes = k.get_changes(body.document, body.old_version, body.new_version, in_scope_only=True)
     imp = specdiff.impact(changes, k)
     rec = builder.recompute(k, [get_case(k, t.key) for t in imp.tests], body.old_version, body.new_version)
-    out = {"changes": [c.model_dump() for c in changes],
+    per_change = {c.key: specdiff.impact([c], k) for c in changes}
+    out = {"changes": [c.model_dump() | {"recompute": [r.id for r in per_change[c.key].recompute],
+                                         "review": [r.id for r in per_change[c.key].review]} for c in changes],
            "recompute": [r.id for r in imp.recompute], "review": [r.id for r in imp.review],
            "tests": [t.model_dump() for t in imp.tests],
            "recomputed": [r.model_dump(mode="json") for r in rec],

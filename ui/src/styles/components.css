@@ -357,3 +357,26 @@ abbr[title] {
   margin-right: 8px;
   border-radius: 2px;
 }
+
+/* Spec changes: old and new passage side by side, removed words red, added words green */
+.passage-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.passage {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.diff-del {
+  background: var(--label-bug-bg);
+  color: var(--label-bug-fg);
+  text-decoration: line-through;
+}
+
+.diff-ins {
+  background: var(--label-exact-bg);
+  color: var(--label-exact-fg);
+}

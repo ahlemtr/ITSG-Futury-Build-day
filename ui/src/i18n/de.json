@@ -37,7 +37,7 @@
     },
     "specChanges": {
       "title": "Verfahrensbeschreibung V13.3 → V13.4",
-      "subtitle": "36 Änderungen gefunden, 5 davon im EEL-Prototyp-Umfang. Feldlayouts unverändert."
+      "subtitle": "Vergleich der beiden Fassungen."
     },
     "testCatalogue": {
       "title": "Testkatalog 2027",
@@ -306,5 +306,32 @@
       "checks": "Was geprüft wird"
     },
     "verdict": "Ergebnis"
+  },
+  "spec": {
+    "subtitle": "{{count}} Änderungen im EEL-Umfang, {{tests}} Testfälle ändern ihr Ergebnis. Feldlayouts unverändert.",
+    "subtitleLoading": "Vergleich der beiden Fassungen.",
+    "loading": "Fassungen werden verglichen (der Spec-Update-Agent braucht beim ersten Mal bis zu einer Minute) …",
+    "toCatalogue": "Betroffene Tests im Katalog",
+    "ruleChange": "Regeländerung",
+    "label": {
+      "editorial": "redaktionell",
+      "clarification": "Klarstellung",
+      "law_change": "Rechtsänderung",
+      "unknown": "unklar"
+    },
+    "old": "Alt (V{{version}})",
+    "new": "Neu (V{{version}})",
+    "impact": "Auswirkung",
+    "recompute": "Regeln neu berechnen",
+    "review": "Regeln prüfen",
+    "param": "Geänderter Parameter",
+    "flips": "Testfall mit neuem Ergebnis",
+    "no41": "keine 41",
+    "agent": "Entwurf des Spec-Update-Agenten",
+    "decision": {
+      "no_change": "Keine Änderung",
+      "update_test": "Test anpassen",
+      "new_test": "Neuer Test"
+    }
   }
 }
