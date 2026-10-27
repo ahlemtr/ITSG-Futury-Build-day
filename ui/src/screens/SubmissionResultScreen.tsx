@@ -13,7 +13,10 @@ import { formatDate, pick } from "../format";
 const CHIP_ORDER: FieldStatus[] = ["identical", "variant", "bug", "invalid", "unclear", "ignored", "valid"];
 
 const isDeviation = (row: FieldRow) => row.deviationId !== undefined;
-const rowKey = (row: FieldRow) => `${row.block}.${row.field}`;
+const rowKey = (row: FieldRow) => `${row.message ?? ""}|${row.block}.${row.field}`;
+/** empty in both files and not a deviation: hidden unless "show empty fields" is on */
+const isEmptyQuiet = (row: FieldRow) => !isDeviation(row) && !row.expected && !row.actual;
+const stepOf = (message: string) => Number.parseInt(message, 10);
 
 export function SubmissionResultScreen() {
   const { id = "" } = useParams();
@@ -38,15 +41,26 @@ function ResultView({ result }: { result: SubmissionResult }) {
   const { t, i18n } = useTranslation();
   const view = useView();
   const [filter, setFilter] = useState<FieldStatus | "all">("all");
-  const [onlyDeviations, setOnlyDeviations] = useState(false);
+  const [onlyDeviations, setOnlyDeviations] = useState(result.deviations.length > 0);
+  const [showEmpty, setShowEmpty] = useState(false);
   const firstDeviation = result.fields.find(isDeviation) ?? result.fields[0];
   const [selectedKey, setSelectedKey] = useState(firstDeviation ? rowKey(firstDeviation) : "");
 
-  const counts = new Map<FieldStatus, number>();
-  for (const row of result.fields) counts.set(row.status, (counts.get(row.status) ?? 0) + 1);
+  // one tab per message of the chain (api mode); mock results hold one message and show no tabs
+  const messages = [...new Set(result.fields.map((r) => r.message).filter((m): m is string => !!m))].sort(
+    (a, b) => stepOf(a) - stepOf(b),
+  );
+  const [message, setMessage] = useState(firstDeviation?.message ?? messages[0]);
+  const inMessage = result.fields.filter((row) => messages.length === 0 || row.message === message);
 
-  const rows = result.fields.filter(
-    (row) => (filter === "all" || row.status === filter) && (!onlyDeviations || isDeviation(row)),
+  const counts = new Map<FieldStatus, number>();
+  for (const row of inMessage) counts.set(row.status, (counts.get(row.status) ?? 0) + 1);
+
+  const rows = inMessage.filter(
+    (row) =>
+      (filter === "all" || row.status === filter) &&
+      (!onlyDeviations || isDeviation(row)) &&
+      (showEmpty || onlyDeviations || !isEmptyQuiet(row)),
   );
   const selected = result.fields.find((row) => rowKey(row) === selectedKey);
   const deviation = selected?.deviationId
@@ -80,6 +94,32 @@ function ResultView({ result }: { result: SubmissionResult }) {
         </div>
       </div>
 
+      {messages.length > 1 && (
+        <div className="chips message-tabs" role="tablist" aria-label={t("result.messages")}>
+          {messages.map((m) => {
+            const devs = result.fields.filter((r) => r.message === m && isDeviation(r)).length;
+            return (
+              <button
+                key={m}
+                type="button"
+                role="tab"
+                className="chip"
+                aria-selected={m === message}
+                aria-pressed={m === message}
+                onClick={() => {
+                  setMessage(m);
+                  setFilter("all");
+                }}
+              >
+                {t("result.message", { step: stepOf(m), abgabegrund: m.split(" · ")[1] })}{" "}
+                <span className="chip-count">{t("result.fieldCount", { count: result.fields.filter((r) => r.message === m).length })}</span>
+                {devs > 0 && <span className="chip-count chip-alert">{t("result.deviationCount", { count: devs })}</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       <div className="toolbar">
         <div className="chips" role="group" aria-label={t("result.filter")}>
           <button
@@ -88,7 +128,7 @@ function ResultView({ result }: { result: SubmissionResult }) {
             aria-pressed={filter === "all"}
             onClick={() => setFilter("all")}
           >
-            {t("chips.all")} <span className="chip-count">{result.fields.length}</span>
+            {t("chips.all")} <span className="chip-count">{inMessage.length}</span>
           </button>
           {CHIP_ORDER.filter((s) => counts.has(s)).map((status) => (
             <button
@@ -110,6 +150,12 @@ function ResultView({ result }: { result: SubmissionResult }) {
           />
           {t("result.onlyDeviations")}
         </label>
+        {!onlyDeviations && (
+          <label className="toggle">
+            <input type="checkbox" checked={showEmpty} onChange={(e) => setShowEmpty(e.target.checked)} />
+            {t("result.showEmpty")}
+          </label>
+        )}
       </div>
 
       <div className="split">

@@ -259,6 +259,9 @@ function toDeviation(d: ApiDeviation, rules: Map<string, ApiRule>): Deviation {
 /** Group fields "BEGINN-AU-2" belong to the deviation on "BEGINN-AU". */
 const baseField = (field: string) => field.replace(/-\d+$/, "");
 
+/** "Step 1 · 41": one tab per message of the chain on the result screen. */
+const messageLabel = (step: number, abgabegrund: string) => `${step} · ${abgabegrund}`;
+
 const GROUP_KINDS = new Set(["missing_group", "extra_group", "order_differs"]);
 
 function rowStatus(row: ApiDiffRow, label: DeviationLabel | undefined): FieldStatus {
@@ -295,7 +298,8 @@ export async function getSubmissionResult(id: string): Promise<SubmissionResult 
           inStep.find((d) => GROUP_KINDS.has(d.kind)));
       if (dev) used.add(dev.id);
       fields.push({
-        block: `${step.abgabegrund} ${row.record}`,
+        message: messageLabel(step.step, step.abgabegrund),
+        block: row.record,
         field: row.field,
         expected: row.expected?.trimEnd() ?? null,
         actual: row.actual?.trimEnd() ?? null,
@@ -309,7 +313,8 @@ export async function getSubmissionResult(id: string): Promise<SubmissionResult 
   const extra = check.deviations
     .filter((d) => !used.has(d.id))
     .map<FieldRow>((d) => ({
-      block: [d.abgabegrund, d.record].filter(Boolean).join(" ") || "–",
+      message: d.step !== null ? messageLabel(d.step, d.abgabegrund ?? "") : undefined,
+      block: d.record ?? "–",
       field: d.field ?? KIND_TITLE[d.kind]?.en ?? d.kind,
       expected: show(d.expected),
       actual: show(d.actual),

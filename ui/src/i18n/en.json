@@ -134,7 +134,14 @@
     "reasoning": "Reasoning",
     "explanation": "Explanation",
     "source": "Source",
-    "identicalNote": "The value matches the model solution."
+    "identicalNote": "The value matches the model solution.",
+    "messages": "Messages of this submission",
+    "message": "Step {{step}} · {{abgabegrund}}",
+    "fieldCount_one": "{{count}} field",
+    "fieldCount_other": "{{count}} fields",
+    "deviationCount_one": "{{count}} deviation",
+    "deviationCount_other": "{{count}} deviations",
+    "showEmpty": "Show empty fields"
   },
   "submissions": {
     "col": {

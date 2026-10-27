@@ -37,6 +37,8 @@ export type Deviation = {
 };
 
 export type FieldRow = {
+  /** the message the field belongs to when a submission holds several, e.g. "1 · 41" */
+  message?: string;
   block: string;
   field: string;
   /** null = not present in that file */

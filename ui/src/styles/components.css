@@ -385,3 +385,12 @@ abbr[title] {
 .split-wide {
   grid-template-columns: minmax(0, 1fr) 420px;
 }
+
+/* Submission result: one tab per message of the chain */
+.message-tabs {
+  margin-bottom: 12px;
+}
+
+.chip-alert {
+  color: var(--label-bug-fg);
+}

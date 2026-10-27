@@ -134,7 +134,14 @@
     "reasoning": "Begründung",
     "explanation": "Erklärung",
     "source": "Quelle",
-    "identicalNote": "Der Wert stimmt mit der Musterlösung überein."
+    "identicalNote": "Der Wert stimmt mit der Musterlösung überein.",
+    "messages": "Meldungen dieser Einreichung",
+    "message": "Schritt {{step}} · {{abgabegrund}}",
+    "fieldCount_one": "{{count}} Feld",
+    "fieldCount_other": "{{count}} Felder",
+    "deviationCount_one": "{{count}} Abweichung",
+    "deviationCount_other": "{{count}} Abweichungen",
+    "showEmpty": "Leere Felder zeigen"
   },
   "submissions": {
     "col": {
