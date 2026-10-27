@@ -962,3 +962,35 @@ export const getCalendar = (company?: string) =>
 
 /** Needs attention: overdue, or due within a week. */
 export const isPressing = (d: Deadline) => d.status === "overdue" || d.status === "soon";
+
+// ---------- Demo reset (user menu) ----------
+
+export type ResetJob = {
+  id: string;
+  status: "running" | "done" | "failed";
+  created: string;
+  stages: { name: string; status: ActivityStage["status"]; counts: Record<string, unknown> }[];
+  error: string | null;
+};
+
+export const getResetStatus = () => getJson<{ allowed: boolean; job: ResetJob | null }>("/admin/reset");
+
+/** Starts the reset and mirrors it in the AI overlay until it is done; resolves with the final job. */
+export async function resetAll(): Promise<ResetJob> {
+  let job = await postJson<ResetJob>("/admin/reset", {});
+  const startedAt = Date.parse(job.created) || Date.now();
+  const title = both("admin.reset.job");
+  for (;;) {
+    upsertActivity({
+      id: job.id,
+      title,
+      startedAt,
+      status: job.status,
+      error: job.error ?? undefined,
+      stages: job.stages.map((st) => ({ name: st.name, title: both(`admin.reset.stage.${st.name}`), status: st.status, counts: st.counts })),
+    });
+    if (job.status !== "running") return job;
+    await new Promise((r) => setTimeout(r, 1000));
+    job = (await getResetStatus()).job ?? job;
+  }
+}

@@ -443,7 +443,10 @@
       "skipped": "übersprungen:",
       "chunks": "Chunks",
       "calculation_rules": "Berechnungsregeln",
-      "proposals": "Parametervorschläge"
+      "proposals": "Parametervorschläge",
+      "versions": "Fassungen",
+      "test_cases": "Testfälle",
+      "submissions": "Einreichungen"
     },
     "title": {
       "specUpload": "Neue Fassung wird verarbeitet: {{doc}} V{{version}}",
@@ -567,5 +570,23 @@
     },
     "upcoming": "Nächste Fristen",
     "all": "Alle Fristen"
+  },
+  "admin": {
+    "menu": "Benutzermenü",
+    "reset": {
+      "action": "Alles zurücksetzen",
+      "notAllowed": "Nur auf einer lokalen Installation möglich.",
+      "title": "Alles zurücksetzen?",
+      "body": "Die Plattform geht auf den Startpunkt zurück: Einreichungen, Testläufe, Berichte, Entscheidungen der Systemberater und hochgeladene Fassungen werden gelöscht, der Wissensgraph wird neu aufgebaut. KI-Antworten und Embeddings bleiben im Cache.",
+      "confirm": "Zurücksetzen",
+      "cancel": "Abbrechen",
+      "job": "Plattform wird auf den Startpunkt zurückgesetzt",
+      "failed": "Zurücksetzen fehlgeschlagen: {{error}}",
+      "stage": {
+        "files": "Hochgeladene Dateien löschen",
+        "graph": "Wissensgraph neu aufbauen",
+        "store": "Datenbank neu befüllen"
+      }
+    }
   }
 }

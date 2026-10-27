@@ -64,6 +64,7 @@ function ActivityCard({ activity }: { activity: Activity }) {
 const SHOWN_COUNTS = [
   "passages", "chunks", "sections", "vectors", "changes", "candidates", "rules", "analysed", "param_changes",
   "parameters_changed", "in_scope", "calculation_rules", "proposals", "flipped", "drafts", "rechecked", "skipped",
+  "versions", "test_cases", "submissions",
 ];
 
 function StageRow({ stage }: { stage: ActivityStage }) {

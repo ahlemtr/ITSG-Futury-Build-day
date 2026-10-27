@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
@@ -50,6 +51,9 @@ class MemoryRepo:
         self.events: list[dict] = []
         self.companies: dict[str, Company] = {}
         self.deadlines: dict[str, Deadline] = {}
+
+    def clear(self) -> None:
+        self.__init__()
 
     # test cases
     def upsert_test_case(self, tc: Case) -> None:
@@ -180,6 +184,11 @@ class PgRepo:
 
     def apply_schema(self) -> None:
         self.conn.execute(SCHEMA.read_text(encoding="utf-8"))
+
+    def clear(self) -> None:
+        """Empties every app table (demo reset)."""
+        tables = re.findall(r"CREATE TABLE IF NOT EXISTS (\w+)", SCHEMA.read_text(encoding="utf-8"))
+        self.conn.execute(f"TRUNCATE {', '.join(tables)} RESTART IDENTITY CASCADE")
 
     def _one(self, sql: str, *args: Any):
         return self.conn.execute(sql, args).fetchone()

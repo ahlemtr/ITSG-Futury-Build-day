@@ -2,6 +2,7 @@
 
 import io
 import json
+import time
 import zipfile
 
 import pytest
@@ -221,3 +222,28 @@ def test_calendar_rounds_and_rule_set_deadlines(client, itsg_bytes):
     late = client.get("/calendar", params={"today": "2027-01-05", "company": vendor}).json()["deadlines"]
     assert next(d for d in late if d["kind"] == "recert")["status"] == "overdue"
     assert client.get("/calendar", params={"company": vendor}).json()["history"] == []
+
+
+def test_admin_reset(client, tmp_path, monkeypatch):
+    # never the real data/ or Neo4j: YAML backend, data under tmp_path
+    for k, v in {"KG_BACKEND": "yaml", "DATA_DIR": str(tmp_path), "SPEC_BASELINE": "VB@13.3",
+                 "PRECEDENTS_PATH": str(tmp_path / "precedents.yaml")}.items():
+        monkeypatch.setenv(k, v)
+    monkeypatch.delenv("ALLOW_RESET", raising=False)
+    assert client.post("/admin/reset").status_code == 403  # the test client is not loopback
+    monkeypatch.setenv("ALLOW_RESET", "1")
+    (tmp_path / "ingested" / "VB@13.4").mkdir(parents=True)
+    client.post("/runs", json={"test_case_id": "peter", "valid_on": "2027-01-01", "vendor": "Lohnwerk Demo GmbH"})
+    job = client.post("/admin/reset").json()
+    for _ in range(600):
+        job = client.get("/admin/reset").json()["job"]
+        if job["status"] != "running":
+            break
+        time.sleep(0.1)
+    assert job["status"] == "done", job
+    assert [s["status"] for s in job["stages"]] == ["done", "done", "done"]
+    assert not (tmp_path / "ingested").exists()
+    assert client.get("/submissions").json() == []
+    cal = client.get("/calendar").json()
+    assert len(cal["companies"]) == 6 and not any(d["kind"] == "round" for d in cal["deadlines"])
+    assert [e["kind"] for e in cal["history"]] == ["baseline"]

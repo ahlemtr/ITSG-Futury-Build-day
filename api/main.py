@@ -11,7 +11,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from api.routes import builder, calendar, catalogue, checking, criteria, kgview, overview, runs, specs
+from api.routes import admin, builder, calendar, catalogue, checking, criteria, kgview, overview, runs, specs
 
 
 def create_app(kb=None, repo=None, ai=None, data_root: Path | None = None, seed: bool = False) -> FastAPI:
@@ -50,7 +50,7 @@ def create_app(kb=None, repo=None, ai=None, data_root: Path | None = None, seed:
         return {"status": "ok"}
 
     for r in (catalogue.router, checking.router, builder.router, runs.router, criteria.router, overview.router, specs.router,
-              kgview.router, calendar.router):
+              kgview.router, calendar.router, admin.router):
         app.include_router(r)
     return app
 

@@ -443,7 +443,10 @@
       "skipped": "skipped:",
       "chunks": "chunks",
       "calculation_rules": "calculation rules",
-      "proposals": "parameter proposals"
+      "proposals": "parameter proposals",
+      "versions": "versions",
+      "test_cases": "test cases",
+      "submissions": "submissions"
     },
     "title": {
       "specUpload": "Processing new version: {{doc}} V{{version}}",
@@ -567,5 +570,23 @@
     },
     "upcoming": "Next deadlines",
     "all": "All deadlines"
+  },
+  "admin": {
+    "menu": "User menu",
+    "reset": {
+      "action": "Reset everything",
+      "notAllowed": "Only possible on a local installation.",
+      "title": "Reset everything?",
+      "body": "The platform goes back to its starting point: submissions, test runs, reports, advisor decisions and uploaded versions are deleted, the knowledge graph is rebuilt. AI answers and embeddings stay cached.",
+      "confirm": "Reset",
+      "cancel": "Cancel",
+      "job": "Resetting the platform to its starting point",
+      "failed": "Reset failed: {{error}}",
+      "stage": {
+        "files": "Delete uploaded files",
+        "graph": "Rebuild the knowledge graph",
+        "store": "Seed the database again"
+      }
+    }
   }
 }

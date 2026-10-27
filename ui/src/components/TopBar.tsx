@@ -5,6 +5,7 @@ import { useData } from "../data/useData";
 import { formatDate } from "../format";
 import { LANGUAGES, setLanguage } from "../i18n";
 import { useTopBarContent } from "./TopBarContext";
+import { UserMenu } from "./UserMenu";
 import { useView, type View } from "./useView";
 
 const VIEWS: { view: View; home: string }[] = [
@@ -54,9 +55,13 @@ export function TopBar() {
           </button>
         ))}
       </div>
-      <span className="avatar" title={t(view === "vendor" ? "app.vendorUser" : "app.user")}>
-        {view === "vendor" ? "HS" : "IT"}
-      </span>
+      {view === "vendor" ? (
+        <span className="avatar" title={t("app.vendorUser")}>
+          HS
+        </span>
+      ) : (
+        <UserMenu initials="IT" title={t("app.user")} />
+      )}
     </header>
   );
 }
