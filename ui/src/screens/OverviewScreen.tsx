@@ -1,17 +1,21 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getOverview, getSubmissions } from "../data/dataSource";
+import { getCalendar, type CalendarData } from "../data/api";
+import { deadlineTitle, dueText } from "../data/deadlines";
 import type { OverviewData } from "../data/types";
 import { useData } from "../data/useData";
 import { SubmissionsTable } from "../components/SubmissionsTable";
 import { formatDate } from "../format";
 
 const LATEST_COUNT = 5;
+const DEADLINE_COUNT = 5;
 
 export function OverviewScreen() {
   const { t } = useTranslation();
   const overview = useData(getOverview, []);
   const submissions = useData(getSubmissions, []);
+  const calendar = useData(() => getCalendar(), []);
   const live = overview.status === "ready" ? overview.data : undefined;
 
   return (
@@ -24,6 +28,7 @@ export function OverviewScreen() {
       {overview.status === "loading" && <p className="page-subtitle">{t("common.loading")}</p>}
       {overview.status === "error" && <div className="placeholder">{t("common.error")}</div>}
       {live && <OverviewCards data={live} />}
+      {calendar.status === "ready" && <NextDeadlines data={calendar.data} />}
 
       <div className="overview-bottom">
         {live && <ResolutionCard data={live.resolution} />}
@@ -129,6 +134,39 @@ function ResolutionCard({ data }: { data: OverviewData["resolution"] }) {
               <td className="tabular">{p.value}</td>
             </tr>
           ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+function NextDeadlines({ data }: { data: CalendarData }) {
+  const { t, i18n } = useTranslation();
+  const names = new Map(data.companies.map((c) => [c.id, c.name]));
+  const next = data.deadlines.filter((d) => !d.done).slice(0, DEADLINE_COUNT);
+  return (
+    <section className="panel panel-flush next-deadlines" aria-labelledby="next-deadlines-title">
+      <div className="list-head">
+        <h2 id="next-deadlines-title" className="panel-title">{t("calendar.upcoming")}</h2>
+        <Link to="/calendar">{t("calendar.all")}</Link>
+      </div>
+      <table className="list-table">
+        <tbody>
+          {next.map((d) => (
+            <tr key={d.id}>
+              <td className="tabular cell-field">{formatDate(d.due)}</td>
+              <td>{d.company_id ? names.get(d.company_id) : "ITSG"}</td>
+              <td>{deadlineTitle(t, d, i18n.language)}</td>
+              <td>
+                <span className={`badge badge-${d.status === "overdue" ? "bug" : "neutral"}`}>{dueText(t, d)}</span>
+              </td>
+            </tr>
+          ))}
+          {next.length === 0 && (
+            <tr>
+              <td colSpan={4} className="empty">{t("calendar.empty")}</td>
+            </tr>
+          )}
         </tbody>
       </table>
     </section>

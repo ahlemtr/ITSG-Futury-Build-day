@@ -30,7 +30,8 @@
     "myTests": "Meine Testfälle",
     "results": "Ergebnisse",
     "vendorReports": "Berichte",
-    "knowledgeGraph": "Wissensgraph"
+    "knowledgeGraph": "Wissensgraph",
+    "calendar": "Fristen"
   },
   "screens": {
     "overview": {
@@ -68,6 +69,11 @@
     "vendorReports": {
       "title": "Berichte",
       "subtitle": "Signierte Prüfberichte zum Herunterladen."
+    },
+    "calendar": {
+      "title": "Fristen",
+      "subtitle": "Wann welche Datei fällig ist, je Hersteller, und wie sich der Testkatalog entwickelt.",
+      "vendorSubtitle": "Wann Ihre nächsten Dateien fällig sind."
     }
   },
   "status": {
@@ -485,5 +491,81 @@
       "changed_one": "{{count}} Änderung betrifft diese Passage",
       "changed_other": "{{count}} Änderungen betreffen diese Passage"
     }
+  },
+  "calendar": {
+    "timeline": "Zeitleiste {{from}} bis {{to}}",
+    "timelineLabel": "Fristen je Hersteller auf der Zeitleiste",
+    "company": "Hersteller",
+    "itsgRow": "Testkatalog und Stichtag",
+    "today": "Heute {{date}}",
+    "certifiedUntil": "zertifiziert bis {{date}}",
+    "firstCertification": "Erstzertifizierung",
+    "dueOn": "fällig am {{date}}",
+    "openRun": "Zum Testlauf",
+    "list": "Alle Fristen",
+    "filter": "Fristen filtern",
+    "empty": "Keine Fristen in dieser Auswahl.",
+    "filters": {
+      "open": "Offen",
+      "pressing": "Dringend",
+      "done": "Erledigt",
+      "all": "Alle"
+    },
+    "col": {
+      "due": "Fällig",
+      "what": "Frist",
+      "status": "Stand"
+    },
+    "kind": {
+      "round": "Runde {{round}} von {{rounds}} · {{testCase}}",
+      "permanent": "Dauertestfälle {{month}}",
+      "recert": "Rezertifizierung V{{version}}",
+      "catalogue": "Testkatalog V{{version}} freigeben",
+      "switch": "V{{version}} tritt in Kraft"
+    },
+    "code": {
+      "round": "R{{round}}",
+      "permanent": "Dauertest",
+      "recert": "Rezert.",
+      "catalogue": "Katalog",
+      "switch": "Stichtag"
+    },
+    "legend": {
+      "round": "Testlauf-Runde",
+      "recert": "Rezertifizierung",
+      "permanent": "Dauertestfälle (PTA 8.4)",
+      "catalogue": "Katalog-Freigabe",
+      "switch": "Stichtag"
+    },
+    "status": {
+      "overdue": "überfällig"
+    },
+    "due": {
+      "done": "erledigt",
+      "today": "heute fällig",
+      "in_one": "in {{count}} Tag",
+      "in_other": "in {{count}} Tagen",
+      "overdue_one": "{{count}} Tag überfällig",
+      "overdue_other": "{{count}} Tage überfällig"
+    },
+    "reminders": {
+      "title_one": "{{count}} Frist in den nächsten 7 Tagen",
+      "title_other": "{{count}} Fristen in den nächsten 7 Tagen",
+      "none": "Nächste Frist",
+      "daysLeft_one": "Tag",
+      "daysLeft_other": "Tage",
+      "daysLate_one": "Tag über",
+      "daysLate_other": "Tage über"
+    },
+    "history": {
+      "title": "Entwicklung des Testkatalogs",
+      "empty": "Noch keine Ereignisse.",
+      "baseline": "Startpunkt V{{version}}: {{count}} Testfall",
+      "upload": "{{document}} V{{version}} hochgeladen (gültig ab {{date}}): {{drafts}} Entwürfe, {{flipped}} Testfälle neu freizugeben",
+      "approved": "{{testCase}} freigegeben",
+      "rejected": "{{testCase}} abgelehnt"
+    },
+    "upcoming": "Nächste Fristen",
+    "all": "Alle Fristen"
   }
 }

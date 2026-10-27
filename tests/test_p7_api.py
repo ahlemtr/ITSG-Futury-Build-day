@@ -202,3 +202,22 @@ def test_kg_stats_and_ask(client):
     r = client.get("/kg/ask", params={"q": "Vorerkrankung 6 Monate"}).json()["results"]
     chaining = next(x for x in r if x["passage"]["key"].endswith("#3.12/chaining"))
     assert "R41-2" in chaining["rules"] and "peter-gap-exact" in chaining["tests"] and chaining["passage"]["snippet"]
+
+
+def test_calendar_rounds_and_rule_set_deadlines(client, itsg_bytes):
+    vendor = "Lohnwerk Demo GmbH"
+    run = client.post("/runs", json={"test_case_id": "peter", "valid_on": "2027-01-01", "vendor": vendor}).json()
+    rounds = lambda: [d for d in client.get("/calendar", params={"company": vendor}).json()["deadlines"]
+                      if d["kind"] == "round" and d["ref"] == run["run_id"]]
+    assert [(d["params"]["round"], d["done"]) for d in rounds()] == [(1, False)]
+    assert rounds()[0]["days"] == 14
+    client.post(f"/runs/{run['run_id']}/submit", files=[("files", ("TEEL0-r1", itsg_bytes))])
+    assert [(d["params"]["round"], d["done"]) for d in rounds()] == [(1, True), (2, False)]
+
+    cal = client.get("/calendar", params={"today": "2026-10-27"}).json()
+    kinds = {(d["company_id"], d["kind"]) for d in cal["deadlines"]}
+    assert ("lohnwerk-demo-gmbh", "recert") in kinds and (None, "switch") in kinds and (None, "catalogue") in kinds
+    assert ("abrechnung-sud-demo", "recert") not in kinds  # new software: no certificate to renew
+    late = client.get("/calendar", params={"today": "2027-01-05", "company": vendor}).json()["deadlines"]
+    assert next(d for d in late if d["kind"] == "recert")["status"] == "overdue"
+    assert client.get("/calendar", params={"company": vendor}).json()["history"] == []

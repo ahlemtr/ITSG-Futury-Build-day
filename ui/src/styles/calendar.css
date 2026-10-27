@@ -1,0 +1,382 @@
+/* Calendar: companies down the left, days across. Every kind of deadline has its own mark;
+   full colour only for what needs action (overdue). Data hue = the "variant" blue. */
+.calendar {
+  display: grid;
+  gap: 16px;
+}
+
+.timeline-head,
+.list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 16px 10px;
+}
+
+.timeline-head .panel-title,
+.list-head .panel-title {
+  margin: 0;
+}
+
+.timeline-scroll {
+  overflow-x: auto;
+}
+
+.timeline {
+  min-width: 860px;
+  --tl-hue: var(--label-variant-fg);
+  --tl-late: var(--label-bug-fg);
+}
+
+.tl-row {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  min-height: 44px;
+  border-top: 1px solid var(--border);
+}
+
+.tl-name {
+  display: grid;
+  align-content: center;
+  gap: 1px;
+  padding: 4px 12px 4px 16px;
+  min-width: 0;
+}
+
+.tl-company {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tl-name .cell-hint {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tl-track {
+  position: relative;
+  margin-right: 24px;
+  overflow-x: clip; /* labels of marks near the end stop at the edge */
+}
+
+.tl-row-itsg {
+  background: var(--ground);
+}
+
+/* axis */
+.tl-axis {
+  min-height: 30px;
+  border-top: 0;
+}
+
+.tl-axis .tl-name {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.tl-month {
+  position: absolute;
+  top: 8px;
+  padding-left: 4px;
+  font-size: 12px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.tl-today-label {
+  position: absolute;
+  bottom: 2px;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.tl-gridline,
+.tl-today,
+.tl-switch {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  pointer-events: none;
+}
+
+.tl-gridline {
+  background: var(--border);
+}
+
+.tl-today {
+  background: var(--tl-hue);
+}
+
+.tl-switch {
+  width: 2px;
+  margin-left: -1px;
+  background: var(--ink);
+  opacity: 0.55;
+}
+
+/* test run round: window from the reply it answers to its due date */
+.tl-bar {
+  position: absolute;
+  top: 50%;
+  height: 22px;
+  margin-top: -11px;
+  padding: 0 6px;
+  border-radius: 4px;
+  border-left: 3px solid var(--tl-hue);
+  background: var(--label-variant-bg);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tl-bar.tl-done {
+  background: var(--label-neutral-bg);
+  border-left-color: var(--ink-muted);
+  color: var(--ink-muted);
+}
+
+.tl-bar.tl-overdue {
+  background: var(--label-bug-bg);
+  border-left-color: var(--tl-late);
+}
+
+/* two lanes: bars on top, marks below */
+.tl-row-lanes {
+  min-height: 64px;
+}
+
+.tl-row-lanes .tl-bar {
+  top: 8px;
+  margin-top: 0;
+}
+
+.tl-row-lanes .tl-mark {
+  top: auto;
+  bottom: 10px;
+  transform: translate(-7px, 0);
+}
+
+/* point deadlines: the shape says the kind, the fill says the state */
+.tl-mark {
+  position: absolute;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transform: translate(-7px, -50%);
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.tl-glyph {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--surface);
+  background: var(--surface);
+  border: 2px solid var(--ink);
+}
+
+.tl-mark-recert .tl-glyph {
+  background: var(--ink);
+}
+
+.tl-mark-permanent .tl-glyph {
+  border-radius: 50%;
+  border-width: 1.5px;
+  border-color: var(--ink-muted);
+}
+
+.tl-mark-catalogue .tl-glyph,
+.tl-mark-switch .tl-glyph {
+  transform: rotate(45deg) scale(0.85);
+}
+
+.tl-mark-switch .tl-glyph {
+  background: var(--ink);
+}
+
+.tl-mark-label {
+  color: var(--ink-muted);
+}
+
+.tl-mark.tl-soon .tl-mark-label {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.tl-mark.tl-overdue .tl-glyph {
+  background: var(--tl-late);
+  border-color: var(--tl-late);
+}
+
+.tl-mark.tl-overdue .tl-mark-label {
+  color: var(--tl-late);
+  font-weight: 500;
+}
+
+.tl-mark.tl-done .tl-glyph {
+  background: var(--ink-muted);
+  border-color: var(--ink-muted);
+}
+
+.tl-mark.tl-done .tl-glyph,
+.tl-mark.tl-done.tl-mark-catalogue .tl-glyph {
+  color: var(--surface);
+}
+
+/* legend: each swatch is the mark itself, scaled down */
+.tl-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.tl-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tl-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--ink);
+  background: var(--surface);
+}
+
+.tl-swatch-round {
+  width: 18px;
+  border: 0;
+  border-left: 3px solid var(--label-variant-fg);
+  border-radius: 2px;
+  background: var(--label-variant-bg);
+}
+
+.tl-swatch-recert { background: var(--ink); }
+.tl-swatch-permanent { border-radius: 50%; border-color: var(--ink-muted); }
+.tl-swatch-catalogue { transform: rotate(45deg) scale(0.85); }
+.tl-swatch-switch { transform: rotate(45deg) scale(0.85); background: var(--ink); }
+.tl-swatch-overdue { background: var(--label-bug-fg); border-color: var(--label-bug-fg); }
+
+/* vendor reminders */
+.reminders .card-title {
+  margin-bottom: 8px;
+}
+
+.reminder-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.reminder {
+  display: grid;
+  grid-template-columns: 56px 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.reminder:first-child {
+  border-top: 0;
+}
+
+.reminder-days {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: right;
+}
+
+.reminder-overdue .reminder-days {
+  color: var(--label-bug-fg);
+}
+
+.reminder-unit {
+  font-size: 12px;
+  color: var(--ink-muted);
+  line-height: 1.2;
+}
+
+.reminder-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* ITSG: catalogue history */
+.history {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0 0 0 14px;
+  display: grid;
+  gap: 12px;
+  border-left: 2px solid var(--border);
+}
+
+.history li {
+  display: grid;
+  gap: 2px;
+  position: relative;
+}
+
+.history li::before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--ink-muted);
+}
+
+.history .history-spec_upload::before {
+  background: var(--label-variant-fg);
+  border-color: var(--label-variant-fg);
+}
+
+.history .history-baseline::before {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+/* overview: next deadlines */
+.next-deadlines {
+  margin-top: 16px;
+}
+
+.next-deadlines .list-table td:first-child {
+  width: 120px;
+}

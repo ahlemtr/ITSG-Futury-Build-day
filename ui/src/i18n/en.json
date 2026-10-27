@@ -30,7 +30,8 @@
     "myTests": "My test cases",
     "results": "Results",
     "vendorReports": "Reports",
-    "knowledgeGraph": "Knowledge graph"
+    "knowledgeGraph": "Knowledge graph",
+    "calendar": "Deadlines"
   },
   "screens": {
     "overview": {
@@ -68,6 +69,11 @@
     "vendorReports": {
       "title": "Reports",
       "subtitle": "Signed test reports to download."
+    },
+    "calendar": {
+      "title": "Deadlines",
+      "subtitle": "When each file is due, per vendor, and how the test catalogue evolves.",
+      "vendorSubtitle": "When your next files are due."
     }
   },
   "status": {
@@ -485,5 +491,81 @@
       "changed_one": "{{count}} change touches this passage",
       "changed_other": "{{count}} changes touch this passage"
     }
+  },
+  "calendar": {
+    "timeline": "Timeline {{from}} to {{to}}",
+    "timelineLabel": "Deadlines per vendor on the timeline",
+    "company": "Vendor",
+    "itsgRow": "Test catalogue and switch date",
+    "today": "Today {{date}}",
+    "certifiedUntil": "certified until {{date}}",
+    "firstCertification": "first certification",
+    "dueOn": "due on {{date}}",
+    "openRun": "Open test run",
+    "list": "All deadlines",
+    "filter": "Filter deadlines",
+    "empty": "No deadlines in this selection.",
+    "filters": {
+      "open": "Open",
+      "pressing": "Urgent",
+      "done": "Done",
+      "all": "All"
+    },
+    "col": {
+      "due": "Due",
+      "what": "Deadline",
+      "status": "State"
+    },
+    "kind": {
+      "round": "Round {{round}} of {{rounds}} · {{testCase}}",
+      "permanent": "Permanent test cases {{month}}",
+      "recert": "Recertification V{{version}}",
+      "catalogue": "Approve test catalogue V{{version}}",
+      "switch": "V{{version}} takes effect"
+    },
+    "code": {
+      "round": "R{{round}}",
+      "permanent": "Permanent",
+      "recert": "Recert.",
+      "catalogue": "Catalogue",
+      "switch": "Switch"
+    },
+    "legend": {
+      "round": "Test run round",
+      "recert": "Recertification",
+      "permanent": "Permanent test cases (PTA 8.4)",
+      "catalogue": "Catalogue approval",
+      "switch": "Switch date"
+    },
+    "status": {
+      "overdue": "overdue"
+    },
+    "due": {
+      "done": "done",
+      "today": "due today",
+      "in_one": "in {{count}} day",
+      "in_other": "in {{count}} days",
+      "overdue_one": "{{count}} day overdue",
+      "overdue_other": "{{count}} days overdue"
+    },
+    "reminders": {
+      "title_one": "{{count}} deadline in the next 7 days",
+      "title_other": "{{count}} deadlines in the next 7 days",
+      "none": "Next deadline",
+      "daysLeft_one": "day",
+      "daysLeft_other": "days",
+      "daysLate_one": "day late",
+      "daysLate_other": "days late"
+    },
+    "history": {
+      "title": "How the test catalogue evolved",
+      "empty": "No events yet.",
+      "baseline": "Starting point V{{version}}: {{count}} test case",
+      "upload": "{{document}} V{{version}} uploaded (valid from {{date}}): {{drafts}} drafts, {{flipped}} test cases to re-approve",
+      "approved": "{{testCase}} approved",
+      "rejected": "{{testCase}} rejected"
+    },
+    "upcoming": "Next deadlines",
+    "all": "All deadlines"
   }
 }

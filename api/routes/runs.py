@@ -12,7 +12,7 @@ from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
 from api.routes.common import ai, kb, repo, test_case
-from engine import intake, runs
+from engine import calendar, intake, runs
 from engine.expected import build_chain, load_scenario
 
 router = APIRouter()
@@ -70,6 +70,7 @@ def start(request: Request, body: RunBody):
         story = ai(request).story(st.test_case) or story
     doc = {"vendor": body.vendor, "story": story, "file_names": [], "plan": _plan(request, st)}
     _save(request, st, doc)
+    calendar.run_started(repo(request), st, body.vendor, date.today())
     return {"rounds": st.last_round, **_public(st, doc)}
 
 
@@ -107,6 +108,7 @@ async def submit(request: Request, run_id: str, files: list[UploadFile] = File(d
         triage = ai(request).triage if ai(request) else None
         repo(request).save_check(receipt["submission_id"], runs.check_so_far(kb(request), st, triage=triage))
     _save(request, st, doc)
+    calendar.round_accepted(repo(request), st, doc.get("vendor"), date.today())
     out = res.model_dump()
     if st.test_case.hidden:  # pass / fail only
         out = {"round": res.round, "ended": res.ended,

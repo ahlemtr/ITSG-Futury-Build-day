@@ -1,0 +1,177 @@
+"""Deadlines per vendor company (HANDOUT agenda 1): what is due when, and how the catalogue evolved.
+
+Stored deadlines come from events: starting a test run opens round 1, every accepted round closes its
+deadline and opens the next one. Rule-set deadlines are derived on read from the knowledge base and the
+companies' certificates, so they always match the versions the platform knows:
+
+- recertification: a certified company re-certifies by the end of its certificate (`certified_until`),
+  under the rule set valid on the day after; done once a run of that company under it passed;
+- permanent test cases (PTA 8.4): certified companies send them every month, due on the last day;
+  done once a submission of that company arrived in the month;
+- ITSG: next year's catalogue approved CATALOGUE_LEAD_DAYS before the switch date; the switch date itself.
+
+The day counts are assumptions until ITSG confirms them (HANDOUT agenda 1, "open").
+"""
+
+from __future__ import annotations
+
+import calendar as cal
+import re
+import unicodedata
+from datetime import date, timedelta
+from typing import Literal
+
+from pydantic import BaseModel
+
+from engine.rules import params as params_mod
+
+ROUND_DAYS = 14  # round N is due 14 days after the insurer reply of round N-1 (round 1: after the start)
+CATALOGUE_LEAD_DAYS = 60  # vendors get two months with the approved catalogue before the switch
+PERMANENT_MONTHS = 3  # this month and the next two
+SOON_DAYS = 7  # due within a week: shown as a reminder
+
+Kind = Literal["round", "recert", "permanent", "catalogue", "switch"]
+
+
+class Company(BaseModel):
+    id: str
+    name: str
+    product: str | None = None
+    certified_until: date | None = None  # None: new software, not certified yet
+    certified_for: str | None = None  # rule set of the current certificate
+
+
+class Deadline(BaseModel):
+    id: str
+    company_id: str | None = None  # None = ITSG
+    kind: Kind
+    due: date
+    opened: date | None = None  # start of the window (round: the day the reply it answers went out)
+    ref: str | None = None  # run id or rule set version
+    params: dict = {}  # round, rounds, test case, version: the UI writes the text
+    done: bool = False
+    done_on: date | None = None
+
+
+def slug(name: str) -> str:
+    plain = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", "-", plain.lower()).strip("-")
+
+
+def company_for(repo, name: str | None) -> Company | None:
+    """The company of a vendor name; a name seen for the first time becomes a new, uncertified company."""
+    if not name:
+        return None
+    c = repo.get_company(slug(name))
+    if c is None:
+        c = Company(id=slug(name), name=name)
+        repo.save_company(c)
+    return c
+
+
+def _round_id(run_id: str, n: int) -> str:
+    return f"round-{run_id[:8]}-{n}"
+
+
+def _open_round(repo, st, company: Company, n: int, opened: date) -> None:
+    repo.save_deadline(Deadline(id=_round_id(st.id, n), company_id=company.id, kind="round", opened=opened,
+                                due=opened + timedelta(days=ROUND_DAYS), ref=st.id,
+                                params={"round": n, "rounds": st.last_round, "test_case": st.test_case.id,
+                                        "hidden": st.test_case.hidden, "version": st.version}))
+
+
+def run_started(repo, st, vendor: str | None, today: date) -> None:
+    if c := company_for(repo, vendor):
+        _open_round(repo, st, c, 1, today)
+
+
+def round_accepted(repo, st, vendor: str | None, today: date) -> None:
+    """Called after `runs.submit`: closes the round just played, opens the next while the run is open."""
+    c = company_for(repo, vendor)
+    if c is None:
+        return
+    d = repo.get_deadline(_round_id(st.id, st.round))
+    if d is not None:
+        repo.save_deadline(d.model_copy(update={"done": True, "done_on": today}))
+    if st.status == "open" and st.round < st.last_round:
+        _open_round(repo, st, c, st.round + 1, today)
+
+
+def _month_end(d: date) -> date:
+    return d.replace(day=cal.monthrange(d.year, d.month)[1])
+
+
+def _add_month(d: date) -> date:
+    return (d.replace(day=1) + timedelta(days=32)).replace(day=1)
+
+
+def derived(kb, repo, today: date) -> list[Deadline]:
+    out: list[Deadline] = []
+    runs = repo.list_runs()
+    subs = repo.list_submissions()
+    for c in repo.list_companies():
+        if c.certified_until is None:
+            continue
+        target = params_mod.version_on(kb, c.certified_until + timedelta(days=1))
+        passed = any(r.get("status") == "passed" and r.get("version") == target and slug(r.get("vendor") or "") == c.id
+                     for r in runs)
+        out.append(Deadline(id=f"recert-{c.id}-{target}", company_id=c.id, kind="recert", due=c.certified_until,
+                            ref=target, params={"version": target}, done=passed))
+        month = today.replace(day=1)
+        for _ in range(PERMANENT_MONTHS):
+            sent = [s.created.date() for s in subs if slug(s.vendor or "") == c.id
+                    and (s.created.year, s.created.month) == (month.year, month.month)]
+            out.append(Deadline(id=f"permanent-{c.id}-{month:%Y-%m}", company_id=c.id, kind="permanent",
+                                opened=month, due=_month_end(month), params={"month": f"{month:%Y-%m}"},
+                                done=bool(sent), done_on=min(sent) if sent else None))
+            month = _add_month(month)
+    drafts = sum(1 for t in repo.list_test_cases() if t.status == "draft")
+    for v in kb.get_versions("VB"):
+        if v.version.startswith("sim") or not v.valid_from or v.valid_from <= today:
+            continue
+        out.append(Deadline(id=f"catalogue-{v.version}", kind="catalogue", ref=v.version,
+                            due=v.valid_from - timedelta(days=CATALOGUE_LEAD_DAYS),
+                            params={"version": v.version, "drafts": drafts}, done=drafts == 0))
+        out.append(Deadline(id=f"switch-{v.version}", kind="switch", ref=v.version, due=v.valid_from,
+                            params={"version": v.version}))
+    return out
+
+
+def status(d: Deadline, today: date) -> str:
+    if d.done:
+        return "done"
+    if d.due < today:
+        return "overdue"
+    return "soon" if (d.due - today).days <= SOON_DAYS else "open"
+
+
+def history(repo) -> list[dict]:
+    """How the catalogue evolved: the baseline, every spec upload and every approval, oldest first."""
+    out = []
+    for e in repo.list_events():
+        if e["kind"] == "baseline":
+            out.append({"at": e["at"], "kind": "baseline", "version": e.get("version"), "tests": e.get("test_cases")})
+        elif e["kind"] == "spec_upload":
+            out.append({"at": e["at"], "kind": "spec_upload", "document": e.get("document"),
+                        "version": e.get("version"), "valid_from": e.get("valid_from"),
+                        "changes": e.get("in_scope"), "drafts": len(e.get("drafts") or []),
+                        "flipped": len(e.get("tests_flipped") or [])})
+    for a in repo.list_approvals():
+        out.append({"at": a["at"], "kind": "approval", "test_case": a["test_case_id"], "decision": a["decision"]})
+    return sorted(out, key=lambda x: x["at"])
+
+
+def view(kb, repo, today: date, company: str | None = None) -> dict:
+    """The calendar of all companies, or of one (id or name) for the vendor view."""
+    companies = repo.list_companies()
+    if company is not None:
+        companies = [c for c in companies if company in (c.id, c.name)]
+    ids = {c.id for c in companies}
+    deadlines = [d for d in repo.list_deadlines() + derived(kb, repo, today)
+                 if d.company_id in ids or (company is None and d.company_id is None)]
+    rows = [d.model_dump(mode="json") | {"status": status(d, today), "days": (d.due - today).days}
+            for d in sorted(deadlines, key=lambda d: (d.due, d.id))]
+    return {"today": today.isoformat(),
+            "companies": [c.model_dump(mode="json") for c in companies],
+            "deadlines": rows,
+            "history": history(repo) if company is None else []}

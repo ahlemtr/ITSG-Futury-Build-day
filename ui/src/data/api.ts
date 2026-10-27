@@ -21,6 +21,7 @@ import type {
 import i18n from "../i18n";
 import { parseText } from "../records/parse";
 import { upsertActivity, withAi, type ActivityStage } from "./aiActivity";
+import type { NavCounts } from "./dataSource";
 import type { ReplyFile, RoundState, RunState } from "./runStore";
 
 const BASE = "/api";
@@ -107,9 +108,20 @@ export function mainSource(sources: string[]): string | undefined {
 
 export const getOverview = () => getJson<OverviewData>("/overview");
 
-export async function getNavCounts(): Promise<{ specChanges: number; advisorQueue: number }> {
-  const [o, queue] = await Promise.all([getOverview(), getJson<unknown[]>("/advisor/queue")]);
-  return { specChanges: o.nextYear && o.nextYear.specChangesInScope > 0 ? 1 : 0, advisorQueue: queue.length };
+export async function getNavCounts(vendor: string): Promise<NavCounts> {
+  const [o, queue, all, own] = await Promise.all([
+    getOverview(),
+    getJson<unknown[]>("/advisor/queue"),
+    getCalendar(),
+    getCalendar(vendor),
+  ]);
+  return {
+    specChanges: o.nextYear && o.nextYear.specChangesInScope > 0 ? 1 : 0,
+    advisorQueue: queue.length,
+    // ITSG: its own pressing deadlines and every overdue one of a vendor; vendor: its own pressing ones
+    calendar: all.deadlines.filter((d) => d.status === "overdue" || (d.company_id === null && isPressing(d))).length,
+    vendorCalendar: own.deadlines.filter(isPressing).length,
+  };
 }
 
 // ---------- Rules (titles for rule ids) ----------
@@ -907,3 +919,46 @@ export const getSubgraph = (label: string, key: string, depth = 1) =>
     `/graph/subgraph?label=${encodeURIComponent(label)}&key=${encodeURIComponent(key)}&depth=${depth}`,
   );
 export const askGraph = (q: string) => getJson<KgAnswer>(`/kg/ask?q=${encodeURIComponent(q)}`);
+
+// ---------- Calendar (deadlines per vendor company) ----------
+
+export type DeadlineKind = "round" | "recert" | "permanent" | "catalogue" | "switch";
+export type DeadlineStatus = "done" | "overdue" | "soon" | "open";
+
+export type Company = {
+  id: string;
+  name: string;
+  product: string | null;
+  certified_until: string | null;
+  certified_for: string | null;
+};
+
+export type Deadline = {
+  id: string;
+  /** null = ITSG */
+  company_id: string | null;
+  kind: DeadlineKind;
+  due: string;
+  opened: string | null;
+  ref: string | null;
+  params: { round?: number; rounds?: number; test_case?: string; hidden?: boolean; version?: string; month?: string; drafts?: number };
+  done: boolean;
+  done_on: string | null;
+  status: DeadlineStatus;
+  /** days from today to the due date, negative when past */
+  days: number;
+};
+
+export type CatalogueEvent =
+  | { at: string; kind: "baseline"; version: string; tests: number }
+  | { at: string; kind: "spec_upload"; document: string; version: string; valid_from: string; changes: number; drafts: number; flipped: number }
+  | { at: string; kind: "approval"; test_case: string; decision: "approved" | "rejected" };
+
+export type CalendarData = { today: string; companies: Company[]; deadlines: Deadline[]; history: CatalogueEvent[] };
+
+/** All companies (ITSG), or one company by id or name (vendor view). */
+export const getCalendar = (company?: string) =>
+  getJson<CalendarData>(company ? `/calendar?company=${encodeURIComponent(company)}` : "/calendar");
+
+/** Needs attention: overdue, or due within a week. */
+export const isPressing = (d: Deadline) => d.status === "overdue" || d.status === "soon";

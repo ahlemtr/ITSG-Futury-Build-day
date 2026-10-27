@@ -9,6 +9,7 @@ import os
 from datetime import date
 from pathlib import Path
 
+from engine.calendar import Company, slug
 from engine.checker import Checker
 from engine.expected import get_case
 from engine.intake import load_files, receive
@@ -29,12 +30,31 @@ VENDORS = {
     "s-legacy-hidden": "Altlohn Classic Demo",
 }
 
+# Vendor companies of the calendar: certified under 13.3 until the end of 2026, except new software in its
+# first certification. Lohnwerk Demo GmbH is the vendor of the vendor view (ui/src/data/runTexts.ts).
+COMPANIES = [
+    ("Lohnwerk Demo GmbH", "Lohnwerk Personal", True),
+    ("Payroll Nord Demo", "Nord Entgelt", True),
+    ("Gehalt 24 Demo", "Gehalt 24", True),
+    ("Lohnbüro West Demo", "West Lohn", True),
+    ("Altlohn Classic Demo", "Altlohn Classic", True),
+    ("Abrechnung Süd Demo", "Süd Abrechnung", False),
+]
+
+
+def seed_companies(repo) -> None:
+    for name, product, certified in COMPANIES:
+        repo.save_company(Company(id=slug(name), name=name, product=product,
+                                  certified_until=date(2026, 12, 31) if certified else None,
+                                  certified_for="13.3" if certified else None))
+
 
 def seed(kb: KnowledgeBase, repo, root: Path | None = None, check: bool = True, triage=None) -> dict[str, int]:
     """With `check`, every seed submission is checked once, so lists and counts show labels right away;
     `triage` (the AI services' triage) fills the AI proposal of unclear deviations."""
     for ref in kb.get_test_cases(include_hidden=True):
         repo.upsert_test_case(get_case(kb, ref.key))
+    seed_companies(repo)
     if os.environ.get("SPEC_BASELINE"):  # the starting point has no submissions; vendors upload live
         return {"test_cases": len(repo.list_test_cases()), "submissions": 0}
     subs = build_submissions(kb)

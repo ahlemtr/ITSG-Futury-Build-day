@@ -131,3 +131,20 @@ CREATE TABLE IF NOT EXISTS kg_event (
     kind  text NOT NULL,               -- baseline / spec_upload / precedent / tests
     doc   jsonb NOT NULL
 );
+
+-- Calendar (HANDOUT agenda 1): vendor companies and the deadlines that come from events (test run rounds).
+-- Rule-set deadlines (recertification, permanent test cases, catalogue, switch date) are derived on read.
+CREATE TABLE IF NOT EXISTS company (
+    id   text PRIMARY KEY,
+    name text NOT NULL,
+    doc  jsonb NOT NULL                -- product, certified_until, certified_for
+);
+
+CREATE TABLE IF NOT EXISTS deadline (
+    id         text PRIMARY KEY,
+    company_id text,                   -- NULL = ITSG
+    kind       text NOT NULL,          -- round
+    due        date NOT NULL,
+    done       boolean NOT NULL DEFAULT false,
+    doc        jsonb NOT NULL
+);

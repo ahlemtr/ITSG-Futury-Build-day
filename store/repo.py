@@ -11,6 +11,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from engine.calendar import Company, Deadline
 from engine.model import Case, CheckResult, CriterionDraft, Deviation
 
 SCHEMA = Path(__file__).resolve().parent / "schema.sql"
@@ -47,6 +48,8 @@ class MemoryRepo:
         self.criteria: dict[str, CriterionDraft] = {}
         self.jobs: dict[str, dict] = {}
         self.events: list[dict] = []
+        self.companies: dict[str, Company] = {}
+        self.deadlines: dict[str, Deadline] = {}
 
     # test cases
     def upsert_test_case(self, tc: Case) -> None:
@@ -66,6 +69,9 @@ class MemoryRepo:
         self.approvals.append({"test_case_id": id_, "approver": approver, "decision": decision,
                                "at": datetime.now(UTC).isoformat()})
         return tc
+
+    def list_approvals(self) -> list[dict]:
+        return list(self.approvals)
 
     # submissions and checks
     def add_submission(self, s: Submission) -> None:
@@ -104,6 +110,9 @@ class MemoryRepo:
     def get_run(self, run_id: str) -> dict | None:
         return self.runs.get(run_id)
 
+    def list_runs(self) -> list[dict]:
+        return list(self.runs.values())
+
     def save_report(self, submission_id: str, signed: dict) -> None:
         self.reports[submission_id] = signed
 
@@ -134,6 +143,27 @@ class MemoryRepo:
 
     def list_events(self) -> list[dict]:
         return list(reversed(self.events))
+
+    # calendar
+    def save_company(self, c: Company) -> None:
+        self.companies[c.id] = c.model_copy(deep=True)
+
+    def get_company(self, id_: str) -> Company | None:
+        c = self.companies.get(id_)
+        return c.model_copy(deep=True) if c else None
+
+    def list_companies(self) -> list[Company]:
+        return sorted((c.model_copy(deep=True) for c in self.companies.values()), key=lambda c: c.name)
+
+    def save_deadline(self, d: Deadline) -> None:
+        self.deadlines[d.id] = d.model_copy(deep=True)
+
+    def get_deadline(self, id_: str) -> Deadline | None:
+        d = self.deadlines.get(id_)
+        return d.model_copy(deep=True) if d else None
+
+    def list_deadlines(self) -> list[Deadline]:
+        return sorted((d.model_copy(deep=True) for d in self.deadlines.values()), key=lambda d: (d.due, d.id))
 
 
 def _j(model: BaseModel | dict) -> str:
@@ -184,6 +214,10 @@ class PgRepo:
         self.conn.execute("INSERT INTO approval (test_case_id, approver, decision) VALUES (%s,%s,%s)",
                           (id_, approver, decision))
         return tc
+
+    def list_approvals(self) -> list[dict]:
+        return [{"test_case_id": t, "approver": a, "decision": d, "at": at.isoformat()}
+                for t, a, d, at in self._all("SELECT test_case_id, approver, decision, at FROM approval ORDER BY at")]
 
     def add_submission(self, s: Submission) -> None:
         self.conn.execute(
@@ -239,6 +273,9 @@ class PgRepo:
         row = self._one("SELECT doc FROM run WHERE id=%s", run_id)
         return row[0] if row else None
 
+    def list_runs(self) -> list[dict]:
+        return [r[0] for r in self._all("SELECT doc FROM run ORDER BY id")]
+
     def save_report(self, submission_id: str, signed: dict) -> None:
         sig = signed["signature"]
         self.conn.execute("""INSERT INTO report VALUES (%s,%s,%s,%s) ON CONFLICT (submission_id)
@@ -279,6 +316,30 @@ class PgRepo:
     def list_events(self) -> list[dict]:
         return [{"at": at.isoformat(), "kind": kind, **doc}
                 for at, kind, doc in self._all("SELECT at, kind, doc FROM kg_event ORDER BY id DESC")]
+
+    def save_company(self, c: Company) -> None:
+        self.conn.execute("""INSERT INTO company VALUES (%s,%s,%s)
+                             ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name, doc=EXCLUDED.doc""",
+                          (c.id, c.name, _j(c)))
+
+    def get_company(self, id_: str) -> Company | None:
+        row = self._one("SELECT doc FROM company WHERE id=%s", id_)
+        return Company.model_validate(row[0]) if row else None
+
+    def list_companies(self) -> list[Company]:
+        return [Company.model_validate(r[0]) for r in self._all("SELECT doc FROM company ORDER BY name")]
+
+    def save_deadline(self, d: Deadline) -> None:
+        self.conn.execute("""INSERT INTO deadline VALUES (%s,%s,%s,%s,%s,%s)
+                             ON CONFLICT (id) DO UPDATE SET due=EXCLUDED.due, done=EXCLUDED.done, doc=EXCLUDED.doc""",
+                          (d.id, d.company_id, d.kind, d.due, d.done, _j(d)))
+
+    def get_deadline(self, id_: str) -> Deadline | None:
+        row = self._one("SELECT doc FROM deadline WHERE id=%s", id_)
+        return Deadline.model_validate(row[0]) if row else None
+
+    def list_deadlines(self) -> list[Deadline]:
+        return [Deadline.model_validate(r[0]) for r in self._all("SELECT doc FROM deadline ORDER BY due, id")]
 
 
 def get_repo():

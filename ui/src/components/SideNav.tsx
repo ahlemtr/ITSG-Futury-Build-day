@@ -13,6 +13,7 @@ const startsWith = (prefix: string) => (p: string) => p === prefix || p.startsWi
 
 const ITSG_ITEMS: Item[] = [
   { to: "/", key: "overview", match: (p) => p === "/" },
+  { to: "/calendar", key: "calendar", count: "calendar", match: startsWith("/calendar") },
   { to: "/spec-changes", key: "specChanges", count: "specChanges", match: startsWith("/spec-changes") },
   { to: "/test-catalogue", key: "testCatalogue", match: startsWith("/test-catalogue") },
   { to: "/submissions", key: "submissions", match: startsWith("/submissions") },
@@ -23,6 +24,7 @@ const ITSG_ITEMS: Item[] = [
 
 const VENDOR_ITEMS: Item[] = [
   { to: "/vendor", key: "myTests", match: (p) => p === "/vendor" || p.startsWith("/vendor/runs") },
+  { to: "/vendor/calendar", key: "calendar", count: "vendorCalendar", match: startsWith("/vendor/calendar") },
   { to: "/vendor/results", key: "results", match: startsWith("/vendor/results") },
   { to: "/vendor/reports", key: "vendorReports", match: startsWith("/vendor/reports") },
 ];
@@ -35,8 +37,9 @@ export function SideNav() {
   const advisor = useAdvisorState();
 
   useEffect(() => {
-    getNavCounts().then(setCounts).catch(() => setCounts(null));
-  }, []);
+    // reloaded per screen, so a submitted round or an approval updates the deadline count
+    getNavCounts(DEMO_VENDOR).then(setCounts).catch(() => setCounts(null));
+  }, [pathname]);
 
   const items = view === "vendor" ? VENDOR_ITEMS : ITSG_ITEMS;
 

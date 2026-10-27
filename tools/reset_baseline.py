@@ -15,7 +15,7 @@ import os
 import shutil
 from pathlib import Path
 
-TABLES = ["kg_event", "ingest_job", "criterion_draft", "approval", "report", "run_step", "run", "check_result", "verdict", "submission_file",
+TABLES = ["deadline", "company", "kg_event", "ingest_job", "criterion_draft", "approval", "report", "run_step", "run", "check_result", "verdict", "submission_file",
           "submission", "expected_field", "test_step", "test_case"]
 
 
