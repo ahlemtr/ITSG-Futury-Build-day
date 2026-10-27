@@ -309,3 +309,38 @@ def test_transport_api_error_degrades():
     t, _ = _transport([_bad_request("model not found")])
     with pytest.raises(LLMUnavailable):
         t([], [], {}, "x")
+
+
+# ---------------------------------------------------------------- chat assistant (HANDOUT agenda 4)
+
+
+def test_chat_retrieval_has_graph_context(kb):
+    from llm.agents import chat
+
+    ctx = chat.retrieve(kb, "Lücke von genau 6 Monaten zwischen zwei Arbeitsunfähigkeiten")
+    assert ctx and all({"key", "snippet", "rules", "changes", "test_cases"} <= set(c) for c in ctx)
+    assert any(c["rules"] for c in ctx)
+
+
+def test_chat_answer_must_cite_real_passages(kb, tmp_path):
+    from llm.agents import chat
+
+    real = chat.retrieve(kb, "Vorerkrankung 41")[0]["key"]
+    seen = []
+
+    def handler(messages):
+        seen.append(user_json(messages)["question"] if not seen else None)
+        rejected = any(m["role"] == "user" and "rejected" in str(m["content"]) for m in messages)
+        if not rejected:  # first try cites a passage that does not exist
+            return content({"answer": "Siehe [VB@13.3#99.99].", "citations": ["VB@13.3#99.99"]})
+        return content({"answer": f"Die 41 fragt Vorerkrankungen ab [{real}].", "citations": []})
+
+    ai, _ = ai_with(kb, {"ChatAnswer": handler}, tmp_path)
+    out = ai.chat("Wozu dient die 41?", [], "de", chat.retrieve(kb, "Wozu dient die 41?"))
+    assert out is not None and out.citations == [real] and seen[0] == "Wozu dient die 41?"
+
+
+def test_chat_api_without_ai_returns_sources_only(fresh_kb, tmp_path):
+    client = TestClient(create_app(kb=fresh_kb, repo=MemoryRepo(), ai=False, data_root=tmp_path))
+    r = client.post("/chat", json={"question": "Wann endet die Entgeltfortzahlung?"}).json()
+    assert r["answer"] is None and r["citations"] == [] and r["context"]

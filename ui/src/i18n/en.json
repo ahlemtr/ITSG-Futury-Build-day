@@ -462,7 +462,8 @@
       "specDiff": "AI assesses the impact on the test cases",
       "story": "AI writes the task",
       "check": "Check with AI assessment",
-      "report": "AI explains the deviations"
+      "report": "AI explains the deviations",
+      "chat": "Assistant searches and answers"
     }
   },
   "kg": {
@@ -599,5 +600,28 @@
         "store": "Seed the database again"
       }
     }
+  },
+  "chat": {
+    "open": "Assistant",
+    "title": "Assistant",
+    "close": "Close",
+    "clear": "Start over",
+    "info": "Answers from the knowledge graph: passages of the Verfahrensbeschreibung, Grundsätze, examples and Rundschreiben, with rules and test cases. Every statement names its source; no source, no answer.",
+    "empty": "Ask about the documents, rules and test cases.",
+    "examples": {
+      "q1": "When must a prior illness request (41) be sent?",
+      "q2": "What changes in V13.4 for the six-month gap?",
+      "q3": "What goes into the field 12-MONATSFRIST-AB?"
+    },
+    "label": "Your question",
+    "placeholder": "Type a question, Enter to send",
+    "send": "Send",
+    "thinking": "Searching the knowledge graph …",
+    "noAnswer": "No answer with a source. These passages match best:",
+    "sources_one": "{{count}} source",
+    "sources_other": "{{count}} sources",
+    "rules": "rules {{rules}}",
+    "tests": "test cases {{tests}}",
+    "error": "The question could not be answered: {{error}}"
   }
 }

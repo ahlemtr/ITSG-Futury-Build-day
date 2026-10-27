@@ -6,6 +6,7 @@ import { formatDate } from "../format";
 import { LANGUAGES, setLanguage } from "../i18n";
 import { useTopBarContent } from "./TopBarContext";
 import { UserMenu } from "./UserMenu";
+import { ChatButton } from "./ChatPanel";
 import { useView, type View } from "./useView";
 
 const VIEWS: { view: View; home: string }[] = [
@@ -43,6 +44,7 @@ export function TopBar() {
       <span className="topbar-context">
         {screenContext ?? (sets || view === "vendor" ? <Trans i18nKey={defaultContext} values={contextValues} components={{ strong: <strong /> }} /> : null)}
       </span>
+      <ChatButton />
       <div className="segmented" role="group" aria-label={t("app.languageSwitch")}>
         {LANGUAGES.map((lang) => (
           <button

@@ -3,6 +3,7 @@ import { TopBar } from "./components/TopBar";
 import { TopBarProvider } from "./components/TopBarContext";
 import { SideNav } from "./components/SideNav";
 import { AiOverlay } from "./components/AiOverlay";
+import { ChatPanel } from "./components/ChatPanel";
 import { ReportScreen } from "./screens/ReportScreen";
 import { ReportsScreen } from "./screens/ReportsScreen";
 import { KnowledgeGraphScreen } from "./screens/KnowledgeGraphScreen";
@@ -24,6 +25,7 @@ export function App() {
         <TopBar />
         <SideNav />
         <AiOverlay />
+        <ChatPanel />
         <main className="main">
           <Routes>
             <Route path="/" element={<OverviewScreen />} />

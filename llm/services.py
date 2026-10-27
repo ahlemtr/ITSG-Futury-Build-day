@@ -12,7 +12,7 @@ from engine.model import Case, CheckResult, CriterionReview, Deviation
 from kg.interface import KnowledgeBase
 from llm import explain as explain_mod
 from llm import story as story_mod
-from llm.agents import calculation_analysis, change_analysis, spec_update
+from llm.agents import calculation_analysis, change_analysis, chat, spec_update
 from llm.agents import check as check_agent
 from llm.client import LLMClient, LLMInvalid, LLMUnavailable
 from llm.extract import LLMExtractor
@@ -90,6 +90,10 @@ class AIServices:
     def report_draft(self, res: CheckResult) -> dict | None:
         out = self._safe(check_agent.report_draft, self.client, self.tools, res, self.cites_ok)
         return out.model_dump() if out else None
+
+    # chat assistant (HANDOUT agenda 4): None = no cited answer, the caller shows the retrieval only
+    def chat(self, question: str, history: list[dict], language: str, context: list[dict]):
+        return self._safe(chat.answer, self.client, self.tools, question, history, language, context, self.cites_ok)
 
     # P8.2
     def criteria(self, document: str, version: str, section: str, decided: dict[str, CriterionReview] | None = None):

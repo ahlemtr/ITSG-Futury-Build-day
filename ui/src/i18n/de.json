@@ -462,7 +462,8 @@
       "specDiff": "KI bewertet die Auswirkungen auf die Testfälle",
       "story": "KI schreibt die Aufgabe",
       "check": "Prüfung mit KI-Einschätzung",
-      "report": "KI erklärt die Abweichungen"
+      "report": "KI erklärt die Abweichungen",
+      "chat": "Assistent sucht und antwortet"
     }
   },
   "kg": {
@@ -599,5 +600,28 @@
         "store": "Datenbank neu befüllen"
       }
     }
+  },
+  "chat": {
+    "open": "Assistent",
+    "title": "Assistent",
+    "close": "Schließen",
+    "clear": "Neu beginnen",
+    "info": "Antwortet aus dem Wissensgraphen: Passagen der Verfahrensbeschreibung, Grundsätze, Beispiele und Rundschreiben, mit Regeln und Testfällen. Jede Aussage nennt ihre Quelle; ohne Quelle keine Antwort.",
+    "empty": "Fragen Sie zu den Dokumenten, Regeln und Testfällen.",
+    "examples": {
+      "q1": "Wann ist eine Vorerkrankungsanfrage (41) zu senden?",
+      "q2": "Was ändert sich in V13.4 bei der Lücke von sechs Monaten?",
+      "q3": "Was steht im Feld 12-MONATSFRIST-AB?"
+    },
+    "label": "Ihre Frage",
+    "placeholder": "Frage eingeben, Enter zum Senden",
+    "send": "Senden",
+    "thinking": "Sucht im Wissensgraphen …",
+    "noAnswer": "Keine belegte Antwort. Diese Passagen passen am besten:",
+    "sources_one": "{{count}} Quelle",
+    "sources_other": "{{count}} Quellen",
+    "rules": "Regeln {{rules}}",
+    "tests": "Testfälle {{tests}}",
+    "error": "Die Frage konnte nicht beantwortet werden: {{error}}"
   }
 }
