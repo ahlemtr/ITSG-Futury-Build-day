@@ -12,7 +12,7 @@ from pathlib import Path
 
 from kg.common import BUILD_DIR, env
 
-MAX_CHARS = 24_000
+MAX_CHARS = 12_000  # German spec text runs about 2.5 characters per token; the model takes 8192 tokens
 BATCH = 100
 CACHE = BUILD_DIR / "embeddings.jsonl"
 
