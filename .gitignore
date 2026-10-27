@@ -31,3 +31,6 @@ HANDOVER.md
 !.vscode/tasks.json
 .DS_Store
 Thumbs.db
+
+# Sample vendor uploads (round 1 = ITSG's TEEL0 file): generate with python -m tools.make_vendor_uploads
+samples/vendor_uploads/
