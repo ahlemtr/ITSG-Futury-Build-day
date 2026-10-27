@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Living Knowledge Graph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600&family=Fira+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1c2430; --muted:#5b6573; --ground:#eef2f6; --red:#d50032; --red-dark:#a8002a;
+    --red-faint:#fbeaee; --border:#dde3ea; --cond:"Fira Sans Condensed", "Segoe UI", sans-serif; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; background:var(--ground); color:var(--ink);
+    font-family:"Fira Sans", "Segoe UI", system-ui, sans-serif; overflow:hidden; }
+  #stage { position:fixed; inset:0; }
+  svg { width:100%; height:100%; display:block; }
+  svg text { font-family:"Fira Sans", "Segoe UI", sans-serif; }
+  svg .cond { font-family:var(--cond); font-weight:700; }
+
+  .station { transition: opacity .5s; }
+  .station rect.card { fill:#fff; stroke:var(--border); stroke-width:1.2; transition: stroke .3s, fill .3s; }
+  .station.future { opacity:.32; }
+  .station.current rect.card { stroke:var(--red); stroke-width:2.4; fill:var(--red-faint); }
+  .station.work rect.card { animation: work .7s ease-out; }
+  @keyframes work { 0% { stroke-width:7; } 100% { stroke-width:2.4; } }
+
+  .conn { fill:none; stroke:#b3bdc9; stroke-width:1.6; transition: stroke .3s, opacity .5s; }
+  .conn.future { opacity:.3; }
+  .conn.current { stroke:var(--red); stroke-width:2.2; stroke-dasharray:7 7; animation: flow .8s linear infinite; }
+  @keyframes flow { to { stroke-dashoffset:-14; } }
+  .connlab { fill:var(--muted); transition: opacity .5s, fill .3s; }
+  .connlab.future { opacity:.3; }
+  .connlab.current { fill:var(--red-dark); }
+
+  .link { fill:none; stroke:#c4cdd8; stroke-width:1.4; }
+  .link.hl { stroke:var(--red); stroke-width:2.6; }
+  .nlabel { font-size:13px; font-weight:600; fill:var(--ink); paint-order:stroke; stroke:#f8fafc; stroke-width:4px;
+    stroke-linejoin:round; }
+  .pill { transition: opacity .5s; }
+
+  #top { position:fixed; left:0; right:0; top:0; height:7vh; background:#fff; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; padding:0 3.2vw; gap:1.2vw; z-index:2; }
+  #top .logo { font:italic 700 2.1vh/1 var(--cond); color:var(--red); letter-spacing:.02em; }
+  #top .app { font:600 1.8vh/1 "Fira Sans", sans-serif; }
+  #top .ctx { margin-left:auto; font:500 1.6vh/1 "Fira Sans", sans-serif; color:var(--muted); }
+  #top .ctx b { color:var(--ink); }
+  /* soft band behind the title: zoomed-in content slides under it instead of colliding with the text */
+  #fade { position:fixed; left:0; right:0; top:7vh; height:16vh; pointer-events:none;
+    background:linear-gradient(var(--ground) 72%, rgba(238,242,246,0)); }
+  #head { position:fixed; left:3.2vw; right:3.2vw; top:9vh; display:flex; align-items:flex-end; pointer-events:none; }
+  #head .t { font:700 4.4vh/1.05 var(--cond); }
+  #head .num { margin-left:auto; text-align:right; }
+  #head .n { font:700 6.4vh/1 var(--cond); color:var(--red); }
+  #head .c { font:500 1.7vh/1.3 "Fira Sans", sans-serif; color:var(--muted); }
+  #dots { position:fixed; left:50%; bottom:2vh; transform:translateX(-50%); display:flex; gap:10px; }
+  #dots i { width:8px; height:8px; border-radius:50%; background:#c3ccd7; transition: background .3s, transform .3s; }
+  #dots i.on { background:var(--red); transform:scale(1.35); }
+  #hint { position:fixed; right:3.2vw; bottom:2vh; font:400 12px/1.4 "Fira Sans", sans-serif; color:var(--muted);
+    transition: opacity .6s; }
+  #hint.gone { opacity:0; }
+</style>
+</head>
+<body>
+<!-- HyperFrames composition root, so the same page can be rendered to an MP4 -->
+
+<div id="root" data-composition-id="architecture" data-start="0" data-duration="63" data-fps="30"
+  data-width="1920" data-height="1080" data-layout-allow-overflow data-layout-allow-overlap>
+<div id="stage"><svg id="svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet"></svg></div>
+<div id="top"><span class="logo">ITSG</span><span class="app">EEL Review Assistant</span>
+  <span class="ctx">Architecture · <b id="count"></b></span></div>
+<div id="fade"></div>
+<div id="head"><div class="t" id="title"></div><div class="num"><div class="n" id="num"></div><div class="c" id="cap"></div></div></div>
+<div id="dots"></div>
+<div id="hint">→ / space next · ← back · P autoplay · F full screen</div>
+</div>
+<script>
+// ---------------------------------------------------------------- basics
+const NS = "http://www.w3.org/2000/svg", svg = document.getElementById("svg");
+const mk = (tag, attrs, parent, text) => { const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text;
+  if (parent) parent.appendChild(e); return e; };
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const back = t => { const c = 1.7; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+
+// ---------------------------------------------------------------- clock: real time in the browser, virtual time
+// when HyperFrames records the video (headless Chrome under automation, or ?video), so every frame is a
+// function of the seek time
+const VIDEO = !!window.HF_VIDEO || new URLSearchParams(location.search).has("video") || navigator.webdriver === true;
+let vt = 0, vRafs = [];
+const vTimers = [];
+const now = () => VIDEO ? vt : performance.now();
+const raf = cb => VIDEO ? vRafs.push(cb) : requestAnimationFrame(cb);
+const later = (cb, ms) => VIDEO ? vTimers.push({ at: vt + ms, cb }) : setTimeout(cb, ms);
+
+const CENTER = { x: 800, y: 505 }, RADIUS = 225;
+const TYPES = {
+  doc: { r: 15, c: "#5b6573", name: "Document" }, passage: { r: 8, c: "#1f5fad", name: "Passage" },
+  change: { r: 11, c: "#b42318", name: "Change" }, rule: { r: 13, c: "#1c2430", name: "Rule" },
+  param: { r: 11, c: "#9a5b00", name: "Parameter" }, value: { r: 7, c: "#c58a2b", name: "Value" },
+  test: { r: 12, c: "#1e7b45", name: "Test case" }, precedent: { r: 12, c: "#6b2fa3", name: "Precedent" },
+};
+
+// ---------------------------------------------------------------- layers
+const defs = mk("defs", {}, svg);
+const glow = mk("filter", { id: "glow", x: "-200%", y: "-200%", width: "500%", height: "500%" }, defs);
+mk("feGaussianBlur", { stdDeviation: "5", result: "b" }, glow);
+const fm = mk("feMerge", {}, glow); mk("feMergeNode", { in: "b" }, fm); mk("feMergeNode", { in: "SourceGraphic" }, fm);
+const soft = mk("radialGradient", { id: "soft" }, defs);
+mk("stop", { offset: "0%", "stop-color": "#ffffff" }, soft); mk("stop", { offset: "100%", "stop-color": "#f3f6f9" }, soft);
+for (const [id, c] of [["ah", "#b3bdc9"], ["ahr", "#d50032"]]) {
+  const m = mk("marker", { id, viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "6", markerHeight: "6", orient: "auto-start-reverse" }, defs);
+  mk("path", { d: "M0 0 L10 5 L0 10 z", fill: c }, m);
+}
+const L = {}; for (const k of ["ring", "conn", "links", "nodes", "stations", "pills", "parts"]) L[k] = mk("g", {}, svg);
+
+// graph ring + title
+mk("circle", { cx: CENTER.x, cy: CENTER.y, r: RADIUS + 38, fill: "url(#soft)", stroke: "#dde3ea", "stroke-width": 1.2 }, L.ring);
+// title and tag sit above the ring, so nodes near the top never collide with them
+const KT = CENTER.y - RADIUS - 64;
+mk("text", { class: "cond", x: CENTER.x - 40, y: KT, "text-anchor": "middle", "font-size": 22, fill: "#1c2430" }, L.ring, "Knowledge graph");
+const kgChip = mk("g", {}, L.ring);
+mk("rect", { x: CENTER.x + 50, y: KT - 17, width: 68, height: 22, rx: 4, fill: "#fff", stroke: "#dde3ea" }, kgChip);
+mk("circle", { cx: CENTER.x + 62, cy: KT - 6, r: 4, fill: "#8a94a3" }, kgChip);
+mk("text", { x: CENTER.x + 71, y: KT - 1, "font-size": 13, "font-weight": 500, fill: "#1c2430" }, kgChip, "Neo4j");
+
+// legend + stack
+const leg = mk("g", {}, L.ring);
+Object.values(TYPES).forEach((t, i) => {
+  const x = 80 + (i % 2) * 130, y = 625 + Math.floor(i / 2) * 24;
+  mk("circle", { cx: x + 6, cy: y - 4, r: 6, fill: t.c }, leg);
+  mk("text", { x: x + 18, y, "font-size": 13, fill: "#5b6573" }, leg, t.name);
+});
+mk("text", { x: 80, y: 730, "font-size": 13, fill: "#5b6573" }, leg, "Stack: React · FastAPI · Neo4j ·");
+mk("text", { x: 80, y: 748, "font-size": 13, fill: "#5b6573" }, leg, "PostgreSQL · OpenAI");
+
+// ---------------------------------------------------------------- stations
+const SW = 240, SH = 66;
+const ST = {
+  upload:   { x: 70,   y: 215, title: "Spec upload",     tag: "ITSG view",            first: 2 },
+  ingest:   { x: 70,   y: 405, title: "Ingest",          tag: "chunk · embed · diff", first: 2 },
+  ai:       { x: 1290, y: 215, title: "AI analysis",     tag: "OpenAI · RAG",         first: 3 },
+  engine:   { x: 1290, y: 405, title: "Rules engine",    tag: "no AI maths",          first: 4 },
+  approval: { x: 1290, y: 595, title: "Test catalogue",  tag: "ITSG approves",        first: 4 },
+  vendor:   { x: 1290, y: 785, title: "Vendor response", tag: "uploaded file",        first: 5 },
+  // attach: where on the top edge the graph arrow lands, clear of the result pills drawn above the card
+  checker:  { x: 940,  y: 785, title: "Checker",         tag: "field by field",       first: 5, attach: .8 },
+  advisor:  { x: 420,  y: 785, title: "Advisor",         tag: "human decision",       first: 6, attach: .75 },
+};
+for (const [k, s] of Object.entries(ST)) {
+  s.g = mk("g", { class: "station" }, L.stations);
+  mk("rect", { class: "card", x: s.x, y: s.y, width: SW, height: SH, rx: 6 }, s.g);
+  mk("text", { class: "cond", x: s.x + 18, y: s.y + 28, "font-size": 21, fill: "#1c2430" }, s.g, s.title);
+  const tw = s.tag.length * 7.2 + 30;
+  mk("rect", { x: s.x + 18, y: s.y + 37, width: tw, height: 21, rx: 4, fill: "#fff", stroke: "#dde3ea" }, s.g);
+  mk("circle", { cx: s.x + 30, cy: s.y + 47.5, r: 4, fill: "#8a94a3" }, s.g);
+  mk("text", { x: s.x + 40, y: s.y + 52, "font-size": 12.5, "font-weight": 500, fill: "#1c2430" }, s.g, s.tag);
+  s.c = [s.x + SW / 2, s.y + SH / 2];
+}
+const stP = k => () => ST[k].c;
+
+// small result pills next to stations
+const PILL = { ai: [1290, 304], approval: [1290, 585], checker: [940, 773], advisor: [420, 773] };
+const pills = {};
+function pill(k, text, color = "#1e7b45", bg = "#e6f4ea") {
+  const [x, y] = PILL[k]; const w = text.length * 7.6 + 26;
+  const g = mk("g", { class: "pill", opacity: 0 }, L.pills);
+  mk("rect", { x, y: y - 20, width: w, height: 24, rx: 4, fill: bg }, g);
+  mk("text", { x: x + 13, y: y - 3.5, "font-size": 13, "font-weight": 600, fill: color }, g, text);
+  raf(() => g.setAttribute("opacity", 1)); pills[k] = g;
+}
+
+// ---------------------------------------------------------------- graph model + physics
+let nodes = [], links = [], byId = {};
+function addNode(id, type, o = {}) {
+  const t = TYPES[type]; let near = o.near;
+  if (typeof near === "string") near = [byId[near].x, byId[near].y];
+  near = near || [CENTER.x, CENTER.y];
+  const n = { id, type, r: t.r, c: t.c, label: o.label, x: near[0] + (rnd() - .5) * 40, y: near[1] + (rnd() - .5) * 40,
+    vx: 0, vy: 0, born: now(), draft: !!o.draft, hidden: !!o.hidden, hl: 0, pull: o.pull };
+  n.g = mk("g", {}, L.nodes);
+  n.halo = mk("circle", { r: n.r + 9, fill: "#d50032", opacity: 0 }, n.g);
+  n.core = mk("circle", { r: n.r, "stroke-width": 2.5 }, n.g);
+  if (n.label) n.text = mk("text", { class: "nlabel", "text-anchor": "middle", y: n.r + 17 }, n.g, n.label);
+  style(n); nodes.push(n); byId[id] = n; return n;
+}
+function style(n) {
+  n.core.setAttribute("fill", n.draft ? "#ffffff" : n.c);
+  n.core.setAttribute("stroke", n.draft ? n.c : "#ffffff");
+  n.core.setAttribute("stroke-dasharray", n.hidden ? "4 3" : "none");
+  if (n.hidden && !n.draft) { n.core.setAttribute("stroke", n.c); n.core.setAttribute("fill", "#ffffff"); }
+}
+function link(a, b) {
+  const l = { a: byId[a], b: byId[b], hl: 0, born: now() };
+  l.len = l.a.r + l.b.r + 38 + (l.a.type === "doc" || l.b.type === "doc" ? 22 : 0);
+  l.el = mk("path", { class: "link" }, L.links); links.push(l); return l;
+}
+const findLink = (a, b) => links.find(l => (l.a.id === a && l.b.id === b) || (l.a.id === b && l.b.id === a));
+
+function physics() {
+  for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
+    const a = nodes[i], b = nodes[j]; let dx = b.x - a.x, dy = b.y - a.y; const d2 = Math.max(dx * dx + dy * dy, 30), d = Math.sqrt(d2);
+    let f = 1500 * (a.r + b.r) / 22 / d2; dx /= d; dy /= d;
+    // labels need room: keep labelled nodes well apart so their text never overlaps
+    const minD = a.label && b.label ? 86 : a.label || b.label ? 54 : 0;
+    if (d < minD) f += (minD - d) * .22;
+    a.vx -= dx * f; a.vy -= dy * f; b.vx += dx * f; b.vy += dy * f;
+  }
+  for (const l of links) { const a = l.a, b = l.b; let dx = b.x - a.x, dy = b.y - a.y; const d = Math.max(Math.hypot(dx, dy), 1);
+    const f = .035 * (d - l.len); dx /= d; dy /= d; a.vx += dx * f; a.vy += dy * f; b.vx -= dx * f; b.vy -= dy * f; }
+  for (const n of nodes) {
+    n.vx += (CENTER.x - n.x) * .0016; n.vy += (CENTER.y - n.y) * .0016;
+    if (n.pull) { n.vx += (n.pull[0] - n.x) * .012; n.vy += (n.pull[1] - n.y) * .012; }
+    const dx = n.x - CENTER.x, dy = n.y - CENTER.y, d = Math.hypot(dx, dy);
+    if (d > RADIUS) { n.vx -= dx / d * (d - RADIUS) * .05; n.vy -= dy / d * (d - RADIUS) * .05; }
+    n.vx *= .8; n.vy *= .8; n.x += n.vx; n.y += n.vy;
+  }
+}
+function curve(ax, ay, bx, by, bend) {
+  const mx = (ax + bx) / 2, my = (ay + by) / 2, dx = bx - ax, dy = by - ay;
+  return [mx - dy * bend, my + dx * bend];
+}
+
+// ---------------------------------------------------------------- connectors: every station stays wired
+const anchor = {};
+const CONN = [
+  { id: "upload-ingest", from: () => [ST.upload.c[0], ST.upload.y + SH], to: () => [ST.ingest.c[0], ST.ingest.y], first: 2, beats: [2] },
+  { id: "approval-vendor", from: () => [ST.approval.c[0], ST.approval.y + SH], to: () => [ST.vendor.c[0], ST.vendor.y], first: 5, beats: [5],
+    label: "tests published to vendors", labelAt: () => [ST.approval.c[0] - 12, ST.approval.y + SH + 66] },
+  { id: "vendor-checker", from: () => [ST.vendor.x, ST.vendor.c[1]], to: () => [ST.checker.x + SW, ST.checker.c[1]], first: 5, beats: [5] },
+  { id: "checker-advisor", from: () => [ST.checker.x, ST.checker.c[1]], to: () => [ST.advisor.x + SW, ST.advisor.c[1]], first: 6, beats: [6] },
+  // dir: "in" = station writes into the graph, "out" = graph feeds the station, "both" = reads and writes
+  ...["ingest", "ai", "engine", "approval", "checker", "advisor"].map(k => ({ id: k, station: k, first: ST[k].first,
+    beats: { ingest: [2], ai: [3, 6], engine: [4], approval: [4], checker: [5, 6], advisor: [6, 7] }[k],
+    dir: { ingest: "in", ai: "both", engine: "in", approval: "out", checker: "out", advisor: "in" }[k] })),
+];
+for (const c of CONN) {
+  c.el = mk("path", { class: "conn" }, L.conn);
+  if (c.label) { const [x, y] = c.labelAt();
+    c.lab = mk("text", { x, y, "text-anchor": "end", "font-size": 13, "font-weight": 500, class: "connlab" }, L.conn, c.label); }
+}
+function edgePoint(s, tx, ty) {
+  const [cx, cy] = s.c;
+  if (s.attach && ty < s.y) return [s.x + SW * s.attach, s.y]; // node above: always land on the top edge
+  if (tx > s.x + SW) return [s.x + SW, cy];
+  if (tx < s.x) return [s.x, cy];
+  return [s.attach ? s.x + SW * s.attach : cx, ty < cy ? s.y : s.y + SH];
+}
+
+// ---------------------------------------------------------------- particles
+let parts = [];
+const SLOW = 1.45; // stretches every particle, pause and highlight; raise it for a calmer pace
+function particle(from, to, ms = 1000) {
+  if (FAST) return Promise.resolve();
+  ms *= SLOW;
+  return new Promise(res => {
+    const p = { from, to, ms, t0: now(), res, tok: token, bend: (rnd() - .5) * .3 };
+    p.trail = [3, 2, 1].map(i => mk("circle", { r: 3 + i, fill: "#d50032", opacity: .12 * i }, L.parts));
+    p.dot = mk("circle", { r: 8, fill: "#d50032", filter: "url(#glow)" }, L.parts);
+    parts.push(p);
+  });
+}
+const nodeP = id => () => [byId[id].x, byId[id].y];
+
+// ---------------------------------------------------------------- render loop
+function frame(now) {
+  physics();
+  for (const n of nodes) {
+    const k = Math.min(1, Math.max(0, (now - n.born) / (550 * SLOW))), s = FAST ? 1 : back(k);
+    n.g.setAttribute("transform", `translate(${n.x},${n.y}) scale(${Math.max(0, s)})`);
+    n.halo.setAttribute("opacity", n.hl > now ? .22 + .12 * Math.sin(now / 120) : 0);
+  }
+  for (const l of links) {
+    const [qx, qy] = curve(l.a.x, l.a.y, l.b.x, l.b.y, .12);
+    l.el.setAttribute("d", `M${l.a.x} ${l.a.y} Q${qx} ${qy} ${l.b.x} ${l.b.y}`);
+    l.el.classList.toggle("hl", l.hl > now);
+    l.el.setAttribute("opacity", FAST ? 1 : Math.min(1, Math.max(0, (now - l.born) / (500 * SLOW))));
+  }
+  for (const c of CONN) {
+    let a, b, n;
+    if (c.station) { n = byId[anchor[c.station]]; if (!n) continue; const s = ST[c.station];
+      b = [n.x, n.y]; a = edgePoint(s, n.x, n.y); }
+    else { a = c.from(); b = c.to(); }
+    const horiz = Math.abs(b[0] - a[0]) > Math.abs(b[1] - a[1]);
+    const c1 = horiz ? [(a[0] + b[0]) / 2, a[1]] : [a[0], (a[1] + b[1]) / 2], c2 = horiz ? [(a[0] + b[0]) / 2, b[1]] : [b[0], (a[1] + b[1]) / 2];
+    if (n) { // stop just outside the node so the arrowhead stays visible
+      let ux = b[0] - c2[0], uy = b[1] - c2[1], d = Math.hypot(ux, uy);
+      if (d < 1) { ux = b[0] - a[0]; uy = b[1] - a[1]; d = Math.hypot(ux, uy) || 1; }
+      b = [b[0] - ux / d * (n.r + 7), b[1] - uy / d * (n.r + 7)];
+    }
+    c.el.setAttribute("d", `M${a[0]} ${a[1]} C${c1[0]} ${c1[1]} ${c2[0]} ${c2[1]} ${b[0]} ${b[1]}`);
+    const head = c.el.classList.contains("current") ? "url(#ahr)" : "url(#ah)", dir = c.dir || "in";
+    c.el.setAttribute("marker-end", dir !== "out" ? head : "");
+    c.el.setAttribute("marker-start", dir !== "in" ? head : "");
+  }
+  parts = parts.filter(p => {
+    if (p.tok !== token) { p.dot.remove(); p.trail.forEach(t => t.remove()); p.res(); return false; }
+    const k = Math.min(1, Math.max(0, (now - p.t0) / p.ms)), a = p.from(), b = p.to(), q = curve(a[0], a[1], b[0], b[1], p.bend);
+    const at = t => { const u = 1 - t; return [u * u * a[0] + 2 * u * t * q[0] + t * t * b[0], u * u * a[1] + 2 * u * t * q[1] + t * t * b[1]]; };
+    const e = ease(k), [x, y] = at(e); p.dot.setAttribute("cx", x); p.dot.setAttribute("cy", y);
+    p.trail.forEach((t, i) => { const [tx, ty] = at(Math.max(0, e - (i + 1) * .035)); t.setAttribute("cx", tx); t.setAttribute("cy", ty); });
+    if (k >= 1) { p.dot.remove(); p.trail.forEach(t => t.remove()); p.res(); return false; }
+    return true;
+  });
+  raf(frame);
+}
+if (!VIDEO) raf(frame);
+
+// ---------------------------------------------------------------- beat helpers
+let token = 0, FAST = false;
+const CANCEL = {};
+function sleep(ms) { if (FAST) return Promise.resolve(); const tok = token;
+  return new Promise((res, rej) => later(() => tok === token ? res() : rej(CANCEL), ms * SLOW)); }
+async function go2(p) { const tok = token; await p; if (tok !== token) throw CANCEL; }
+function hl(ids, ms = 2600) { const t = now() + (FAST ? 0 : ms * SLOW); for (const id of ids) byId[id].hl = t; }
+function hlLink(a, b, ms = 2600) { const l = findLink(a, b); if (l) l.hl = now() + (FAST ? 0 : ms * SLOW); }
+function work(k) { if (FAST) return; const g = ST[k].g; g.classList.remove("work"); void g.getBBox(); g.classList.add("work"); }
+function setStations(beat) {
+  const active = { 2: ["upload", "ingest"], 3: ["ai"], 4: ["engine", "approval"], 5: ["vendor", "checker"],
+    6: ["checker", "ai", "advisor"], 7: ["advisor"] }[beat] || [];
+  for (const [k, s] of Object.entries(ST)) { s.g.classList.remove("future", "current");
+    if (s.first > beat) s.g.classList.add("future"); else if (active.includes(k)) s.g.classList.add("current"); }
+  for (const c of CONN) for (const el of [c.el, c.lab].filter(Boolean)) { el.classList.remove("future", "current");
+    if (c.first > beat) el.classList.add("future"); else if (c.beats.includes(beat)) el.classList.add("current"); }
+}
+
+// ---------------------------------------------------------------- the beats
+const SEED = [
+  ["vb33", "doc", { label: "VB 13.3" }], ["gg", "doc", { label: "GG 13.1", near: [700, 600] }],
+  ["pa1", "passage", { near: "vb33" }], ["pc33", "passage", { near: "vb33" }], ["pa3", "passage", { near: "vb33" }],
+  ["pa4", "passage", { near: "vb33" }], ["pa5", "passage", { near: "gg" }], ["pa6", "passage", { near: "gg" }],
+  ["r412", "rule", { label: "R41-2", near: "pc33" }], ["r414", "rule", { near: "pa3" }], ["f418", "rule", { near: "pa4" }],
+  ["e1", "rule", { near: "pa5" }], ["gap", "param", { label: "6-month gap", near: "r412" }], ["mtd", "param", { near: "r414" }],
+  ["efz", "param", { near: "e1" }], ["gap33", "value", { near: "gap" }], ["mtd33", "value", { near: "mtd" }],
+  ["peter", "test", { label: "Peter", near: "r414" }],
+];
+const SEED_LINKS = [["vb33", "pa1"], ["vb33", "pc33"], ["vb33", "pa3"], ["vb33", "pa4"], ["gg", "pa5"], ["gg", "pa6"],
+  ["r412", "pc33"], ["r414", "pa3"], ["f418", "pa4"], ["f418", "pa1"], ["e1", "pa5"], ["e1", "pa6"], ["r412", "gap"],
+  ["r414", "mtd"], ["e1", "efz"], ["gap", "gap33"], ["mtd", "mtd33"], ["peter", "r412"], ["peter", "r414"], ["peter", "e1"]];
+
+const BEATS = [
+  { title: "The knowledge graph", num: "4,000+", cap: "connected nodes in Neo4j (a slice shown)",
+    note: "This is our knowledge graph. It holds every rule, every document and every test case, and shows how they are connected.",
+    run: async () => {
+      for (const [id, type, o] of SEED) { addNode(id, type, o);
+        for (const [a, b] of SEED_LINKS) if ((a === id && byId[b]) || (b === id && byId[a])) link(a, b);
+        await sleep(90); }
+      Object.assign(anchor, { ingest: "vb33", ai: "r412", engine: "gap", approval: "peter", checker: "peter", advisor: "r412" });
+    } },
+  { title: "A new rule arrives", num: "1", cap: "upload, the rest is automatic",
+    note: "Rules change every year. When a new version comes out, ITSG uploads it once. The platform breaks it into pieces, compares it with the old version, and marks exactly what changed in the graph.",
+    run: async () => {
+      await go2(particle(stP("upload"), stP("ingest"), 900)); work("ingest");
+      addNode("vb34", "doc", { label: "VB 13.4", near: [CENTER.x - 170, CENTER.y - 90] }); link("vb34", "vb33");
+      anchor.ingest = "vb34"; await sleep(500);
+      const ids = ["pc34", "pn2", "pn3", "pn4", "pn5", "pn6"], done = [];
+      for (const id of ids) {
+        done.push(particle(stP("ingest"), nodeP("vb34"), 750).then(() => { if (!byId[id]) { addNode(id, "passage", { near: "vb34" }); link("vb34", id); } }));
+        await sleep(170);
+      }
+      await go2(Promise.all(done));
+      if (FAST) for (const id of ids) if (!byId[id]) { addNode(id, "passage", { near: "vb34" }); link("vb34", id); }
+      await sleep(300);
+      addNode("chg", "change", { label: "Change", near: "pc34" }); link("chg", "pc34"); link("chg", "pc33");
+      hl(["chg"]); hlLink("chg", "pc34"); hlLink("chg", "pc33");
+    } },
+  { title: "RAG + AI analysis", num: "100 %", cap: "of AI answers cite their source",
+    note: "This is where RAG comes in. The AI looks up everything connected to that change in the graph, finds the rule it affects, and explains what is different, always with the source.",
+    run: async () => {
+      await go2(particle(stP("ai"), nodeP("chg"), 1000));
+      const path = ["chg", "pc33", "r412", "gap"];
+      for (let i = 0; i < path.length; i++) { hl([path[i]], 4000); if (i) hlLink(path[i - 1], path[i], 4000); await sleep(420); }
+      await go2(particle(nodeP("gap"), stP("ai"), 900)); work("ai");
+      pill("ai", "6-month rule changed", "#a8002a", "#fbeaee");
+      await go2(particle(stP("ai"), nodeP("gap"), 800));
+      addNode("gap34", "value", { label: "new value", near: "gap" }); link("gap", "gap34"); hl(["gap34"]);
+    } },
+  { title: "New tests", num: "0", cap: "calculations done by the AI",
+    note: "Next, the rules engine creates new tests for the changed rule, one public and one hidden. It calculates the expected results itself, so there is no AI guessing, and ITSG approves them.",
+    run: async () => {
+      await go2(particle(nodeP("gap34"), stP("engine"), 900)); work("engine");
+      await go2(particle(stP("engine"), nodeP("r412"), 900));
+      // new tests settle towards the Test catalogue side, so its edge never runs on top of the Rules engine edge
+      addNode("tge", "test", { label: "gap-exact", near: "r412", draft: true, pull: [955, 615] }); link("tge", "r412");
+      await sleep(250);
+      addNode("tgh", "test", { label: "hidden", near: "tge", draft: true, hidden: true, pull: [1022, 548] }); link("tgh", "tge");
+      hl(["tge", "tgh"]); anchor.approval = anchor.checker = "tge"; await sleep(500);
+      await go2(particle(nodeP("tge"), stP("approval"), 900)); work("approval");
+      for (const id of ["tge", "tgh"]) { byId[id].draft = false; style(byId[id]); }
+      pill("approval", "2 new tests approved");
+    } },
+  { title: "Vendor test run", num: "4", cap: "automatic checks before a human",
+    note: "Once approved, the tests go out to the vendors. Their software sends back a file, and our checker compares it field by field with the expected results.",
+    run: async () => {
+      await go2(particle(stP("approval"), stP("vendor"), 900)); work("vendor");
+      await go2(particle(stP("vendor"), stP("checker"), 1000));
+      await go2(particle(nodeP("tge"), stP("checker"), 900)); work("checker");
+      const res = [["✓", "#1e7b45", "#e6f4ea"], ["✓", "#1e7b45", "#e6f4ea"], ["✓", "#1e7b45", "#e6f4ea"], ["✗", "#b42318", "#fdebe9"]];
+      const g = mk("g", { class: "pill" }, L.pills); pills.res = g;
+      for (let i = 0; i < res.length; i++) { const [s, c, bg] = res[i], x = ST.checker.x + i * 32;
+        mk("rect", { x, y: 753, width: 26, height: 24, rx: 4, fill: bg }, g);
+        mk("text", { x: x + 13, y: 770, "text-anchor": "middle", "font-size": 15, "font-weight": 700, fill: c }, g, s);
+        await sleep(260); }
+    } },
+  { title: "AI triage and decision", num: "1", cap: "human makes the final call",
+    note: "If something doesn't match, the AI looks up the rule behind it and suggests whether it is a real error. But a human advisor always makes the final call.",
+    run: async () => {
+      await go2(particle(stP("checker"), nodeP("r412"), 900)); hl(["r412", "pc34"], 3000); hlLink("chg", "pc34", 3000);
+      await go2(particle(nodeP("pc34"), stP("ai"), 900)); work("ai");
+      await go2(particle(stP("ai"), nodeP("r412"), 800));
+      await go2(particle(nodeP("r412"), stP("advisor"), 900)); work("advisor");
+      pill("advisor", "decided: bug");
+    } },
+  { title: "The loop", num: "↻", cap: "every decision teaches the graph",
+    note: "Finally, the advisor's decision is saved in the graph. Next time the same difference appears, the platform already knows the answer. Let's see it live.",
+    run: async () => {
+      await go2(particle(stP("advisor"), nodeP("r412"), 1000));
+      addNode("prec", "precedent", { label: "Precedent", near: "r412" }); link("prec", "r412"); link("prec", "tge");
+      anchor.advisor = "prec"; hl(["prec"], 5000); hlLink("prec", "r412", 5000); hlLink("prec", "tge", 5000);
+    } },
+];
+const N = BEATS.length;
+
+// ---------------------------------------------------------------- camera: each beat looks at its part of the map
+const CAM = {
+  FULL: [40, 185, 1520, 680], GRAPH: [540, 235, 520, 545], LEFT: [40, 200, 1060, 520],
+  RIGHT: [520, 195, 1040, 500], RIGHT2: [520, 300, 1040, 520], BOTTOM: [420, 420, 1140, 450],
+  BOTTOM2: [380, 230, 1180, 640], ADVISOR: [380, 290, 960, 580],
+};
+// beats 1 and 2 stay at normal size; later beats zoom in on their part, then back out to normal size
+[["FULL"], ["FULL"], ["RIGHT", "FULL"], ["RIGHT2", "FULL"], ["BOTTOM", "FULL"], ["BOTTOM2", "FULL"], ["ADVISOR", "FULL"]]
+  .forEach(([v, e], i) => { BEATS[i].view = CAM[v]; if (e) BEATS[i].end = CAM[e]; });
+let view = [0, 0, 1600, 900];
+// top 23 % of the screen is the app bar and title, bottom 5 % the dots; follows the real screen shape
+function frameV([x, y, w, h]) {
+  const A = innerWidth / innerHeight;
+  let H = h / 0.72, W = H * A;
+  if (W < w * 1.04) { W = w * 1.04; H = W / A; }
+  return [x + w / 2 - W / 2, y - 0.23 * H - (0.72 * H - h) / 2, W, H];
+}
+let target = CAM.FULL;
+function setView(v) { view = v; svg.setAttribute("viewBox", v.join(" ")); }
+addEventListener("resize", () => setView(frameV(target)));
+function camera(t, ms) {
+  target = t; const v = frameV(t);
+  if (FAST) { setView(v); return Promise.resolve(); }
+  if (v.every((x, i) => Math.abs(x - view[i]) < .5)) return Promise.resolve(); // already there: no dead time
+  const from = view.slice(), t0 = now(), tok = token; ms *= SLOW;
+  return new Promise((res, rej) => { const step = t => {
+    if (tok !== token) return rej(CANCEL);
+    const k = Math.min(1, Math.max(0, (t - t0) / ms)), e = ease(k);
+    setView(from.map((f, i) => f + (v[i] - f) * e)); k < 1 ? raf(step) : res(); };
+    raf(step); });
+}
+
+// ---------------------------------------------------------------- navigation
+const dots = document.getElementById("dots"); BEATS.forEach(() => dots.appendChild(document.createElement("i")));
+let cur = -1, done = -1, playing = false;
+function reset() {
+  for (const n of nodes) n.g.remove(); for (const l of links) l.el.remove();
+  for (const p of parts) { p.dot.remove(); p.trail.forEach(t => t.remove()); } parts = [];
+  for (const k in pills) pills[k].remove();
+  nodes = []; links = []; byId = {}; for (const k in pills) delete pills[k]; for (const k in anchor) delete anchor[k]; seed = 7;
+}
+async function goTo(b, animate = true) {
+  if (b < 0 || b >= N) return;
+  // the next beat after a finished one simply continues; anything else rebuilds the state it needs
+  const cont = animate && b > 0 && b === cur + 1 && done === cur;
+  const tok = ++token; cur = b; const B = BEATS[b];
+  document.getElementById("count").textContent = `${String(b + 1).padStart(2, "0")} / ${String(N).padStart(2, "0")}`;
+  document.getElementById("title").textContent = B.title;
+  document.getElementById("num").textContent = B.num;
+  document.getElementById("cap").textContent = B.cap;
+  if (VIDEO) (window.__beatStarts = window.__beatStarts || [])[b] = vt / 1000; // beat boundaries for the slide clips
+  [...dots.children].forEach((d, i) => d.classList.toggle("on", i === b));
+  if (!cont) {
+    reset(); FAST = true;
+    for (let i = 0; i < b; i++) await BEATS[i].run();
+    for (let i = 0; i < 260; i++) physics();
+    const P = BEATS[b - 1];
+    target = animate ? (P ? P.end || P.view : B.view) : B.end || B.view; setView(frameV(target));
+  }
+  FAST = !animate; setStations(b + 1);
+  try {
+    await camera(B.view, 1000);
+    await B.run();
+    if (B.end) { await sleep(900); await camera(B.end, 1300); }
+    if (tok === token) done = b;
+  } catch (e) { if (e !== CANCEL) throw e; }
+  if (tok === token) FAST = false;
+}
+function next() { if (cur < N - 1) goTo(cur + 1); }
+function prev() { if (cur > 0) goTo(cur - 1, false); }
+// autoplay (P) and the video: each beat starts as soon as the previous one has finished, after a short breath,
+// so nothing is cut off and nothing waits on a fixed timer
+const HOLD = 700; // ms between beats (times SLOW)
+async function playAll() {
+  try {
+    for (let b = 0; b < N; b++) {
+      if (!VIDEO && !playing) return;
+      await goTo(b);
+      if (cur !== b || done !== b) return; // the presenter took over
+      if (b < N - 1) await sleep(HOLD);
+    }
+    window.__videoEnd = vt / 1000;
+  } catch (e) { if (e !== CANCEL) throw e; } finally { if (!VIDEO) playing = false; }
+}
+function play() {
+  if (playing) { playing = false; return; }
+  playing = true; playAll();
+}
+document.addEventListener("keydown", e => {
+  document.getElementById("hint").classList.add("gone");
+  if (["ArrowRight", " ", "PageDown", "Enter"].includes(e.key)) { e.preventDefault(); playing = false; next(); }
+  else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { playing = false; prev(); }
+  else if (e.key === "p" || e.key === "P") play();
+  else if (e.key === "f" || e.key === "F") document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  else if (e.key === "r" || e.key === "R") { playing = false; goTo(0); }
+});
+document.addEventListener("click", () => { document.getElementById("hint").classList.add("gone"); playing = false; next(); });
+if (!VIDEO) {
+  const start = parseInt(new URLSearchParams(location.search).get("beat") || "1") - 1;
+  goTo(Math.max(0, Math.min(N - 1, start)));
+}
+
+// ---------------------------------------------------------------- video mode: HyperFrames seeks a time, the page
+// steps its virtual clock up to it (60 steps per second). Seeking backwards replays from 0, which is identical
+// because the layout is seeded.
+const cssStart = new WeakMap();
+function syncCss() { // CSS fades and pulses follow the virtual clock too
+  for (const a of document.getAnimations()) {
+    if (!cssStart.has(a)) { cssStart.set(a, vt); a.pause(); }
+    a.currentTime = vt - cssStart.get(a);
+  }
+}
+const yieldTask = () => new Promise(r => { const ch = new MessageChannel(); ch.port1.onmessage = () => r(); ch.port2.postMessage(0); });
+async function advance(to) {
+  while (vt < to - 1e-3) {
+    vt = Math.min(to, vt + 1000 / 60);
+    for (const t of vTimers.filter(t => t.at <= vt).sort((a, b) => a.at - b.at)) { vTimers.splice(vTimers.indexOf(t), 1); t.cb(); }
+    await yieldTask();
+    const cbs = vRafs; vRafs = []; for (const cb of cbs) cb(vt);
+    await yieldTask();
+    syncCss();
+  }
+}
+let started = false, queue = Promise.resolve();
+function startVideo() {
+  started = true; vt = 0; vTimers.length = 0; vRafs = []; cur = -1; done = -1;
+  raf(frame); playAll();
+}
+function seekTo(sec) {
+  queue = queue.then(async () => { const t = sec * 1000; if (!started || t < vt - 1) startVideo(); await advance(t); });
+  return queue;
+}
+if (VIDEO) {
+  document.getElementById("hint").style.display = "none";
+  window.addEventListener("hf-seek", e => e.detail.waitUntil(seekTo(e.detail.time)));
+  window.__seekTo = seekTo; // for checking the video timing in a normal browser
+  seekTo(0);
+}
+</script>
+</body>
+</html>
