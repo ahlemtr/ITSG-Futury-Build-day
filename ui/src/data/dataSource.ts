@@ -11,10 +11,6 @@ export type NavCounts = { specChanges: number; advisorQueue: number };
 export const MODE = import.meta.env.VITE_DATA_MODE ?? "mock";
 export const isApi = MODE === "api";
 
-function notBuilt(): never {
-  throw new Error("API mode is not built yet");
-}
-
 export async function getNavCounts(): Promise<NavCounts> {
   if (isApi) return api.getNavCounts();
   return navCounts;
@@ -26,12 +22,12 @@ export async function getOverview(): Promise<OverviewData> {
 }
 
 export async function getSubmissions(): Promise<SubmissionSummary[]> {
-  if (isApi) notBuilt();
+  if (isApi) return api.getSubmissions();
   return SUBMISSIONS;
 }
 
 /** Returns null when there is no field-by-field result for this id. */
 export async function getSubmissionResult(id: string): Promise<SubmissionResult | null> {
-  if (isApi) notBuilt();
+  if (isApi) return api.getSubmissionResult(id);
   return SUBMISSION_RESULTS.find((s) => s.id === id) ?? null;
 }

@@ -13,8 +13,8 @@ export type CompareMode = "compare" | "ignore" | "rule";
 /** Result of one field: no deviation (identical / ignored / valid rule field) or a deviation label. */
 export type FieldStatus = "identical" | "ignored" | "valid" | Exclude<Label, "exact">;
 
-/** Which analysis step settled a deviation (doc 05, section 6). */
-export type DecidedBy = "diff" | "catalogue" | "rules" | "ai_proposal" | "advisor";
+/** Which analysis step settled a deviation (doc 05, section 6); "open" = still waiting for the advisor. */
+export type DecidedBy = "diff" | "catalogue" | "rules" | "ai_proposal" | "advisor" | "open";
 
 /** VB = Verfahrensbeschreibung, GG = Gemeinsame Grundsätze, BP = Beispielpapier. */
 export type SpecRef = {
@@ -30,7 +30,8 @@ export type Deviation = {
   title: Localized;
   decidedBy: DecidedBy;
   rule: { id: string; text: Localized };
-  spec: SpecRef;
+  /** missing when no rule or passage covers the deviation (unclear) */
+  spec?: SpecRef;
   criterion?: { id: string; text: Localized };
   reasoning: Localized;
 };

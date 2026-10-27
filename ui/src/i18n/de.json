@@ -104,7 +104,8 @@
     "catalogue": "Katalog bekannter Varianten, Schritt a",
     "rules": "Regelprüfung, Schritt b",
     "ai_proposal": "KI-Vorschlag, vom Systemberater bestätigt",
-    "advisor": "Systemberater"
+    "advisor": "Systemberater",
+    "open": "Offen, wartet auf den Systemberater"
   },
   "result": {
     "topbar": "Einreichung <strong>#{{id}}</strong> · Regelwerk <strong>V{{ruleSet}}</strong>",

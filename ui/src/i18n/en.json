@@ -104,7 +104,8 @@
     "catalogue": "Known-variant catalogue, step a",
     "rules": "Rule re-check, step b",
     "ai_proposal": "AI proposal, confirmed by the system advisor",
-    "advisor": "System advisor"
+    "advisor": "System advisor",
+    "open": "Open, waiting for the system advisor"
   },
   "result": {
     "topbar": "Submission <strong>#{{id}}</strong> · rule set <strong>V{{ruleSet}}</strong>",

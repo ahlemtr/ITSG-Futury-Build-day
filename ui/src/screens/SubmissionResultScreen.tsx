@@ -214,12 +214,14 @@ function DeviationPanel({ deviation, lang }: { deviation: Deviation; lang: strin
             <strong>{deviation.rule.id}</strong> · {pick(deviation.rule.text, lang)}
           </dd>
         </div>
-        <div>
-          <dt>{t("result.specPassage")}</dt>
-          <dd>
-            <SpecRefText spec={deviation.spec} />
-          </dd>
-        </div>
+        {deviation.spec && (
+          <div>
+            <dt>{t("result.specPassage")}</dt>
+            <dd>
+              <SpecRefText spec={deviation.spec} />
+            </dd>
+          </div>
+        )}
         {deviation.criterion && (
           <div>
             <dt>{t("result.criterion")}</dt>
