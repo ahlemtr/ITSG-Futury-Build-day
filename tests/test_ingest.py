@@ -103,3 +103,45 @@ def test_version_valid_now_rechecks_submissions(baseline, tmp_path):
     assert job["status"] == "done", job.get("trace")
     assert job["result"]["track"] == "now" and job["result"]["rechecked"] == 1
     assert repo.get_check(sub.submission_id).version == "13.4"
+
+
+RS_ANL3 = ROOT / "sources" / ("2024_12_11_NS_FLB_TOP_02_24c24i4444b45SGBV45SGBVII47SGBXIV_Aktualisierung_der_GR_zu_"
+                              "Entgeltersatzleistungen_Anl3.pdf")
+
+
+class ScriptedCalcAI:
+    def analyse_calculation(self, change, params, message_types):
+        from llm.agents.calculation_analysis import CalculationAnalysis, CalculationRule
+
+        if "7 Wochen" not in (change["new_text"] or ""):
+            return None
+        return CalculationAnalysis(is_calculation=True, summary="Entgeltfortzahlung 6 -> 7 Wochen", citations=[],
+                                   rules=[CalculationRule(title="Dauer der Entgeltfortzahlung", rule="EFZ 7 Wochen",
+                                                          value="7 Wochen", applies_to=["01"], parameter="efz_days",
+                                                          parameter_value=49)])
+
+
+@pytest.mark.skipif(not RS_ANL3.exists(), reason="Rundschreiben PDF missing")
+def test_rundschreiben_edition_yields_calculation_rules(baseline, monkeypatch):
+    kb, repo = baseline
+    from engine import specdiff
+    from engine.model import Change
+
+    def fake_diff(old_pdf, new_pdf, prefix):
+        return [Change(key=f"{prefix}-000", document="RS-ANL3", old_version="2024-12-11", new_version="2026-12-01",
+                       tag="replace", old="Entgeltfortzahlung für 6 Wochen", new="Entgeltfortzahlung für 7 Wochen")]
+
+    monkeypatch.setattr(specdiff, "diff_pdfs", fake_diff)
+    assert ingest.guess(RS_ANL3.name) == {"version": "2024-12-11", "valid_from": "2024-12-11"}
+    job = ingest.new_job(repo, "RS-ANL3", "2026-12-01", date(2026, 12, 1), "rs.pdf", "x")
+    seen = []
+    job = ingest.Pipeline(job, RS_ANL3, kb, repo, lambda staged: ScriptedCalcAI(), seen.append,
+                          today=date(2026, 10, 27)).run()
+    assert job["status"] == "done", job.get("trace")
+    assert job["result"]["calculation_rules"] == ["CALC-RS-ANL3-1"]
+    proposal = job["result"]["parameter_proposals"][0]
+    assert (proposal["parameter"], proposal["current"], proposal["proposed"]) == ("efz_days", 42, 49)
+    new = seen[-1]
+    assert new.get_param("efz_days", version="13.3") == 42  # a proposal, never applied by itself
+    rule = new.subgraph("Rule", "CALC-RS-ANL3-1", 1)
+    assert any(n.props.get("status") == "draft" for n in rule.nodes if n.key == "CALC-RS-ANL3-1")

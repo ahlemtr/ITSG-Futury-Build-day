@@ -9,7 +9,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-RuleKind = Literal["domain", "format", "reply", "chain", "efz"]
+RuleKind = Literal["domain", "format", "reply", "chain", "efz", "calculation"]
 DeviationKind = Literal[
     "value_differs", "missing_block", "extra_block", "missing_message", "extra_message",
     "missing_group", "extra_group", "order_differs",

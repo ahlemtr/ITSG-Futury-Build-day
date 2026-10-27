@@ -360,7 +360,8 @@
         "running": "running",
         "done": "done",
         "failed": "failed"
-      }
+      },
+      "doneCalc": "{{doc}} {{version}} analysed: {{rules}} calculation rules in the knowledge graph (draft, need implementation in the rules engine). Proposals for engine parameters for ITSG to confirm: {{proposals}}."
     },
     "doc": {
       "VB": "Verfahrensbeschreibung DTA EEL",
@@ -434,7 +435,9 @@
       "drafts": "drafts",
       "rechecked": "re-checked",
       "skipped": "skipped:",
-      "chunks": "chunks"
+      "chunks": "chunks",
+      "calculation_rules": "calculation rules",
+      "proposals": "parameter proposals"
     },
     "title": {
       "specUpload": "Processing new version: {{doc}} V{{version}}",

@@ -360,7 +360,8 @@
         "running": "läuft",
         "done": "fertig",
         "failed": "fehlgeschlagen"
-      }
+      },
+      "doneCalc": "{{doc}} {{version}} ausgewertet: {{rules}} Berechnungsregeln im Wissensgraphen (Entwurf, Umsetzung in der Regel-Engine nötig). Vorschläge für Engine-Parameter, die ITSG bestätigen muss: {{proposals}}."
     },
     "doc": {
       "VB": "Verfahrensbeschreibung DTA EEL",
@@ -434,7 +435,9 @@
       "drafts": "Entwürfe",
       "rechecked": "neu geprüft",
       "skipped": "übersprungen:",
-      "chunks": "Chunks"
+      "chunks": "Chunks",
+      "calculation_rules": "Berechnungsregeln",
+      "proposals": "Parametervorschläge"
     },
     "title": {
       "specUpload": "Neue Fassung wird verarbeitet: {{doc}} V{{version}}",

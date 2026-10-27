@@ -49,9 +49,9 @@ The Gemeinsame Rundschreiben of the GKV-Spitzenverband (Anl. 1: Kinderkrankengel
 
 1. A new Rundschreiben edition is uploaded with its type and date; it succeeds the previous edition.
 2. Chunk, embed, diff against the previous edition.
-3. The AI analysis looks for **calculation rules**: amounts, percentages, periods and thresholds (e.g. EFZ six weeks, Krankengeld 70 % of the Regelentgelt, at most 90 % of the net pay, 78 weeks), each with a citation.
-4. Where a value feeds a parameter the engine already uses (e.g. the six weeks of the EFZ end, `efz_weeks`), it becomes a new parameter value like a VB change and the tests are recomputed.
-5. Where it describes a calculation the engine does not implement yet (Krankengeld amount, Kinderkrankengeld), it is stored in the graph as a **calculation rule without engine implementation** (status `draft`, linked to its passages and message types) and listed in the Test catalogue as "needs implementation". The platform never invents an expected value it cannot compute.
+3. Changes carrying numbers (percent, weeks, days, months, euro) go to the calculation agent (`llm/agents/calculation_analysis.py`), which looks for **calculation rules**: amounts, percentages, periods and thresholds (e.g. EFZ six weeks, Krankengeld 70 % of the Regelentgelt, at most 90 % of the net pay, 78 weeks), each with a citation.
+4. Where a value is the same quantity as a parameter the engine uses (e.g. the 42 days of Entgeltfortzahlung, `efz_days`), it becomes a **parameter proposal** in the job result: parameters are versioned with the Verfahrensbeschreibung, so ITSG confirms it before it changes a rule set.
+5. Every calculation rule found is stored in the graph as a **calculation rule** (`CALC-<document>-<n>`, kind `calculation`, status `draft`, linked to its passages, message types and parameter): it needs an implementation in the rules engine before it can be tested. Draft rules never take part in a check. The platform never invents an expected value it cannot compute.
 
 Out of scope stays as in `plan/00`: maternity, child sick benefit and accident benefits are not computed; their rules are known to the graph, not to the engine.
 
@@ -85,4 +85,4 @@ Retrieval and impact run on Neo4j (vector + full-text search, path change → pa
 | W5 this year or next year (done) | valid-from logic of section 2: future = parallel catalogue, now = re-check open submissions | a correction valid today re-checks the open submissions |
 | W6 knowledge graph tab (done) | "Wissensgraph": what it holds and how it grew (event log: 13.3 loaded, 13.4 uploaded +N passages / +M changes, precedent added), interactive graph around a rule (Cytoscape.js), "ask the graph": a question or a change in, relevant passages (with the matching sentence), rules and test cases out | after the 13.4 upload the counters and the log grow; the 3.12 change highlights change → passage → R41-2 / R41-3 → `peter-gap-exact` |
 | W7 chunk-level search (done) | chunks (about 1,000 characters, overlapping) embedded and searched with full-text + vector, results grouped per passage with the matching sentence | "Vorerkrankung 6 Monate" finds 3.12/chaining in the top 3 |
-| W8 Rundschreiben | the same pipeline for Rundschreiben: calculation rules extracted with citations, parameters updated where the engine uses them, "needs implementation" otherwise | a new Rundschreiben edition shows its calculation changes and the affected parameters |
+| W8 Rundschreiben (done) | the same pipeline for Rundschreiben: calculation rules extracted with citations, parameters updated where the engine uses them, "needs implementation" otherwise | a new Rundschreiben edition shows its calculation changes and the affected parameters |

@@ -142,7 +142,20 @@ function UploadCard({ onDone }: { onDone: () => void }) {
           {error}
         </p>
       )}
-      {last?.status === "done" && (
+      {last?.status === "done" && last.result.calculation_rules !== undefined && (
+        <p className="saved-note" role="status">
+          {t("spec.upload.doneCalc", {
+            doc: t(`spec.doc.${last.document}`, { defaultValue: last.document }),
+            version: last.version,
+            rules: last.result.calculation_rules.length,
+            proposals:
+              (last.result.parameter_proposals ?? [])
+                .map((p) => `${p.parameter}: ${String(p.current)} → ${String(p.proposed)}`)
+                .join(", ") || "–",
+          })}
+        </p>
+      )}
+      {last?.status === "done" && last.result.calculation_rules === undefined && (
         <p className="saved-note" role="status">
           {t(last.result.track === "now" ? "spec.upload.doneNow" : "spec.upload.doneNext", {
             version: last.version,

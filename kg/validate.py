@@ -15,7 +15,7 @@ KEY_FORMATS = {
     "Record": r"D[A-Z]{3}",
     "Field": r"D[A-Z]{3}\.[A-Z0-9][A-Z0-9-]*",
     "MessageType": r"\d{2}",
-    "Rule": r"(R41|F41|K61|K62)-\d+|[EC]-\d+",
+    "Rule": r"(R41|F41|K61|K62)-\d+|[EC]-\d+|CALC-[A-Z0-9-]+-\d+",
     "Criterion": r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
     "Parameter": r"[a-z][a-z0-9_]*",
     "ParamValue": r"[a-z][a-z0-9_]*@(\d+\.\d+|sim-\d+\.\d+)",
@@ -29,7 +29,7 @@ DEVIATION_KINDS = {"value_differs", "missing_block", "extra_block", "missing_mes
 
 # (label, property) -> allowed values (08 section 1.4)
 ENUMS = {
-    ("Rule", "kind"): {"domain", "format", "reply", "chain", "efz"},
+    ("Rule", "kind"): {"domain", "format", "reply", "chain", "efz", "calculation"},
     ("Rule", "status"): {"approved", "draft"},
     ("MessageType", "sender"): {"employer", "insurer", "both"},
     ("Field", "type"): {"an", "n"},

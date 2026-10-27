@@ -37,6 +37,10 @@ STAGES = [
 
 VALID_FROM_RE = re.compile(r"(?:gültig\s+)?ab[\s_]+(\d{2})\.(\d{2})\.(\d{4})", re.IGNORECASE)
 VERSION_RE = re.compile(r"Version[\s_]+(\d+(?:\.\d+)+)", re.IGNORECASE)
+DATED_FILE_RE = re.compile(r"^(\d{4})_(\d{2})_(\d{2})_")  # Rundschreiben: "2025_12_10_NS_FLB_..."
+CALC_RE = re.compile(r"\d+(?:,\d+)?\s*(?:Prozent|%|v\. ?H\.|Wochen|Tage|Kalendertage|Monate|Jahre|Euro|EUR|€)",
+                     re.IGNORECASE)
+MESSAGE_TYPES = ["01", "02", "03", "41", "51", "61", "62", "88"]
 
 
 def now() -> str:
@@ -57,6 +61,9 @@ def guess(filename: str, text: str = "") -> dict:
             out["version"] = m.group(1)
         if "valid_from" not in out and (m := VALID_FROM_RE.search(source)):
             out["valid_from"] = f"{m.group(3)}-{m.group(2)}-{m.group(1)}"
+    if (m := DATED_FILE_RE.match(Path(filename).name)):  # a dated circular: its date is version and validity
+        out.setdefault("version", f"{m.group(1)}-{m.group(2)}-{m.group(3)}")
+        out.setdefault("valid_from", f"{m.group(1)}-{m.group(2)}-{m.group(3)}")
     return out
 
 
@@ -187,12 +194,20 @@ class Pipeline:
                 continue
             impact = self.staged.get_affected_rules([key])
             rules = impact.review + impact.recompute
-            if rules:
+            if rules or (self.calculation and CALC_RE.search(f"{change.old}\n{change.new}")):
                 self.candidates.append({"key": key, "change": change, "rules": rules})
+        self.candidates = self.candidates[:MAX_CANDIDATES]
         self.stage("map", "running", candidates=len(self.candidates),
                    rules=len({r.id for c in self.candidates for r in c["rules"]}))
 
+    @property
+    def calculation(self) -> bool:
+        """The insurers' circulars: changes are read for calculation rules (W8)."""
+        return self.doc.startswith("RS-")
+
     def do_analyse(self) -> None:
+        if self.calculation:
+            return self._analyse_calculations()
         old = self.previous.version if self.previous else None
         notes = {p["name"]: p.get("note", "") for p in load_yaml(ROOT / "kg" / "seed" / "parameters.yaml")["parameters"]}
         ai = self.ai_factory(self.staged) if (self.ai_factory and self.candidates) else None
@@ -226,12 +241,56 @@ class Pipeline:
         if ai is None and self.candidates:
             self.stage("analyse", "running", skipped="no AI available: changes kept unlabelled")
 
+    def _analyse_calculations(self) -> None:
+        """Rundschreiben: calculation rules per change. Rules the engine does not compute become draft rules
+        ("needs implementation"); a value for an engine parameter is a proposal for ITSG, never applied."""
+        old = self.previous.version if self.previous else None
+        notes = {p["name"]: p.get("note", "") for p in load_yaml(ROOT / "kg" / "seed" / "parameters.yaml")["parameters"]}
+        vb = _latest_vb(self.kb)
+        params = {n: {"value": self.kb.get_param(n, version=vb), "note": notes.get(n, "")} for n in _param_names()}
+        ai = self.ai_factory(self.staged) if (self.ai_factory and self.candidates) else None
+        self.curated, self.param_changes, self.calc_rules, self.proposals = [], {}, [], []
+        analysed = rejected = 0
+        for n, c in enumerate(self.candidates):
+            ch = c["change"]
+            answer = None
+            if ai is not None:
+                answer = ai.analyse_calculation(
+                    {"key": ch.key, "old_text": ch.old, "new_text": ch.new, "old_passages": ch.modifies_old,
+                     "new_passages": ch.modifies_new}, params, MESSAGE_TYPES)
+                analysed += 1
+                rejected += answer is None
+            key = f"{self.doc}-{old}-{self.version}-C{n:03d}"
+            in_scope = bool(answer and answer.is_calculation and answer.rules)
+            self.curated.append({"key": key, "raw_keys": [ch.key], "summary": answer.summary if answer else None,
+                                 "label": "law_change" if in_scope else ("editorial" if answer else "unknown"),
+                                 "in_scope": in_scope, "changes_param": [], "modifies_old": ch.modifies_old,
+                                 "modifies_new": ch.modifies_new})
+            for r in (answer.rules if in_scope else []):
+                rid = f"CALC-{self.doc}-{len(self.calc_rules) + 1}"
+                self.calc_rules.append({
+                    "id": rid, "title": r.title, "description": f"{r.rule} ({r.value}). Needs implementation in the "
+                    f"engine; source: {self.doc} {self.version}.", "kind": "calculation", "status": "draft",
+                    "applies_to": r.applies_to, "fields": [], "params": [r.parameter] if r.parameter else [],
+                    "sources": ch.modifies_new or ch.modifies_old})
+                if r.parameter is not None and r.parameter_value != params[r.parameter]["value"]:
+                    self.proposals.append({"parameter": r.parameter, "current": params[r.parameter]["value"],
+                                           "proposed": r.parameter_value, "rule": rid, "change": key})
+            self.stage("analyse", "running", analysed=analysed, of=len(self.candidates), rejected=rejected,
+                       calculation_rules=len(self.calc_rules), proposals=len(self.proposals))
+        if ai is None and self.candidates:
+            self.stage("analyse", "running", skipped="no AI available: changes kept unlabelled")
+        dump_yaml(self.calc_rules, self.folder / "rules.yaml")
+        self.job["result"]["calculation_rules"] = [r["id"] for r in self.calc_rules]
+        self.job["result"]["parameter_proposals"] = self.proposals
+
     def do_apply(self) -> None:
         old = self.previous.version if self.previous else None
         if self.previous:
             dump_yaml({"document": self.doc, "old_version": old, "new_version": self.version,
                        "changes": self.curated}, self.folder / "changes.yaml")
         values = []
+        self.param_changes = getattr(self, "param_changes", {})
         if self.doc == "VB":  # parameters are versioned with the Verfahrensbeschreibung
             for name in _param_names():
                 value = self.param_changes[name]["value"] if name in self.param_changes else \
@@ -251,7 +310,8 @@ class Pipeline:
         from engine.checker import Checker
         from engine.intake import load_files
 
-        old = self.previous.version if self.previous else None
+        # expected results are versioned with the Verfahrensbeschreibung; other documents do not recompute them
+        old = self.previous.version if self.previous and self.doc == "VB" else None
         flipped, expected, drafts = [], {}, []
         for tc in self.repo.list_test_cases():
             if old is None:
@@ -293,7 +353,7 @@ class Pipeline:
                     continue
                 self.repo.save_check(s.id, Checker(self.kb).check(tc, list(load_files(s).values()), self.today))
                 rechecked += 1
-        self.job["result"] = {"flipped": flipped, "drafts": list(dict.fromkeys(drafts)), "rules": recompute_rules,
+        self.job["result"] = self.job.get("result", {}) | {"flipped": flipped, "drafts": list(dict.fromkeys(drafts)), "rules": recompute_rules,
                               "rechecked": rechecked, "track": "now" if self.valid_from <= self.today else "next"}
         self.stage("catalogue", "running", test_cases=len(expected), flipped=len(flipped),
                    drafts=len(self.job["result"]["drafts"]), rechecked=rechecked)
@@ -324,6 +384,15 @@ class Pipeline:
                 if param in r.params:
                     seen[r.id] = r
         return list(seen.values())
+
+
+MAX_CANDIDATES = 40  # changes per upload sent to the AI (largest documents: keep the job in minutes)
+
+
+def _latest_vb(kb) -> str:
+    from engine.rules.params import latest
+
+    return latest(kb)
 
 
 def _param_names() -> list[str]:

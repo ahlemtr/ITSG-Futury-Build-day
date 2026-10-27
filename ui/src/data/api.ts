@@ -813,7 +813,16 @@ export type ApiJob = {
   status: "running" | "done" | "failed";
   created: string;
   stages: { name: string; title: string; status: ActivityStage["status"]; counts: Record<string, unknown> }[];
-  result: { flipped?: string[]; drafts?: string[]; rules?: string[]; rechecked?: number; track?: "now" | "next" };
+  result: {
+    flipped?: string[];
+    drafts?: string[];
+    rules?: string[];
+    rechecked?: number;
+    track?: "now" | "next";
+    /** Rundschreiben: calculation rules found (drafts: need implementation) and proposals for engine parameters */
+    calculation_rules?: string[];
+    parameter_proposals?: { parameter: string; current: unknown; proposed: unknown; rule: string }[];
+  };
   error: string | null;
 };
 

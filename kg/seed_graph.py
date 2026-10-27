@@ -147,6 +147,9 @@ def load_overlays(seed: Seed, folder: Path) -> None:
         if (d / "changes.yaml").exists():
             with open(d / "diff.json", encoding="utf-8") as f:
                 seed.extra_changes.append((load_yaml(d / "changes.yaml"), json.load(f)))
+        if (d / "rules.yaml").exists():  # calculation rules from a Rundschreiben (draft: needs implementation)
+            known_rules = {r["id"] for r in seed.rules}
+            seed.rules += [r for r in load_yaml(d / "rules.yaml") or [] if r["id"] not in known_rules]
         if (d / "tests.yaml").exists():  # test cases the upload made (drafts until ITSG approves them)
             known = {tc["id"] for tc in seed.test_cases}
             for tc in load_yaml(d / "tests.yaml") or []:
