@@ -74,7 +74,7 @@ function ResultView({ result }: { result: SubmissionResult }) {
           <span className="verdict">
             {t("result.verdict")} <Badge value={result.verdict} />
           </span>
-          <Link className="button button-primary" to={`${viewBase(view)}/reports`}>
+          <Link className="button button-primary" to={`${viewBase(view)}/reports/${result.id}`}>
             {t("result.openReport")}
           </Link>
         </div>

@@ -591,3 +591,124 @@ export async function getVendorRuns(curated: RunDef[]): Promise<RunDef[]> {
       },
   );
 }
+
+// ---------- Signed reports (screen 6) ----------
+
+export type ReportListItem = {
+  id: string;
+  testCaseId: string;
+  vendor: string;
+  ruleSet: string;
+  verdict: Label;
+  receivedOn: string;
+  /** ISO timestamp of the last signature, null when not signed yet */
+  signed: string | null;
+};
+
+export async function getReports(vendor?: string): Promise<ReportListItem[]> {
+  const q = vendor ? `?vendor=${encodeURIComponent(vendor)}` : "";
+  const rows = await getJson<
+    { submission_id: string; test_case_id: string; vendor: string | null; rule_set_version: string; label: string; created: string; signed: string | null }[]
+  >(`/reports${q}`);
+  return rows.map((r) => ({
+    id: r.submission_id,
+    testCaseId: r.test_case_id,
+    vendor: r.vendor ?? "–",
+    ruleSet: r.rule_set_version,
+    verdict: toLabel(r.label),
+    receivedOn: r.created.slice(0, 10),
+    signed: r.signed,
+  }));
+}
+
+export type ReportCheck = {
+  step: number | null;
+  abgabegrund: string | null;
+  record: string;
+  field: string | null;
+  kind: string;
+  outcome: string;
+  expected: string | null;
+  actual: string | null;
+  rule: string | null;
+  sources: string[];
+  explanation: string;
+};
+
+export type SignedReport = {
+  report: {
+    submission_id: string;
+    test_case_id: string;
+    vendor: string | null;
+    product_id: string | null;
+    rule_set_version: string;
+    valid_on: string;
+    created: string;
+    label: string;
+    counts: Record<string, number>;
+    expected_messages: number;
+    actual_messages: number;
+    files: { name: string; sha256: string }[];
+    checks: ReportCheck[];
+    chain: string[];
+  };
+  signature: { algorithm: string; json_sha256: string; value: string; public_key: string };
+};
+
+export type RuleLine = { id: string; text: string; result: "pass" | "fail" | "open"; source?: SpecRef };
+
+export type ReportView = {
+  signed: SignedReport;
+  valid: boolean;
+  hidden: boolean;
+  rules: RuleLine[];
+};
+
+const reportPath = (id: string) => `/submissions/${encodeURIComponent(id)}/report`;
+export const reportHtmlUrl = (id: string) => `${BASE}${reportPath(id)}?format=html`;
+
+/** Signs the report (backend), verifies the signature and lists every target rule of the test case. */
+export async function getReport(id: string): Promise<ReportView | null> {
+  let signed: SignedReport;
+  try {
+    signed = await getJson<SignedReport>(reportPath(id));
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) return null;
+    throw e;
+  }
+  const r = signed.report;
+  const [verify, cases, rules] = await Promise.all([
+    request<{ valid: boolean }>("/reports/verify", { method: "POST", body: JSON.stringify(signed) }),
+    getTestCases(),
+    getRules(r.rule_set_version),
+  ]);
+  const tc = cases.find((t) => t.id === r.test_case_id);
+  const ids = [...new Set([...(tc?.targets ?? []), ...r.checks.map((c) => c.rule).filter((x): x is string => !!x)])];
+  const lines: RuleLine[] = ids.map((ruleId) => {
+    const checks = r.checks.filter((c) => c.rule === ruleId);
+    const result = checks.some((c) => c.outcome === "bug" || c.outcome === "invalid")
+      ? "fail"
+      : checks.some((c) => c.outcome === "unclear")
+        ? "open"
+        : "pass";
+    const src = mainSource(checks.flatMap((c) => c.sources).concat(rules.get(ruleId)?.sources ?? []));
+    return { id: ruleId, text: rules.get(ruleId)?.title ?? "", result, source: src ? toSpecRef(src) : undefined };
+  });
+  // deviations no rule covers (unclear, or settled by a precedent)
+  for (const c of r.checks.filter((c) => !c.rule))
+    lines.push({
+      id: "–",
+      text: deviationTitle(c).en,
+      result: c.outcome === "bug" || c.outcome === "invalid" ? "fail" : c.outcome === "unclear" ? "open" : "pass",
+    });
+  return { signed, valid: verify.valid, hidden: tc?.hidden ?? false, rules: lines };
+}
+
+export function downloadJson(name: string, data: unknown) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+}

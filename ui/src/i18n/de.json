@@ -281,5 +281,30 @@
     "decidedToday": "Heute entschieden",
     "signature": "Signatur",
     "resetDemo": "Demo zurücksetzen"
+  },
+  "report": {
+    "topbar": "Prüfbericht <strong>#{{id}}</strong>",
+    "title": "Prüfbericht · {{vendor}}",
+    "subtitle": "Testfall {{testCase}} · Regelwerk V{{ruleSet}} · geprüft für {{date}} · {{files}} Datei(en)",
+    "downloadJson": "JSON herunterladen",
+    "openPrintable": "Druckansicht öffnen (PDF)",
+    "passedHint": "Alle {{count}} geprüften Regeln erfüllt.",
+    "failedHint": "Nicht erfüllt: {{rules}}",
+    "signature": "Signatur",
+    "valid": "Gültig",
+    "invalid": "Ungültig",
+    "signedAt": "Signiert am",
+    "rules": "Regeln",
+    "deviations": "Abweichungen",
+    "files": "Geprüfte Dateien",
+    "signing": "Bericht wird signiert …",
+    "apiOnly": "Prüfberichte gibt es nur mit dem Backend (npm run dev:api).",
+    "none": "Noch keine geprüften Einreichungen.",
+    "notSigned": "noch nicht signiert",
+    "col": {
+      "signed": "Signiert",
+      "checks": "Was geprüft wird"
+    },
+    "verdict": "Ergebnis"
   }
 }

@@ -232,6 +232,21 @@ def get_report(request: Request, sid: str, format: str = "json"):
     return signed
 
 
+@router.get("/reports")
+def list_reports(request: Request, vendor: str | None = None):
+    """Checked submissions with their report status; the report is signed when it is first opened."""
+    out = []
+    for s in sorted(repo(request).list_submissions(), key=lambda x: x.created, reverse=True):
+        res = repo(request).get_check(s.id)
+        if res is None or (vendor and s.vendor != vendor):
+            continue
+        signed = repo(request).get_report(s.id)
+        out.append({"submission_id": s.id, "test_case_id": s.test_case_id, "vendor": s.vendor,
+                    "rule_set_version": res.version, "label": res.label, "created": s.created.isoformat(),
+                    "signed": signed["report"]["created"] if signed else None})
+    return out
+
+
 @router.post("/reports/verify")
 async def verify(request: Request):
     return {"valid": signing.verify_bytes(await request.body())}

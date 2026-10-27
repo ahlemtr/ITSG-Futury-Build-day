@@ -281,5 +281,30 @@
     "decidedToday": "Decided today",
     "signature": "Signature",
     "resetDemo": "Reset demo"
+  },
+  "report": {
+    "topbar": "Test report <strong>#{{id}}</strong>",
+    "title": "Test report · {{vendor}}",
+    "subtitle": "Test case {{testCase}} · rule set V{{ruleSet}} · checked for {{date}} · {{files}} file(s)",
+    "downloadJson": "Download JSON",
+    "openPrintable": "Open printable view (PDF)",
+    "passedHint": "All {{count}} checked rules met.",
+    "failedHint": "Not met: {{rules}}",
+    "signature": "Signature",
+    "valid": "Valid",
+    "invalid": "Invalid",
+    "signedAt": "Signed at",
+    "rules": "Rules",
+    "deviations": "Deviations",
+    "files": "Checked files",
+    "signing": "Signing the report …",
+    "apiOnly": "Reports need the backend (npm run dev:api).",
+    "none": "No checked submissions yet.",
+    "notSigned": "not signed yet",
+    "col": {
+      "signed": "Signed",
+      "checks": "What it checks"
+    },
+    "verdict": "Verdict"
   }
 }

@@ -181,3 +181,11 @@ def test_hidden_run_shows_no_values(client, itsg_bytes):
     assert all(set(p) == {"round"} for p in run["plan"])
     r = client.post(f"/runs/{run['run_id']}/submit", files=[]).json()
     assert "reply" not in r and all(set(o) == {"rule", "outcome"} for o in r["outcomes"])
+
+
+def test_report_list(client):
+    before = {r["submission_id"]: r for r in client.get("/reports").json()}
+    assert before["s-missing-july"]["signed"] is None and before["s-missing-july"]["label"] == "bug"
+    client.get("/submissions/s-missing-july/report")
+    after = {r["submission_id"]: r for r in client.get("/reports", params={"vendor": "Gehalt 24 Demo"}).json()}
+    assert after["s-missing-july"]["signed"] and "s-variant" not in after
