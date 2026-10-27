@@ -93,7 +93,10 @@ class Pipeline:
         st = next(s for s in self.job["stages"] if s["name"] == name)
         st["status"] = status
         st["counts"].update(counts)
-        st["started" if status == "running" else "finished"] = now()
+        if status == "running":
+            st.setdefault("started", now())  # progress updates keep the stage's start time
+        else:
+            st["finished"] = now()
         self.repo.save_job(self.job["id"], self.job)
 
     def run(self) -> dict:
