@@ -13,6 +13,10 @@ uv run uvicorn api.main:app    # KG_BACKEND=yaml by default, SEED_ON_START=1 see
 
 The first test run extracts `kg/build/passages.yaml` from the PDFs in `sources/` (needs `pdftotext`). Backend tests use the real YAML backend with precedents written to a temp file (`tests/conftest.py`: `kb`, `fresh_kb`, `seeds`). Docker: `docker compose up` (api, postgres, neo4j). Docker was not running on this machine, so the image and Postgres were never started.
 
+## UI on the backend (2026-10-27)
+
+`INTEGRATION_PLAN.md`, steps I1 to I8, branch `integration/ui-api`. Every screen of both views runs on the API in `npm run dev:api` (how to run: `ui/README.md`). New endpoints: `GET /overview`, `GET /submissions/{id}/check`, `GET /runs/{id}`, `GET /reports`; `/specdiff` returns the impact per change, `/test-cases` the versions whose result changes. Test run uploads are stored as submissions (`run-<id>-r<n>`), so ITSG sees them live. The `.env` `DATABASE_URL` points to the Docker host `postgres`: run locally with `DATABASE_URL=` (in-memory store).
+
 ## Status per phase
 
 | Phase | Files | Status |
@@ -46,7 +50,7 @@ The first test run extracts `kg/build/passages.yaml` from the PDFs in `sources/`
 
 ## Next steps
 
-1. Run once with a real `OPENAI_API_KEY` (set `OPENAI_MODEL`): `/check` on `s-no-contact`, `/submissions/s-missing-july/report`, `/criteria/extract` on VB 13.4 section 3.12, `/specdiff`. Check the answers, then keep `data/llm_cache/` for the offline demo. Prompts are in `llm/agents/*.py`, `llm/extract.py`, `llm/explain.py`, `llm/story.py`.
+1. (Partly done 2026-10-27: the spec-update agent and the stories ran for real; the transport fix is in `llm/client.py`.) Run once with a real `OPENAI_API_KEY` (set `OPENAI_MODEL`): `/check` on `s-no-contact`, `/submissions/s-missing-july/report`, `/criteria/extract` on VB 13.4 section 3.12, `/specdiff`. Check the answers, then keep `data/llm_cache/` for the offline demo. Prompts are in `llm/agents/*.py`, `llm/extract.py`, `llm/explain.py`, `llm/story.py`.
 2. Start Docker, `docker compose up postgres`, run `DATABASE_URL=postgresql://eel:eel@localhost:5432/eel uv run python -m store.seed` with a real KG, and fix whatever `PgRepo` gets wrong.
 3. P9.2: start Neo4j, `python -m kg.build`, run the backend tests with `KG_BACKEND=graph`.
 5. KG side (for the KG teammate): on this machine (`pdftotext` 4.00 from Git for Windows) the PTA table of contents is detected up to page 129, so no PTA section is extracted and `tests/test_kg.py::test_clean_seed_validates` fails on `PTA@2025-2026-v3#5.14`. Not caused by the backend merge.

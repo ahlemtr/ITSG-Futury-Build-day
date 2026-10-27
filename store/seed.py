@@ -29,8 +29,9 @@ VENDORS = {
 }
 
 
-def seed(kb: KnowledgeBase, repo, root: Path | None = None, check: bool = True) -> dict[str, int]:
-    """With `check`, every seed submission is checked once, so lists and counts show labels right away."""
+def seed(kb: KnowledgeBase, repo, root: Path | None = None, check: bool = True, triage=None) -> dict[str, int]:
+    """With `check`, every seed submission is checked once, so lists and counts show labels right away;
+    `triage` (the AI services' triage) fills the AI proposal of unclear deviations."""
     for ref in kb.get_test_cases(include_hidden=True):
         repo.upsert_test_case(get_case(kb, ref.key))
     subs = build_submissions(kb)
@@ -40,7 +41,8 @@ def seed(kb: KnowledgeBase, repo, root: Path | None = None, check: bool = True) 
                 vendor=VENDORS.get(s.id, "seed"), submission_id=s.id, content=s.content, root=root)
         if check:
             sub = repo.get_submission(s.id)
-            res = Checker(kb).check(repo.get_test_case(s.test_case_id), list(load_files(sub).values()), valid_on)
+            res = Checker(kb).check(repo.get_test_case(s.test_case_id), list(load_files(sub).values()), valid_on,
+                                    triage=triage)
             repo.save_check(s.id, res)
     return {"test_cases": len(repo.list_test_cases()), "submissions": len(repo.list_submissions())}
 

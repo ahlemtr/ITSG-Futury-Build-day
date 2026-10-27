@@ -1,6 +1,6 @@
 # Integration plan: UI on the real backend
 
-Goal: every screen of the portal (ITSG view and vendor view) runs on the FastAPI backend instead of mock data, so the demo storyline of `plan/00` section 6 works end to end. State on 2026-10-27.
+Goal: every screen of the portal (ITSG view and vendor view) runs on the FastAPI backend instead of mock data, so the demo storyline of `plan/00` section 6 works end to end. State on 2026-10-27: **I1 to I8 done** (branch `integration/ui-api`, one commit per step).
 
 ## 1. Principles
 
@@ -26,15 +26,20 @@ Each step ends with a check that is run before the next step starts.
 | I7 test catalogue | screen 3 | `GET /test-cases`, `GET /test-cases/{id}`, `POST /builder/hidden`, `POST /test-cases/{id}/approve` (exist) | table with status and visibility, detail with chain per rule set, approve and generate hidden variant | approving a draft changes its status in the table |
 | I8 docs | how to run both together | | `ui/README.md`, `HANDOUT.md`, UI_PLAN open questions answered | a teammate can start backend + UI with the README only |
 
-## 3. Out of scope for this plan
+## 3. What changed on the way
+
+- `GET /submissions/{id}/check` (read-only) so opening a result never re-runs and overwrites a check.
+- The side-by-side diff fills the expected period count (`ANZAHL-AU` was `00`).
+- `llm/client.py`: OpenAI API errors degrade to "no answer" (they turned `/specdiff` into a 500); reasoning models get one retry with `reasoning_effort="none"` when they reject function tools.
+- Advisor decisions go to `DATA_DIR/precedents.yaml` (`PRECEDENTS_PATH`), not into `kg/seed/precedents.yaml`.
+- `uvicorn --reload` hangs on Windows (the old worker keeps serving): restart by hand after backend changes.
+
+## 4. Out of scope for this plan
 
 - Real OpenAI calls (needs a key; without one the advisor queue shows "no AI proposal" and the deterministic result stands).
 - Postgres and Neo4j (the backend runs on `MemoryRepo` and `KG_BACKEND=yaml`; a backend restart resets runs and decisions).
 - Login. The ITSG / vendor switch in the top bar stays a demo switch.
 
-## 4. How to run (after I1)
+## 5. How to run
 
-```
-uv run uvicorn api.main:app --port 8000      # terminal 1, repo root
-cd ui && npm run dev:api                      # terminal 2, opens http://127.0.0.1:5173
-```
+See `ui/README.md`, section "Run it on the real backend".

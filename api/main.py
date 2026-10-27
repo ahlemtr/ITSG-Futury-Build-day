@@ -39,7 +39,7 @@ def create_app(kb=None, repo=None, ai=None, data_root: Path | None = None, seed:
     if seed:
         from store.seed import seed as do_seed
 
-        do_seed(kb, repo, root=data_root)
+        do_seed(kb, repo, root=data_root, triage=ai.triage if ai else None)
 
     @app.get("/health")
     def health():
