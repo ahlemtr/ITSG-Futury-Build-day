@@ -177,10 +177,12 @@ States of a round: **waiting for upload → checking → receipt → result → 
 
 The ITSG reference file stays in `sources/` (never committed). It is uploaded live during the demo.
 
-### Open questions for the vendor view
-1. Switch in the top bar, or two separate start pages?
-2. Does the vendor see the field-by-field diff (screen 4) for public tests, or only the label per rule? The plan says public tests come with expected results, so I propose: yes for public, never for hidden.
-3. Should the team draw this in Miro first, or is this text enough to start?
+### Vendor view questions (decided 2026-10-27)
+1. Switch in the top bar (kept).
+2. Field-by-field diff for public tests, pass / fail per rule only for hidden tests (hidden tests are left out of the vendor's results and reports show no values for them).
+3. No Miro first: the text and the built screens are enough.
+
+The vendor view stays: it replaces the eVpT portal for EEL. The vendor still works in their own payroll software; the portal hands out the story and the TEEK0 replies to import and receives the TEEL0 files (upload = stand-in for the GKV communication server).
 
 ## 5. Stack (decided: React)
 
@@ -268,7 +270,7 @@ Screen → API endpoint (for later):
 | 7. Screen 6 Signed report | verdict, signature, rule table, JSON download |
 | 8. Screen 2 Spec changes | change list, highlighted passages, impact table |
 | 9. Screen 3 Test catalogue | table, facts, rounds, approve |
-| 10. Switch to the API | same screens, real data |
+| 10. Switch to the API | same screens, real data (**done**, `INTEGRATION_PLAN.md`) |
 
 Slim tests each step locally before anything is pushed.
 
@@ -276,8 +278,8 @@ Slim tests each step locally before anything is pushed.
 
 1. ~~Stack~~: React + Vite.
 2. ~~Upload flow~~: later, by Slim. Button removed for now.
-3. **Submissions and Reports nav items:** there is no list screen for them. Proposal: two simple list pages that reuse the Overview table.
-4. **Red for status (mostly settled):** bad states use the Bug label tone `#B42318`, not the brand red. Remaining: the Overview mockup shows "3 with open deviations" and the "waiting" bar in brand red. Plan: use the Bug tone there too. OK?
-5. **Rule IDs on screen 6:** R01-EFZ, R88-1, R62-1 don't exist in the rules doc. Use its IDs (E-1, C-3, C-6), or rename them in the rules doc?
-6. **AI proposal for "DBAP missing":** screen 5 says "likely correct variant", the backend plan (M8.5) expects "likely bug". Which one is the demo?
+3. ~~Submissions and Reports lists~~: built (Reports list in both views, `ReportsScreen`).
+4. **Red for status:** proposal, not built yet: use the Bug tone `#B42318` for "open deviations" and the "waiting" bar, brand red only for the wordmark and the primary button.
+5. ~~Rule IDs on screen 6~~: the KG ids from `kg/seed/rules.yaml` (E-1, C-3, K62-2 / C-6 ...); the report screen shows them as the backend returns them.
+6. ~~AI proposal for "DBAP missing"~~: "likely bug" with medium confidence, as M8.5 says (every 41 in Beispielpapier 13.1 carries DBAP; Anlage 3 is missing). In api mode the proposal comes from the real check agent; on 2026-10-27 it answered "unclear" (0.88, citing BP 13.1 and VB 3.18) because Anlage 3 is missing. The advisor then decides; the demo reason can cite BP 13.1.
 7. ~~Language~~: German default, English on a button (section 6).

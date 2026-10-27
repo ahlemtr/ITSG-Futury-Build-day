@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { getOverview, getSubmissions } from "../data/dataSource";
+import { getOverview, getSubmissions, isApi } from "../data/dataSource";
 import { useAdvisorState } from "../data/advisorStore";
 import type { OverviewData } from "../data/types";
 import { useData } from "../data/useData";
@@ -13,10 +13,13 @@ export function OverviewScreen() {
   const overview = useData(getOverview, []);
   const submissions = useData(getSubmissions, []);
   const advisor = useAdvisorState();
+  // api mode: the backend counts the advisor's decisions itself
   const live =
-    overview.status === "ready"
-      ? withAdvisor(overview.data, advisor.open.length, advisor.decided.length)
-      : undefined;
+    overview.status !== "ready"
+      ? undefined
+      : isApi
+        ? overview.data
+        : withAdvisor(overview.data, advisor.open.length, advisor.decided.length);
 
   return (
     <>

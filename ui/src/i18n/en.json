@@ -37,7 +37,7 @@
     },
     "specChanges": {
       "title": "Verfahrensbeschreibung V13.3 → V13.4",
-      "subtitle": "36 changes found, 5 inside the EEL prototype scope. Field layouts unchanged."
+      "subtitle": "Comparing both versions."
     },
     "testCatalogue": {
       "title": "Test catalogue 2027",
@@ -68,7 +68,6 @@
       "subtitle": "Signed test reports to download."
     }
   },
-  "placeholder": "This screen is built in a later step.",
   "status": {
     "exact": "Exact match",
     "identical": "Identical",
@@ -104,7 +103,8 @@
     "catalogue": "Known-variant catalogue, step a",
     "rules": "Rule re-check, step b",
     "ai_proposal": "AI proposal, confirmed by the system advisor",
-    "advisor": "System advisor"
+    "advisor": "System advisor",
+    "open": "Open, waiting for the system advisor"
   },
   "result": {
     "topbar": "Submission <strong>#{{id}}</strong> · rule set <strong>V{{ruleSet}}</strong>",
@@ -134,7 +134,14 @@
     "reasoning": "Reasoning",
     "explanation": "Explanation",
     "source": "Source",
-    "identicalNote": "The value matches the model solution."
+    "identicalNote": "The value matches the model solution.",
+    "messages": "Messages of this submission",
+    "message": "Step {{step}} · {{abgabegrund}}",
+    "fieldCount_one": "{{count}} field",
+    "fieldCount_other": "{{count}} fields",
+    "deviationCount_one": "{{count}} deviation",
+    "deviationCount_other": "{{count}} deviations",
+    "showEmpty": "Show empty fields"
   },
   "submissions": {
     "col": {
@@ -210,7 +217,8 @@
       "dropMany": "Drag TEEL0 files here (several allowed)",
       "checking": "Reading and checking the file …",
       "choose": "Choose file",
-      "none": "No message produced"
+      "none": "No message produced",
+      "channelHint": "In the prototype, upload stands in for the GKV communication server; in production the same files arrive over the existing network."
     },
     "receipt": {
       "title": "Receipt",
@@ -240,7 +248,8 @@
       "blank": "(blank)",
       "fromYourFile": "REFERENZ-ID and case number come from your own file.",
       "download": "Download {{file}}",
-      "downloadLater": "The backend creates this file (API mode)."
+      "downloadLater": "The backend creates this file (API mode).",
+      "importHint": "Import this file into your payroll software, then go on with the next round."
     },
     "verdict": {
       "title": "Test run finished",
@@ -278,5 +287,93 @@
     "decidedToday": "Decided today",
     "signature": "Signature",
     "resetDemo": "Reset demo"
+  },
+  "report": {
+    "topbar": "Test report <strong>#{{id}}</strong>",
+    "title": "Test report · {{vendor}}",
+    "subtitle": "Test case {{testCase}} · rule set V{{ruleSet}} · checked for {{date}} · {{files}} file(s)",
+    "downloadJson": "Download JSON",
+    "openPrintable": "Open printable view (PDF)",
+    "passedHint": "All {{count}} checked rules met.",
+    "failedHint": "Not met: {{rules}}",
+    "signature": "Signature",
+    "valid": "Valid",
+    "invalid": "Invalid",
+    "signedAt": "Signed at",
+    "rules": "Rules",
+    "deviations": "Deviations",
+    "files": "Checked files",
+    "signing": "Signing the report …",
+    "apiOnly": "Reports need the backend (npm run dev:api).",
+    "none": "No checked submissions yet.",
+    "notSigned": "not signed yet",
+    "col": {
+      "signed": "Signed",
+      "checks": "What it checks"
+    },
+    "verdict": "Verdict"
+  },
+  "spec": {
+    "subtitle": "{{count}} changes in the EEL scope, {{tests}} test cases change their result. Field layouts unchanged.",
+    "subtitleLoading": "Comparing both versions.",
+    "loading": "Comparing the versions (the spec-update agent needs up to a minute the first time) …",
+    "ruleChange": "Rule change",
+    "label": {
+      "editorial": "editorial",
+      "clarification": "clarification",
+      "law_change": "law change",
+      "unknown": "unknown"
+    },
+    "old": "Old (V{{version}})",
+    "new": "New (V{{version}})",
+    "impact": "Impact",
+    "recompute": "Rules to recompute",
+    "review": "Rules to review",
+    "param": "Changed parameter",
+    "flips": "Test case with a new result",
+    "no41": "no 41",
+    "agent": "Draft by the spec-update agent",
+    "decision": {
+      "no_change": "No change",
+      "update_test": "Update test",
+      "new_test": "New test"
+    },
+    "draft": "Draft affected tests",
+    "drafting": "Drafting tests …"
+  },
+  "catalogue": {
+    "title": "Test catalogue 2027",
+    "subtitle": "{{count}} test cases, {{drafts}} waiting for approval.",
+    "hidden": "Generate hidden variant",
+    "approveAll": "Approve {{count}} test(s)",
+    "approve": "Approve",
+    "reject": "Reject",
+    "from": "from {{parent}}",
+    "flips": "result changes from V{{version}}",
+    "kind": {
+      "reference": "Reference case",
+      "clone": "Clone",
+      "hidden": "Hidden variant"
+    },
+    "status": {
+      "approved": "Approved",
+      "draft": "Needs approval",
+      "rejected": "Rejected"
+    },
+    "col": {
+      "rules": "Rules",
+      "round": "Round"
+    },
+    "fact": {
+      "priorEnds": "Prior illness ends",
+      "auFrom": "New AU from",
+      "priors": "Prior illnesses"
+    },
+    "expected": "Expected under V{{version}}",
+    "with41": "41 with {{count}} period(s), {{days}} days",
+    "softwareMust": "Software must produce (V{{version}})",
+    "weSend": "We send",
+    "noMessages": "Under V{{version}} no message is produced.",
+    "footnote": "Expected files computed by the rules engine. Source:"
   }
 }

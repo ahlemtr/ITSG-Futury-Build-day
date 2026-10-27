@@ -9,15 +9,16 @@ and the run ends.
 from __future__ import annotations
 
 import uuid
+from collections import Counter
 from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel
 
 from engine.builder import story_text
-from engine.checker import Checker
+from engine.checker import Checker, worst
 from engine.expected import build_chain, get_case, load_scenario
-from engine.model import Case, ExpectedMessage, Record
+from engine.model import Case, CheckResult, ExpectedMessage, Record
 from engine.records import parse_file
 from engine.rules import params as params_mod
 from engine.writer_messages import write_file
@@ -138,6 +139,20 @@ def submit(kb: KnowledgeBase, st: RunState, files: list[str | bytes]) -> RoundRe
     elif r >= st.last_round:
         st.status = "failed" if any(o.outcome == "fail" for rr in st.rounds for o in rr.outcomes) else "passed"
     return result
+
+
+def check_so_far(kb: KnowledgeBase, st: RunState, triage=None) -> CheckResult:
+    """The full check of the run's files, limited to the steps of the rounds played so far, so an open
+    run does not show the messages of later rounds as missing. Stored as the run's submission check."""
+    ch = build_chain(load_scenario(kb, st.test_case), st.version, kb)
+    done = {m.step for m in ch.messages if m.actor == "employer" and m.round <= st.round}
+    res = Checker(kb).check(st.test_case, st.files, st.valid_on, version=st.version, triage=triage)
+    devs = [d for d in res.deviations if d.step is None or d.step in done]
+    labels = [d.label for d in devs]
+    return res.model_copy(update={
+        "deviations": devs, "label": worst(labels), "counts": dict(Counter(labels)),
+        "resolved_by": dict(Counter(d.resolved_by or "open" for d in devs)),
+        "expected_messages": sum(1 for m in ch.messages if m.actor == "employer" and m.step in done)})
 
 
 def verdict(st: RunState) -> dict:

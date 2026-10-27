@@ -357,3 +357,40 @@ abbr[title] {
   margin-right: 8px;
   border-radius: 2px;
 }
+
+/* Spec changes: old and new passage side by side, removed words red, added words green */
+.passage-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.passage {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.diff-del {
+  background: var(--label-bug-bg);
+  color: var(--label-bug-fg);
+  text-decoration: line-through;
+}
+
+.diff-ins {
+  background: var(--label-exact-bg);
+  color: var(--label-exact-fg);
+}
+
+/* Test catalogue: table plus a wider detail panel */
+.split-wide {
+  grid-template-columns: minmax(0, 1fr) 420px;
+}
+
+/* Submission result: one tab per message of the chain */
+.message-tabs {
+  margin-bottom: 12px;
+}
+
+.chip-alert {
+  color: var(--label-bug-fg);
+}

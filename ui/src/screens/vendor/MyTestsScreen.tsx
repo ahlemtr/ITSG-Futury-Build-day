@@ -1,12 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { getVendorRuns } from "../../data/api";
+import { isApi } from "../../data/dataSource";
 import { RUNS } from "../../data/mock/runs";
-import { useRunState } from "../../data/runStore";
+import { useSavedRun } from "../../data/runStore";
+import { useData } from "../../data/useData";
 import type { RunDef } from "../../data/types";
 import { pick } from "../../format";
 
 export function MyTestsScreen() {
   const { t } = useTranslation();
+  const runs = useData(() => (isApi ? getVendorRuns(RUNS) : Promise.resolve(RUNS)), []);
   return (
     <>
       <div className="page-header">
@@ -25,9 +29,14 @@ export function MyTestsScreen() {
             </tr>
           </thead>
           <tbody>
-            {RUNS.map((run) => (
-              <TestRow key={run.testCaseId} run={run} />
-            ))}
+            {runs.status === "ready" && runs.data.map((run) => <TestRow key={run.testCaseId} run={run} />)}
+            {runs.status !== "ready" && (
+              <tr>
+                <td colSpan={5} className="empty">
+                  {t(runs.status === "loading" ? "common.loading" : "common.error")}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </section>
@@ -38,7 +47,7 @@ export function MyTestsScreen() {
 function TestRow({ run }: { run: RunDef }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const state = useRunState(run.testCaseId);
+  const state = useSavedRun(run.testCaseId);
   const open = () => navigate(`/vendor/runs/${run.testCaseId}`);
 
   let status = t("myTests.status.notStarted");
@@ -46,7 +55,7 @@ function TestRow({ run }: { run: RunDef }) {
   if (state?.status === "passed") [status, tone] = [t("run.passed"), "exact"];
   else if (state?.status === "failed") [status, tone] = [t("run.failed"), "bug"];
   else if (state && (state.current > 0 || state.rounds[0].receipt || state.rounds[0].outcome))
-    [status, tone] = [t("myTests.status.inRound", { nr: state.current + 1, total: run.rounds.length }), "variant"];
+    [status, tone] = [t("myTests.status.inRound", { nr: state.current + 1, total: state.rounds.length }), "variant"];
 
   return (
     <tr tabIndex={0} className="row-link" onClick={open} onKeyDown={(e) => e.key === "Enter" && open()}>

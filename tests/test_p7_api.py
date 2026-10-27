@@ -143,3 +143,54 @@ def test_passages_and_graph(client):
 
 def test_criteria_needs_llm(client):
     assert client.post("/criteria/extract", json={"version": "13.4", "section": "3.12"}).status_code == 503
+
+
+def test_overview(client):
+    o = client.get("/overview", params={"today": "2026-10-27"}).json()
+    assert o["checksNow"]["ruleSet"] == "13.3" and o["checksNow"]["validUntil"] == "2026-12-31"
+    assert o["checksNow"]["submissions"] == 10 and o["checksNow"]["withOpenDeviations"] == 1
+    assert o["nextYear"]["ruleSet"] == "13.4" and o["nextYear"]["specChangesInScope"] > 0
+    assert o["nextYear"]["testsToReapprove"] == 2
+    assert o["resolution"]["waitingForAdvisor"] == 1
+
+
+def test_seed_is_checked(client):
+    subs = {s["id"]: s for s in client.get("/submissions").json()}
+    assert subs["s-missing-july"]["label"] == "bug" and subs["s-three-periods"]["label"] == "correct_variant"
+    assert subs["s-no-contact"]["vendor"] == "Abrechnung Süd Demo"
+
+
+def test_run_rounds_store_submissions(client, itsg_bytes):
+    run = client.post("/runs", json={"test_case_id": "peter", "valid_on": "2027-01-01", "vendor": "Lohnwerk"}).json()
+    assert run["plan"][0] == {"round": 1, "expects": ["41"], "replies": ["61"]} and run["status"] == "open"
+    text = itsg_bytes.decode()
+    i = text.index("DBVO1") + 6
+    bad = client.post(f"/runs/{run['run_id']}/submit", files=[("files", ("bad", (text[:i] + "X" + text[i + 1:]).encode()))])
+    assert bad.json()["rejected"] and client.get(f"/runs/{run['run_id']}").json()["round"] == 0
+    r = client.post(f"/runs/{run['run_id']}/submit", files=[("files", ("TEEL0-r1", itsg_bytes))]).json()
+    assert r["receipt"]["status"] == "accepted" and r["reply_name"] and r["reply"].count("DSLW") == 1
+    sid = r["receipt"]["submission_id"]
+    sub = next(s for s in client.get("/submissions").json() if s["id"] == sid)
+    assert sub["vendor"] == "Lohnwerk" and sub["label"] == "exact_match"
+    again = client.get(f"/runs/{run['run_id']}").json()
+    assert again["round"] == 1 and again["results"][0]["reply"] == r["reply"]
+
+
+def test_hidden_run_shows_no_values(client, itsg_bytes):
+    run = client.post("/runs", json={"test_case_id": "peter-gap-exact-hidden", "valid_on": "2027-01-01"}).json()
+    assert all(set(p) == {"round"} for p in run["plan"])
+    r = client.post(f"/runs/{run['run_id']}/submit", files=[]).json()
+    assert "reply" not in r and all(set(o) == {"rule", "outcome"} for o in r["outcomes"])
+
+
+def test_report_list(client):
+    before = {r["submission_id"]: r for r in client.get("/reports").json()}
+    assert before["s-missing-july"]["signed"] is None and before["s-missing-july"]["label"] == "bug"
+    client.get("/submissions/s-missing-july/report")
+    after = {r["submission_id"]: r for r in client.get("/reports", params={"vendor": "Gehalt 24 Demo"}).json()}
+    assert after["s-missing-july"]["signed"] and "s-variant" not in after
+
+
+def test_test_cases_flag_result_changes(client):
+    tcs = {t["id"]: t for t in client.get("/test-cases").json()}
+    assert tcs["peter-gap-exact"]["result_changes"] == ["13.4"] and tcs["peter"]["result_changes"] == []

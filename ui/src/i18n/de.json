@@ -37,7 +37,7 @@
     },
     "specChanges": {
       "title": "Verfahrensbeschreibung V13.3 → V13.4",
-      "subtitle": "36 Änderungen gefunden, 5 davon im EEL-Prototyp-Umfang. Feldlayouts unverändert."
+      "subtitle": "Vergleich der beiden Fassungen."
     },
     "testCatalogue": {
       "title": "Testkatalog 2027",
@@ -68,7 +68,6 @@
       "subtitle": "Signierte Prüfberichte zum Herunterladen."
     }
   },
-  "placeholder": "Dieser Bildschirm wird in einem späteren Schritt gebaut.",
   "status": {
     "exact": "Exakte Übereinstimmung",
     "identical": "Identisch",
@@ -104,7 +103,8 @@
     "catalogue": "Katalog bekannter Varianten, Schritt a",
     "rules": "Regelprüfung, Schritt b",
     "ai_proposal": "KI-Vorschlag, vom Systemberater bestätigt",
-    "advisor": "Systemberater"
+    "advisor": "Systemberater",
+    "open": "Offen, wartet auf den Systemberater"
   },
   "result": {
     "topbar": "Einreichung <strong>#{{id}}</strong> · Regelwerk <strong>V{{ruleSet}}</strong>",
@@ -134,7 +134,14 @@
     "reasoning": "Begründung",
     "explanation": "Erklärung",
     "source": "Quelle",
-    "identicalNote": "Der Wert stimmt mit der Musterlösung überein."
+    "identicalNote": "Der Wert stimmt mit der Musterlösung überein.",
+    "messages": "Meldungen dieser Einreichung",
+    "message": "Schritt {{step}} · {{abgabegrund}}",
+    "fieldCount_one": "{{count}} Feld",
+    "fieldCount_other": "{{count}} Felder",
+    "deviationCount_one": "{{count}} Abweichung",
+    "deviationCount_other": "{{count}} Abweichungen",
+    "showEmpty": "Leere Felder zeigen"
   },
   "submissions": {
     "col": {
@@ -210,7 +217,8 @@
       "dropMany": "TEEL0-Dateien hierher ziehen (mehrere möglich)",
       "checking": "Datei wird gelesen und geprüft …",
       "choose": "Datei auswählen",
-      "none": "Keine Meldung erzeugt"
+      "none": "Keine Meldung erzeugt",
+      "channelHint": "Der Upload ersetzt im Prototyp den GKV-Kommunikationsserver; im Betrieb kommen dieselben Dateien über das bestehende Netz."
     },
     "receipt": {
       "title": "Eingangsbestätigung",
@@ -240,7 +248,8 @@
       "blank": "(leer)",
       "fromYourFile": "REFERENZ-ID und Aktenzeichen stammen aus Ihrer eigenen Datei.",
       "download": "{{file}} herunterladen",
-      "downloadLater": "Die Datei erzeugt das Backend (API-Modus)."
+      "downloadLater": "Die Datei erzeugt das Backend (API-Modus).",
+      "importHint": "Importieren Sie diese Datei in Ihre Entgeltabrechnung und fahren Sie mit der nächsten Runde fort."
     },
     "verdict": {
       "title": "Testlauf abgeschlossen",
@@ -278,5 +287,93 @@
     "decidedToday": "Heute entschieden",
     "signature": "Signatur",
     "resetDemo": "Demo zurücksetzen"
+  },
+  "report": {
+    "topbar": "Prüfbericht <strong>#{{id}}</strong>",
+    "title": "Prüfbericht · {{vendor}}",
+    "subtitle": "Testfall {{testCase}} · Regelwerk V{{ruleSet}} · geprüft für {{date}} · {{files}} Datei(en)",
+    "downloadJson": "JSON herunterladen",
+    "openPrintable": "Druckansicht öffnen (PDF)",
+    "passedHint": "Alle {{count}} geprüften Regeln erfüllt.",
+    "failedHint": "Nicht erfüllt: {{rules}}",
+    "signature": "Signatur",
+    "valid": "Gültig",
+    "invalid": "Ungültig",
+    "signedAt": "Signiert am",
+    "rules": "Regeln",
+    "deviations": "Abweichungen",
+    "files": "Geprüfte Dateien",
+    "signing": "Bericht wird signiert …",
+    "apiOnly": "Prüfberichte gibt es nur mit dem Backend (npm run dev:api).",
+    "none": "Noch keine geprüften Einreichungen.",
+    "notSigned": "noch nicht signiert",
+    "col": {
+      "signed": "Signiert",
+      "checks": "Was geprüft wird"
+    },
+    "verdict": "Ergebnis"
+  },
+  "spec": {
+    "subtitle": "{{count}} Änderungen im EEL-Umfang, {{tests}} Testfälle ändern ihr Ergebnis. Feldlayouts unverändert.",
+    "subtitleLoading": "Vergleich der beiden Fassungen.",
+    "loading": "Fassungen werden verglichen (der Spec-Update-Agent braucht beim ersten Mal bis zu einer Minute) …",
+    "ruleChange": "Regeländerung",
+    "label": {
+      "editorial": "redaktionell",
+      "clarification": "Klarstellung",
+      "law_change": "Rechtsänderung",
+      "unknown": "unklar"
+    },
+    "old": "Alt (V{{version}})",
+    "new": "Neu (V{{version}})",
+    "impact": "Auswirkung",
+    "recompute": "Regeln neu berechnen",
+    "review": "Regeln prüfen",
+    "param": "Geänderter Parameter",
+    "flips": "Testfall mit neuem Ergebnis",
+    "no41": "keine 41",
+    "agent": "Entwurf des Spec-Update-Agenten",
+    "decision": {
+      "no_change": "Keine Änderung",
+      "update_test": "Test anpassen",
+      "new_test": "Neuer Test"
+    },
+    "draft": "Betroffene Tests entwerfen",
+    "drafting": "Tests werden entworfen …"
+  },
+  "catalogue": {
+    "title": "Testkatalog 2027",
+    "subtitle": "{{count}} Testfälle, {{drafts}} warten auf Freigabe.",
+    "hidden": "Versteckte Variante erzeugen",
+    "approveAll": "{{count}} Test(s) freigeben",
+    "approve": "Freigeben",
+    "reject": "Ablehnen",
+    "from": "aus {{parent}}",
+    "flips": "Ergebnis ändert sich ab V{{version}}",
+    "kind": {
+      "reference": "Referenzfall",
+      "clone": "Klon",
+      "hidden": "Versteckte Variante"
+    },
+    "status": {
+      "approved": "Freigegeben",
+      "draft": "Freigabe nötig",
+      "rejected": "Abgelehnt"
+    },
+    "col": {
+      "rules": "Regeln",
+      "round": "Runde"
+    },
+    "fact": {
+      "priorEnds": "Vorerkrankung endet",
+      "auFrom": "Neue AU ab",
+      "priors": "Vorerkrankungen"
+    },
+    "expected": "Erwartet unter V{{version}}",
+    "with41": "41 mit {{count}} Zeitraum/Zeiträumen, {{days}} Tage",
+    "softwareMust": "Software muss erzeugen (V{{version}})",
+    "weSend": "Wir senden",
+    "noMessages": "Unter V{{version}} entsteht keine Meldung.",
+    "footnote": "Erwartete Dateien berechnet die Regel-Engine. Quelle:"
   }
 }

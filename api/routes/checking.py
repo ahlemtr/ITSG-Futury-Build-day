@@ -8,7 +8,7 @@ from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, Response
 from pydantic import BaseModel
 
-from api.routes.common import ai, kb, repo, test_case
+from api.routes.common import ai, kb, real_versions, repo, test_case
 from engine import intake, layouts, report, signing
 from engine.checker import Checker
 from engine.diff import Differ
@@ -69,14 +69,38 @@ async def submit(request: Request, test_case_id: str = Form(...), valid_on: date
     return rec.model_dump()
 
 
+def _rounds_total(request: Request, test_case_id: str, version: str | None) -> int:
+    """Rounds of the test run: employer rounds plus an import-only round after the last insurer reply."""
+    from engine.runs import _rounds
+
+    tc = test_case(request, test_case_id)
+    msgs = build_chain(load_scenario(kb(request), tc), version or real_versions(request)[-1], kb(request)).messages
+    return _rounds(msgs, tc.steps)
+
+
 @router.get("/submissions")
 def list_submissions(request: Request, test_case_id: str | None = None):
-    out = []
-    for s in repo(request).list_submissions(test_case_id):
+    out, rounds = [], {}
+    for s in sorted(repo(request).list_submissions(test_case_id), key=lambda x: x.created, reverse=True):
         res = repo(request).get_check(s.id)
+        key = (s.test_case_id, s.rule_set_version)
+        if key not in rounds:
+            rounds[key] = _rounds_total(request, *key)
         out.append({**s.model_dump(mode="json", exclude={"files"}), "files": [f.name for f in s.files],
-                    "label": res.label if res else None, "deviations": len(res.deviations) if res else None})
+                    "label": res.label if res else None, "deviations": len(res.deviations) if res else None,
+                    "rounds_total": rounds[key]})
     return out
+
+
+@router.get("/submissions/{sid}/check")
+def stored_check(request: Request, sid: str):
+    """The stored check result (advisor decisions included); checks once when there is none yet."""
+    s = _submission(request, sid)
+    res = repo(request).get_check(sid)
+    if res is None:
+        res = run_check(request, s.test_case_id, list(intake.load_files(s).values()), s.valid_on or date.today())
+        repo(request).save_check(sid, res)
+    return {"submission_id": sid, **res.model_dump(mode="json")}
 
 
 @router.get("/submissions/{sid}/diff")
@@ -102,7 +126,10 @@ def side_by_side(request: Request, sid: str, valid_on: date | None = None):
             exp_vals = m.head if blk == "DSLW" else m.blocks.get(blk)
             act_vals = r.head if blk == "DSLW" else (r.blocks[blk].fields if blk in r.blocks else None)
             for f in lay.fields:
-                e = format_value(f, exp_vals.get(f.name, f.constant)) if exp_vals is not None else None
+                ev = exp_vals.get(f.name, f.constant) if exp_vals is not None else None
+                if lay.repeating_group and f.name == lay.repeating_group.count_field and exp_vals is not None:
+                    ev = len(exp_vals.get("groups", []))  # the writer derives the count from the groups
+                e = format_value(f, ev) if exp_vals is not None else None
                 if blk == "DSLW" and f.name.startswith("MM-"):
                     e = None
                 a = act_vals[f.name].raw if act_vals and f.name in act_vals else None
@@ -203,6 +230,21 @@ def get_report(request: Request, sid: str, format: str = "json"):
         except RuntimeError as e:
             raise HTTPException(501, str(e))
     return signed
+
+
+@router.get("/reports")
+def list_reports(request: Request, vendor: str | None = None):
+    """Checked submissions with their report status; the report is signed when it is first opened."""
+    out = []
+    for s in sorted(repo(request).list_submissions(), key=lambda x: x.created, reverse=True):
+        res = repo(request).get_check(s.id)
+        if res is None or (vendor and s.vendor != vendor):
+            continue
+        signed = repo(request).get_report(s.id)
+        out.append({"submission_id": s.id, "test_case_id": s.test_case_id, "vendor": s.vendor,
+                    "rule_set_version": res.version, "label": res.label, "created": s.created.isoformat(),
+                    "signed": signed["report"]["created"] if signed else None})
+    return out
 
 
 @router.post("/reports/verify")
