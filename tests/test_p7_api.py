@@ -189,3 +189,8 @@ def test_report_list(client):
     client.get("/submissions/s-missing-july/report")
     after = {r["submission_id"]: r for r in client.get("/reports", params={"vendor": "Gehalt 24 Demo"}).json()}
     assert after["s-missing-july"]["signed"] and "s-variant" not in after
+
+
+def test_test_cases_flag_result_changes(client):
+    tcs = {t["id"]: t for t in client.get("/test-cases").json()}
+    assert tcs["peter-gap-exact"]["result_changes"] == ["13.4"] and tcs["peter"]["result_changes"] == []

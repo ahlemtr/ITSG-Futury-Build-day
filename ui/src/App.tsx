@@ -2,10 +2,10 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { TopBar } from "./components/TopBar";
 import { TopBarProvider } from "./components/TopBarContext";
 import { SideNav } from "./components/SideNav";
-import { PlaceholderScreen } from "./screens/PlaceholderScreen";
 import { ReportScreen } from "./screens/ReportScreen";
 import { ReportsScreen } from "./screens/ReportsScreen";
 import { SpecChangesScreen } from "./screens/SpecChangesScreen";
+import { TestCatalogueScreen } from "./screens/TestCatalogueScreen";
 import { OverviewScreen } from "./screens/OverviewScreen";
 import { AdvisorQueueScreen } from "./screens/AdvisorQueueScreen";
 import { SubmissionsScreen } from "./screens/SubmissionsScreen";
@@ -24,7 +24,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<OverviewScreen />} />
             <Route path="/spec-changes" element={<SpecChangesScreen />} />
-            <Route path="/test-catalogue" element={<PlaceholderScreen screen="testCatalogue" />} />
+            <Route path="/test-catalogue" element={<TestCatalogueScreen />} />
             <Route path="/submissions" element={<SubmissionsScreen />} />
             <Route path="/submissions/:id" element={<SubmissionResultScreen />} />
             <Route path="/advisor-queue" element={<AdvisorQueueScreen />} />

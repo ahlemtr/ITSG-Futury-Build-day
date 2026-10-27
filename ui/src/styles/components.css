@@ -380,3 +380,8 @@ abbr[title] {
   background: var(--label-exact-bg);
   color: var(--label-exact-fg);
 }
+
+/* Test catalogue: table plus a wider detail panel */
+.split-wide {
+  grid-template-columns: minmax(0, 1fr) 420px;
+}

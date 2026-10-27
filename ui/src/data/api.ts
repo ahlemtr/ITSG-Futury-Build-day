@@ -570,6 +570,8 @@ export type ApiTestCase = {
   parent: string | null;
   targets: string[];
   steps: "single" | "chain";
+  /** rule-set versions whose expected result differs from the version before */
+  result_changes: string[];
 };
 
 export const getTestCases = () => getJson<ApiTestCase[]>("/test-cases");
@@ -776,4 +778,48 @@ export async function getSpecDiff(oldVersion = "13.3", newVersion = "13.4"): Pro
     params: { old: oldRules.params, new: newRules.params },
     agent: d.agent?.decisions ?? null,
   };
+}
+
+export type Expected = { send_41: boolean; periods: [string, string][]; total_days: number | null };
+
+export type ChainStep = { step: number; round: number; actor: "employer" | "insurer"; abgabegrund: string; note: string | null };
+
+export type TestCaseDetail = {
+  test_case: ApiTestCase & {
+    inputs: {
+      report_date: string;
+      employment_end: string | null;
+      current: { start: string; end: string | null; certified: boolean };
+      priors: { start: string; end: string; certified: boolean }[];
+    };
+    expected: Record<string, Expected>;
+    sources: string[];
+  };
+  chains: Record<string, ChainStep[]>;
+  submissions: string[];
+};
+
+export const getTestCase = (id: string) => getJson<TestCaseDetail>(`/test-cases/${encodeURIComponent(id)}`);
+
+export const approveTestCase = (id: string, decision: "approved" | "rejected", approver = "ITSG") =>
+  postJson<{ id: string; status: string }>(`/test-cases/${encodeURIComponent(id)}/approve`, { approver, decision });
+
+export const draftHidden = (id: string) => postJson<{ id: string }>("/builder/hidden", { test_case_id: id, seed: 0 });
+
+/** Test builder after a spec change: boundary tests around every recomputed rule (where the builder knows the
+ * rule) and a hidden variant of every public test whose result flips. All come back as drafts. */
+export async function draftAffectedTests(diff: SpecDiff, base = "peter"): Promise<string[]> {
+  const ids: string[] = [];
+  for (const rule of new Set(diff.changes.flatMap((c) => c.recompute))) {
+    try {
+      const made = await postJson<{ id: string }[]>("/builder/boundaries", { rule_id: rule, base_test_case_id: base, version: diff.newVersion });
+      ids.push(...made.map((t) => t.id));
+    } catch (e) {
+      if (!(e instanceof ApiError && e.status === 422)) throw e; // no boundary builder for this rule
+    }
+  }
+  const cases = await getTestCases();
+  for (const id of diff.changedTests)
+    if (cases.some((c) => c.id === id && !c.hidden)) ids.push((await draftHidden(id)).id);
+  return [...new Set(ids)];
 }

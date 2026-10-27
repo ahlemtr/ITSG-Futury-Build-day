@@ -45,8 +45,16 @@ def list_test_cases(request: Request, kind: str | None = None, hidden: bool | No
     if not items:
         items = [get_case(kb(request), t.key) for t in kb(request).get_test_cases(include_hidden=hidden is not False)
                  if (kind is None or t.kind == kind) and (hidden is None or t.hidden == hidden)]
+    versions = real_versions(request)
+
+    def result_changes(t) -> list[str]:
+        """Versions whose expected 41 decision differs from the version before (needs re-approval)."""
+        return [new for old, new in zip(versions, versions[1:])
+                if old in t.expected and new in t.expected and t.expected[old] != t.expected[new]]
+
     return [{"id": t.id, "kind": t.kind, "origin": t.origin, "status": t.status, "hidden": t.hidden,
-             "parent": t.parent, "targets": t.targets, "steps": t.steps} for t in items]
+             "parent": t.parent, "targets": t.targets, "steps": t.steps, "result_changes": result_changes(t)}
+            for t in items]
 
 
 @router.get("/test-cases/{id_}")

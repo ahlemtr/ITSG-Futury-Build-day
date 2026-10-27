@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { getSpecDiff, toSpecRef, type SpecChange, type SpecDiff } from "../data/api";
+import { draftAffectedTests, getSpecDiff, toSpecRef, type SpecChange, type SpecDiff } from "../data/api";
 import { isApi } from "../data/dataSource";
 import { useData } from "../data/useData";
 import { wordDiff, type DiffPart } from "../records/wordDiff";
@@ -12,6 +12,22 @@ import { formatDate } from "../format";
 export function SpecChangesScreen() {
   const { t } = useTranslation();
   const state = useData(() => (isApi ? getSpecDiff() : Promise.resolve(null)), []);
+  const navigate = useNavigate();
+  const [drafting, setDrafting] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  async function draft(diff: SpecDiff) {
+    setDrafting(true);
+    setFailed(false);
+    try {
+      await draftAffectedTests(diff);
+      navigate("/test-catalogue");
+    } catch {
+      setFailed(true);
+    } finally {
+      setDrafting(false);
+    }
+  }
 
   return (
     <>
@@ -25,11 +41,21 @@ export function SpecChangesScreen() {
           </p>
         </div>
         <div className="header-actions">
-          <Link className="button button-primary" to="/test-catalogue">
-            {t("spec.toCatalogue")}
-          </Link>
+          <button
+            type="button"
+            className="button button-primary"
+            disabled={drafting || state.status !== "ready" || !state.data}
+            onClick={() => state.status === "ready" && state.data && draft(state.data)}
+          >
+            {t(drafting ? "spec.drafting" : "spec.draft")}
+          </button>
         </div>
       </div>
+      {failed && (
+        <p className="field-error" role="alert">
+          {t("common.error")}
+        </p>
+      )}
       {!isApi && <div className="placeholder">{t("report.apiOnly")}</div>}
       {state.status === "loading" && <p className="page-subtitle">{t("spec.loading")}</p>}
       {state.status === "error" && <div className="placeholder">{t("common.error")}</div>}

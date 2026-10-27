@@ -68,7 +68,6 @@
       "subtitle": "Signed test reports to download."
     }
   },
-  "placeholder": "This screen is built in a later step.",
   "status": {
     "exact": "Exact match",
     "identical": "Identical",
@@ -311,7 +310,6 @@
     "subtitle": "{{count}} changes in the EEL scope, {{tests}} test cases change their result. Field layouts unchanged.",
     "subtitleLoading": "Comparing both versions.",
     "loading": "Comparing the versions (the spec-update agent needs up to a minute the first time) …",
-    "toCatalogue": "Affected tests in the catalogue",
     "ruleChange": "Rule change",
     "label": {
       "editorial": "editorial",
@@ -332,6 +330,43 @@
       "no_change": "No change",
       "update_test": "Update test",
       "new_test": "New test"
-    }
+    },
+    "draft": "Draft affected tests",
+    "drafting": "Drafting tests …"
+  },
+  "catalogue": {
+    "title": "Test catalogue 2027",
+    "subtitle": "{{count}} test cases, {{drafts}} waiting for approval.",
+    "hidden": "Generate hidden variant",
+    "approveAll": "Approve {{count}} test(s)",
+    "approve": "Approve",
+    "reject": "Reject",
+    "from": "from {{parent}}",
+    "flips": "result changes from V{{version}}",
+    "kind": {
+      "reference": "Reference case",
+      "clone": "Clone",
+      "hidden": "Hidden variant"
+    },
+    "status": {
+      "approved": "Approved",
+      "draft": "Needs approval",
+      "rejected": "Rejected"
+    },
+    "col": {
+      "rules": "Rules",
+      "round": "Round"
+    },
+    "fact": {
+      "priorEnds": "Prior illness ends",
+      "auFrom": "New AU from",
+      "priors": "Prior illnesses"
+    },
+    "expected": "Expected under V{{version}}",
+    "with41": "41 with {{count}} period(s), {{days}} days",
+    "softwareMust": "Software must produce (V{{version}})",
+    "weSend": "We send",
+    "noMessages": "Under V{{version}} no message is produced.",
+    "footnote": "Expected files computed by the rules engine. Source:"
   }
 }
