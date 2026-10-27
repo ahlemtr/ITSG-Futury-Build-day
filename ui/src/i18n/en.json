@@ -15,7 +15,9 @@
   },
   "common": {
     "loading": "Loading …",
-    "error": "The data could not be loaded."
+    "error": "The data could not be loaded.",
+    "info": "Explanation",
+    "why": "Reasoning"
   },
   "nav": {
     "label": "Main navigation",
@@ -347,7 +349,7 @@
     },
     "titlePair": "Verfahrensbeschreibung V{{old}} → V{{new}}",
     "titleNone": "Spec changes",
-    "subtitleNone": "Only V{{version}} is known. Upload a new version: it is chunked into passages, embedded, compared with V{{version}} and analysed by the AI; the knowledge graph grows and the test catalogue is recomputed.",
+    "subtitleNone": "Only V{{version}} is known.",
     "toCatalogue": "Affected tests in the catalogue",
     "upload": {
       "open": "Upload a new version",
@@ -360,14 +362,20 @@
       "auto": "from the file",
       "submit": "Upload and analyse",
       "running": "Processing …",
-      "doneNext": "V{{version}} applies from {{date}}: next year's catalogue is prepared ({{flipped}} test cases with a new result, {{drafts}} drafts to approve). Today's checks stay on the rule set in force.",
-      "doneNow": "V{{version}} applies since {{date}}: the rule set in force is updated, open submissions were re-checked ({{flipped}} test cases with a new result, {{drafts}} drafts to approve).",
+      "doneNext": "V{{version}} applies from {{date}}",
+      "doneNow": "V{{version}} applies since {{date}}",
       "status": {
         "running": "running",
         "done": "done",
         "failed": "failed"
       },
-      "doneCalc": "{{doc}} {{version}} analysed: {{rules}} calculation rules in the knowledge graph (draft, need implementation in the rules engine). Proposals for engine parameters for ITSG to confirm: {{proposals}}."
+      "doneCalc": "{{doc}} {{version}} analysed",
+      "doneNextInfo": "Next year's catalogue is prepared. Today's checks stay on the rule set in force.",
+      "doneNowInfo": "The rule set in force is updated; open submissions were re-checked.",
+      "flipped": "test cases with a new result",
+      "drafts": "drafts to approve",
+      "calcRules": "calculation rules (draft)",
+      "proposals": "parameter proposals for ITSG"
     },
     "doc": {
       "VB": "Verfahrensbeschreibung DTA EEL",
@@ -385,7 +393,8 @@
       "analyse": "AI analyses the changes",
       "apply": "Knowledge graph updated",
       "catalogue": "Test catalogue recomputed"
-    }
+    },
+    "pipelineInfo": "A new version is chunked into passages, embedded, compared with the previous one and analysed by the AI; the knowledge graph grows and the test catalogue is recomputed."
   },
   "catalogue": {
     "title": "Test catalogue 2027",
@@ -458,7 +467,7 @@
   },
   "kg": {
     "title": "Knowledge graph",
-    "subtitle": "The AI's memory: versions, passages, rules, parameters, changes, test cases and decisions, all linked. Every new version, test and decision extends it; the more it holds, the more precisely search finds the passages, rules and test cases a change touches.",
+    "subtitle": "The AI's memory: versions, rules, test cases and decisions, linked.",
     "count": {
       "DocVersion": "document versions",
       "Passage": "passages",
@@ -569,7 +578,9 @@
       "rejected": "{{testCase}} rejected"
     },
     "upcoming": "Next deadlines",
-    "all": "All deadlines"
+    "all": "All deadlines",
+    "vendors_one": "{{count}} vendor",
+    "vendors_other": "{{count}} vendors"
   },
   "admin": {
     "menu": "User menu",

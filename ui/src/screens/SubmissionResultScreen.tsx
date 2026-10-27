@@ -9,6 +9,7 @@ import { SpecRefText } from "../components/SpecRefText";
 import { useSetTopBar } from "../components/TopBarContext";
 import { useView, viewBase } from "../components/useView";
 import { formatDate, pick } from "../format";
+import { InfoTip, Reasoning } from "../components/InfoTip";
 
 const CHIP_ORDER: FieldStatus[] = ["identical", "variant", "bug", "invalid", "unclear", "ignored", "valid"];
 
@@ -246,7 +247,6 @@ function DeviationPanel({ deviation, lang }: { deviation: Deviation; lang: strin
   const { t } = useTranslation();
   return (
     <>
-      <p className="eyebrow">{t("result.why")}</p>
       <h2>{pick(deviation.title, lang)}</h2>
       <Badge value={deviation.label} />
       <dl className="facts">
@@ -277,11 +277,8 @@ function DeviationPanel({ deviation, lang }: { deviation: Deviation; lang: strin
             </dd>
           </div>
         )}
-        <div>
-          <dt>{t("result.reasoning")}</dt>
-          <dd>{pick(deviation.reasoning, lang)}</dd>
-        </div>
       </dl>
+      <Reasoning>{pick(deviation.reasoning, lang)}</Reasoning>
     </>
   );
 }
@@ -290,7 +287,6 @@ function FieldPanel({ row, lang }: { row: FieldRow; lang: string }) {
   const { t } = useTranslation();
   return (
     <>
-      <p className="eyebrow">{t("result.fieldInfo")}</p>
       <h2>
         {row.block} · {row.field}
       </h2>
@@ -299,7 +295,8 @@ function FieldPanel({ row, lang }: { row: FieldRow; lang: string }) {
         <div>
           <dt>{t("result.col.mode")}</dt>
           <dd>
-            <strong>{t(`mode.${row.mode}`)}</strong> · {t(`modeHint.${row.mode}`)}
+            <strong>{t(`mode.${row.mode}`)}</strong>
+            <InfoTip>{t(`modeHint.${row.mode}`)}</InfoTip>
           </dd>
         </div>
         <div>

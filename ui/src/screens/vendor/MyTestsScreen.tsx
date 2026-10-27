@@ -6,6 +6,7 @@ import { useSavedRun } from "../../data/runStore";
 import { useData } from "../../data/useData";
 import type { RunDef } from "../../data/types";
 import { pick } from "../../format";
+import { InfoTip } from "../../components/InfoTip";
 
 export function MyTestsScreen() {
   const { t } = useTranslation();
@@ -13,8 +14,10 @@ export function MyTestsScreen() {
   return (
     <>
       <div className="page-header">
-        <h1>{t("screens.myTests.title")}</h1>
-        <p className="page-subtitle">{t("screens.myTests.subtitle")}</p>
+        <h1>
+          {t("screens.myTests.title")}
+          <InfoTip>{t("screens.myTests.subtitle")}</InfoTip>
+        </h1>
       </div>
       <section className="panel panel-flush">
         <table className="list-table">

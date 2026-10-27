@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getOverview, getSubmissions } from "../data/dataSource";
-import { getCalendar, type CalendarData } from "../data/api";
+import { getCalendar, type CalendarData, type Deadline } from "../data/api";
 import { deadlineTitle, dueText } from "../data/deadlines";
 import type { OverviewData } from "../data/types";
 import { useData } from "../data/useData";
 import { SubmissionsTable } from "../components/SubmissionsTable";
 import { formatDate } from "../format";
+import { InfoTip } from "../components/InfoTip";
 
 const LATEST_COUNT = 5;
 const DEADLINE_COUNT = 5;
@@ -21,8 +22,10 @@ export function OverviewScreen() {
   return (
     <>
       <div className="page-header">
-        <h1>{t("screens.overview.title")}</h1>
-        <p className="page-subtitle">{t("screens.overview.subtitle")}</p>
+        <h1>
+          {t("screens.overview.title")}
+          <InfoTip>{t("screens.overview.subtitle")}</InfoTip>
+        </h1>
       </div>
 
       {overview.status === "loading" && <p className="page-subtitle">{t("common.loading")}</p>}
@@ -143,7 +146,10 @@ function ResolutionCard({ data }: { data: OverviewData["resolution"] }) {
 function NextDeadlines({ data }: { data: CalendarData }) {
   const { t, i18n } = useTranslation();
   const names = new Map(data.companies.map((c) => [c.id, c.name]));
-  const next = data.deadlines.filter((d) => !d.done).slice(0, DEADLINE_COUNT);
+  const groups = new Map<string, Deadline[]>();
+  for (const d of data.deadlines.filter((x) => !x.done))
+    groups.set(`${d.due}|${deadlineTitle(t, d, i18n.language)}`, [...(groups.get(`${d.due}|${deadlineTitle(t, d, i18n.language)}`) ?? []), d]);
+  const next = [...groups.values()].slice(0, DEADLINE_COUNT);
   return (
     <section className="panel panel-flush next-deadlines" aria-labelledby="next-deadlines-title">
       <div className="list-head">
@@ -152,10 +158,12 @@ function NextDeadlines({ data }: { data: CalendarData }) {
       </div>
       <table className="list-table">
         <tbody>
-          {next.map((d) => (
+          {next.map(([d, ...more]) => (
             <tr key={d.id}>
               <td className="tabular cell-field">{formatDate(d.due)}</td>
-              <td>{d.company_id ? names.get(d.company_id) : "ITSG"}</td>
+              <td title={more.length ? [d, ...more].map((x) => names.get(x.company_id ?? "")).join(", ") : undefined}>
+                {more.length ? t("calendar.vendors", { count: more.length + 1 }) : d.company_id ? names.get(d.company_id) : "ITSG"}
+              </td>
               <td>{deadlineTitle(t, d, i18n.language)}</td>
               <td>
                 <span className={`badge badge-${d.status === "overdue" ? "bug" : "neutral"}`}>{dueText(t, d)}</span>

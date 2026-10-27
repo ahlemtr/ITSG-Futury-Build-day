@@ -16,6 +16,7 @@ import { useData } from "../data/useData";
 import { wordDiff, type DiffPart } from "../records/wordDiff";
 import { SpecRefText } from "../components/SpecRefText";
 import { formatDate } from "../format";
+import { InfoTip, Reasoning, Stat } from "../components/InfoTip";
 
 /** Documents a new version can be uploaded for: the Verfahrensbeschreibung, the Gemeinsame Grundsätze and the
  * insurers' Rundschreiben (calculation rules). */
@@ -40,7 +41,10 @@ export function SpecChangesScreen() {
     <>
       <div className="page-header page-header-split">
         <div>
-          <h1>{pair ? t("spec.titlePair", { old: pair[0], new: pair[1] }) : t("spec.titleNone")}</h1>
+          <h1>
+            {pair ? t("spec.titlePair", { old: pair[0], new: pair[1] }) : t("spec.titleNone")}
+            <InfoTip>{t("spec.pipelineInfo")}</InfoTip>
+          </h1>
           <p className="page-subtitle">
             {!known
               ? t("common.loading")
@@ -103,8 +107,10 @@ function UploadCard({ onDone }: { onDone: () => void }) {
 
   return (
     <section className="panel upload-card">
-      <h2 className="card-title">{t("spec.upload.title")}</h2>
-      <p className="card-subtitle">{t("spec.upload.hint")}</p>
+      <h2 className="card-title">
+        {t("spec.upload.title")}
+        <InfoTip>{t("spec.upload.hint")}</InfoTip>
+      </h2>
       <form className="upload-form" onSubmit={submit}>
         <label>
           <span className="field-label">{t("spec.upload.document")}</span>
@@ -143,27 +149,28 @@ function UploadCard({ onDone }: { onDone: () => void }) {
         </p>
       )}
       {last?.status === "done" && last.result.calculation_rules !== undefined && (
-        <p className="saved-note" role="status">
-          {t("spec.upload.doneCalc", {
-            doc: t(`spec.doc.${last.document}`, { defaultValue: last.document }),
-            version: last.version,
-            rules: last.result.calculation_rules.length,
-            proposals:
-              (last.result.parameter_proposals ?? [])
-                .map((p) => `${p.parameter}: ${String(p.current)} → ${String(p.proposed)}`)
-                .join(", ") || "–",
-          })}
-        </p>
+        <div className="saved-note" role="status">
+          <strong>{t("spec.upload.doneCalc", { doc: t(`spec.doc.${last.document}`, { defaultValue: last.document }), version: last.version })}</strong>
+          <div className="stats">
+            <Stat value={last.result.calculation_rules.length} label={t("spec.upload.calcRules")} />
+            <Stat value={(last.result.parameter_proposals ?? []).length} label={t("spec.upload.proposals")} attention />
+            {(last.result.parameter_proposals ?? []).map((p) => (
+              <span key={p.parameter} className="cell-hint mono">
+                {p.parameter}: {String(p.current)} → {String(p.proposed)}
+              </span>
+            ))}
+          </div>
+        </div>
       )}
       {last?.status === "done" && last.result.calculation_rules === undefined && (
-        <p className="saved-note" role="status">
-          {t(last.result.track === "now" ? "spec.upload.doneNow" : "spec.upload.doneNext", {
-            version: last.version,
-            date: formatDate(last.valid_from),
-            drafts: last.result.drafts?.length ?? 0,
-            flipped: last.result.flipped?.length ?? 0,
-          })}
-        </p>
+        <div className="saved-note" role="status">
+          <strong>{t(last.result.track === "now" ? "spec.upload.doneNow" : "spec.upload.doneNext", { version: last.version, date: formatDate(last.valid_from) })}</strong>
+          <InfoTip>{t(last.result.track === "now" ? "spec.upload.doneNowInfo" : "spec.upload.doneNextInfo")}</InfoTip>
+          <div className="stats">
+            <Stat value={last.result.flipped?.length ?? 0} label={t("spec.upload.flipped")} />
+            <Stat value={last.result.drafts?.length ?? 0} label={t("spec.upload.drafts")} attention />
+          </div>
+        </div>
       )}
       {jobs.status === "ready" && jobs.data.length > 0 && (
         <table className="list-table compact">
@@ -332,14 +339,16 @@ function ChangeDetail({ change, diff }: { change: SpecChange; diff: SpecDiff }) 
       {drafts.length > 0 && (
         <section className="sub-card ai-card">
           <div className="sub-card-head">
-            <h3>{t("spec.agent")}</h3>
+            <h3>
+              {t("spec.agent")}
+              <InfoTip>{t("advisor.draftOnly")}</InfoTip>
+            </h3>
           </div>
           <ul className="rule-list">
             {drafts.map((d, i) => (
               <li key={i}>
                 <strong>{t(`spec.decision.${d.decision}`)}</strong>
                 {d.test_case_id && <span className="mono"> · {d.test_case_id}</span>}
-                <div lang="de">{d.reasoning}</div>
                 <div className="cell-hint">
                   {d.citations.map(toSpecRef).map((s, j) => (
                     <span key={j}>
@@ -348,10 +357,12 @@ function ChangeDetail({ change, diff }: { change: SpecChange; diff: SpecDiff }) 
                     </span>
                   ))}
                 </div>
+                <Reasoning>
+                  <div lang="de">{d.reasoning}</div>
+                </Reasoning>
               </li>
             ))}
           </ul>
-          <p className="cell-hint">{t("advisor.draftOnly")}</p>
         </section>
       )}
     </section>

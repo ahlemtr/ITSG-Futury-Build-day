@@ -5,6 +5,7 @@ import { DEMO_VENDOR } from "../data/runTexts";
 import { useData } from "../data/useData";
 import { Badge } from "../components/Badge";
 import { formatDate } from "../format";
+import { InfoTip } from "../components/InfoTip";
 
 /** Reports list (ITSG: every checked submission; vendor: its own, hidden tests included as pass / fail). */
 export function ReportsScreen({ vendor = false }: { vendor?: boolean }) {
@@ -21,8 +22,10 @@ export function ReportsScreen({ vendor = false }: { vendor?: boolean }) {
   return (
     <>
       <div className="page-header">
-        <h1>{t(`screens.${screen}.title`)}</h1>
-        <p className="page-subtitle">{t(`screens.${screen}.subtitle`)}</p>
+        <h1>
+          {t(`screens.${screen}.title`)}
+          <InfoTip>{t(`screens.${screen}.subtitle`)}</InfoTip>
+        </h1>
       </div>
       {(
         <section className="panel panel-flush">

@@ -12,6 +12,7 @@ import "./styles/components.css";
 import "./styles/vendor.css";
 import "./styles/advisor.css";
 import "./styles/calendar.css";
+import "./styles/compact.css";
 import "./i18n";
 
 import { App } from "./App";

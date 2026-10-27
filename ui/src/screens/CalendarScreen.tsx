@@ -6,6 +6,7 @@ import { addDays, daysBetween, deadlineCode, deadlineTitle, dueText, monthLabel,
 import { DEMO_VENDOR } from "../data/runTexts";
 import { useData } from "../data/useData";
 import { formatDate } from "../format";
+import { InfoTip } from "../components/InfoTip";
 
 /** Days before and after today on the timeline: two weeks back, about three months ahead (past the 1 January switch). */
 const BACK = 14;
@@ -28,8 +29,10 @@ export function CalendarScreen({ vendor = false }: { vendor?: boolean }) {
   return (
     <>
       <div className="page-header">
-        <h1>{t("screens.calendar.title")}</h1>
-        <p className="page-subtitle">{t(vendor ? "screens.calendar.vendorSubtitle" : "screens.calendar.subtitle")}</p>
+        <h1>
+          {t("screens.calendar.title")}
+          <InfoTip>{t(vendor ? "screens.calendar.vendorSubtitle" : "screens.calendar.subtitle")}</InfoTip>
+        </h1>
       </div>
       {data.status === "loading" && <p className="page-subtitle">{t("common.loading")}</p>}
       {data.status === "error" && <div className="placeholder">{t("common.error")}</div>}

@@ -6,6 +6,7 @@ import { Badge } from "../components/Badge";
 import { SpecRefText } from "../components/SpecRefText";
 import { useSetTopBar } from "../components/TopBarContext";
 import { pick } from "../format";
+import { InfoTip, Reasoning } from "../components/InfoTip";
 
 const DECISIONS: Precedent["label"][] = ["variant", "bug", "invalid"];
 const ADVISOR = "SA";
@@ -41,8 +42,10 @@ export function AdvisorQueueScreen() {
     <>
       <div className="page-header page-header-split">
         <div>
-          <h1>{t("screens.advisorQueue.title")}</h1>
-          <p className="page-subtitle">{t("screens.advisorQueue.subtitle")}</p>
+          <h1>
+            {t("screens.advisorQueue.title")}
+            <InfoTip>{t("screens.advisorQueue.subtitle")}</InfoTip>
+          </h1>
         </div>
       </div>
 
@@ -139,7 +142,6 @@ function DeviationDetail({
 
   return (
     <section className="panel advisor-detail">
-      <p className="eyebrow">{t("advisor.deviation")}</p>
       <h2>{pick(item.title, lang)}</h2>
       <p className="cell-hint">
         {item.vendor} · {item.testCaseId} · V{item.ruleSet} · {item.record}
@@ -162,12 +164,12 @@ function DeviationDetail({
           <div className="sub-card-head">
             <h3>
               {t("advisor.aiProposal")}: {t(`advisor.proposal.${proposal.label}`)}
+              <InfoTip>{t("advisor.draftOnly")}</InfoTip>
             </h3>
-            <span className="muted tabular">
-              {t("advisor.confidence")} {proposal.confidence.toFixed(2)}
+            <span className="badge tabular" title={t("advisor.confidence")}>
+              {Math.round(proposal.confidence * 100)} %
             </span>
           </div>
-          <p>{pick(proposal.reasoning, lang)}</p>
           <p className="cell-hint">
             {t("advisor.cited")}:{" "}
             {proposal.citations.map((c, i) => (
@@ -179,7 +181,9 @@ function DeviationDetail({
             {" · "}
             {t("advisor.similar")}: {proposal.precedents.length ? proposal.precedents.join(", ") : t("advisor.none")}
           </p>
-          <p className="cell-hint">{t("advisor.draftOnly")}</p>
+          <Reasoning>
+            <p>{pick(proposal.reasoning, lang)}</p>
+          </Reasoning>
         </section>
       ) : (
         <p className="hint-box">{t("advisor.noProposal")}</p>
@@ -189,6 +193,7 @@ function DeviationDetail({
         <label className="field-label" htmlFor={`reason-${item.id}`}>
           {t("advisor.reason")}
         </label>
+        <InfoTip>{t("advisor.becomesPrecedent")}</InfoTip>
         <textarea
           id={`reason-${item.id}`}
           className={`reason${missingReason ? " reason-missing" : ""}`}
@@ -215,7 +220,6 @@ function DeviationDetail({
             );
           })}
         </div>
-        <p className="cell-hint">{t("advisor.becomesPrecedent")}</p>
       </div>
     </section>
   );

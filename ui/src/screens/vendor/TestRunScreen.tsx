@@ -9,6 +9,7 @@ import { ReceiptCard } from "../../components/ReceiptCard";
 import { ParsedRecordView } from "../../components/ParsedRecordView";
 import { useSetTopBar } from "../../components/TopBarContext";
 import { pick } from "../../format";
+import { InfoTip } from "../../components/InfoTip";
 
 export function TestRunScreen() {
   const { id = "" } = useParams();
@@ -57,7 +58,12 @@ export function TestRunScreen() {
               </div>
             ))}
           </div>
-          {def.hidden && <p className="hint-box">{t("run.hiddenHint")}</p>}
+          {def.hidden && (
+            <p>
+              <span className="badge">{t("run.hidden")}</span>
+              <InfoTip>{t("run.hiddenHint")}</InfoTip>
+            </p>
+          )}
         </aside>
 
         <div className="rounds">
@@ -120,7 +126,10 @@ function RoundCard(props: {
   return (
     <section className={`panel round-card${isCurrent ? " round-current" : ""}`}>
       <div className="sub-card-head">
-        <h2>{t("run.round", { nr: round.nr })}</h2>
+        <h2>
+          {t("run.round", { nr: round.nr })}
+          {open && <InfoTip>{t("run.upload.channelHint")}</InfoTip>}
+        </h2>
         {!def.hidden && (
           <span className="muted">
             {t("run.expects")}{" "}
@@ -131,7 +140,6 @@ function RoundCard(props: {
       <p>{pick(round.instruction, lang)}</p>
 
       {open && <UploadZone runId={runId} primaryUpload={!expectsNothing} multiple={round.expects.length > 1} />}
-      {open && <p className="cell-hint">{t("run.upload.channelHint")}</p>}
       {rs.noMessage && <p className="hint-box">{t("run.reportedNoMessage")}</p>}
       {rs.receipt && <ReceiptCard receipt={rs.receipt} />}
       {rs.files && rs.receipt?.accepted !== false && <ParsedRecordView files={rs.files} />}
@@ -159,15 +167,18 @@ function RoundCard(props: {
       {round.reply && !def.hidden && rs.reply && (
         <section className="sub-card reply">
           <div className="sub-card-head">
-            <h3>{pick(round.reply.title, lang)}</h3>
+            <h3>
+              {pick(round.reply.title, lang)}
+              <InfoTip>
+                {t("run.reply.fromYourFile")} {t("run.reply.importHint")}
+              </InfoTip>
+            </h3>
             <span className="mono muted">{rs.reply.name}</span>
           </div>
           <ParsedRecordView files={[rs.reply]} />
-          <p className="cell-hint">{t("run.reply.fromYourFile")}</p>
           <button type="button" className="button" onClick={() => download(rs.reply!)}>
             {t("run.reply.download", { file: rs.reply.name })}
           </button>
-          <p className="cell-hint">{t("run.reply.importHint")}</p>
         </section>
       )}
 

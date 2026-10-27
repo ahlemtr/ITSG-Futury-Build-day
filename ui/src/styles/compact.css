@@ -1,0 +1,111 @@
+/* Less text, more UI (HANDOUT agenda 3): explanations behind an "i", reasoning folded, results as numbers. */
+.infotip {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.infotip-button {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--ink-muted);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-muted);
+  font: italic 600 11px/1 Georgia, "Times New Roman", serif;
+  cursor: help;
+}
+
+.infotip-button:hover,
+.infotip-button:focus-visible {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.infotip-text {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 8px);
+  z-index: 40;
+  width: max-content;
+  max-width: 320px;
+  padding: 8px 10px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--surface);
+  border-radius: var(--radius-button);
+  font: 400 13px/1.45 var(--font-ui);
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 120ms ease-out;
+  pointer-events: none;
+}
+
+.infotip:hover .infotip-text,
+.infotip-button:focus-visible + .infotip-text {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .infotip-text {
+    transition: none;
+  }
+}
+
+/* header with the title and its "i" on one line */
+.page-header h1 .infotip,
+.card-title .infotip,
+.panel-title .infotip,
+h3 .infotip {
+  top: -2px;
+}
+
+.reasoning {
+  margin-top: 4px;
+}
+
+.reasoning summary {
+  cursor: pointer;
+  color: var(--ink-muted);
+  font-size: 13px;
+  width: max-content;
+}
+
+.reasoning summary:hover {
+  color: var(--ink);
+}
+
+.reasoning-body {
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  margin: 12px 0 0;
+}
+
+.stat {
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.stat strong {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.stat-attention strong {
+  color: var(--label-bug-fg);
+}

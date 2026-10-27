@@ -4,6 +4,7 @@ import { getSubmissions } from "../../data/dataSource";
 import { DEMO_VENDOR } from "../../data/runTexts";
 import { useData } from "../../data/useData";
 import { SubmissionsTable } from "../../components/SubmissionsTable";
+import { InfoTip } from "../../components/InfoTip";
 
 /** The vendor's own submissions; a row opens the same result view as on the ITSG side.
  * Hidden tests are left out: their result is pass / fail per rule on the test run page only. */
@@ -20,8 +21,10 @@ export function VendorResultsScreen() {
   return (
     <>
       <div className="page-header">
-        <h1>{t("screens.vendorResults.title")}</h1>
-        <p className="page-subtitle">{t("screens.vendorResults.subtitle")}</p>
+        <h1>
+          {t("screens.vendorResults.title")}
+          <InfoTip>{t("screens.vendorResults.subtitle")}</InfoTip>
+        </h1>
       </div>
       <section className="panel panel-flush">
         {state.status === "loading" && <p className="empty">{t("common.loading")}</p>}
