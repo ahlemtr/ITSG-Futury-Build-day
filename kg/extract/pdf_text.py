@@ -25,8 +25,11 @@ GG_FOOTNOTE_RE = re.compile(r"^\s*1 Das Bundesministerium")
 # Numbered heading: "3.12 Datenbaustein ...", "23. Abgabegrund 88 ...". The title starts upper case,
 # which skips cross-references like '3.7 „Datenbaustein ...' at line start.
 HEADING_RE = re.compile(r"^(?P<indent> *)(?P<num>\d+\.|\d+\.\d+(?:\.\d+)*)\s+(?P<title>[A-ZÄÖÜ].*)$")
-# Chapter without a dot, as in the PTA: "8     Systemprüfung / Modulprüfung"
-BARE_HEADING_RE = re.compile(r"^(?P<indent> *)(?P<num>\d{1,2})\s{2,}(?P<title>[A-ZÄÖÜ].*)$")
+# Chapter without a dot, as in the PTA: "8     Systemprüfung / Modulprüfung". Some pdftotext builds (4.00 on
+# Windows) keep a single space ("3 Zuordnung der Testaufgaben ..."): accepted when the title has 3+ words,
+# so calendar rows like "5 Fr" never match
+BARE_HEADING_RE = re.compile(
+    r"^(?P<indent> *)(?P<num>\d{1,2})(?:\s{2,}|\s(?=\S+(?:\s+\S+){2,}))(?P<title>[A-ZÄÖÜ].*)$")
 
 TOC_SEARCH_PAGES = 20
 
