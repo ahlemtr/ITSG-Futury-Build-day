@@ -263,3 +263,49 @@ def test_criteria_endpoint(fresh_kb, tmp_path):
 
 def test_triage_proposal_model():
     AiProposal(proposal="unclear", reasoning="r", citations=["VB@13.4#3.12"], confidence=0.1)
+
+
+def _bad_request(text):
+    import httpx
+    import openai
+
+    req = httpx.Request("POST", "https://api.openai.com/v1/chat/completions")
+    return openai.BadRequestError(text, response=httpx.Response(400, request=req), body=None)
+
+
+class _StubCompletions:
+    def __init__(self, errors):
+        self.errors, self.calls = list(errors), []
+
+    def create(self, **kw):
+        from types import SimpleNamespace
+
+        self.calls.append(kw)
+        if self.errors:
+            raise self.errors.pop(0)
+        msg = SimpleNamespace(tool_calls=None, content='{"ok": true}')
+        return SimpleNamespace(choices=[SimpleNamespace(message=msg)])
+
+
+def _transport(errors):
+    from types import SimpleNamespace
+
+    from llm.client import OpenAITransport
+
+    t = OpenAITransport.__new__(OpenAITransport)
+    t.model, t.client = "m", SimpleNamespace(chat=SimpleNamespace(completions=_StubCompletions(errors)))
+    return t, t.client.chat.completions
+
+
+def test_transport_retries_tools_without_reasoning():
+    t, stub = _transport([_bad_request("Function tools with reasoning_effort are not supported")])
+    assert t([], [{"type": "function"}], {}, "x") == {"content": '{"ok": true}'}
+    assert stub.calls[1]["reasoning_effort"] == "none"
+
+
+def test_transport_api_error_degrades():
+    from llm.client import LLMUnavailable
+
+    t, _ = _transport([_bad_request("model not found")])
+    with pytest.raises(LLMUnavailable):
+        t([], [], {}, "x")

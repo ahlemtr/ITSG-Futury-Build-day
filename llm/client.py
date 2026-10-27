@@ -51,11 +51,25 @@ class OpenAITransport:
                                                                   "strict": False}}}
         if tools:
             kw["tools"] = tools
-        msg = self.client.chat.completions.create(**kw).choices[0].message
+        msg = self._create(kw).choices[0].message
         if msg.tool_calls:
             return {"tool_calls": [{"id": c.id, "name": c.function.name, "arguments": c.function.arguments}
                                    for c in msg.tool_calls]}
         return {"content": msg.content or ""}
+
+    def _create(self, kw: dict[str, Any]):
+        """Any API error becomes LLMUnavailable, so the deterministic result stands. Reasoning models
+        reject function tools on chat completions unless reasoning_effort is "none": retried once."""
+        import openai
+
+        try:
+            return self.client.chat.completions.create(**kw)
+        except openai.BadRequestError as e:
+            if "reasoning_effort" in str(e) and "reasoning_effort" not in kw:
+                return self._create(kw | {"reasoning_effort": "none"})
+            raise LLMUnavailable(f"OpenAI rejected the request: {e}") from e
+        except openai.OpenAIError as e:
+            raise LLMUnavailable(f"OpenAI call failed: {e}") from e
 
 
 def _cache_dir() -> Path:
