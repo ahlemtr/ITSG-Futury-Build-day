@@ -1,6 +1,7 @@
 // The backend API (api mode). Vite proxies /api/* to FastAPI (see vite.config.ts).
 // Every function maps the backend JSON to the UI types in ./types, so the screens do not change.
 import type {
+  AdvisorItem,
   CompareMode,
   DecidedBy,
   Deviation,
@@ -9,6 +10,7 @@ import type {
   Label,
   Localized,
   OverviewData,
+  Precedent,
   SpecRef,
   SubmissionResult,
   SubmissionSummary,
@@ -319,5 +321,67 @@ export async function getSubmissionResult(id: string): Promise<SubmissionResult 
     abgabegrund: diff.steps.map((s) => s.abgabegrund).join(", "),
     fields: [...extra, ...fields],
     deviations,
+  };
+}
+
+// ---------- Advisor queue (screen 5) ----------
+
+type ApiQueueItem = ApiDeviation & { submission_id: string; test_case_id: string; signature: string };
+
+const PROPOSAL_LABEL: Record<string, DeviationLabel> = {
+  likely_variant: "variant",
+  likely_bug: "bug",
+  unclear: "unclear",
+};
+
+export async function getAdvisorQueue(): Promise<AdvisorItem[]> {
+  const [queue, subs] = await Promise.all([getJson<ApiQueueItem[]>("/advisor/queue"), listSubmissions()]);
+  return queue.map((d) => {
+    const sub = subs.find((s) => s.id === d.submission_id);
+    const p = d.ai_proposal;
+    return {
+      id: d.id,
+      title: deviationTitle(d),
+      vendor: sub?.vendor ?? "–",
+      testCaseId: d.test_case_id,
+      ruleSet: sub?.rule_set_version ?? "–",
+      record: d.record ?? "–",
+      field: d.field ?? "*",
+      kind: d.kind,
+      expected: same(show(d.expected) ?? "–"),
+      actual: same(show(d.actual) ?? "–"),
+      proposal: p
+        ? {
+            label: PROPOSAL_LABEL[p.proposal] ?? "unclear",
+            confidence: p.confidence,
+            reasoning: same(p.reasoning),
+            citations: p.citations.map(toSpecRef),
+            precedents: [],
+          }
+        : undefined,
+    };
+  });
+}
+
+const DECISION_LABEL: Record<Precedent["label"], string> = { variant: "correct_variant", bug: "bug", invalid: "invalid" };
+
+export async function decideDeviation(
+  item: AdvisorItem,
+  label: Precedent["label"],
+  reason: string,
+  advisor: string,
+): Promise<Precedent> {
+  const r = await postJson<{ precedent: { key: string; decided: string } }>(
+    `/deviations/${encodeURIComponent(item.id)}/decide`,
+    { label: DECISION_LABEL[label], reason, advisor },
+  );
+  return {
+    id: r.precedent.key,
+    signature: r.precedent.key,
+    label,
+    reason,
+    advisor,
+    at: new Date().toISOString(),
+    itemTitle: item.title,
   };
 }

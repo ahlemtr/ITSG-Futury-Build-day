@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { decide, resetAdvisor, useAdvisorState } from "../data/advisorStore";
+import { isApi } from "../data/dataSource";
 import { ADVISOR_ITEMS } from "../data/mock/advisor";
 import type { AdvisorItem, Precedent } from "../data/types";
 import { Badge } from "../components/Badge";
@@ -14,17 +15,25 @@ const ADVISOR_FIRST_ID = ADVISOR_ITEMS[0]?.id ?? "";
 
 export function AdvisorQueueScreen() {
   const { t, i18n } = useTranslation();
-  const { open, decided } = useAdvisorState();
+  const { open, decided, status } = useAdvisorState();
   const [selectedId, setSelectedId] = useState(open[0]?.id ?? "");
   const [lastSaved, setLastSaved] = useState<Precedent | null>(null);
+  const [failed, setFailed] = useState(false);
   const selected = open.find((i) => i.id === selectedId) ?? open[0];
 
   useSetTopBar(<Trans i18nKey="advisor.topbar" values={{ count: open.length }} components={{ strong: <strong /> }} />, [
     open.length,
   ]);
 
-  function onDecide(item: AdvisorItem, label: Precedent["label"], reason: string) {
-    const precedent = decide(item.id, label, reason, ADVISOR);
+  async function onDecide(item: AdvisorItem, label: Precedent["label"], reason: string) {
+    let precedent: Precedent | undefined;
+    try {
+      precedent = await decide(item.id, label, reason, ADVISOR);
+      setFailed(false);
+    } catch {
+      setFailed(true);
+      return;
+    }
     if (!precedent) return;
     setLastSaved(precedent);
     const next = open.find((i) => i.id !== item.id);
@@ -38,7 +47,7 @@ export function AdvisorQueueScreen() {
           <h1>{t("screens.advisorQueue.title")}</h1>
           <p className="page-subtitle">{t("screens.advisorQueue.subtitle")}</p>
         </div>
-        {decided.length > 0 && (
+        {decided.length > 0 && !isApi && (
           <div className="header-actions">
             <button
               type="button"
@@ -61,10 +70,18 @@ export function AdvisorQueueScreen() {
         </p>
       )}
 
+      {failed && (
+        <p className="field-error" role="alert">
+          {t("common.error")}
+        </p>
+      )}
+
       <div className="queue-layout">
         <div className="queue-side">
           <section className="panel panel-flush">
-            {open.length === 0 && <p className="empty">{t("advisor.empty")}</p>}
+            {status === "loading" && <p className="empty">{t("common.loading")}</p>}
+            {status === "error" && <p className="empty">{t("common.error")}</p>}
+            {status === "ready" && open.length === 0 && <p className="empty">{t("advisor.empty")}</p>}
             <ul className="queue-list">
               {open.map((item) => (
                 <li key={item.id}>
@@ -93,7 +110,8 @@ export function AdvisorQueueScreen() {
               <ul className="decided-list">
                 {decided.map((p) => (
                   <li key={p.id}>
-                    <span className="mono">{p.id}</span> {pick(p.itemTitle, i18n.language)} <Badge value={p.label} />
+                    {p.id !== p.signature && <span className="mono">{p.id} </span>}
+                    {pick(p.itemTitle, i18n.language)} <Badge value={p.label} />
                     <div className="cell-hint">
                       {t("advisor.signature")}: <span className="mono">{p.signature}</span>
                     </div>
@@ -115,20 +133,26 @@ function DeviationDetail({
   onDecide,
 }: {
   item: AdvisorItem;
-  onDecide: (item: AdvisorItem, label: Precedent["label"], reason: string) => void;
+  onDecide: (item: AdvisorItem, label: Precedent["label"], reason: string) => Promise<void>;
 }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const [reason, setReason] = useState("");
   const [tried, setTried] = useState(false);
+  const [busy, setBusy] = useState(false);
   // Doc 05: a proposal without a cited passage is rejected and never shown.
   const proposal = item.proposal && item.proposal.citations.length > 0 ? item.proposal : undefined;
   const missingReason = tried && reason.trim() === "";
 
-  function submit(label: Precedent["label"]) {
+  async function submit(label: Precedent["label"]) {
     setTried(true);
     if (reason.trim() === "") return;
-    onDecide(item, label, reason.trim());
+    setBusy(true);
+    try {
+      await onDecide(item, label, reason.trim());
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -201,6 +225,7 @@ function DeviationDetail({
                 key={label}
                 type="button"
                 className={`button${suggested ? " button-primary" : ""}`}
+                disabled={busy}
                 onClick={() => submit(label)}
               >
                 {t(suggested ? "advisor.confirmAs" : "advisor.markAs", { label: t(`status.${label}`) })}
