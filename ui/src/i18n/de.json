@@ -622,6 +622,7 @@
     "sources_other": "{{count}} Quellen",
     "rules": "Regeln {{rules}}",
     "tests": "Testfälle {{tests}}",
-    "error": "Die Frage konnte nicht beantwortet werden: {{error}}"
+    "error": "Die Frage konnte nicht beantwortet werden: {{error}}",
+    "crashed": "Im Assistenten ist ein Fehler aufgetreten. Der Rest der Seite funktioniert weiter."
   }
 }

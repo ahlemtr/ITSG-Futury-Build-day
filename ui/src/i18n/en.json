@@ -622,6 +622,7 @@
     "sources_other": "{{count}} sources",
     "rules": "rules {{rules}}",
     "tests": "test cases {{tests}}",
-    "error": "The question could not be answered: {{error}}"
+    "error": "The question could not be answered: {{error}}",
+    "crashed": "Something went wrong in the assistant. The rest of the page keeps working."
   }
 }
