@@ -89,7 +89,8 @@ def _head(sc: Scenario, step: int, abgabegrund: str, insurer: bool = False, korr
 
 def _dbna(sc: Scenario) -> dict[str, Any]:
     p = sc.extras["person"]
-    return {"FAMILIENNAME": p["familienname"], "VORNAME": p["vorname"], "UNKLAR": ""}
+    return {"FAMILIENNAME": p["familienname"], "VORNAME": p["vorname"],
+            "VORSATZWORT": "", "NAMENSZUSATZ": "", "TITEL": "", "KENNZ-AEND-BER": ""}
 
 
 def _dbid(sc: Scenario, ref: str = "") -> dict[str, Any]:

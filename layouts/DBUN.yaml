@@ -38,7 +38,7 @@ fields:
   start: 33
   end: 47
   length: 15
-  type: n
+  type: an
   required: m
 - name: ZUSCHL-1
   start: 48

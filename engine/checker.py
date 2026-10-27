@@ -104,6 +104,7 @@ class Checker:
         cur = sc.test_case.inputs.current
         for r in actual:
             results += [(r, x) for x in formats.check_mm_flags(r)]
+            results += [(r, x) for x in formats.check_key_values(r)]
             if r.abgabegrund in EMPLOYER_TYPES:
                 results.append((r, formats.check_uuid(r)))
             if r.abgabegrund == "41":
@@ -119,7 +120,7 @@ class Checker:
             rec_name, _, fld = (x.field or "DSLW.").partition(".")
             d = Deviation(step=step_of.get(id(rec)), abgabegrund=ag, record=rec_name, field=fld or None,
                           kind="value_differs", expected=_s(x.expected), actual=_s(x.actual))
-            self._label(d, "invalid" if x.rule.startswith("F") else "bug", x.rule, x.message)
+            self._label(d, "invalid" if x.rule.startswith(("F", "S-")) else "bug", x.rule, x.message)
             devs.append(d)
             covered.add((ag, x.field))
 

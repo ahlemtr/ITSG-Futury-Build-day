@@ -19,6 +19,7 @@ const ITSG_ITEMS: Item[] = [
   { to: "/submissions", key: "submissions", match: startsWith("/submissions") },
   { to: "/advisor-queue", key: "advisorQueue", count: "advisorQueue", match: startsWith("/advisor-queue") },
   { to: "/reports", key: "reports", match: startsWith("/reports") },
+  { to: "/calculator", key: "calculator", match: startsWith("/calculator") },
   { to: "/knowledge-graph", key: "knowledgeGraph", match: startsWith("/knowledge-graph") },
 ];
 

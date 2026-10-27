@@ -15,6 +15,7 @@
   },
   "common": {
     "loading": "Loading …",
+    "close": "Close",
     "error": "The data could not be loaded.",
     "info": "Explanation",
     "why": "Reasoning"
@@ -33,7 +34,8 @@
     "results": "Results",
     "vendorReports": "Reports",
     "knowledgeGraph": "Knowledge graph",
-    "calendar": "Deadlines"
+    "calendar": "Deadlines",
+    "calculator": "Calculator"
   },
   "screens": {
     "overview": {
@@ -473,6 +475,7 @@
       "DocVersion": "document versions",
       "Passage": "passages",
       "Chunk": "search chunks",
+      "FieldDefinition": "field definitions",
       "Rule": "rules",
       "Parameter": "parameters",
       "ParamValue": "parameter values",
@@ -625,5 +628,115 @@
     "tests": "test cases {{tests}}",
     "error": "The question could not be answered: {{error}}",
     "crashed": "Something went wrong in the assistant. The rest of the page keeps working."
+  },
+  "labels": {
+    "yes": "yes",
+    "no": "no",
+    "message": "Message {{code}}",
+    "param": {
+      "min_total_days": "Minimum days of incapacity",
+      "gap_months": "Largest gap that still chains",
+      "gap_inclusive": "Gap of exactly 6 months chains",
+      "sum_window_months": "Window for summing prior illnesses",
+      "open_end_days": "Open incapacity counts until report date plus",
+      "efz_days": "Continued pay"
+    },
+    "unit": {
+      "min_total_days": "{{value}} days",
+      "gap_months": "{{value}} months",
+      "sum_window_months": "{{value}} months",
+      "open_end_days": "{{value}} days",
+      "efz_days": "{{value}} days"
+    },
+    "kind": {
+      "value_differs": "value differs",
+      "missing_block": "block missing",
+      "extra_block": "extra block",
+      "missing_message": "message missing",
+      "extra_message": "extra message",
+      "missing_group": "period missing",
+      "extra_group": "extra period",
+      "order_differs": "order differs"
+    },
+    "node": {
+      "DocVersion": "Document version",
+      "Passage": "Passage",
+      "Chunk": "Search chunk",
+      "Rule": "Rule",
+      "Parameter": "Parameter",
+      "ParamValue": "Parameter value",
+      "Change": "Change",
+      "TestCase": "Test case",
+      "Precedent": "Precedent",
+      "Criterion": "Criterion",
+      "Field": "Field",
+      "FieldDefinition": "Source field definition",
+      "MessageType": "Message type"
+    }
+  },
+  "calc": {
+    "title": "Krankengeld calculator",
+    "info": "Computes Krankengeld from earnings as the Gemeinsames Rundschreiben Krankengeld does (Anlage 3, version 11.12.2024): Bemessungszeitraum, Regelentgelt, one-off payments, Höchstregelentgelt, 70 % / 90 %. Every step names its section.",
+    "inputs": "Inputs",
+    "optional": "optional",
+    "calculate": "Calculate",
+    "example": "Load example 103",
+    "empty": "Enter the inputs and calculate.",
+    "krankengeld": "Krankengeld",
+    "perDay": "per calendar day",
+    "bz": "Bemessungszeitraum",
+    "match": "matches the file ({{value}} €)",
+    "mismatch": "differs: file {{value}} €",
+    "unconfirmed": "to confirm",
+    "unconfirmedHint": "Value not from our documents (the year's contribution ceiling); to be confirmed by ITSG.",
+    "scope": "Not covered yet: Entgeltumwandlung, flexible working time, Altersteilzeit, pay by output over 3 periods, special cases at the start of employment and Elternzeit.",
+    "pay": {
+      "monthly": "Monthly pay",
+      "hourly": "Hourly pay"
+    },
+    "billing": {
+      "same": "in the same month",
+      "next": "in the following month"
+    },
+    "f": {
+      "au_start": "Start of incapacity",
+      "pay": "Type of pay",
+      "billing_day": "Payroll on day",
+      "billing_month": "Payroll",
+      "gross": "Monthly gross pay (without one-off payments)",
+      "net": "Monthly net pay",
+      "one_off": "Contributory one-off payments, 12 months",
+      "weekly_hours": "Weekly working hours",
+      "paid_hours": "Paid hours in the period",
+      "fileValue": "Krankengeld in the file (to compare)"
+    },
+    "col": {
+      "step": "Step",
+      "value": "Value",
+      "how": "Calculation",
+      "source": "Source"
+    },
+    "step": {
+      "bemessungszeitraum": "Bemessungszeitraum",
+      "zwoelf_monate": "12-month window for one-off payments",
+      "regelentgelt_laufend": "Regelentgelt (current pay)",
+      "netto_laufend": "Net pay (current)",
+      "hinzurechnung_brutto": "Gross add-on for one-off payments",
+      "regelentgelt_kumuliert": "Regelentgelt, cumulated",
+      "hoechstregelentgelt": "Höchstregelentgelt (ceiling)",
+      "regelentgelt_massgeblich": "Regelentgelt used",
+      "hinzurechnung_netto": "Net add-on for one-off payments",
+      "netto_kumuliert": "Net pay, cumulated",
+      "kg_70_regelentgelt": "70 % of the Regelentgelt",
+      "kg_90_netto": "90 % of net pay",
+      "kg_100_netto_laufend": "100 % of current net pay",
+      "krankengeld": "Krankengeld"
+    },
+    "how": {
+      "bemessungszeitraum": "last calendar month ended and billed before the AU start",
+      "zwoelf_monate": "12 calendar months up to the Bemessungszeitraum",
+      "hoechstregelentgelt": "KV contribution ceiling of the year / 360",
+      "kg_100_netto_laufend": "upper limit: current net pay"
+    }
   }
 }

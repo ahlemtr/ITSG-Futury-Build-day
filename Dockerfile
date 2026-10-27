@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=ghcr.io/astral-sh/uv:0.8.4 /uv /usr/local/bin/uv
 WORKDIR /app
 COPY pyproject.toml uv.lock* ./
-RUN uv sync --no-dev --extra pdf --no-install-project
+RUN uv sync --frozen --no-dev --extra pdf --no-install-project
 COPY . .
 ENV PATH="/app/.venv/bin:$PATH" DATA_DIR=/app/data
 EXPOSE 8000

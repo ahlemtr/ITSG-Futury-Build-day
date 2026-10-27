@@ -3,7 +3,7 @@
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import yaml from "js-yaml";
 
-const SRC = new URL("../../plan/starter/layouts/", import.meta.url);
+const SRC = new URL("../../layouts/", import.meta.url);
 const OUT = new URL("../src/records/layouts.generated.json", import.meta.url);
 
 const pickField = (f) => ({

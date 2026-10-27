@@ -11,6 +11,7 @@ import { SpecChangesScreen } from "./screens/SpecChangesScreen";
 import { TestCatalogueScreen } from "./screens/TestCatalogueScreen";
 import { OverviewScreen } from "./screens/OverviewScreen";
 import { CalendarScreen } from "./screens/CalendarScreen";
+import { CalculatorScreen } from "./screens/CalculatorScreen";
 import { AdvisorQueueScreen } from "./screens/AdvisorQueueScreen";
 import { SubmissionsScreen } from "./screens/SubmissionsScreen";
 import { SubmissionResultScreen } from "./screens/SubmissionResultScreen";
@@ -30,6 +31,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<OverviewScreen />} />
             <Route path="/calendar" element={<CalendarScreen />} />
+            <Route path="/calculator" element={<CalculatorScreen />} />
             <Route path="/spec-changes" element={<SpecChangesScreen />} />
             <Route path="/test-catalogue" element={<TestCatalogueScreen />} />
             <Route path="/knowledge-graph" element={<KnowledgeGraphScreen />} />

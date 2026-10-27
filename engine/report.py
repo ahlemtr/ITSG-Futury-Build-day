@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import base64
 from datetime import UTC, date, datetime
+from functools import lru_cache
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -13,6 +15,44 @@ from engine.signing import sha256
 from kg.interface import KnowledgeBase
 
 TEMPLATES = Path(__file__).resolve().parents[1] / "templates"
+
+OUTCOME_LABELS = {
+    "exact_match": "Ohne Abweichung", "correct_variant": "Zulässige Variante", "bug": "Fehler festgestellt",
+    "invalid": "Formal ungültig", "unclear": "Klärung erforderlich",
+}
+OUTCOME_SUMMARIES = {
+    "exact_match": "Die Einreichung stimmt mit den erwarteten Meldungen und geprüften Regeln überein.",
+    "correct_variant": "Die festgestellten Unterschiede wurden als zulässige Varianten eingeordnet.",
+    "bug": "Die Prüfung hat fachliche Fehler festgestellt. Die betroffenen Meldungen und ihre Begründungen sind im Folgenden dokumentiert.",
+    "invalid": "Die Einreichung erfüllt die geprüften formalen Anforderungen nicht. Die Feststellungen sind im Folgenden dokumentiert.",
+    "unclear": "Mindestens eine Feststellung erfordert eine fachliche Klärung, bevor die Einreichung abschließend bewertet werden kann.",
+}
+KIND_LABELS = {
+    "value_differs": "Abweichender Feldinhalt", "missing_block": "Fehlender Datenbaustein",
+    "extra_block": "Zusätzlicher Datenbaustein", "missing_message": "Fehlende Meldung",
+    "extra_message": "Zusätzliche Meldung", "missing_group": "Fehlende Wiederholungsgruppe",
+    "extra_group": "Zusätzliche Wiederholungsgruppe", "order_differs": "Abweichende Reihenfolge",
+}
+
+
+@lru_cache(maxsize=4)
+def _asset_uri(name: str, mime: str) -> str:
+    """Self-contained exports: no remote logo/font requests or filesystem base URL needed."""
+    return f"data:{mime};base64," + base64.b64encode((TEMPLATES / "assets" / name).read_bytes()).decode("ascii")
+
+
+def _display_date(value, with_time: bool = False) -> str:
+    if not value:
+        return "–"
+    try:
+        parsed = datetime.fromisoformat(str(value))
+        if with_time:
+            if parsed.tzinfo is not None:
+                parsed = parsed.astimezone(UTC)
+            return parsed.strftime("%d.%m.%Y · %H:%M UTC")
+        return parsed.strftime("%d.%m.%Y")
+    except ValueError:
+        return str(value)
 
 
 class CheckLine(BaseModel):
@@ -89,7 +129,13 @@ def _env() -> Environment:
 
 
 def render_html(signed: dict) -> str:
-    return _env().get_template("report.html.j2").render(r=signed["report"], sig=signed.get("signature"))
+    return _env().get_template("report.html.j2").render(
+        r=signed["report"], sig=signed.get("signature"), outcomes=OUTCOME_LABELS,
+        summaries=OUTCOME_SUMMARIES, kinds=KIND_LABELS, display_date=_display_date,
+        logo=_asset_uri("itsg-logo.png", "image/png"),
+        font_regular=_asset_uri("fira-sans-regular.woff", "font/woff"),
+        font_medium=_asset_uri("fira-sans-medium.woff", "font/woff"),
+        font_heading=_asset_uri("fira-sans-condensed-bold.woff", "font/woff"))
 
 
 def render_pdf(html: str) -> bytes:

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useActivities, type Activity, type ActivityStage } from "../data/aiActivity";
+import { dismissActivity, useActivities, type Activity, type ActivityStage } from "../data/aiActivity";
 import { pick } from "../format";
 
 /** Pinned to the top of every screen while the AI works in the background; the screen stays usable. */
@@ -47,6 +47,11 @@ function ActivityCard({ activity }: { activity: Activity }) {
           </span>
         </div>
         <span className="ai-elapsed tabular">{elapsed}</span>
+        <button type="button" className="ai-close" aria-label={t("common.close")} title={t("common.close")} onClick={() => dismissActivity(activity.id)}>
+          <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
+            <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+        </button>
       </div>
       {running && <div className="ai-progress" aria-hidden="true" />}
       {activity.stages && (

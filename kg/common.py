@@ -119,6 +119,9 @@ def load_documents(seed_dir: Path = SEED_DIR) -> list[dict]:
                 "file": v.get("file"),
                 "succeeds": str(v["succeeds"]) if v.get("succeeds") else None,
                 "present": bool(v.get("file")) and (ROOT / v["file"]).exists(),
+                "role": doc.get("role", "commentary" if doc["code"] == "VB" else "reference"),
+                "parents": doc.get("parents", []),
+                "source_url": v.get("source_url"),
             })
     return out
 

@@ -1,5 +1,7 @@
-# ITSG source documents and sample files: all rights reserved, never commit
-sources/
+# Baseline reference documents are included for a self-contained demo checkout.
+# Keep the main VB 13.4 PDF local: it is uploaded live during the demo.
+sources/2026_03_10_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.4_ab_01.01.2027.pdf
+sources/uploads/
 
 # Node / Vite
 node_modules/

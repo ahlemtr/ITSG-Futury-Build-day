@@ -43,11 +43,14 @@ class Line:
 
 def pdf_to_text(pdf: Path, out_txt: Path) -> Path:
     out_txt.parent.mkdir(parents=True, exist_ok=True)
-    if shutil.which("pdftotext"):
-        subprocess.run(["pdftotext", "-enc", "UTF-8", "-layout", str(pdf), str(out_txt)], check=True)
-        return out_txt
+    candidates = [shutil.which("pdftotext", path="C:/Program Files/Git/mingw64/bin"), shutil.which("pdftotext")]
+    for binary in dict.fromkeys(c for c in candidates if c):
+        result = subprocess.run([binary, "-enc", "UTF-8", "-layout", str(pdf), str(out_txt)],
+                                capture_output=True, check=False)
+        if result.returncode == 0:
+            return out_txt
     # Fallback (09 section 2): pdfplumber, pages joined by form feeds like pdftotext does
-    print(f"WARNING: pdftotext not found, using pdfplumber for {pdf.name} (layout may differ)")
+    print(f"WARNING: no working pdftotext, using pdfplumber for {pdf.name} (layout may differ)")
     import pdfplumber
 
     with pdfplumber.open(pdf) as doc:

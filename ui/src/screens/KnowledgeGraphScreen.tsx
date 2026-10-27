@@ -14,8 +14,10 @@ import {
 } from "../data/api";
 import { useData } from "../data/useData";
 import { SpecRefText } from "../components/SpecRefText";
+import { outcomeLabel, paramLabel, paramValue, signatureLabel } from "../data/labels";
+import i18n from "../i18n";
 
-const COUNTED = ["DocVersion", "Passage", "Chunk", "Rule", "Parameter", "Change", "TestCase", "Precedent"];
+const COUNTED = ["DocVersion", "Passage", "Chunk", "FieldDefinition", "Rule", "Parameter", "Change", "TestCase", "Precedent"];
 
 /** Node colours of the graph view: one muted tone per kind, legend below the canvas. */
 const KIND_COLORS: Record<string, string> = {
@@ -28,6 +30,7 @@ const KIND_COLORS: Record<string, string> = {
   Precedent: "#6b2fa3",
   Criterion: "#4b5563",
   Field: "#8a94a3",
+  FieldDefinition: "#786741",
   MessageType: "#8a94a3",
   DocVersion: "#5b6573",
 };
@@ -104,10 +107,10 @@ function EventRow({ event }: { event: KgEvent }) {
       version: event.version,
       passages: event.passages ?? 0,
       changes: event.in_scope ?? 0,
-      params: (event.parameters_changed ?? []).join(", ") || "–",
+      params: (event.parameters_changed ?? []).map((p) => paramLabel(t, p)).join(", ") || "–",
       tests: (event.drafts ?? []).length,
     });
-  else if (event.kind === "precedent") text = t("kg.event.precedent", { signature: event.signature, label: event.label });
+  else if (event.kind === "precedent") text = t("kg.event.precedent", { signature: signatureLabel(t, String(event.signature)), label: outcomeLabel(t, String(event.label)) });
   else if (event.kind === "baseline")
     text = t("kg.event.baseline", { doc: event.document, version: event.version, tests: event.test_cases ?? 0 });
   else text = event.kind;
@@ -339,7 +342,12 @@ function GraphView({ focus, onFocus }: { focus: { label: string; key: string }; 
 
 function shortLabel(n: KgNode): string {
   if (n.label === "Passage") return n.key.replace(/^([A-Z-]+)@([^#]+)#/, "$1 $2 ");
-  if (n.label === "ParamValue") return `${n.key} = ${String(n.props.value)}`;
+  if (n.label === "ParamValue") {
+    const name = n.key.split("@")[0];
+    return `${paramLabel(i18n.t, name)}: ${paramValue(i18n.t, name, n.props.value)}`;
+  }
+  if (n.label === "Parameter") return paramLabel(i18n.t, n.key);
+  if (n.label === "Precedent") return signatureLabel(i18n.t, n.key);
   if (n.label === "Change") return String(n.props.summary ?? n.key).slice(0, 40);
   if (n.label === "Criterion") return n.key.slice(0, 8);
   return n.key;

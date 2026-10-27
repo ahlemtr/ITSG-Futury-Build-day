@@ -59,7 +59,7 @@ def test_layout_dbvo(kb):
 
 def test_rules_41_under_13_3(kb):
     rules = kb.get_rules("41", "13.3")
-    expected = [f"R41-{i}" for i in range(1, 7)] + [f"F41-{i}" for i in range(1, 11)] + ["C-1", "C-2"]
+    expected = [f"R41-{i}" for i in range(1, 7)] + [f"F41-{i}" for i in range(1, 11)] + ["C-1", "C-2", "S-1"]
     assert [r.id for r in rules] == expected
     sources = [s for r in rules for s in r.sources]
     assert not [s for s in sources if s.startswith("VB@13.4")]

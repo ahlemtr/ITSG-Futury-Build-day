@@ -33,7 +33,16 @@ export function useActivities(): Activity[] {
   );
 }
 
+// closed by the user: later updates of a job that is still being polled stay hidden
+const dismissed = new Set<string>();
+
+export function dismissActivity(id: string) {
+  dismissed.add(id);
+  set(activities.filter((x) => x.id !== id));
+}
+
 export function upsertActivity(a: Activity) {
+  if (dismissed.has(a.id)) return;
   set(activities.some((x) => x.id === a.id) ? activities.map((x) => (x.id === a.id ? a : x)) : [...activities, a]);
   // finished jobs stay visible for a moment, then leave
   if (a.status !== "running") setTimeout(() => set(activities.filter((x) => x.id !== a.id)), a.status === "done" ? 4000 : 12000);

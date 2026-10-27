@@ -36,7 +36,11 @@ SPECS = {
     "get_param": _fn("get_param", "Value of a rule parameter, by version or by validity date",
                      {"name": S, "version": S, "on_date": DATE}, ["name"]),
     "get_passage": _fn("get_passage", "Spec passage by key, e.g. VB@13.4#3.12/chaining", {"key": S}, ["key"]),
-    "search_passages": _fn("search_passages", "Search spec passages", {"text": S, "k": I}, ["text"]),
+    "search_passages": _fn("search_passages", "Search spec passages, optionally for an applicable rule set",
+                            {"text": S, "k": I, "version": S, "on_date": DATE}, ["text"]),
+    "get_field_definitions": _fn("get_field_definitions", "Source-specific field definitions, conditions and checks. "
+                                 "M/m is requirement scope, not an automatic contradiction.",
+                                 {"record": S, "field": S, "version": S, "on_date": DATE}, ["record"]),
     "get_versions": _fn("get_versions", "Versions of a document with valid_from", {"document": S}, ["document"]),
     "get_changes": _fn("get_changes", "Curated changes between two versions",
                        {"document": S, "old_version": S, "new_version": S, "in_scope_only": B},
@@ -98,7 +102,8 @@ class ToolBox:
             return _dump(kb.get_passage(args["key"]))
         if name == "search_passages":
             return [{"key": p.key, "heading": p.heading, "text": p.text[:1500]}
-                    for p in kb.search_passages(args["text"], args.get("k", 5))]
+                    for p in kb.search_passages(args["text"], args.get("k", 5),
+                                                 version=args.get("version"), on_date=args.get("on_date"))]
         if name == "get_test_case":
             return _dump(kb.get_test_case(args["key"]))
         if name == "get_affected_rules":
@@ -107,7 +112,7 @@ class ToolBox:
             return _dump(kb.get_deviation_context(args["record"], args["field"], args["abgabegrund"], args["version"]))
         if name == "find_precedent":
             return _dump(kb.find_precedent(args["signature"]))
-        if name in ("get_layout", "get_rules", "get_versions", "get_changes", "get_test_cases"):
+        if name in ("get_layout", "get_rules", "get_versions", "get_changes", "get_test_cases", "get_field_definitions"):
             return _dump(getattr(kb, name)(**args))
         if name == "add_months":
             return str(add_months(_d(args["date"]), int(args["n"])))

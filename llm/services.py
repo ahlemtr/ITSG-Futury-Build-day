@@ -12,7 +12,7 @@ from engine.model import Case, CheckResult, CriterionReview, Deviation
 from kg.interface import KnowledgeBase
 from llm import explain as explain_mod
 from llm import story as story_mod
-from llm.agents import calculation_analysis, change_analysis, chat, spec_update
+from llm.agents import calculation_analysis, change_analysis, chat, document_metadata, spec_update
 from llm.agents import check as check_agent
 from llm.client import LLMClient, LLMInvalid, LLMUnavailable
 from llm.extract import LLMExtractor
@@ -51,6 +51,9 @@ class AIServices:
             return None
 
     # P8.5: proposal for an unclear deviation; never a final label
+    def read_document_metadata(self, filename: str, text: str):
+        return self._safe(document_metadata.run, self.client, filename, text)
+
     def triage(self, d: Deviation, version: str) -> None:
         prop = self._safe(check_agent.triage, self.client, self.tools, d, version, self.cites_ok)
         if prop is not None:

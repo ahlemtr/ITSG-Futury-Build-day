@@ -36,6 +36,7 @@ def baseline(tmp_path, monkeypatch):
     monkeypatch.setenv("KG_BACKEND", "yaml")
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("PRECEDENTS_PATH", str(tmp_path / "precedents.yaml"))
+    monkeypatch.setenv("SOURCE_UPLOAD_DIR", str(tmp_path / "sources" / "uploads"))
     from kg import get_kb
     from store.seed import seed
 
@@ -59,6 +60,8 @@ def test_upload_vb_13_4(baseline):
     seen = []
     job = ingest.Pipeline(job, VB_13_4, kb, repo, lambda staged: ai, seen.append, today=date(2026, 10, 27)).run()
     assert job["status"] == "done", job.get("trace")
+    assert Path(job["source_file"]).read_bytes() == VB_13_4.read_bytes()
+    assert Path(job["source_file"]).name == "VB@13.4.pdf"
     assert all(s["status"] == "done" for s in job["stages"])
     stages = {s["name"]: s["counts"] for s in job["stages"]}
     assert stages["chunk"]["passages"] > 100 and stages["diff"]["changes"] > 10

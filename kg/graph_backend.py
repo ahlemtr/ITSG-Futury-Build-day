@@ -143,7 +143,25 @@ class GraphBackend:
         raise KeyError(f"Field {key!r} not found")
 
     # ---------------------------------------------------------------- interface
+    def _document_versions(self) -> list[dict]:
+        return [r["d"] for r in self._q("MATCH (d:DocVersion) RETURN d {.*} AS d")]
+
+    def get_field_definitions(self, record: str, field: str | None = None,
+                              version: str | None = None, on_date=None) -> list[dict]:
+        from kg.field_evidence import applicable_documents
+
+        if version is not None:
+            version = resolve_vb(version, self.vb_versions)
+        active = applicable_documents(self._document_versions(), version, on_date)
+        fkey = self._field_key(record, field) if field else None
+        rows = self._q("MATCH (d:FieldDefinition {record: $record}) "
+                       "WHERE $field IS NULL OR d.field = $field RETURN d {.*} AS d ORDER BY d.key",
+                       record=record, field=fkey)
+        return [dict(r["d"], applicable=r["d"]["document_version"] in active) for r in rows]
+
     def get_layout(self, record: str, version: str) -> Layout:
+        from kg.field_evidence import resolve_fields
+
         vb = resolve_vb(version, self.vb_versions)
         row = self._one(
             "MATCH (rec:Record {key: $record}) "
@@ -153,7 +171,9 @@ class GraphBackend:
             f"Record {record!r}", record=record)
         rec = row["rec"]
         fields = []
-        for f in row["fields"]:
+        resolved = resolve_fields(row["fields"], self.get_field_definitions(record, version=vb),
+                                  self._document_versions(), vb)
+        for f in resolved:
             f["values"] = json.loads(f["values"]) if f.get("values") else None
             fields.append(FieldDef(**f))
         return Layout(record=record, title=rec["title"], section=rec["section"], page=rec.get("page"),
@@ -188,7 +208,7 @@ class GraphBackend:
             raise KeyError(f"Passage {key!r} not found")
         return found[0]
 
-    def search_passages(self, text: str, k: int = 5) -> list[Passage]:
+    def search_passages(self, text: str, k: int = 5, version: str | None = None, on_date=None) -> list[Passage]:
         """Hybrid search on chunks (W7): full-text and vector (needs embeddings and OPENAI_API_KEY) ranks merged by
         reciprocal rank fusion, full-text weighted higher; a passage scores with its best chunk and comes back with
         the sentence that matched."""
@@ -196,17 +216,24 @@ class GraphBackend:
 
         from kg import embed
         from kg.chunks import snippet
+        from kg.field_evidence import applicable_documents
 
         pool = max(60, k * 12)
+        heads = None
+        if version is not None or on_date is not None:
+            vb = resolve_vb(version, self.vb_versions) if version else None
+            heads = sorted(applicable_documents(self._document_versions(), vb, on_date))
         query = " ".join(_lucene_term(t) for t in text.split())
         lists: list[tuple[float, list[dict]]] = []  # (weight, ranked chunks)
         if query:
             rows = self._q("CALL db.index.fulltext.queryNodes('chunk_text', $q, {limit: $limit}) YIELD node, score "
-                           "RETURN node.passage AS passage, node.text AS text, score", q=query, limit=pool)
+                           "WHERE $heads IS NULL OR split(node.passage, '#')[0] IN $heads "
+                           "RETURN node.passage AS passage, node.text AS text, score", q=query, limit=pool, heads=heads)
             lists.append((FULLTEXT_WEIGHT, rows))
             # whole passages too: a section about the topic beats a list that only names it
             rows = self._q("CALL db.index.fulltext.queryNodes('passage_text', $q, {limit: $limit}) YIELD node, score "
-                           "RETURN node.key AS passage, node.text AS text, score", q=query, limit=pool)
+                           "WHERE $heads IS NULL OR split(node.key, '#')[0] IN $heads "
+                           "RETURN node.key AS passage, node.text AS text, score", q=query, limit=pool, heads=heads)
             lists.append((FULLTEXT_WEIGHT, rows))
         stored = self._q("MATCH (c:Chunk) WHERE c.embedding IS NOT NULL RETURN size(c.embedding) AS n LIMIT 1")
         if embed.available() and stored and text.strip():
@@ -215,8 +242,9 @@ class GraphBackend:
                 try:
                     lists.append((1.0, self._q(
                         "CALL db.index.vector.queryNodes('chunk_embedding', $k, $v) YIELD node, score "
+                        "WHERE $heads IS NULL OR split(node.passage, '#')[0] IN $heads "
                         "RETURN node.passage AS passage, node.text AS text, score ORDER BY score DESC",
-                        k=pool, v=vector)))
+                        k=pool, v=vector, heads=heads)))
                 except Neo4jError:
                     pass  # no usable vector index: full-text only
         fused: dict[str, float] = {}
@@ -292,7 +320,10 @@ class GraphBackend:
         return found[0]
 
     def get_deviation_context(self, record: str, field: str, abgabegrund: str, version: str) -> DeviationContext:
+        from kg.field_evidence import applicable_documents
+
         vb = resolve_vb(version, self.vb_versions)
+        active = applicable_documents(self._document_versions(), vb)
         fkey = self._field_key(record, field)
         ag = str(abgabegrund)
         rule_keys = [r["k"] for r in self._q(
@@ -303,6 +334,7 @@ class GraphBackend:
         passage_keys |= {r["k"] for r in self._q(
             "MATCH (:Field {key: $field})-[:DESCRIBED_IN]->(p:Passage) WHERE p.doc <> 'VB' OR p.version = $vb "
             "RETURN p.key AS k", field=fkey, vb=vb)}
+        passage_keys = {pk for pk in passage_keys if pk.split("#", 1)[0] in active}
         precedents = [r["k"] for r in self._q(
             "MATCH (p:Precedent)-[:ABOUT]->(:Field {key: $field}) RETURN p.key AS k ORDER BY k", field=fkey)]
         flag = fkey.split(".", 1)[1]

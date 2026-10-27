@@ -9,7 +9,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 
-from api.routes.common import kb, repo
+from api.routes.common import ai, kb, repo
 from engine.signing import sha256
 from kg import ingest
 
@@ -29,7 +29,14 @@ async def upload(request: Request, file: UploadFile = File(...), document: str =
     if version is None or valid_from is None:
         from engine.specdiff import extract_text
 
-        found = ingest.guess(file.filename or "", extract_text(tmp))
+        text = extract_text(tmp)
+        found = ingest.guess(file.filename or "", text, document=document)
+        if (not found.get("version") or not found.get("valid_from")) and ai(request) and text.strip():
+            metadata = ai(request).read_document_metadata(file.filename or "", text)
+            if metadata:
+                for key in ("version", "valid_from"):
+                    if getattr(metadata, key):
+                        found.setdefault(key, getattr(metadata, key))
         version = version or found.get("version")
         valid_from = valid_from or (date.fromisoformat(found["valid_from"]) if "valid_from" in found else None)
     if not version or not valid_from:

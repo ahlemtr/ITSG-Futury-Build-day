@@ -22,13 +22,15 @@ class ChatBody(BaseModel):
     question: str
     history: list[Turn] = []
     language: Literal["de", "en"] = "de"
+    version: str | None = None
+    on_date: str | None = None
 
 
 @router.post("/chat")
 def ask(request: Request, body: ChatBody):
     """`answer` is null when the model is unavailable or gave no valid cited answer; `context` (the retrieved
     passages with rules, changes and test cases) is always there, so the UI can show the sources at least."""
-    context = chat.retrieve(kb(request), body.question)
+    context = chat.retrieve(kb(request), body.question, version=body.version, on_date=body.on_date)
     out = ai(request).chat(body.question, [t.model_dump() for t in body.history], body.language, context) \
         if ai(request) else None
     cited = set(out.citations) if out else set()

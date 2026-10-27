@@ -5,3 +5,13 @@ __pycache__
 .pytest_cache
 .ruff_cache
 .env
+**/node_modules
+ui/dist
+kg/build
+bundles
+.agents
+.codex
+.aws
+**/__pycache__
+sources/uploads
+sources/2026_03_10_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.4_ab_01.01.2027.pdf

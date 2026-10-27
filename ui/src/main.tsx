@@ -14,6 +14,7 @@ import "./styles/advisor.css";
 import "./styles/calendar.css";
 import "./styles/compact.css";
 import "./styles/chat.css";
+import "./styles/calc.css";
 import "./i18n";
 
 import { App } from "./App";

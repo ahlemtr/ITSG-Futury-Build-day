@@ -12,10 +12,11 @@ KEY_FORMATS = {
     "DocVersion": r"[A-Z][A-Z0-9-]*@[A-Za-z0-9.-]+",
     "Passage": r"[A-Z][A-Z0-9-]*@[A-Za-z0-9.-]+#[A-Za-z0-9.-]+(/[a-z_]+)?",
     "Chunk": r"[A-Z][A-Z0-9-]*@[A-Za-z0-9.-]+#[A-Za-z0-9.-]+(/[a-z_]+)?~\d+",
-    "Record": r"D[A-Z]{3}",
-    "Field": r"D[A-Z]{3}\.[A-Z0-9][A-Z0-9-]*",
+    "Record": r"[A-Z]{4}",
+    "Field": r"[A-Z]{4}\.[A-Z0-9][A-Z0-9-]*",
+    "FieldDefinition": r"[A-Z][A-Z0-9-]*@[A-Za-z0-9.-]+#[A-Za-z0-9.-]+",
     "MessageType": r"\d{2}",
-    "Rule": r"(R41|F41|K61|K62)-\d+|[EC]-\d+|CALC-[A-Z0-9-]+-\d+",
+    "Rule": r"(R41|F41|K61|K62)-\d+|[ECS]-\d+|CALC-[A-Z0-9-]+-\d+",
     "Criterion": r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
     "Parameter": r"[a-z][a-z0-9_]*",
     "ParamValue": r"[a-z][a-z0-9_]*@(\d+\.\d+|sim-\d+\.\d+)",
@@ -34,6 +35,8 @@ ENUMS = {
     ("MessageType", "sender"): {"employer", "insurer", "both"},
     ("Field", "type"): {"an", "n"},
     ("Field", "required"): {"M", "m"},
+    ("FieldDefinition", "type"): {"an", "n"},
+    ("FieldDefinition", "required"): {"M", "m"},
     ("Field", "compare_mode"): {"compare", "rule", "ignore"},
     ("Field", "status"): {"extracted", "inferred", "partial", "missing"},
     ("Record", "status"): {"extracted", "inferred", "partial", "missing"},
@@ -86,6 +89,17 @@ def validate(graph: dict) -> tuple[list[str], list[str]]:
                 errors.append(f"edge {t} {e['from_key']} -> {e['to_key']}: {prop} = {e['props'].get(prop)!r}")
 
     # rules: at least one source and one message type
+    for (label, key), props in nodes.items():
+        if label != "FieldDefinition":
+            continue
+        if props.get("end", 0) - props.get("start", 0) + 1 != props.get("length"):
+            errors.append(f"field definition {key}: inconsistent position/length")
+        types = {e["type"] for e in out_edges[(label, key)]}
+        if not {"DEFINES", "SOURCED_FROM"} <= types:
+            errors.append(f"field definition {key}: missing field or source link")
+        if props.get("required") == "m" and props.get("condition_status") != "source_prose":
+            errors.append(f"field definition {key}: conditional marker lost its source condition status")
+
     for (label, key) in nodes:
         if label != "Rule":
             continue

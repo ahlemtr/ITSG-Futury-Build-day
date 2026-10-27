@@ -96,6 +96,15 @@ def _expand(sources: list[str], vb_versions: list[str]) -> list[str]:
     return out
 
 
+def _key_values(record: str, field: str) -> str | None:
+    """The Schlüsselzahlen of GG Anlage 2 for a field (kg/seed/key_values.yaml), as the Field's allowed values."""
+    from engine.model import base_field_name
+    from engine.rules.formats import key_values
+
+    t = key_values().get(base_field_name(field))
+    return to_json(t["codes"]) if t and record in t["records"] else None
+
+
 class Seed:
     """Everything the build reads, so the YAML backend can reuse it."""
 
@@ -136,6 +145,9 @@ def load_overlays(seed: Seed, folder: Path) -> None:
         if (d / "document.yaml").exists():
             found.append((load_yaml(d / "document.yaml"), d))
     for doc, d in sorted(found, key=lambda x: str(x[0]["valid_from"])):
+        family = next((v for v in seed.documents if v["doc"] == doc["doc"]), {})
+        doc.setdefault("role", family.get("role", "commentary" if doc["doc"] == "VB" else "reference"))
+        doc.setdefault("parents", family.get("parents", []))
         seed.documents.append({**doc, "present": True})
         seed.passages += load_yaml(d / "passages.yaml") or []
         values = (load_yaml(d / "parameters.yaml") or []) if (d / "parameters.yaml").exists() else []
@@ -229,13 +241,18 @@ def build_from(seed: Seed) -> dict:
         if not d["present"] and d["doc"] not in ("VB", "GG", "PTA"):
             g.warn(f"{d['doc']}@{d['version']}: file missing, not loaded")
             continue
-        g.node("Document", d["doc"], title=d["title"])
+        g.node("Document", d["doc"], title=d["title"], role=d.get("role", "reference"))
         dv = f"{d['doc']}@{d['version']}"
         g.node("DocVersion", dv, doc=d["doc"], version=d["version"], published=d["published"],
-               valid_from=d["valid_from"], file=d["file"])
+               valid_from=d["valid_from"], file=d["file"], role=d.get("role", "reference"),
+               source_url=d.get("source_url"))
         g.edge("HAS_VERSION", "Document", d["doc"], "DocVersion", dv)
         if d["succeeds"]:
             g.edge("SUCCEEDS", "DocVersion", dv, "DocVersion", f"{d['doc']}@{d['succeeds']}")
+    for d in seed.documents:
+        for parent in d.get("parents", []):
+            if g.has("Document", parent) and g.has("Document", d["doc"]):
+                g.edge("ANNEX_OF", "Document", d["doc"], "Document", parent)
 
     # --- K2: passages
     for p in seed.passages:
@@ -268,13 +285,16 @@ def build_from(seed: Seed) -> dict:
             g.node("Field", key, record=name, name=key.split(".", 1)[1], layout_name=f["name"],
                    start=f["start"], end=f["end"], length=f["length"], type=f["type"], required=f["required"],
                    format=f.get("format"), constant=f.get("constant"),
-                   values=to_json(f["values"]) if f.get("values") else None,
+                   values=to_json(f["values"]) if f.get("values") else _key_values(name, f["name"]),
                    repeating=f["repeating"], offset_in_group=f.get("offset_in_group"), status=status,
                    compare_mode=mode["mode"], compare_rule=mode.get("rule"), compare_source=mode.get("source"),
                    order=order)
             g.edge("HAS_FIELD", "Record", name, "Field", key, order=order)
             for pk in field_passages.get(key, []):
                 g.edge("DESCRIBED_IN", "Field", key, "Passage", pk)
+    from kg.field_evidence import add_definitions
+
+    add_definitions(g, seed)
     dslw = seed.layouts.get("DSLW")
     if dslw:
         for order, block in enumerate(dslw.get("block_order", []), start=1):

@@ -32,7 +32,7 @@ fields:
   start: 13
   end: 13
   length: 1
-  type: n
+  type: an
   required: M
 - name: DATUM-EGZBIS
   start: 14

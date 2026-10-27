@@ -11,7 +11,7 @@ from api.routes.common import catalogue_on_rules, kb
 router = APIRouter()
 
 SHOWN = ["DocVersion", "Passage", "Chunk", "Rule", "Parameter", "ParamValue", "Change", "TestCase", "Precedent",
-         "Field"]
+         "Field", "FieldDefinition"]
 
 
 @router.get("/kg/stats")
@@ -35,15 +35,21 @@ def stats(request: Request):
 
 
 @router.get("/kg/ask")
-def ask(request: Request, q: str, k: int = 6):
+def ask(request: Request, q: str, k: int = 6, version: str | None = None, on_date: str | None = None):
     """Question or change text in: the passages that match (with the sentence), the rules built on them, the
     changes that modified them and the test cases on those rules."""
     graph = kb(request)
     out = []
-    for p in graph.search_passages(q, k):
+    for p in graph.search_passages(q, k, version=version, on_date=on_date):
         sub = graph.subgraph("Passage", p.key, 1)
-        rules = sorted({e.from_key for e in sub.edges if e.type == "SOURCED_FROM"})
+        rules = sorted({e.from_key for e in sub.edges if e.type == "SOURCED_FROM" and e.from_label == "Rule"})
         changes = sorted({e.from_key for e in sub.edges if e.type in ("MODIFIES_OLD", "MODIFIES_NEW")})
         tests = sorted({t.id for t in catalogue_on_rules(request, rules)}) if rules else []
         out.append({"passage": p.model_dump(), "rules": rules, "changes": changes, "tests": tests})
     return {"query": q, "results": out}
+
+
+@router.get("/kg/fields/{record}/definitions")
+def field_definitions(request: Request, record: str, field: str | None = None,
+                      version: str | None = None, on_date: str | None = None):
+    return {"record": record, "definitions": kb(request).get_field_definitions(record, field, version, on_date)}

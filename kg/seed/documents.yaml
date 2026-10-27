@@ -20,6 +20,51 @@ documents:
         published: 2025-05-06
         valid_from: 2026-01-01
         file: sources/GG_EEL_V13.1_06.05.2025.pdf
+  # Annexes of the GG (added 2026-10-27): Anlage 1 = record layouts with M/m markers, Anlage 2 = Schlüsselzahlen
+  # (allowed codes per field, read into kg/seed/key_values.yaml), Anlage 3 = Einzelfälle / Ausnahmen
+  - code: GG-ANL1
+    title: GG Anlage 1 - Datensätze und Datenbausteine
+    role: record_layout
+    parents: [GG, VB]
+    versions:
+      - version: "13.1.1"
+        published: 2025-05-06
+        valid_from: 2026-01-01
+        file: sources/GG_EEL_V13.1_Anlage_1_24.03.2025.pdf
+  - code: VB-ANL1
+    title: Anlage 1 (VB) - Datensätze und Datenbausteine mit Prüfungen
+    role: record_layout
+    parents: [VB]
+    versions:
+      - version: "13.1.3"
+        published: 2026-01-14
+        valid_from: 2026-01-01
+        file: sources/VB_EEL_V13.1.3_Anlage_1_14.01.2026.pdf
+        source_url: https://www.gkv-datenaustausch.de/media/dokumente/arbeitgeber/eel/verfahrensbeschreibung_1/VB_EEL_V13.1.3_Anlage_1_14.01.2026.pdf
+      - version: "13.1.4"
+        published: 2026-09-28
+        valid_from: 2027-07-01
+        succeeds: "13.1.3"
+        file: sources/28.09.2026_VB_EEL_V13.1.4_Anlage_1_Final.pdf
+        source_url: https://www.gkv-datenaustausch.de/media/dokumente/arbeitgeber/eel/verfahrensbeschreibung_1/28.09.2026_VB_EEL_V13.1.4_Anlage_1_Final.pdf
+  - code: GG-ANL2
+    title: GG Anlage 2 - Schlüsselzahlen
+    role: code_list
+    parents: [GG]
+    versions:
+      - version: "13.0"
+        published: 2024-07-19
+        valid_from: 2026-01-01
+        file: sources/GG_EEL_V13_Anlage_2_19.07.2024.pdf
+  - code: GG-ANL3
+    title: GG Anlage 3 - Einzelfälle / Ausnahmen
+    role: exceptions
+    parents: [GG]
+    versions:
+      - version: "13.0"
+        published: 2024-07-19
+        valid_from: 2026-01-01
+        file: sources/GG_EEL_V13_Anlage_3_19.07.2024.pdf
   - code: PTA
     title: Pool-Testaufgaben 2025/2026
     versions:

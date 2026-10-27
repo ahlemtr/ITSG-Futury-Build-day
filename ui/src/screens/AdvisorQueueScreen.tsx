@@ -7,6 +7,7 @@ import { SpecRefText } from "../components/SpecRefText";
 import { useSetTopBar } from "../components/TopBarContext";
 import { pick } from "../format";
 import { InfoTip, Reasoning } from "../components/InfoTip";
+import { signatureLabel } from "../data/labels";
 
 const DECISIONS: Precedent["label"][] = ["variant", "bug", "invalid"];
 const ADVISOR = "SA";
@@ -98,7 +99,7 @@ export function AdvisorQueueScreen() {
                     {p.id !== p.signature && <span className="mono">{p.id} </span>}
                     {pick(p.itemTitle, i18n.language)} <Badge value={p.label} />
                     <div className="cell-hint">
-                      {t("advisor.signature")}: <span className="mono">{p.signature}</span>
+                      {t("advisor.signature")}: <span title={p.signature}>{signatureLabel(t, p.signature)}</span>
                     </div>
                   </li>
                 ))}

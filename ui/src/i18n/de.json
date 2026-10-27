@@ -15,6 +15,7 @@
   },
   "common": {
     "loading": "Wird geladen …",
+    "close": "Schließen",
     "error": "Die Daten konnten nicht geladen werden.",
     "info": "Erklärung",
     "why": "Begründung"
@@ -33,7 +34,8 @@
     "results": "Ergebnisse",
     "vendorReports": "Berichte",
     "knowledgeGraph": "Wissensgraph",
-    "calendar": "Fristen"
+    "calendar": "Fristen",
+    "calculator": "Prüfrechner"
   },
   "screens": {
     "overview": {
@@ -473,6 +475,7 @@
       "DocVersion": "Dokumentfassungen",
       "Passage": "Passagen",
       "Chunk": "Suchabschnitte",
+      "FieldDefinition": "Felddefinitionen",
       "Rule": "Regeln",
       "Parameter": "Parameter",
       "ParamValue": "Parameterwerte",
@@ -625,5 +628,115 @@
     "tests": "Testfälle {{tests}}",
     "error": "Die Frage konnte nicht beantwortet werden: {{error}}",
     "crashed": "Im Assistenten ist ein Fehler aufgetreten. Der Rest der Seite funktioniert weiter."
+  },
+  "labels": {
+    "yes": "ja",
+    "no": "nein",
+    "message": "Meldung {{code}}",
+    "param": {
+      "min_total_days": "Mindestzahl AU-Tage",
+      "gap_months": "Größte Lücke, die noch verkettet",
+      "gap_inclusive": "Lücke von genau 6 Monaten verkettet",
+      "sum_window_months": "Zeitraum für die Summe der Vorerkrankungen",
+      "open_end_days": "Offene AU zählt bis Meldedatum plus",
+      "efz_days": "Entgeltfortzahlung"
+    },
+    "unit": {
+      "min_total_days": "{{value}} Tage",
+      "gap_months": "{{value}} Monate",
+      "sum_window_months": "{{value}} Monate",
+      "open_end_days": "{{value}} Tage",
+      "efz_days": "{{value}} Tage"
+    },
+    "kind": {
+      "value_differs": "Wert weicht ab",
+      "missing_block": "Block fehlt",
+      "extra_block": "Block zu viel",
+      "missing_message": "Meldung fehlt",
+      "extra_message": "Meldung zu viel",
+      "missing_group": "Zeitraum fehlt",
+      "extra_group": "Zeitraum zu viel",
+      "order_differs": "Reihenfolge anders"
+    },
+    "node": {
+      "DocVersion": "Dokumentfassung",
+      "Passage": "Passage",
+      "Chunk": "Suchabschnitt",
+      "Rule": "Regel",
+      "Parameter": "Parameter",
+      "ParamValue": "Parameterwert",
+      "Change": "Änderung",
+      "TestCase": "Testfall",
+      "Precedent": "Präzedenzfall",
+      "Criterion": "Kriterium",
+      "Field": "Feld",
+      "FieldDefinition": "Felddefinition mit Quelle",
+      "MessageType": "Meldungsart"
+    }
+  },
+  "calc": {
+    "title": "Prüfrechner Krankengeld",
+    "info": "Rechnet das Krankengeld aus Arbeitsentgelt wie das Gemeinsame Rundschreiben Krankengeld (Anlage 3, Fassung 11.12.2024): Bemessungszeitraum, Regelentgelt, Einmalzahlungen, Höchstregelentgelt, 70 % / 90 %. Jeder Schritt nennt seinen Abschnitt.",
+    "inputs": "Angaben",
+    "optional": "optional",
+    "calculate": "Berechnen",
+    "example": "Beispiel 103 laden",
+    "empty": "Angaben eintragen und berechnen.",
+    "krankengeld": "Krankengeld",
+    "perDay": "kalendertäglich",
+    "bz": "Bemessungszeitraum",
+    "match": "stimmt mit der Datei überein ({{value}} €)",
+    "mismatch": "weicht ab: Datei {{value}} €",
+    "unconfirmed": "zu bestätigen",
+    "unconfirmedHint": "Wert nicht aus unseren Dokumenten (Beitragsbemessungsgrenze des Jahres); bitte von ITSG bestätigen.",
+    "scope": "Noch nicht abgedeckt: Entgeltumwandlung, flexible Arbeitszeit, Altersteilzeit, Leistungslohn über 3 Zeiträume, Sonderfälle bei Beschäftigungsbeginn und Elternzeit.",
+    "pay": {
+      "monthly": "Monatsentgelt",
+      "hourly": "Stundenlohn"
+    },
+    "billing": {
+      "same": "im selben Monat",
+      "next": "im Folgemonat"
+    },
+    "f": {
+      "au_start": "Beginn der Arbeitsunfähigkeit",
+      "pay": "Entgeltart",
+      "billing_day": "Abrechnung am Tag",
+      "billing_month": "Abrechnung",
+      "gross": "Bruttoarbeitsentgelt im Monat (ohne Einmalzahlungen)",
+      "net": "Nettoarbeitsentgelt im Monat",
+      "one_off": "Beitragspflichtige Einmalzahlungen, 12 Monate",
+      "weekly_hours": "Wöchentliche Arbeitszeit (Std.)",
+      "paid_hours": "Bezahlte Stunden im Zeitraum",
+      "fileValue": "Krankengeld laut Datei (zum Abgleich)"
+    },
+    "col": {
+      "step": "Schritt",
+      "value": "Wert",
+      "how": "Rechnung",
+      "source": "Quelle"
+    },
+    "step": {
+      "bemessungszeitraum": "Bemessungszeitraum",
+      "zwoelf_monate": "Zwölf-Monats-Zeitraum Einmalzahlungen",
+      "regelentgelt_laufend": "Regelentgelt laufend",
+      "netto_laufend": "Nettoarbeitsentgelt laufend",
+      "hinzurechnung_brutto": "Brutto-Hinzurechnungsbetrag",
+      "regelentgelt_kumuliert": "Regelentgelt kumuliert",
+      "hoechstregelentgelt": "Höchstregelentgelt",
+      "regelentgelt_massgeblich": "Regelentgelt maßgeblich",
+      "hinzurechnung_netto": "Netto-Hinzurechnungsbetrag",
+      "netto_kumuliert": "Nettoarbeitsentgelt kumuliert",
+      "kg_70_regelentgelt": "70 % des Regelentgelts",
+      "kg_90_netto": "90 % des Nettoarbeitsentgelts",
+      "kg_100_netto_laufend": "100 % des laufenden Nettoarbeitsentgelts",
+      "krankengeld": "Krankengeld"
+    },
+    "how": {
+      "bemessungszeitraum": "letzter abgelaufener und abgerechneter Kalendermonat vor AU-Beginn",
+      "zwoelf_monate": "12 Kalendermonate bis zum Bemessungszeitraum",
+      "hoechstregelentgelt": "Beitragsbemessungsgrenze KV des Jahres / 360",
+      "kg_100_netto_laufend": "Obergrenze: laufendes Nettoarbeitsentgelt"
+    }
   }
 }

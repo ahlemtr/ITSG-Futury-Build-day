@@ -35,6 +35,7 @@ class FieldDef(BaseModel):
     compare_mode: Literal["compare", "rule", "ignore"] = "compare"
     compare_rule: str | None = None
     order: int
+    definition_source: str | None = None
 
 
 class Layout(BaseModel):

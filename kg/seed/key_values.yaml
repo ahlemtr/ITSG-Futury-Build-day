@@ -1,0 +1,144 @@
+document: GG-ANL2
+version: '13.0'
+valid_from: '2026-01-01'
+tables:
+- field: ABGABEGRUND
+  records:
+  - DSLW
+  codes: &id001
+    '01': Entgeltbescheinigung KV bei Krankengeld
+    '02': Entgeltbescheinigung KV bei Kinderkrankengeld wegen häuslicher Betreuung und Mitaufnahme bei stationärer Behandlung
+    '03': Entgeltbescheinigung KV bei Mutterschaftsgeld
+    '04': Entgeltbescheinigung KV bei Krankengeld wegen Mitaufnahme im Krankenhaus bei Begleitung von Menschen mit Behinderung
+    '11': Entgeltbescheinigung RV bei Übergangsgeld Leistungen zur medizinischen Rehabilitation
+    '12': Entgeltbescheinigung RV bei Übergangsgeld Leistungen zur Teilhabe am Arbeitsleben
+    '21': Entgeltbescheinigung UV bei Verletztengeld
+    '22': Entgeltbescheinigung UV bei Übergangsgeld
+    '23': Entgeltbescheinigung UV bei Kinderverletztengeld
+    '31': Entgeltbescheinigung BA Übergangsgeld
+    '41': Anforderung Vorerkrankungsmitteilungen
+    '42': Anforderung Ende Entgeltersatzleistung
+    '51': Höhe der beitragspflichtigen Einnahmen (§ 23c SGB IV)
+    '61': Rückmeldung Vorerkrankungsmitteilungen
+    '62': Übermittlung Ende Entgeltersatzleistung
+    '66': Rückmeldung falscher Abgabegrund
+    '67': Unzuständige Krankenkasse / unbekannte Person
+    '71': Höhe der Entgeltersatzleistung
+    '72': Anforderung Anzahl freigestellter Arbeitstage
+    '73': Rückmeldung Anzahl freigestellter Arbeitstage
+    '88': Stornierung eines Datensatzes
+    '99': Wechsel der meldenden Stelle und Systemwechsel
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#2
+- field: KORR-ABGABEGRUND
+  records:
+  - DSLW
+  codes: *id001
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#2
+- field: GRUNDBEEND
+  records:
+  - DBAL
+  codes:
+    '01': Kündigung des Arbeitgebers
+    '02': Kündigung des Arbeitnehmers
+    '03': befristetes Beschäftigungsverhältnis
+    '04': Aufhebungsvertrag
+    '05': Sonstiges
+    '06': zulässige Auflösung
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#3
+- field: FEHLZEIT
+  records:
+  - DBMU
+  codes:
+    '00': Keine Fehlzeit
+    '01': Unbezahlter Urlaub
+    '02': Bezug einer Entgeltersatzleistung
+    '03': Unentschuldigtes Fehlen/Arbeitsbummelei
+    '04': Elternzeit
+    '99': Sonstiges
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#4
+- field: EEL-ENDE-GRUND
+  records:
+  - DBEE
+  codes:
+    '01': kein Leistungsbezug
+    '02': laufender Leistungsbezug
+    '03': Ende des Leistungsbezuges
+    '04': Ende wegen Bezug einer Erwerbsminderungsrente
+    '05': Ende wegen Ablauf der Leistungsdauer (Aussteuerung)
+    '06': Ende Mutterschaftsgeld bei Vorliegen eines Verlängerungstatbestandes
+    '99': Sonstiges Ende (z.B. wegen fehlender Mitwirkung, Wechsel der Krankenkasse, Ende des Beschäftigungsverhältnisses)
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#5
+- field: ABRECHNUNGSPROGRAMM
+  records:
+  - DSLW
+  codes:
+    '1': systemgeprüftes Entgeltabrechnungsprogramm
+    '2': systemgeprüfte Ausfüllhilfe
+    '3': systemgeprüftes Zeiterfassungssystem
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#6
+- field: MM-KUG
+  records:
+  - DBAL
+  codes:
+    '1': KUG
+    '2': Saison-KUG
+    '3': Transfer-KUG
+    '4': Qualifizierungsgeld
+  grundstellung_allowed: true
+  source: GG-ANL2@13.0#7
+- field: ENTGART
+  records:
+  - DBAE
+  - DBMU
+  codes:
+    '1': Stundenlohn
+    '2': festes Monatsentgelt
+    '3': Sonstiges (z. B. Akkord, Stücklohn, etc.)
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#8
+- field: KEINEFREIST
+  records:
+  - DBFR
+  codes:
+    '0': besteht teilweise
+    '1': ist ausgeschlossen durch Tarifvertrag
+    '2': ist ausgeschlossen durch Betriebsvereinbarung
+    '3': ist ausgeschlossen durch Arbeitsvertrag
+    '4': besteht vollständig für den gesamten Zeitraum
+    '5': Meldung mit Abgabegrund 72/73
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#9
+- field: GRUNDAV
+  records:
+  - DBVO
+  codes:
+    '1': Arbeitsunfähigkeit wegen Krankheit
+    '2': Teilnahme an einer Leistung zur medizinischen Vorsorge/Rehabilitation
+    '3': Übermittlung anrechenbarer Vorerkrankungen bei Übergangsgeld
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#10
+- field: KZ-NACHWEIS
+  records:
+  - DBVO
+  codes:
+    '1': liegt vollständig vor
+    '2': liegt teilweise vor
+    '4': liegt nicht vor
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#11
+- field: KZ-AU
+  records:
+  - DBVO
+  codes:
+    '1': anrechenbare Zeiten
+    '2': keine Anrechnung
+    '3': Prüfung der AU
+    '5': teilweise Anrechnung
+  grundstellung_allowed: false
+  source: GG-ANL2@13.0#12

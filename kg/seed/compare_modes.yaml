@@ -5,7 +5,6 @@ ignore:
   - {field: DSLW.DATUM-ERSTELLUNG,   source: VB@13.4#3.1.5}
   - {field: DSLW.DATUM-VERARBEITUNG, source: VB@13.4#3.1.14}
   - {field: DBID.AKTENZEICHEN-SV,    source: VB@13.4#3.19.1}
-  - {field: DBNA.UNKLAR,             source: null, note: positions 065-125 unknown}
   - {record: DBAE, all_fields_except_dates_and_flags: true, note: vendor payroll amounts}
   - {record: DBAL, all_fields_except_dates_and_flags: true, note: vendor payroll amounts}
 rule:

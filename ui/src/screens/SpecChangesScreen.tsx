@@ -17,6 +17,7 @@ import { wordDiff, type DiffPart } from "../records/wordDiff";
 import { SpecRefText } from "../components/SpecRefText";
 import { formatDate } from "../format";
 import { InfoTip, Reasoning, Stat } from "../components/InfoTip";
+import { paramChange } from "../data/labels";
 
 /** Documents a new version can be uploaded for: the Verfahrensbeschreibung, the Gemeinsame Grundsätze and the
  * insurers' Rundschreiben (calculation rules). */
@@ -251,7 +252,6 @@ function Parts({ parts }: { parts: DiffPart[] }) {
   );
 }
 
-const showValue = (v: unknown) => (v === undefined ? "–" : JSON.stringify(v));
 
 function periodsText(p: { send_41: boolean; periods: [string, string][]; total_days: number | null }, t: (k: string) => string) {
   if (!p.send_41) return t("spec.no41");
@@ -309,7 +309,7 @@ function ChangeDetail({ change, diff }: { change: SpecChange; diff: SpecDiff }) 
           <div key={p}>
             <dt>{t("spec.param")}</dt>
             <dd className="mono">
-              {p}: {showValue(diff.params.old[p])} → {showValue(diff.params.new[p])}
+              <span title={p}>{paramChange(t, p, diff.params.old[p], diff.params.new[p])}</span>
             </dd>
           </div>
         ))}

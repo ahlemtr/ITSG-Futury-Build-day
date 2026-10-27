@@ -26,10 +26,17 @@ a passage key, written inline in square brackets exactly as given, e.g. [VB@13.4
 in `citations` too. If the context does not answer the question, say so in one sentence and cite the closest
 passage. Do not compute dates yourself: use add_months and count_days. Keep the answer short: 2 to 6 sentences
 or a short list. Legal terms stay German. Answer in the language given as `language` (de = German, en = English).
+
+Technical annexes define record structure; the VB commentary supplies business context. Preserve both sources.
+M (unconditional mandatory) is the unconditional case of m (mandatory under conditions); a marker difference
+alone is not a contradiction. Read the quoted conditions and block introduction before interpreting a row.
+Never invent a condition or assume an unspecified condition is always true. Numeric content can specialize an
+alphanumeric technical field. Compare document applicability dates, not version numbers across document families.
+Use get_field_definitions for field questions, and distinguish applicable from historical/future definitions.
 """
 
 TOOLS = ["search_passages", "get_passage", "get_rules", "get_param", "get_versions", "get_changes", "get_test_case",
-         "add_months", "count_days"]
+         "add_months", "count_days", "get_field_definitions"]
 K = 6
 CITE_RE = re.compile(r"\[([A-Z0-9-]+@[^#\]\s]+#[^\]\s]+)\]")
 
@@ -41,16 +48,31 @@ class ChatAnswer(BaseModel):
     test_cases: list[str] = []
 
 
-def retrieve(kb, question: str, k: int = K) -> list[dict]:
+def retrieve(kb, question: str, k: int = K, version: str | None = None, on_date=None) -> list[dict]:
     """The passages that match, each with its graph neighbourhood."""
     out = []
-    for p in kb.search_passages(question, k):
+    for p in kb.search_passages(question, k, version=version, on_date=on_date):
         sub = kb.subgraph("Passage", p.key, 1)
         rule_nodes = {n.key: n.props for n in sub.nodes if n.label == "Rule"}
-        rules = sorted({e.from_key for e in sub.edges if e.type == "SOURCED_FROM"} | set(rule_nodes))
+        rules = sorted({e.from_key for e in sub.edges if e.type == "SOURCED_FROM" and e.from_label == "Rule"}
+                       | set(rule_nodes))
         changes = sorted({e.from_key for e in sub.edges if e.type in ("MODIFIES_OLD", "MODIFIES_NEW")})
         tests = sorted({t.key for r in rules for t in kb.get_test_cases(r)})
+        definitions = kb.get_field_definitions(*p.field.split(".", 1), version=version, on_date=on_date) \
+            if p.field else []
+        introductions = []
+        for d in definitions:
+            if (version is not None or on_date is not None) and not d["applicable"]:
+                continue
+            block_key = d["key"].split(".f", 1)[0]
+            try:
+                block = kb.get_passage(block_key)
+                if block.key not in {b["key"] for b in introductions}:
+                    introductions.append({"key": block.key, "text": block.text[:2000]})
+            except KeyError:
+                pass
         out.append({"key": p.key, "heading": p.heading, "snippet": p.snippet, "text": p.text[:1500],
+                    "field_definitions": definitions, "block_context": introductions,
                     "rules": [{"id": r, "title": (rule_nodes.get(r) or {}).get("title")} for r in rules],
                     "changes": changes, "test_cases": tests})
     return out

@@ -81,9 +81,16 @@ function Panel() {
   const input = useRef<HTMLTextAreaElement>(null);
   const log = useRef<HTMLDivElement>(null);
 
-  useEffect(() => input.current?.focus(), []);
-  const follow = () => log.current?.scrollTo({ top: log.current.scrollHeight });
-  useEffect(follow, [turns.length, busy]);
+  // effects return nothing: a returned value would be taken for a cleanup function
+  useEffect(() => {
+    input.current?.focus();
+  }, []);
+  const follow = () => {
+    log.current?.scrollTo({ top: log.current.scrollHeight });
+  };
+  useEffect(() => {
+    follow();
+  }, [turns.length, busy]);
 
   const send = (e?: FormEvent) => {
     e?.preventDefault();

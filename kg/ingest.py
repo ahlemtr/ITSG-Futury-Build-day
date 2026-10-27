@@ -35,8 +35,8 @@ STAGES = [
     ("catalogue", "Test catalogue recomputed"),
 ]
 
-VALID_FROM_RE = re.compile(r"(?:gültig\s+)?ab[\s_]+(\d{2})\.(\d{2})\.(\d{4})", re.IGNORECASE)
-VERSION_RE = re.compile(r"Version[\s_]+(\d+(?:\.\d+)+)", re.IGNORECASE)
+VALID_FROM_RE = re.compile(r"(?:gültig\s+)?ab[\s_:=-]*(\d{1,2})\s*\.\s*(\d{1,2})\s*\.\s*(\d{4})", re.IGNORECASE)
+VERSION_RE = re.compile(r"(?:Version(?:snummer)?[\s_:=-]*|(?:^|[_\s-])V)(\d+(?:\.\d+)+)", re.IGNORECASE)
 DATED_FILE_RE = re.compile(r"^(\d{4})_(\d{2})_(\d{2})_")  # Rundschreiben: "2025_12_10_NS_FLB_..."
 CALC_RE = re.compile(r"\d+(?:,\d+)?\s*(?:Prozent|%|v\. ?H\.|Wochen|Tage|Kalendertage|Monate|Jahre|Euro|EUR|€)",
                      re.IGNORECASE)
@@ -53,15 +53,24 @@ def ingested_root() -> Path:
     return ingested_dir()
 
 
-def guess(filename: str, text: str = "") -> dict:
+def source_upload_dir() -> Path:
+    folder = Path(env("SOURCE_UPLOAD_DIR", str(ROOT / "sources" / "uploads")))
+    return folder if folder.is_absolute() else ROOT / folder
+
+
+def guess(filename: str, text: str = "", document: str | None = None) -> dict:
     """Version and valid-from date from the file name or the first page ("Version 13.4 ab 01.01.2027")."""
     out: dict = {}
-    for source in (filename, text[:4000]):
+    for source in (text[:4000], filename):
         if "version" not in out and (m := VERSION_RE.search(source)):
             out["version"] = m.group(1)
         if "valid_from" not in out and (m := VALID_FROM_RE.search(source)):
-            out["valid_from"] = f"{m.group(3)}-{m.group(2)}-{m.group(1)}"
-    if (m := DATED_FILE_RE.match(Path(filename).name)):  # a dated circular: its date is version and validity
+            try:
+                out["valid_from"] = date(int(m.group(3)), int(m.group(2)), int(m.group(1))).isoformat()
+            except ValueError:
+                pass
+    circular = document.startswith("RS-") if document else "version" not in out
+    if circular and (m := DATED_FILE_RE.match(Path(filename).name)):
         out.setdefault("version", f"{m.group(1)}-{m.group(2)}-{m.group(3)}")
         out.setdefault("valid_from", f"{m.group(1)}-{m.group(2)}-{m.group(3)}")
     return out
@@ -85,8 +94,12 @@ class Pipeline:
         self.ai_factory, self.on_kb = ai_factory, on_kb
         self.today = today or date.today()
         self.doc, self.version = job["document"], job["version"]
+        if not re.fullmatch(r"[A-Z][A-Z0-9-]*", self.doc) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.-]*", self.version):
+            raise ValueError("invalid document or version identifier")
         self.valid_from = date.fromisoformat(job["valid_from"])
         self.folder = ingested_root() / f"{self.doc}@{self.version}"
+        self.created_folder = False
+        self.created_source: Path | None = None
 
     # ---------------------------------------------------------------- bookkeeping
     def stage(self, name: str, status: str, **counts) -> None:
@@ -114,7 +127,10 @@ class Pipeline:
                 self.stage(current, "failed")
             self.job["status"], self.job["error"] = "failed", f"{type(e).__name__}: {e}"
             self.job["trace"] = traceback.format_exc()[-2000:]
-            shutil.rmtree(self.folder, ignore_errors=True)  # a failed upload leaves nothing behind
+            if self.created_folder:
+                shutil.rmtree(self.folder, ignore_errors=True)
+            if self.created_source:
+                self.created_source.unlink(missing_ok=True)
         self.repo.save_job(self.job["id"], self.job)
         return self.job
 
@@ -125,10 +141,24 @@ class Pipeline:
             raise ValueError(f"{self.doc} {self.version} is already known")
         older = [v for v in versions if v.valid_from and v.valid_from < self.valid_from]
         self.previous = max(older, key=lambda v: v.valid_from) if older else None
-        self.folder.mkdir(parents=True, exist_ok=True)
+        self.folder.mkdir(parents=True, exist_ok=False)
+        self.created_folder = True
         target = self.folder / f"{self.doc}@{self.version}{self.pdf.suffix}"
         shutil.copyfile(self.pdf, target)
         self.file = target
+        name = f"{self.doc}@{self.version}.pdf"
+        if not re.fullmatch(r"[A-Za-z0-9@._-]+", name):
+            raise ValueError("invalid document/version for source archive")
+        archive = source_upload_dir() / name
+        archive.parent.mkdir(parents=True, exist_ok=True)
+        if archive.exists():
+            if archive.read_bytes() != target.read_bytes():
+                raise ValueError(f"a different source PDF already exists for {self.doc}@{self.version}")
+        else:
+            with archive.open("xb") as saved, target.open("rb") as original:
+                self.created_source = archive
+                shutil.copyfileobj(original, saved)
+        self.job["source_file"] = str(archive)
         self.job["previous"] = self.previous.version if self.previous else None
         self.stage("store", "running", bytes=target.stat().st_size, previous=self.job["previous"])
 
@@ -137,6 +167,11 @@ class Pipeline:
 
         warnings: list[str] = []
         dv = {"doc": self.doc, "version": self.version, "file": str(self.file)}
+        from kg.common import load_documents
+
+        family = next((d for d in load_documents() if d["doc"] == self.doc), None)
+        if family:
+            dv.update(role=family["role"], parents=family["parents"])
         self.passages = extract_document(dv, load_layouts(), self.folder / "text", warnings.append)
         from kg.chunks import passage_chunks
 

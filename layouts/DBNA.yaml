@@ -10,12 +10,11 @@ announced_by:
   record: DSLW
   field: MM-NAME
   value_if_present: J
-status: partial
+status: extracted
 fixed_length: 125
 notes:
-- Not commented in the Verfahrensbeschreibung ("keine Kommentierung vorgesehen"). Total length 125 measured in the
-  TEEL0 sample. Positions 065-125 are empty in the sample; their split (e.g. Vorsatzwort, Namenszusatz, Titel) must
-  come from the record description in the GG annexes.
+- Technical structure from Anlage 1 (VB), section 5. In EEL, KENNZ-AEND-BER must remain blank;
+  the general name-change codes printed in the row are restricted by the block introduction.
 fields:
 - name: KENNUNG
   start: 1
@@ -39,10 +38,32 @@ fields:
   type: an
   required: M
   source: TEEL0 sample
-- name: UNKLAR
+- name: VORSATZWORT
   start: 65
-  end: 125
-  length: 61
+  end: 84
+  length: 20
   type: an
   required: m
-  source: TEEL0 sample, content empty
+  source: GG-ANL1@13.1.1#5.f065
+- name: NAMENSZUSATZ
+  start: 85
+  end: 104
+  length: 20
+  type: an
+  required: m
+  source: GG-ANL1@13.1.1#5.f085
+- name: TITEL
+  start: 105
+  end: 124
+  length: 20
+  type: an
+  required: m
+  source: GG-ANL1@13.1.1#5.f105
+- name: KENNZ-AEND-BER
+  start: 125
+  end: 125
+  length: 1
+  type: an
+  required: m
+  constant: ''
+  source: GG-ANL1@13.1.1#5.f125

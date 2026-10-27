@@ -44,6 +44,9 @@ __all__ = [
 class KnowledgeBase(Protocol):
     def get_layout(self, record: str, version: str) -> Layout: ...
 
+    def get_field_definitions(self, record: str, field: str | None = None,
+                              version: str | None = None, on_date=None) -> list[dict]: ...
+
     def get_rules(self, abgabegrund: str, version: str) -> list[Rule]:
         """Rules for a message type; sources limited to VB passages of that version (other docs always)."""
         ...
@@ -54,7 +57,7 @@ class KnowledgeBase(Protocol):
 
     def get_passage(self, ref: str | SpecRef) -> Passage: ...
 
-    def search_passages(self, text: str, k: int = 5) -> list[Passage]:
+    def search_passages(self, text: str, k: int = 5, version: str | None = None, on_date=None) -> list[Passage]:
         """Vector search, full-text fallback (YAML backend: plain substring search)."""
         ...
 

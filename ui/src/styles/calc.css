@@ -1,0 +1,88 @@
+/* Prüfrechner: inputs left, the calculation with its sources right */
+.calc-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.calc-form {
+  display: grid;
+  gap: 12px;
+}
+
+.calc-form label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.calc-form input,
+.calc-form select {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.calc-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.calc-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.calc-headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 40px;
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.calc-headline > div {
+  display: grid;
+  gap: 2px;
+}
+
+.calc-amount {
+  font-family: var(--font-heading);
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.calc-result .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.calc-final td {
+  font-weight: 500;
+  background: var(--ground);
+}
+
+.calc-unconfirmed {
+  margin-left: 6px;
+  --dot: var(--label-unclear-fg);
+}
+
+.calc-scope {
+  padding: 10px 16px 14px;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .calc-layout {
+    grid-template-columns: 1fr;
+  }
+}

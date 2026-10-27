@@ -6,7 +6,7 @@ from pathlib import Path
 
 from kg.common import BUILD_DIR, LAYOUT_DIR, ROOT, SEED_DIR, dump_yaml, load_documents, load_layouts
 from kg.extract import docx as docx_split
-from kg.extract import generic, vb
+from kg.extract import field_tables, generic, vb
 from kg.extract.pdf_text import clean, pdf_to_text, read_lines
 
 # 08 section 5.2: these must hold on the generated passages (also checked by validate.py)
@@ -45,8 +45,12 @@ def extract_document(dv: dict, layouts: dict, text_dir: Path, warn) -> list[dict
     toc_last_page = lines[toc_last].page if toc_last >= 0 else 0
     lines = clean(lines)
     if doc == "VB":
-        return vb.split(doc, version, lines, layouts, warn)
-    return generic.split(doc, version, lines, toc_last_page, warn)
+        passages = vb.split(doc, version, lines, layouts, warn)
+    else:
+        passages = generic.split(doc, version, lines, toc_last_page, warn)
+    if doc == "VB" or dv.get("role") == "record_layout":
+        passages += field_tables.extract(dv, layouts, warn)
+    return passages
 
 
 def run(seed_dir: Path = SEED_DIR, layout_dir: Path = LAYOUT_DIR, build_dir: Path = BUILD_DIR) -> list[dict]:

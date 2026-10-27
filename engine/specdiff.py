@@ -23,13 +23,20 @@ TOC_RE = re.compile(r"\.{4,}")
 
 def extract_text(pdf: Path) -> str:
     """pdftotext (poppler), pdfplumber as fallback."""
-    if shutil.which("pdftotext"):
-        return subprocess.run(["pdftotext", "-enc", "UTF-8", "-layout", str(pdf), "-"], capture_output=True,
-                              check=True).stdout.decode("utf-8")
+    binaries = [shutil.which("pdftotext", path="C:/Program Files/Git/mingw64/bin"), shutil.which("pdftotext")]
+    for binary in dict.fromkeys(b for b in binaries if b):
+        result = subprocess.run([binary, "-enc", "UTF-8", "-layout", str(pdf), "-"],
+                                capture_output=True, check=False)
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.decode("utf-8")
     import pdfplumber
 
     with pdfplumber.open(pdf) as doc:
-        return "\f".join(page.extract_text() or "" for page in doc.pages)
+        texts = []
+        for page in doc.pages:
+            texts.append(page.extract_text() or "")
+            page.close()
+        return "\f".join(texts)
 
 
 def normalise(text: str) -> list[tuple[str, str | None, str | None]]:

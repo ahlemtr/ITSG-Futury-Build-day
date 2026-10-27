@@ -1,4 +1,7 @@
-"""Step K9.3: load the validated graph into Neo4j (08 section 12.3). Idempotent: MERGE by key, never deletes.
+"""Step K9.3: load the validated graph into Neo4j (08 section 12.3). MERGE by key.
+
+Reconcile generated layout membership so replaced placeholders no longer enter the parser.
+Historical nodes, uploaded versions and advisor decisions are preserved.
 
 To rebuild from zero: run `MATCH (n) DETACH DELETE n` by hand in Neo4j Browser, then load again.
 """
@@ -11,11 +14,11 @@ from kg.common import env, to_date
 
 # Labels and relationship types come from this whitelist (07 section 3), never from input data.
 LABELS = ["Document", "DocVersion", "Passage", "MessageType", "Record", "Field", "Rule", "Criterion",
-          "Parameter", "ParamValue", "Change", "TestCase", "Precedent", "Chunk"]
+          "Parameter", "ParamValue", "Change", "TestCase", "Precedent", "Chunk", "FieldDefinition"]
 REL_TYPES = ["HAS_VERSION", "SUCCEEDS", "CONTAINS", "USES_BLOCK", "HAS_FIELD", "CARRIES", "DESCRIBED_IN",
              "APPLIES_TO", "CONSTRAINS", "SOURCED_FROM", "IMPLEMENTS", "USES_PARAM", "HAS_VALUE", "MODIFIES_OLD",
              "MODIFIES_NEW", "DERIVED_FROM", "CHANGES_PARAM", "TARGETS", "CLONE_OF", "HIDDEN_OF", "ABOUT",
-             "JUSTIFIED_BY", "HAS_CHUNK"]
+             "JUSTIFIED_BY", "HAS_CHUNK", "ANNEX_OF", "DEFINES", "HAS_DEFINITION", "IN_CONTEXT", "COMPLEMENTS"]
 DATE_PROPS = {"published", "valid_from", "decided"}  # stored as Neo4j date() (08 section 1.5)
 BATCH = 500
 
@@ -77,6 +80,13 @@ def load(graph: dict, driver) -> None:
                     f"MERGE (a)-[e:{rel}]->(b) SET e += r.props",
                     rows=chunk,
                 )
+        memberships = defaultdict(list)
+        for e in graph["edges"]:
+            if e["type"] == "HAS_FIELD":
+                memberships[e["from_key"]].append(e["to_key"])
+        s.run("UNWIND $records AS row MATCH (rec:Record {key: row.key}) "
+              "MATCH (rec)-[h:HAS_FIELD]->(f:Field) WHERE NOT f.key IN row.fields DELETE h",
+              records=[{"key": k, "fields": fs} for k, fs in memberships.items()]).consume()
         s.run(
             "CREATE FULLTEXT INDEX passage_text IF NOT EXISTS FOR (p:Passage) ON EACH [p.text, p.heading] "
             "OPTIONS {indexConfig: {`fulltext.analyzer`: 'german'}}"

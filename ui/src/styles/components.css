@@ -444,6 +444,30 @@ abbr[title] {
   font-size: 12px;
 }
 
+.ai-close {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-right: -4px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.ai-close:hover {
+  background: var(--border);
+  color: var(--ink);
+}
+
+.ai-close:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
 .ai-progress {
   position: relative;
   height: 3px;

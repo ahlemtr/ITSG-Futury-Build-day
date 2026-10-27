@@ -165,16 +165,35 @@ class YamlBackend:
         return key
 
     # ---------------------------------------------------------------- interface
+    def _document_versions(self) -> list[dict]:
+        return [dict(p) for _, p in self._labelled("DocVersion")]
+
+    def get_field_definitions(self, record: str, field: str | None = None,
+                              version: str | None = None, on_date=None) -> list[dict]:
+        from kg.field_evidence import applicable_documents
+
+        if version is not None:
+            version = resolve_vb(version, self.vb_versions)
+        active = applicable_documents(self._document_versions(), version, on_date)
+        fkey = self._field_key(record, field) if field else None
+        return [dict(p, key=k, applicable=p["document_version"] in active)
+                for k, p in self._labelled("FieldDefinition")
+                if p["record"] == record and (fkey is None or p["field"] == fkey)]
+
     def get_layout(self, record: str, version: str) -> Layout:
+        from kg.field_evidence import resolve_fields
+
         vb = resolve_vb(version, self.vb_versions)
         p = self._props("Record", record)
         edges = sorted((e for e in self.out[("Record", record)] if e["type"] == "HAS_FIELD"),
                        key=lambda e: e["props"]["order"])
-        fields = []
+        raw_fields = []
         for e in edges:
             f = dict(self.nodes[("Field", e["to_key"])])
             f["values"] = json.loads(f["values"]) if f.get("values") else None
-            fields.append(FieldDef(key=e["to_key"], **f))
+            raw_fields.append(dict(f, key=e["to_key"]))
+        fields = [FieldDef(**f) for f in resolve_fields(raw_fields, self.get_field_definitions(record, version=vb),
+                                                       self._document_versions(), vb)]
         return Layout(record=record, title=p["title"], section=p["section"], page=p.get("page"),
                       fixed_length=p["fixed_length"], status=p["status"], version=vb, fields=fields)
 
@@ -203,8 +222,9 @@ class YamlBackend:
         key = ref.key if isinstance(ref, SpecRef) else ref
         return self._passage(resolve_passage_key(key, self.vb_versions))
 
-    def search_passages(self, text: str, k: int = 5) -> list[Passage]:
+    def search_passages(self, text: str, k: int = 5, version: str | None = None, on_date=None) -> list[Passage]:
         from kg.chunks import snippet
+        from kg.field_evidence import applicable_documents
 
         tokens = list(dict.fromkeys(t.lower() for t in _TOKEN.findall(text)))
         if self._search_docs is None:  # W7: one search document per chunk, scored per passage by its best chunk
@@ -212,6 +232,10 @@ class YamlBackend:
                                   f"{c.get('heading') or ''}\n{c.get('text') or ''}".lower(), c.get("text") or "")
                                  for _key, c in self._labelled("Chunk")]
         docs = self._search_docs
+        if version is not None or on_date is not None:
+            vb = resolve_vb(version, self.vb_versions) if version else None
+            active = applicable_documents(self._document_versions(), vb, on_date)
+            docs = [d for d in docs if d[0].split("#", 1)[0] in active]
         if not tokens or not docs:
             return []
         patterns = search_patterns(tokens)
@@ -285,7 +309,10 @@ class YamlBackend:
                               sources=sorted(self._targets("TestCase", key, "DESCRIBED_IN")))
 
     def get_deviation_context(self, record: str, field: str, abgabegrund: str, version: str) -> DeviationContext:
+        from kg.field_evidence import applicable_documents
+
         vb = resolve_vb(version, self.vb_versions)
+        active = applicable_documents(self._document_versions(), vb)
         fkey = self._field_key(record, field)
         ag = str(abgabegrund)
         rule_keys = [r for r in self._sources("Field", fkey, "CONSTRAINS", "Rule")
@@ -293,6 +320,7 @@ class YamlBackend:
         rules = [self._rule(r, vb) for r in sorted(rule_keys, key=self._rule_order)]
         passage_keys = {s for r in rules for s in r.sources}
         passage_keys |= {pk for pk in self._targets("Field", fkey, "DESCRIBED_IN") if keep_source(pk, vb)}
+        passage_keys = {pk for pk in passage_keys if pk.split("#", 1)[0] in active}
         flag = fkey.split(".", 1)[1]
         blocks = [FlaggedBlock(record=e["to_key"], flag=flag, mandatory=e["props"]["mandatory"])
                   for e in self.out[("MessageType", ag)]
