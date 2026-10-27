@@ -1,7 +1,6 @@
 import { useRef, useState, type DragEvent } from "react";
 import { useParams } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
-import { isApi } from "../../data/dataSource";
 import { nextRound, resetRun, submitRound, useRun, type ReplyFile, type RoundState, type RunState } from "../../data/runStore";
 import type { RoundDef, RunDef } from "../../data/types";
 import { Badge } from "../../components/Badge";
@@ -132,7 +131,7 @@ function RoundCard(props: {
       <p>{pick(round.instruction, lang)}</p>
 
       {open && <UploadZone runId={runId} primaryUpload={!expectsNothing} multiple={round.expects.length > 1} />}
-      {open && isApi && <p className="cell-hint">{t("run.upload.channelHint")}</p>}
+      {open && <p className="cell-hint">{t("run.upload.channelHint")}</p>}
       {rs.noMessage && <p className="hint-box">{t("run.reportedNoMessage")}</p>}
       {rs.receipt && <ReceiptCard receipt={rs.receipt} />}
       {rs.files && rs.receipt?.accepted !== false && <ParsedRecordView files={rs.files} />}
@@ -157,39 +156,22 @@ function RoundCard(props: {
         </section>
       )}
 
-      {round.reply && !def.hidden && (isApi ? rs.reply : rs.outcome?.passed) && (
+      {round.reply && !def.hidden && rs.reply && (
         <section className="sub-card reply">
           <div className="sub-card-head">
             <h3>{pick(round.reply.title, lang)}</h3>
-            <span className="mono muted">{rs.reply?.name ?? round.reply.fileName}</span>
+            <span className="mono muted">{rs.reply.name}</span>
           </div>
-          {!rs.reply && round.reply.rows.length > 0 && <table className="list-table compact">
-            <tbody>
-              {round.reply.rows.map((row) => (
-                <tr key={row.field}>
-                  <td className="cell-field">{row.field}</td>
-                  <td className="mono">{fillReply(row.value, rs) || t("run.reply.blank")}</td>
-                  <td className="muted">{row.note ? pick(row.note, lang) : ""}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>}
-          {rs.reply && <ParsedRecordView files={[rs.reply]} />}
+          <ParsedRecordView files={[rs.reply]} />
           <p className="cell-hint">{t("run.reply.fromYourFile")}</p>
-          {rs.reply ? (
-            <button type="button" className="button" onClick={() => download(rs.reply!)}>
-              {t("run.reply.download", { file: rs.reply.name })}
-            </button>
-          ) : (
-            <button type="button" className="button" disabled title={t("run.reply.downloadLater")}>
-              {t("run.reply.download", { file: round.reply.fileName })}
-            </button>
-          )}
-          {rs.reply && <p className="cell-hint">{t("run.reply.importHint")}</p>}
+          <button type="button" className="button" onClick={() => download(rs.reply!)}>
+            {t("run.reply.download", { file: rs.reply.name })}
+          </button>
+          <p className="cell-hint">{t("run.reply.importHint")}</p>
         </section>
       )}
 
-      {isCurrent && running && rs.outcome && (isApi || rs.outcome.passed) && !isLast && (
+      {isCurrent && running && rs.outcome && !isLast && (
         <div className="round-next">
           <button type="button" className="button button-primary" onClick={() => nextRound(runId)}>
             {t("run.next", { nr: round.nr + 1 })}
@@ -208,13 +190,6 @@ function download(reply: ReplyFile) {
   a.download = reply.name;
   a.click();
   URL.revokeObjectURL(url);
-}
-
-function fillReply(value: string, rs: RoundState): string {
-  const values = rs.outcome?.replyValues;
-  if (value === "{REF}") return values?.REF ?? "";
-  if (value === "{AZVU}") return values?.AZVU ?? "";
-  return value;
 }
 
 function UploadZone({ runId, primaryUpload, multiple }: { runId: string; primaryUpload: boolean; multiple: boolean }) {

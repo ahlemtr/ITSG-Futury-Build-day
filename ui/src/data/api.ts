@@ -18,7 +18,7 @@ import type {
   SubmissionResult,
   SubmissionSummary,
 } from "./types";
-import { fieldValue, parseText } from "../records/parse";
+import { parseText } from "../records/parse";
 import type { ReplyFile, RoundState, RunState } from "./runStore";
 
 const BASE = "/api";
@@ -461,7 +461,7 @@ function genericInstruction(expects: string[] | undefined, hidden: boolean): Loc
   };
 }
 
-/** The run as the screens know it: curated texts (mock/runs.ts) where they exist, backend plan and rules otherwise. */
+/** The run as the screens know it: curated texts (runTexts.ts) where they exist, backend plan and rules otherwise. */
 export async function runDef(run: ApiRun, curated?: RunDef): Promise<RunDef> {
   const rules = [...(await getRules(run.version)).values()].map((r) => ({ id: r.id, text: same(r.title) }));
   return {
@@ -487,7 +487,6 @@ export async function runDef(run: ApiRun, curated?: RunDef): Promise<RunDef> {
                 abgabegrund: codes(replies),
                 fileName: `TEEK0-r${p.round}`,
                 title: { de: `Antwort der Krankenkasse (${codes(replies)})`, en: `Insurer reply (${codes(replies)})` },
-                rows: [],
               }),
       };
     }),
@@ -501,10 +500,9 @@ export function toReply(r: ApiRoundResult): ReplyFile | undefined {
   return { name: r.reply_name, text: r.reply, parsed: parseText(r.reply) };
 }
 
-export function toOutcome(r: ApiRoundResult, hidden: boolean, reply?: ReplyFile): RoundOutcome {
+export function toOutcome(r: ApiRoundResult, hidden: boolean): RoundOutcome {
   const failedOnes = r.outcomes.filter((o) => o.outcome === "fail");
   const review = r.outcomes.some((o) => o.outcome === "review");
-  const last = reply?.parsed.records[reply.parsed.records.length - 1];
   return {
     passed: failedOnes.length === 0,
     label: failedOnes.length ? "bug" : review ? "unclear" : "exact",
@@ -514,9 +512,6 @@ export function toOutcome(r: ApiRoundResult, hidden: boolean, reply?: ReplyFile)
       : failedOnes.length
         ? same(failedOnes.map((o) => `${o.rule}: ${o.message || "failed"}`).join(" · "))
         : { de: "Alle geprüften Regeln erfüllt.", en: "All checked rules passed." },
-    replyValues: last
-      ? { REF: fieldValue(last, "DBID", "REFERENZ-ID"), AZVU: fieldValue(last, "DBID", "AKTENZEICHEN-VERURSACHER") }
-      : undefined,
   };
 }
 
@@ -552,7 +547,7 @@ export function runState(run: ApiRun, def: RunDef, prev?: RunState): RunState {
     const ui = prev?.rounds[i] ?? {};
     if (!result) return { receipt: ui.receipt };
     const reply = toReply(result);
-    return { ...ui, files: undefined, outcome: toOutcome(result, run.hidden, reply), reply };
+    return { ...ui, files: undefined, outcome: toOutcome(result, run.hidden), reply };
   });
   const last = def.rounds.length - 1;
   const current =

@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { getOverview, getSubmissions, isApi } from "../data/dataSource";
-import { useAdvisorState } from "../data/advisorStore";
+import { getOverview, getSubmissions } from "../data/dataSource";
 import type { OverviewData } from "../data/types";
 import { useData } from "../data/useData";
 import { SubmissionsTable } from "../components/SubmissionsTable";
@@ -12,14 +11,7 @@ export function OverviewScreen() {
   const { t } = useTranslation();
   const overview = useData(getOverview, []);
   const submissions = useData(getSubmissions, []);
-  const advisor = useAdvisorState();
-  // api mode: the backend counts the advisor's decisions itself
-  const live =
-    overview.status !== "ready"
-      ? undefined
-      : isApi
-        ? overview.data
-        : withAdvisor(overview.data, advisor.open.length, advisor.decided.length);
+  const live = overview.status === "ready" ? overview.data : undefined;
 
   return (
     <>
@@ -44,19 +36,6 @@ export function OverviewScreen() {
       </div>
     </>
   );
-}
-
-/** The mock figures assume the advisor queue as seeded; each decision moves one deviation from waiting to confirmed. */
-function withAdvisor(data: OverviewData, open: number, decided: number): OverviewData {
-  return {
-    ...data,
-    checksNow: { ...data.checksNow, withOpenDeviations: open },
-    resolution: {
-      ...data.resolution,
-      waitingForAdvisor: open,
-      aiConfirmedByAdvisor: data.resolution.aiConfirmedByAdvisor + decided,
-    },
-  };
 }
 
 function monthName(isoMonth: string, lang: string): string {

@@ -245,10 +245,8 @@
       "value": "Wert"
     },
     "reply": {
-      "blank": "(leer)",
       "fromYourFile": "REFERENZ-ID und Aktenzeichen stammen aus Ihrer eigenen Datei.",
       "download": "{{file}} herunterladen",
-      "downloadLater": "Die Datei erzeugt das Backend (API-Modus).",
       "importHint": "Importieren Sie diese Datei in Ihre Entgeltabrechnung und fahren Sie mit der nächsten Runde fort."
     },
     "verdict": {
@@ -285,8 +283,7 @@
     "becomesPrecedent": "Die Entscheidung wird als Präzedenzfall gespeichert und klärt dieselbe Abweichung künftig automatisch.",
     "saved": "Gespeichert als Präzedenzfall {{id}} ({{label}}). Dieselbe Abweichung wird künftig automatisch geklärt.",
     "decidedToday": "Heute entschieden",
-    "signature": "Signatur",
-    "resetDemo": "Demo zurücksetzen"
+    "signature": "Signatur"
   },
   "report": {
     "topbar": "Prüfbericht <strong>#{{id}}</strong>",
@@ -304,7 +301,6 @@
     "deviations": "Abweichungen",
     "files": "Geprüfte Dateien",
     "signing": "Bericht wird signiert …",
-    "apiOnly": "Prüfberichte gibt es nur mit dem Backend (npm run dev:api).",
     "none": "Noch keine geprüften Einreichungen.",
     "notSigned": "noch nicht signiert",
     "col": {

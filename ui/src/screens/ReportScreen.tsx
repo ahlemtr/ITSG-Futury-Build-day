@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
 import { downloadJson, getReport, reportHtmlUrl, type ReportView, type RuleLine } from "../data/api";
-import { isApi } from "../data/dataSource";
 import { useData } from "../data/useData";
 import { PassFail } from "../components/PassFail";
 import { SpecRefText } from "../components/SpecRefText";
@@ -14,11 +13,10 @@ const PASSED = ["exact_match", "correct_variant"];
 export function ReportScreen({ vendor = false }: { vendor?: boolean }) {
   const { id = "" } = useParams();
   const { t } = useTranslation();
-  const state = useData(() => (isApi ? getReport(id) : Promise.resolve(null)), [id]);
+  const state = useData(() => getReport(id), [id]);
 
   useSetTopBar(<Trans i18nKey="report.topbar" values={{ id }} components={{ strong: <strong /> }} />, [id]);
 
-  if (!isApi) return <div className="placeholder">{t("report.apiOnly")}</div>;
   if (state.status === "loading") return <p className="page-subtitle">{t("report.signing")}</p>;
   if (state.status === "error") return <div className="placeholder">{t("common.error")}</div>;
   if (!state.data) return <div className="placeholder">{t("result.notFound")}</div>;

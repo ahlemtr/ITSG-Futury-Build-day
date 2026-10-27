@@ -46,7 +46,7 @@ function ResultView({ result }: { result: SubmissionResult }) {
   const firstDeviation = result.fields.find(isDeviation) ?? result.fields[0];
   const [selectedKey, setSelectedKey] = useState(firstDeviation ? rowKey(firstDeviation) : "");
 
-  // one tab per message of the chain (api mode); mock results hold one message and show no tabs
+  // one tab per message of the chain
   const messages = [...new Set(result.fields.map((r) => r.message).filter((m): m is string => !!m))].sort(
     (a, b) => stepOf(a) - stepOf(b),
   );

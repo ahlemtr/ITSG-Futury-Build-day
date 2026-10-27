@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { draftAffectedTests, getSpecDiff, toSpecRef, type SpecChange, type SpecDiff } from "../data/api";
-import { isApi } from "../data/dataSource";
 import { useData } from "../data/useData";
 import { wordDiff, type DiffPart } from "../records/wordDiff";
 import { SpecRefText } from "../components/SpecRefText";
@@ -11,7 +10,7 @@ import { formatDate } from "../format";
 /** Screen 2: a new Verfahrensbeschreibung is published. What changed, which rules and tests it touches. */
 export function SpecChangesScreen() {
   const { t } = useTranslation();
-  const state = useData(() => (isApi ? getSpecDiff() : Promise.resolve(null)), []);
+  const state = useData(() => getSpecDiff(), []);
   const navigate = useNavigate();
   const [drafting, setDrafting] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -56,7 +55,6 @@ export function SpecChangesScreen() {
           {t("common.error")}
         </p>
       )}
-      {!isApi && <div className="placeholder">{t("report.apiOnly")}</div>}
       {state.status === "loading" && <p className="page-subtitle">{t("spec.loading")}</p>}
       {state.status === "error" && <div className="placeholder">{t("common.error")}</div>}
       {state.status === "ready" && state.data && <SpecDiffView diff={state.data} />}

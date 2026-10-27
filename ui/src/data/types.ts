@@ -1,5 +1,5 @@
 // Data shapes the UI expects. The backend API should send the same shapes,
-// so switching from mock to api needs no screen changes.
+// the adapters in ./api map the backend JSON to them.
 
 /** Text the backend provides in both languages (e.g. explanations). */
 export type Localized = { de: string; en: string };
@@ -75,8 +75,6 @@ export type ReplyDef = {
   abgabegrund: string;
   fileName: string;
   title: Localized;
-  /** values "{REF}" / "{AZVU}" are filled from the vendor's own file */
-  rows: { field: string; value: string; note?: Localized }[];
 };
 
 export type RoundDef = {
@@ -119,8 +117,6 @@ export type RoundOutcome = {
   rules: { id: string; passed: boolean }[];
   /** shown for public tests only */
   message?: Localized;
-  /** filled reply rows (public: shown, hidden runs never have replies) */
-  replyValues?: { REF: string; AZVU: string };
 };
 
 // ---------- Advisor queue (doc 05, steps c and d) ----------

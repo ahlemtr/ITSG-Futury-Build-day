@@ -245,10 +245,8 @@
       "value": "Value"
     },
     "reply": {
-      "blank": "(blank)",
       "fromYourFile": "REFERENZ-ID and case number come from your own file.",
       "download": "Download {{file}}",
-      "downloadLater": "The backend creates this file (API mode).",
       "importHint": "Import this file into your payroll software, then go on with the next round."
     },
     "verdict": {
@@ -285,8 +283,7 @@
     "becomesPrecedent": "The decision is saved as a precedent and settles the same deviation automatically next time.",
     "saved": "Saved as precedent {{id}} ({{label}}). The same deviation will be settled automatically next time.",
     "decidedToday": "Decided today",
-    "signature": "Signature",
-    "resetDemo": "Reset demo"
+    "signature": "Signature"
   },
   "report": {
     "topbar": "Test report <strong>#{{id}}</strong>",
@@ -304,7 +301,6 @@
     "deviations": "Deviations",
     "files": "Checked files",
     "signing": "Signing the report …",
-    "apiOnly": "Reports need the backend (npm run dev:api).",
     "none": "No checked submissions yet.",
     "notSigned": "not signed yet",
     "col": {

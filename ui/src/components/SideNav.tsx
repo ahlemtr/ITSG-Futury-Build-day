@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getNavCounts, type NavCounts } from "../data/dataSource";
 import { useAdvisorState } from "../data/advisorStore";
-import { DEMO_VENDOR } from "../data/mock/runs";
+import { DEMO_VENDOR } from "../data/runTexts";
 import { Term } from "./Term";
 import { useView } from "./useView";
 

@@ -1,6 +1,6 @@
-// Test runs as the vendor sees them (06, section 5). Stories and rounds from the plan documents.
-// Reply values in {braces} are filled from the vendor's own file: {REF} = their DATENSATZ-ID, {AZVU} = their case number.
-import type { RunDef } from "../types";
+// Hand-written texts of the vendor test runs (06, section 5): stories, facts and round instructions in both
+// languages. The backend runs the rounds; these texts replace its generic ones where they exist.
+import type { RunDef } from "./types";
 
 export const DEMO_VENDOR = "Lohnwerk Demo GmbH";
 
@@ -39,15 +39,6 @@ export const RUNS: RunDef[] = [
           abgabegrund: "61",
           fileName: "TEEK0001",
           title: { de: "Antwort der Krankenkasse: Vorerkrankungen (61)", en: "Insurer reply: prior illnesses (61)" },
-          rows: [
-            { field: "DBID REFERENZ-ID", value: "{REF}" },
-            { field: "DBID AKTENZEICHEN-VERURSACHER", value: "{AZVU}" },
-            { field: "DBVO 12-MONATSFRIST-AB", value: "11.03.2025" },
-            { field: "01.03. – 03.03.2026", value: "KZ-NACHWEIS 4", note: { de: "Bescheinigung fehlt", en: "sick note missing" } },
-            { field: "01.12. – 03.12.2025", value: "KZ-NACHWEIS 1 · KZ-AU 1", note: { de: "zählt", en: "counts" } },
-            { field: "01.10. – 17.10.2025", value: "KZ-NACHWEIS 1 · KZ-AU 1", note: { de: "zählt", en: "counts" } },
-            { field: "14.07. – 15.07.2025", value: "KZ-NACHWEIS 1 · KZ-AU 1", note: { de: "zählt", en: "counts" } },
-          ],
         },
       },
       {
@@ -65,11 +56,6 @@ export const RUNS: RunDef[] = [
           abgabegrund: "61",
           fileName: "TEEK0002",
           title: { de: "Korrigierte 61: alle vier Zeiträume zählen", en: "Corrected 61: all four periods count" },
-          rows: [
-            { field: "DBID REFERENZ-ID", value: "{REF}" },
-            { field: "01.03. – 03.03.2026", value: "KZ-NACHWEIS 1 · KZ-AU 1", note: { de: "Bescheinigung nachgereicht", en: "sick note received" } },
-            { field: "3 weitere Zeiträume", value: "KZ-NACHWEIS 1 · KZ-AU 1", note: { de: "unverändert", en: "unchanged" } },
-          ],
         },
       },
       {
@@ -88,10 +74,6 @@ export const RUNS: RunDef[] = [
           abgabegrund: "62",
           fileName: "TEEK0003",
           title: { de: "Antwort der Krankenkasse: Ende der Leistung (62)", en: "Insurer reply: end of benefit (62)" },
-          rows: [
-            { field: "DBID REFERENZ-ID", value: "{REF}" },
-            { field: "DBEE EEL-ENDE", value: "31.03.2026", note: { de: "Ende der Beschäftigung", en: "end of employment" } },
-          ],
         },
       },
       {

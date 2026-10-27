@@ -11,7 +11,6 @@ import {
   type Expected,
   type TestCaseDetail,
 } from "../data/api";
-import { isApi } from "../data/dataSource";
 import { useData } from "../data/useData";
 import { SpecRefText } from "../components/SpecRefText";
 import { formatDate } from "../format";
@@ -23,8 +22,8 @@ export function TestCatalogueScreen() {
   const { t } = useTranslation();
   const [reload, setReload] = useState(0);
   const [busy, setBusy] = useState(false);
-  const list = useData(() => (isApi ? getTestCases() : Promise.resolve(null)), [reload]);
-  const cases = list.status === "ready" && list.data ? list.data.filter((c) => c.origin !== "pta") : [];
+  const list = useData(() => getTestCases(), [reload]);
+  const cases = list.status === "ready" ? list.data.filter((c) => c.origin !== "pta") : [];
   const [selectedId, setSelectedId] = useState("peter-gap-exact");
   const selected = cases.find((c) => c.id === selectedId) ?? cases[0];
   const drafts = cases.filter((c) => c.status === "draft");
@@ -66,7 +65,6 @@ export function TestCatalogueScreen() {
         </div>
       </div>
 
-      {!isApi && <div className="placeholder">{t("report.apiOnly")}</div>}
       {list.status === "loading" && <p className="page-subtitle">{t("common.loading")}</p>}
       {list.status === "error" && <div className="placeholder">{t("common.error")}</div>}
 

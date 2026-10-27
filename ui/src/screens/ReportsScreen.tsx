@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getReports, getTestCases } from "../data/api";
-import { isApi } from "../data/dataSource";
-import { DEMO_VENDOR } from "../data/mock/runs";
+import { DEMO_VENDOR } from "../data/runTexts";
 import { useData } from "../data/useData";
 import { Badge } from "../components/Badge";
 import { formatDate } from "../format";
@@ -14,7 +13,6 @@ export function ReportsScreen({ vendor = false }: { vendor?: boolean }) {
   const screen = vendor ? "vendorReports" : "reports";
   const base = vendor ? "/vendor/reports" : "/reports";
   const state = useData(async () => {
-    if (!isApi) return null;
     const [rows, cases] = await Promise.all([getReports(vendor ? DEMO_VENDOR : undefined), getTestCases()]);
     const hidden = new Set(cases.filter((c) => c.hidden).map((c) => c.id));
     return rows.map((r) => ({ ...r, hidden: hidden.has(r.testCaseId) }));
@@ -26,12 +24,11 @@ export function ReportsScreen({ vendor = false }: { vendor?: boolean }) {
         <h1>{t(`screens.${screen}.title`)}</h1>
         <p className="page-subtitle">{t(`screens.${screen}.subtitle`)}</p>
       </div>
-      {state.status === "ready" && state.data === null && <div className="placeholder">{t("report.apiOnly")}</div>}
-      {(state.status !== "ready" || state.data !== null) && (
+      {(
         <section className="panel panel-flush">
           {state.status === "loading" && <p className="empty">{t("common.loading")}</p>}
           {state.status === "error" && <p className="empty">{t("common.error")}</p>}
-          {state.status === "ready" && state.data && (
+          {state.status === "ready" && (
             <table className="list-table">
               <thead>
                 <tr>

@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:api": "vite --mode api",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "check:i18n": "node scripts/check-i18n.mjs",

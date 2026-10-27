@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { decide, resetAdvisor, useAdvisorState } from "../data/advisorStore";
-import { isApi } from "../data/dataSource";
-import { ADVISOR_ITEMS } from "../data/mock/advisor";
+import { decide, useAdvisorState } from "../data/advisorStore";
 import type { AdvisorItem, Precedent } from "../data/types";
 import { Badge } from "../components/Badge";
 import { SpecRefText } from "../components/SpecRefText";
@@ -11,7 +9,6 @@ import { pick } from "../format";
 
 const DECISIONS: Precedent["label"][] = ["variant", "bug", "invalid"];
 const ADVISOR = "SA";
-const ADVISOR_FIRST_ID = ADVISOR_ITEMS[0]?.id ?? "";
 
 export function AdvisorQueueScreen() {
   const { t, i18n } = useTranslation();
@@ -47,21 +44,6 @@ export function AdvisorQueueScreen() {
           <h1>{t("screens.advisorQueue.title")}</h1>
           <p className="page-subtitle">{t("screens.advisorQueue.subtitle")}</p>
         </div>
-        {decided.length > 0 && !isApi && (
-          <div className="header-actions">
-            <button
-              type="button"
-              className="button"
-              onClick={() => {
-                resetAdvisor();
-                setLastSaved(null);
-                setSelectedId(ADVISOR_FIRST_ID);
-              }}
-            >
-              {t("advisor.resetDemo")}
-            </button>
-          </div>
-        )}
       </div>
 
       {lastSaved && (

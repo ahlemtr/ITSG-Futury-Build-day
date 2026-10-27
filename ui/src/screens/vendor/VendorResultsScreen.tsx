@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { getTestCases } from "../../data/api";
-import { getSubmissions, isApi } from "../../data/dataSource";
-import { DEMO_VENDOR } from "../../data/mock/runs";
+import { getSubmissions } from "../../data/dataSource";
+import { DEMO_VENDOR } from "../../data/runTexts";
 import { useData } from "../../data/useData";
 import { SubmissionsTable } from "../../components/SubmissionsTable";
 
@@ -9,7 +9,6 @@ import { SubmissionsTable } from "../../components/SubmissionsTable";
  * Hidden tests are left out: their result is pass / fail per rule on the test run page only. */
 async function loadOwn() {
   const subs = (await getSubmissions()).filter((s) => s.vendor === DEMO_VENDOR);
-  if (!isApi) return subs;
   const hidden = new Set((await getTestCases()).filter((t) => t.hidden).map((t) => t.id));
   return subs.filter((s) => !hidden.has(s.testCaseId));
 }

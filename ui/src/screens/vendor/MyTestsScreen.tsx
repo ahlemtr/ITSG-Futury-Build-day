@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getVendorRuns } from "../../data/api";
-import { isApi } from "../../data/dataSource";
-import { RUNS } from "../../data/mock/runs";
+import { RUNS } from "../../data/runTexts";
 import { useSavedRun } from "../../data/runStore";
 import { useData } from "../../data/useData";
 import type { RunDef } from "../../data/types";
@@ -10,7 +9,7 @@ import { pick } from "../../format";
 
 export function MyTestsScreen() {
   const { t } = useTranslation();
-  const runs = useData(() => (isApi ? getVendorRuns(RUNS) : Promise.resolve(RUNS)), []);
+  const runs = useData(() => getVendorRuns(RUNS), []);
   return (
     <>
       <div className="page-header">
