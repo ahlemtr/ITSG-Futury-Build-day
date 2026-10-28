@@ -124,7 +124,7 @@ cd ui && npm run dev
 
 Then open **Spec changes** and upload V13.4 to watch the whole flow. Run the tests with `uv run pytest -q`.
 
-More detail: [`ui/README.md`](ui/README.md) (running the UI), [`HANDOUT.md`](HANDOUT.md) (architecture and state), [`SPEC_UPDATE_WORKFLOW.md`](SPEC_UPDATE_WORKFLOW.md) (the core flow), [`VM_DEPLOYMENT.md`](VM_DEPLOYMENT.md) (deployment).
+More detail: [`ui/README.md`](ui/README.md) (running the UI), [`docs/HANDOUT.md`](docs/HANDOUT.md) (architecture and state), [`docs/SPEC_UPDATE_WORKFLOW.md`](docs/SPEC_UPDATE_WORKFLOW.md) (the core flow), [`docs/VM_DEPLOYMENT.md`](docs/VM_DEPLOYMENT.md) (deployment).
 
 <details>
 <summary><b>Knowledge graph build details</b></summary>
