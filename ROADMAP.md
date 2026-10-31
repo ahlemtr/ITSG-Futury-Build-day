@@ -5,17 +5,17 @@ The goal: a near-finished EEL test platform for a live demo to the GKV and ITSG 
 How to read this file:
 
 - Work is split into **goals** (G0 to G16). Each goal can be picked up and finished alone. A goal lists what it needs first under "Needs".
-- Phases follow the decided order: **scope → AI rule derivation → hardening**, then demo preparation. Weeks are a target, not a deadline per goal.
+- Phases follow the decided order: **scope → AI rule derivation → hardening**, then demo preparation. There is no schedule: each goal is worked until it is done properly.
 - A task is done when its tests pass in CI. A goal is done when its "Done when" line holds.
 - Tick the boxes on `main` as work lands, so everyone sees the current state.
 
-| Phase | Weeks | Goals |
-|---|---|---|
-| 0 Foundation | 2–6 Nov | G0, G1 |
-| 1 Full EEL scope | 2–22 Nov | G2–G8 |
-| 2 AI rule derivation | 16–29 Nov | G9–G11 |
-| 3 Hardening | 23 Nov–6 Dec | G12–G15 |
-| 4 Demo | 7–11 Dec | G16 |
+| Phase | Goals |
+|---|---|
+| 0 Foundation | G0, G1 |
+| 1 Full EEL scope | G2–G8 |
+| 2 AI rule derivation | G9–G11 |
+| 3 Hardening | G12–G15 |
+| 4 Demo | G16 |
 
 ---
 
