@@ -147,7 +147,7 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 | Hosting | Google Cloud ($300 free credits), Google's default HTTPS URL, no own domain |
 | ITSG | There is a contact who can answer domain questions and provide data |
 | Git | Work in `ahlemtr/ITSG-Futury-Build-day` itself (no fork), so the whole team sees progress on `main`; one branch + pull request per feature; GitHub Actions (Linux) runs pytest, ruff, tsc and the i18n check on every PR |
-| Roadmap | [`ROADMAP.md`](ROADMAP.md): goals G0–G16 by phase, each one independent, ticked on `main` as work lands |
+| Roadmap | [`ROADMAP.md`](ROADMAP.md): goals G0–G17 by phase, each one independent, ticked on `main` as work lands |
 
 ### Questions for the ITSG contact
 

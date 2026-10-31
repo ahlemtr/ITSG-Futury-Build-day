@@ -4,7 +4,7 @@ The goal: a near-finished EEL test platform for a live demo to the GKV and ITSG 
 
 How to read this file:
 
-- Work is split into **goals** (G0 to G16). Each goal can be picked up and finished alone. A goal lists what it needs first under "Needs".
+- Work is split into **goals** (G0 to G17). Each goal can be picked up and finished alone. A goal lists what it needs first under "Needs".
 - Phases follow the decided order: **scope → AI rule derivation → hardening**, then demo preparation. There is no schedule: each goal is worked until it is done properly.
 - A task is done when its tests pass in CI. A goal is done when its "Done when" line holds.
 - Tick the boxes on `main` as work lands, so everyone sees the current state.
@@ -13,9 +13,9 @@ How to read this file:
 |---|---|
 | 0 Foundation | G0, G1 |
 | 1 Full EEL scope | G2–G8 |
-| 2 AI rule derivation | G9–G11 |
-| 3 Hardening | G12–G15 |
-| 4 Demo | G16 |
+| 2 Expert knowledge and AI rule derivation | G9–G12 |
+| 3 Hardening | G13–G16 |
+| 4 Demo | G17 |
 
 ---
 
@@ -133,15 +133,32 @@ Why: the demo story includes a new vendor completing the yearly catalogue and ea
 
 Done when: a fresh vendor account goes from zero to certified in the UI, and the permanent cases appear.
 
-Needs: G2; G12 for real accounts (works with the demo toggle before that).
+Needs: G2; G13 for real accounts (works with the demo toggle before that).
 
 ---
 
-## Phase 2: AI rule derivation
+## Phase 2: Expert knowledge and AI rule derivation
 
-Why: today rules are hand-coded and the AI only adjusts existing parameters (gap 2 in section 5.2). The AI must turn spec text into executable rules, while still never computing results itself.
+### G9. Expert knowledge capture
 
-### G9. Rules as data
+Why: the experts who retire take the reasons with them: why a deviation is acceptable, how they read an unclear passage. Today an advisor decision is stored as a precedent with a short optional reason, matched only by its exact signature, with no spec version and no review. Decided cases become the asset the system learns from and the tests every rule change must pass.
+
+- [ ] A decided case stores: the deviation and the case facts, verdict, reason in the expert's words (required), the passages relied on (required), author, date, the spec version or validity date it holds for
+- [ ] Scope per decision: exact signature only, or a wider pattern the expert names
+- [ ] Conflicting decisions on the same situation are flagged and must be resolved; the resolution is recorded
+- [ ] A random sample of confident verdicts (rules, catalogue, precedents) goes to an expert for review, not only the unclear ones
+- [ ] Every confirmed case becomes a regression test that runs in CI
+- [ ] Groups of similar decisions are proposed as a rule or a known variant; an expert approves before it is used
+- [ ] Agreement rate between AI proposal and expert verdict, per category, shown in the UI as the measure of readiness
+- [ ] Ask the ITSG contact for real past eVpT deviations with the advisor's verdict as the starting set
+
+Done when: an advisor decision carries its reason, passages and validity, a conflicting decision is caught, and the decision runs as a test.
+
+Needs: G0.
+
+### G10. Rules as data
+
+Why: today rules are hand-coded and the AI only adjusts existing parameters (gap 2 in section 5.2). G10 to G12 let the AI turn spec text into executable rules, while still never computing results itself.
 
 - [ ] Declarative rule types that cover the hand-coded rules: date window, day sum, period chaining, field format, code list, block presence, cross-field consistency
 - [ ] The engine interprets these rule definitions; expected results stay deterministic
@@ -151,9 +168,9 @@ Done when: the hand-coded rules are deleted or reduced to the interpreter, and a
 
 Needs: G2.
 
-### G10. Spec text to executable rule
+### G11. Spec text to executable rule
 
-- [ ] Agent reads a spec section and proposes rule definitions in the G9 schema, with citations that must resolve to real passages
+- [ ] Agent reads a spec section and proposes rule definitions in the G10 schema, with citations that must resolve to real passages
 - [ ] Code validates each proposal (schema, parameter types, referenced fields exist in the layouts) and runs it against the existing test tables
 - [ ] ITSG reviews proposals in the UI (diff against the current rule, affected tests, approve or reject); only approved rules become active
 - [ ] Wire the existing criteria pipeline (`/criteria/extract`) into the UI
@@ -161,24 +178,25 @@ Needs: G2.
 
 Done when: uploading a spec change that needs new logic (not just a parameter) ends with an approved, executable rule and new test cases, without a developer.
 
-Needs: G9.
+Needs: G10.
 
-### G11. Measure the AI
+### G12. Measure the AI
 
-- [ ] Golden set: spec sections paired with the known correct rule definitions (from G9)
+- [ ] Golden set: spec sections paired with the known correct rule definitions (from G10)
 - [ ] Evaluation script reports match rate, wrong citations, rejected proposals; run it on every prompt change
+- [ ] Report the agreement rate with expert decisions (G9) next to the match rate
 - [ ] Prompt versions recorded with cached answers so cache invalidation is deliberate
 - [ ] Second real document path: a Rundschreiben or GG update end to end
 
 Done when: the match rate is known and shown in the report, and a prompt change cannot silently lower it.
 
-Needs: G10.
+Needs: G11.
 
 ---
 
 ## Phase 3: Hardening
 
-### G12. Login and roles
+### G13. Login and roles
 
 - [ ] User table in Postgres: email, password hash (argon2), role (ITSG staff, vendor), company
 - [ ] Login, logout, sessions with secure cookies; password reset by ITSG staff
@@ -191,7 +209,7 @@ Done when: tests prove a vendor cannot read another vendor's data or any hidden 
 
 Needs: G0.
 
-### G13. Security measures
+### G14. Security measures
 
 - [ ] Upload limits (size, type, count), safe file names, no path traversal under `DATA_DIR`
 - [ ] Rate limits on login and AI endpoints; AI cost cap per day
@@ -202,9 +220,9 @@ Needs: G0.
 
 Done when: a checklist review passes and is recorded in `PROJECT_REPORT.md`.
 
-Needs: G12.
+Needs: G13.
 
-### G14. Google Cloud deployment
+### G15. Google Cloud deployment
 
 Budget: $300 free credits; keep a budget alert.
 
@@ -216,9 +234,9 @@ Budget: $300 free credits; keep a budget alert.
 
 Done when: the platform runs on Google's default HTTPS URL and a push to `main` updates it.
 
-Needs: G0; G13 for the secrets part.
+Needs: G0; G14 for the secrets part.
 
-### G15. Reliability
+### G16. Reliability
 
 - [ ] PDF reports work in the deployed image (WeasyPrint)
 - [ ] Health checks, structured logs, error pages that do not leak internals
@@ -228,13 +246,13 @@ Needs: G0; G13 for the secrets part.
 
 Done when: a restore from backup and a full demo run work on the deployed instance.
 
-Needs: G14.
+Needs: G15.
 
 ---
 
 ## Phase 4: Demo
 
-### G16. Demo for 11 December
+### G17. Demo for 11 December
 
 - [ ] Demo script: vendor run with full EEL coverage, deviations judged, VB 13.4 upload, rules and tests update, signed report, new vendor reaching the certified label
 - [ ] Demo data and accounts, seeded by one command

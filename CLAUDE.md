@@ -2,7 +2,7 @@
 
 Test platform for ITSG's system review of payroll software, scoped to income replacement benefits (Entgeltersatzleistungen, EEL). Won the Futury Hackathon 2026 × ITSG. Next milestone: live demo to the GKV and ITSG on **11 December 2026**, pilot likely after.
 
-Read `PROJECT_REPORT.md` first: what exists, promised vs. delivered (section 5), decisions in force (6), decisions for December (9), open questions for ITSG. The plan is `ROADMAP.md` (goals G0–G16).
+Read `PROJECT_REPORT.md` first: what exists, promised vs. delivered (section 5), decisions in force (6), decisions for December (9), open questions for ITSG. The plan is `ROADMAP.md` (goals G0–G17).
 
 ## Layout
 
