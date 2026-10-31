@@ -1,0 +1,248 @@
+# Roadmap to 11 December 2026
+
+The goal: a near-finished EEL test platform for a live demo to the GKV and ITSG on 11 December 2026 and a likely pilot discussion after. Background and decisions are in [`PROJECT_REPORT.md`](PROJECT_REPORT.md) (gaps: section 5.2, decisions: section 9).
+
+How to read this file:
+
+- Work is split into **goals** (G0 to G16). Each goal can be picked up and finished alone. A goal lists what it needs first under "Needs".
+- Phases follow the decided order: **scope → AI rule derivation → hardening**, then demo preparation. Weeks are a target, not a deadline per goal.
+- A task is done when its tests pass in CI. A goal is done when its "Done when" line holds.
+- Tick the boxes on `main` as work lands, so everyone sees the current state.
+
+| Phase | Weeks | Goals |
+|---|---|---|
+| 0 Foundation | 2–6 Nov | G0, G1 |
+| 1 Full EEL scope | 2–22 Nov | G2–G8 |
+| 2 AI rule derivation | 16–29 Nov | G9–G11 |
+| 3 Hardening | 23 Nov–6 Dec | G12–G15 |
+| 4 Demo | 7–11 Dec | G16 |
+
+---
+
+## Phase 0: Foundation
+
+### G0. CI and a clean baseline
+
+Why: every later goal relies on a green, reproducible check.
+
+- [ ] GitHub Actions workflow on Linux: `uv run pytest -q`, `uv run ruff check .`, `npm run build` (includes `tsc`), `npm run check:i18n`
+- [ ] Install `poppler-utils` in CI so the annex tests run as intended
+- [ ] Make `test_vb_annex_centered_chapters_work_with_linux_poppler_indentation` pass on Windows too, or mark it Linux-only with a clear reason
+- [ ] Neo4j service container in a second CI job with `NEO4J_TESTS=1`
+- [ ] Fix or document `test_search_finds_chaining[graph]` (German full-text ranking)
+
+Done when: every push to `main` and every PR shows a green check.
+
+### G1. ITSG questions and German-only UI
+
+Why: answers from the ITSG contact unblock several scope goals; the English UI is extra work on every new screen.
+
+- [ ] Send the 9 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for VB Anlage 3 and sample files for 02 and 03
+- [ ] Record each answer in `PROJECT_REPORT.md` and in the affected rule or parameter
+- [ ] Remove the English locale and the language switch; keep the i18n key structure so texts stay in one place
+- [ ] Update the i18n check to German only
+
+Done when: questions sent, UI has one language, i18n check green.
+
+Needs: nothing.
+
+---
+
+## Phase 1: Full EEL scope
+
+Scope as decided: certificates 01, 02, 03, the other messages and error cases. Each certificate goal follows the same pattern: layouts, rules with spec citations, expected chains, test cases (boundary clones and hidden variants), checker labels, insurer replies.
+
+### G2. Generalise the engine beyond prior illnesses
+
+Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scenario family. New families must plug in without special cases.
+
+- [ ] Define a scenario family interface (inputs, expected chain builder, rules, compare modes) and move the prior-illness logic behind it
+- [ ] Map each Abgabegrund to its required and optional data blocks (VB Anlage 3, or the VB text until it arrives)
+- [ ] Check every layout in `layouts/` against GG Anlage 1 (`tools/compare_anlage1`), fill gaps
+- [ ] Test cases name their family; catalogue, runs and reports group by family
+
+Done when: Peter still passes unchanged and a second family can be added by adding files, not by editing the checker.
+
+Needs: G0.
+
+### G3. Certificate 01 Krankengeld, complete
+
+Why: 01 appears in Peter's chain, but only the fields that touch the chain are checked.
+
+- [ ] Rules for all 01 fields and blocks (salary data, working time, one-off payments, contact data) with VB citations
+- [ ] Use the Krankengeld calculator logic for expected salary values where the spec defines them
+- [ ] Test cases: monthly pay, hourly pay, part time, one-off payment, start of employment mid-month, plus hidden variants
+- [ ] Insurer replies to a 01 (62 benefit end, error replies)
+
+Done when: an 01 with every block is checked field by field, each deviation cites a passage.
+
+Needs: G2.
+
+### G4. Certificate 02 Kinderkrankengeld
+
+- [ ] Layouts and rules for 02 (child data, care days, limits per child and year)
+- [ ] Expected chain and test cases, including limit boundaries and a hidden variant
+- [ ] Insurer replies and checker labels
+
+Done when: a vendor can run a 02 test case end to end and get a signed report.
+
+Needs: G2.
+
+### G5. Certificate 03 Mutterschaftsgeld
+
+- [ ] Layouts and rules for 03 (protection periods before and after birth, expected and actual birth date, premature and multiple births)
+- [ ] Expected chain and test cases at the period boundaries, plus a hidden variant
+- [ ] Insurer replies and checker labels
+
+Done when: a vendor can run a 03 test case end to end and get a signed report.
+
+Needs: G2.
+
+### G6. Other messages: 42, 51, 73, 99 and insurer 66, 67, 71, 72
+
+- [ ] For each Abgabegrund: layout check, rules, when it is due, expected reply
+- [ ] Insurer simulator sends 66/67 error replies when the vendor's file is wrong, so the vendor has to react
+- [ ] Cancel (88) and correction paths for every certificate, not only Peter's
+
+Done when: every in-scope Abgabegrund has at least one executable test case.
+
+Needs: G2.
+
+### G7. Error cases and robustness
+
+Why: the demo should show complex situations, not only the happy path.
+
+- [ ] Test cases built from wrong vendor files: invalid codes, missing mandatory blocks, wrong order, duplicates, wrong envelope, encoding errors
+- [ ] Format check returns precise, cited errors for each; no crash on any malformed upload (fuzz the parser)
+- [ ] Mixed chains: two certificates for one employee, overlapping periods, change of insurer
+- [ ] Checker labels stay correct under these cases (invalid > bug > unclear > correct variant > exact match)
+
+Done when: a corpus of broken files runs in CI and each gets the expected label.
+
+Needs: G3 (works best after G4–G6).
+
+### G8. Certification flow and automation
+
+Why: the demo story includes a new vendor completing the yearly catalogue and earning the certified label.
+
+- [ ] Vendor lifecycle: new, in certification, certified, under yearly audit
+- [ ] Yearly catalogue per vendor; progress per test case and family
+- [ ] Certified label when every required case passes; label unlocks the permanent test cases
+- [ ] Deadlines in the calendar from ITSG's real rules (G1 answers), reminders in the vendor view
+- [ ] Signed certification report in addition to per-run reports
+
+Done when: a fresh vendor account goes from zero to certified in the UI, and the permanent cases appear.
+
+Needs: G2; G12 for real accounts (works with the demo toggle before that).
+
+---
+
+## Phase 2: AI rule derivation
+
+Why: today rules are hand-coded and the AI only adjusts existing parameters (gap 2 in section 5.2). The AI must turn spec text into executable rules, while still never computing results itself.
+
+### G9. Rules as data
+
+- [ ] Declarative rule types that cover the hand-coded rules: date window, day sum, period chaining, field format, code list, block presence, cross-field consistency
+- [ ] The engine interprets these rule definitions; expected results stay deterministic
+- [ ] Re-express the existing 37 rules as data; the old Python and the new definitions must give identical results on all test tables
+
+Done when: the hand-coded rules are deleted or reduced to the interpreter, and all tests are unchanged.
+
+Needs: G2.
+
+### G10. Spec text to executable rule
+
+- [ ] Agent reads a spec section and proposes rule definitions in the G9 schema, with citations that must resolve to real passages
+- [ ] Code validates each proposal (schema, parameter types, referenced fields exist in the layouts) and runs it against the existing test tables
+- [ ] ITSG reviews proposals in the UI (diff against the current rule, affected tests, approve or reject); only approved rules become active
+- [ ] Wire the existing criteria pipeline (`/criteria/extract`) into the UI
+- [ ] A new rule from a spec change creates new test cases through the builder
+
+Done when: uploading a spec change that needs new logic (not just a parameter) ends with an approved, executable rule and new test cases, without a developer.
+
+Needs: G9.
+
+### G11. Measure the AI
+
+- [ ] Golden set: spec sections paired with the known correct rule definitions (from G9)
+- [ ] Evaluation script reports match rate, wrong citations, rejected proposals; run it on every prompt change
+- [ ] Prompt versions recorded with cached answers so cache invalidation is deliberate
+- [ ] Second real document path: a Rundschreiben or GG update end to end
+
+Done when: the match rate is known and shown in the report, and a prompt change cannot silently lower it.
+
+Needs: G10.
+
+---
+
+## Phase 3: Hardening
+
+### G12. Login and roles
+
+- [ ] User table in Postgres: email, password hash (argon2), role (ITSG staff, vendor), company
+- [ ] Login, logout, sessions with secure cookies; password reset by ITSG staff
+- [ ] ITSG staff create vendor accounts; no self sign-up
+- [ ] Every endpoint checks role and company; vendors see only their own runs and reports
+- [ ] Hidden test expectations and the reset endpoint protected on the server, not only in the UI
+- [ ] Replace the ITSG/vendor demo toggle with real accounts; seed demo accounts for the pitch
+
+Done when: tests prove a vendor cannot read another vendor's data or any hidden expectation through the API.
+
+Needs: G0.
+
+### G13. Security measures
+
+- [ ] Upload limits (size, type, count), safe file names, no path traversal under `DATA_DIR`
+- [ ] Rate limits on login and AI endpoints; AI cost cap per day
+- [ ] CORS limited to the UI origin; security headers; HTTPS only
+- [ ] Audit log of logins, uploads, approvals and advisor decisions
+- [ ] Secrets (OpenAI key, DB passwords, signing key) in Google Secret Manager, never in the image
+- [ ] Dependency and container scanning in CI
+
+Done when: a checklist review passes and is recorded in `PROJECT_REPORT.md`.
+
+Needs: G12.
+
+### G14. Google Cloud deployment
+
+Budget: $300 free credits; keep a budget alert.
+
+- [ ] API and UI on Cloud Run (UI as static files behind the API or its own service)
+- [ ] Postgres on Cloud SQL (smallest instance), Neo4j on a small Compute Engine VM
+- [ ] `DATA_DIR` files, `kg/build/` and `data/llm_cache/` on Cloud Storage
+- [ ] Deploy from `main` with GitHub Actions after CI passes
+- [ ] Budget alert and a cost estimate in `PROJECT_REPORT.md`
+
+Done when: the platform runs on Google's default HTTPS URL and a push to `main` updates it.
+
+Needs: G0; G13 for the secrets part.
+
+### G15. Reliability
+
+- [ ] PDF reports work in the deployed image (WeasyPrint)
+- [ ] Health checks, structured logs, error pages that do not leak internals
+- [ ] Database backups and a tested restore
+- [ ] Demo reset that works in the cloud, admin only
+- [ ] Load check: several vendors uploading at once
+
+Done when: a restore from backup and a full demo run work on the deployed instance.
+
+Needs: G14.
+
+---
+
+## Phase 4: Demo
+
+### G16. Demo for 11 December
+
+- [ ] Demo script: vendor run with full EEL coverage, deviations judged, VB 13.4 upload, rules and tests update, signed report, new vendor reaching the certified label
+- [ ] Demo data and accounts, seeded by one command
+- [ ] Offline fallback: cached AI answers and a local run if the network fails
+- [ ] Answers ready for expected questions (data protection, AI errors, cost, how ITSG would run it)
+- [ ] Update `README.md` and `PROJECT_REPORT.md` to the delivered state; slides
+- [ ] Two full rehearsals on the deployed instance
+
+Done when: two rehearsals in a row run without a fix in between.
+
+Needs: all goals that are part of the script.

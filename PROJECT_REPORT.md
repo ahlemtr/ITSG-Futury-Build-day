@@ -146,7 +146,8 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 | Architecture | Keep Neo4j + Postgres |
 | Hosting | Google Cloud ($300 free credits), Google's default HTTPS URL, no own domain |
 | ITSG | There is a contact who can answer domain questions and provide data |
-| Git | Fork `ahlemtr/ITSG-Futury-Build-day`, one branch + pull request per feature into her `main`; GitHub Actions (Linux) runs pytest, ruff, tsc and the i18n check on every PR |
+| Git | Work in `ahlemtr/ITSG-Futury-Build-day` itself (no fork), so the whole team sees progress on `main`; one branch + pull request per feature; GitHub Actions (Linux) runs pytest, ruff, tsc and the i18n check on every PR |
+| Roadmap | [`ROADMAP.md`](ROADMAP.md): goals G0–G16 by phase, each one independent, ticked on `main` as work lands |
 
 ### Questions for the ITSG contact
 

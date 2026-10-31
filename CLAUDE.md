@@ -2,7 +2,7 @@
 
 Test platform for ITSG's system review of payroll software, scoped to income replacement benefits (Entgeltersatzleistungen, EEL). Won the Futury Hackathon 2026 × ITSG. Next milestone: live demo to the GKV and ITSG on **11 December 2026**, pilot likely after.
 
-Read `PROJECT_REPORT.md` first: what exists, promised vs. delivered (section 5), decisions in force (6), decisions for December (9), open questions for ITSG.
+Read `PROJECT_REPORT.md` first: what exists, promised vs. delivered (section 5), decisions in force (6), decisions for December (9), open questions for ITSG. The plan is `ROADMAP.md` (goals G0–G16).
 
 ## Layout
 
@@ -27,4 +27,4 @@ Known: `tests/test_annex_evidence.py::test_vb_annex_centered_chapters_work_with_
 - Parameters are versioned with the Verfahrensbeschreibung; a Rundschreiben only proposes values.
 - UI is German only (legal terms stay German). OpenAI stays the provider. Only test data goes through the platform.
 - Keep `kg/build/` (paid embeddings) and `data/llm_cache/`; changing prompt text invalidates cached answers.
-- Git: fork of `ahlemtr/ITSG-Futury-Build-day`, one branch + PR per feature into her `main`.
+- Git: work in `ahlemtr/ITSG-Futury-Build-day` (no fork), one branch + PR per feature into `main`. Tick `ROADMAP.md` boxes as work lands.
