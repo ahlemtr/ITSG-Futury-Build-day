@@ -1,5 +1,5 @@
 // Reads DTA EEL files (TEEL0 / TEEK0) in the browser, driven by the record layouts.
-// Port of plan/starter/layouts/parse_check.py. Display only: the official check is the backend's.
+// Port of engine/records.py, display only: the official check is the backend's.
 import layoutsJson from "./layouts.generated.json";
 import type { Localized } from "../data/types";
 

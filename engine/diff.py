@@ -1,4 +1,4 @@
-"""Three-level diff (P4.1, plan/05 section 3): messages, matching, fields.
+"""Three-level diff: messages, matching, fields.
 
 Matching is by person (VSNR) + Abgabegrund + position in the chain (n-th message of that type),
 never by line order. Fields are compared on their fixed-width form, using the compare mode of
@@ -65,7 +65,7 @@ class Differ:
 
     def _order(self, exps: list[ExpectedMessage], cands: list[Record]) -> list[Record]:
         """Chain position among messages of the same type: keep the vendor's order unless another
-        assignment gives fewer deviations (lines may come in any order, plan/02 M4.1)."""
+        assignment gives fewer deviations (lines may come in any order)."""
         if len(exps) < 2 or len(cands) < 2 or len(cands) > 5:
             return cands
         best, best_cost = cands, None

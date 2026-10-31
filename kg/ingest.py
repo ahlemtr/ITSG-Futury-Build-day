@@ -1,4 +1,4 @@
-"""Spec upload pipeline (SPEC_UPDATE_WORKFLOW.md section 2): a new document version goes in, the knowledge graph
+"""Spec upload pipeline: a new document version goes in, the knowledge graph
 and the test catalogue come out updated.
 
 store -> chunk -> embed -> diff -> map -> analyse -> apply -> catalogue
@@ -240,7 +240,7 @@ class Pipeline:
 
     @property
     def calculation(self) -> bool:
-        """The insurers' circulars: changes are read for calculation rules (W8)."""
+        """The insurers' circulars: changes are read for calculation rules."""
         return self.doc.startswith("RS-")
 
     def do_analyse(self) -> None:

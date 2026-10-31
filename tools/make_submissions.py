@@ -1,4 +1,4 @@
-"""Seed submissions by mutation (P3.4, plan/02 section 7).
+"""Seed submissions by mutation.
 
 Each submission = the expected employer files of its test case (one TEEL0 per round) with one
 mutation applied. `python -m tools.make_submissions [out_dir]` writes them to disk.

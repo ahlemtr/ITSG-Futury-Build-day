@@ -21,7 +21,7 @@ DBVO has a repeating group (`ANZAHL-AU` x 50 chars). All other blocks are fixed 
 |---|---|---|
 | extracted | DSLW, DBAL, DBAE, DBZA, DBEE, DBAW, DBFR, DBUN, DBMU, DBVO, DBHE, DBBE, DBLT, DBSF, DBTK, DBID, DBSD | from the spec tables, no gaps |
 | inferred | DBAP | spec has no table. Boundaries measured from the TEEL0 sample, names tentative |
-| partial | DBNA | name and first name from the sample, positions 065-125 unknown |
+| extracted (annex) | DBNA | from Anlage 1 (GG/VB section 5): VORSATZWORT, NAMENSZUSATZ, TITEL, KENNZ-AEND-BER at positions 065-125 |
 | missing | DBAN | no table in the spec, not in the sample |
 
 Also derived (marked in the files): DSLW positions 206-224 (MM-* flags, names from the
@@ -31,5 +31,5 @@ Not covered here: the file envelope records VOSZ, DSKO and NCSZ. They are define
 "Gemeinsame Grundsätze Kommunikationsdaten", not in this document.
 
 ## Validation
-`python parse_check.py <TEEL0 file>` parses the ITSG sample (DSLW with DBNA, DBVO, DBAP, DBID)
+`engine/records.py` parses the ITSG sample (DSLW with DBNA, DBVO, DBAP, DBID)
 with zero length mismatches.

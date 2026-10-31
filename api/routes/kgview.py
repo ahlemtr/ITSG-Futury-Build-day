@@ -1,4 +1,4 @@
-"""Knowledge graph tab (SPEC_UPDATE_WORKFLOW.md W6): what the graph holds, how it grew, and "ask the graph"."""
+"""Knowledge graph tab: what the graph holds, how it grew, and "ask the graph"."""
 
 from __future__ import annotations
 

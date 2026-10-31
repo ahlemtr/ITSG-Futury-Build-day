@@ -1,8 +1,8 @@
-"""Rule checker (P4, plan/05): exact match first, then each deviation gets one label.
+"""Rule checker: exact match first, then each deviation gets one label.
 
 Flow per submission: parse (issues -> invalid) -> expected chain under the rule set valid on
 `valid_on` -> 3-level diff -> rule-field and format checks -> per deviation: a. catalogue and
-precedents, b. rule re-check, c. left `unclear` with an empty AI slot (filled by llm/ in P8).
+precedents, b. rule re-check, c. left `unclear` with an empty AI slot (filled by llm/).
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ F41_6 = {"DBVO.AU-AB-SV", "DBVO.KZ-AK-AU", "DBVO.12-MONATSFRIST-AB"}
 F41_9 = {"DBVO.KZ-NACHWEIS", "DBVO.TEIL-NACHWEIS-AU-BEGINN", "DBVO.TEIL-NACHWEIS-AU-ENDE", "DBVO.KZ-AU",
          "DBVO.TEIL-ANR-AU-BEGINN", "DBVO.TEIL-ANR-AU-ENDE"}
 
-Triage = Callable[[Deviation, str], None]  # fills d.ai_proposal for unclear deviations (P8.5)
+Triage = Callable[[Deviation, str], None]  # fills d.ai_proposal for unclear deviations
 
 
 def worst(labels: list[str]) -> str:
@@ -154,7 +154,7 @@ class Checker:
             return next((r for r in employer if r.abgabegrund == "88"), None)
         return next((r for r in employer if r.dsid == x.actual), employer[0] if employer else None)
 
-    # ------------------------------------------------------------ b. rule re-check (P4.5)
+    # ------------------------------------------------------------ b. rule re-check
     def recheck(self, d: Deviation) -> bool:
         ag, f = d.abgabegrund, f"{d.record}.{base_field_name(d.field or '')}"
         i = self.sc.test_case.inputs

@@ -1,6 +1,6 @@
 """Entry point: python -m kg.build [--skip-extract] [--skip-load] [--skip-embed]
 
-Run order (08 section 12): extract -> build -> validate -> load -> embed.
+Run order: extract -> build -> validate -> load -> embed.
 """
 
 from __future__ import annotations

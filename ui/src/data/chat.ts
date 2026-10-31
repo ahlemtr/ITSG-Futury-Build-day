@@ -1,4 +1,4 @@
-// Chat assistant (HANDOUT agenda 4): POST /chat, answers from the knowledge graph with passage citations.
+// Chat assistant: POST /chat, answers from the knowledge graph with passage citations.
 import { useSyncExternalStore } from "react";
 import { postJson } from "./api";
 

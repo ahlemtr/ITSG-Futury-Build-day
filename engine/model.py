@@ -1,4 +1,4 @@
-"""Shared Pydantic models (02 section 5). The first part is what the knowledge graph interface returns;
+"""Shared Pydantic models. The first part is what the knowledge graph interface returns;
 the second part holds the engine models (parsed records, traces, deviations, criteria)."""
 
 from __future__ import annotations
@@ -70,7 +70,7 @@ class Passage(BaseModel):
     text: str = ""
     page: int | None = None
     field: str | None = None
-    snippet: str | None = None  # search results only: the sentence that matched (W7)
+    snippet: str | None = None  # search results only: the sentence that matched
 
 
 class Rule(BaseModel):
@@ -206,14 +206,14 @@ Label = Literal["exact_match", "correct_variant", "bug", "invalid", "unclear"]
 ResolvedBy = Literal["diff", "catalogue", "rules", "ai_proposal", "advisor"]
 TestStatus = Literal["draft", "approved", "rejected"]
 
-# worst first (05 section 5)
+# worst first
 LABEL_ORDER: list[str] = ["invalid", "bug", "unclear", "correct_variant", "exact_match"]
 
 REPEAT_SUFFIX = re.compile(r"-(\{nn\}|\d+)$")
 
 
 def base_field_name(name: str) -> str:
-    """BEGINN-AU-{nn} and BEGINN-AU-1 -> BEGINN-AU (08 section 1.3)."""
+    """BEGINN-AU-{nn} and BEGINN-AU-1 -> BEGINN-AU."""
     return REPEAT_SUFFIX.sub("", name)
 
 
@@ -450,7 +450,7 @@ class CheckResult(BaseModel):
     actual_messages: int = 0
 
 
-# ---------------------------------------------------------------- criteria pipeline (P8.2)
+# ---------------------------------------------------------------- criteria pipeline
 
 
 class RequirementSentence(BaseModel):

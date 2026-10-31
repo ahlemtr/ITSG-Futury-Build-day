@@ -1,4 +1,4 @@
-"""Intake (P7.3, plan/02 M7.4): store the uploaded files with SHA-256, parse them, return a receipt
+"""Intake: store the uploaded files with SHA-256, parse them, return a receipt
 like eVpT's processing confirmation: accepted, or rejected with the format issues."""
 
 from __future__ import annotations

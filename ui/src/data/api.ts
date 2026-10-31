@@ -85,7 +85,7 @@ export function both(key: string, values?: Record<string, unknown>): Localized {
 /** Backend explanations are English only; shown as is in both languages. */
 export const same = (text: string): Localized => ({ de: text, en: text });
 
-/** Backend labels (05 section 5) to UI labels. */
+/** Backend labels to UI labels. */
 export function toLabel(label: string | null | undefined): Label {
   switch (label) {
     case "exact_match":
@@ -109,7 +109,7 @@ export function toSpecRef(key: string): SpecRef {
 }
 
 /** Spec passages first (VB, GG, BP), ITSG criteria (BVORERK) last; within VB a section part
- * ("3.12/chaining") before a field passage ("3.12.7"), as the report does (HANDOUT decision 20). */
+ * ("3.12/chaining") before a field passage ("3.12.7"), as the report does. */
 export function mainSource(sources: string[]): string | undefined {
   const rank = (k: string) =>
     (k.startsWith("VB@") ? 0 : k.startsWith("GG@") ? 2 : k.startsWith("BP@") ? 3 : 4) + (k.startsWith("VB@") && !k.includes("/") ? 1 : 0);
@@ -258,7 +258,7 @@ function toDeviation(d: ApiDeviation, rules: Map<string, ApiRule>): Deviation {
     id: d.id,
     label: devLabel(d.label),
     title: deviationTitle(d),
-    // an AI proposal alone settles nothing: the label stays unclear until the advisor decides (HANDOUT 16)
+    // an AI proposal alone settles nothing: the label stays unclear until the advisor decides
     decidedBy: d.label === "unclear" || !d.resolved_by ? "open" : d.resolved_by,
     rule: d.rule
       ? { id: d.rule, text: same(rule?.title ?? "") }
@@ -414,7 +414,7 @@ export async function decideDeviation(
   };
 }
 
-// ---------- Vendor test runs (06 section 5) ----------
+// ---------- Vendor test runs ----------
 
 type ApiOutcome = { rule: string; outcome: "pass" | "fail" | "review"; message?: string };
 
@@ -827,7 +827,7 @@ export const approveTestCase = (id: string, decision: "approved" | "rejected", a
 export const draftHidden = (id: string) => postJson<{ id: string }>("/builder/hidden", { test_case_id: id, seed: 0 });
 
 
-// ---------- Spec upload (SPEC_UPDATE_WORKFLOW.md) ----------
+// ---------- Spec upload ----------
 
 export type ApiJob = {
   id: string;
@@ -890,7 +890,7 @@ export async function trackJob(job: ApiJob): Promise<ApiJob> {
   }
 }
 
-// ---------- Knowledge graph tab (SPEC_UPDATE_WORKFLOW.md W6) ----------
+// ---------- Knowledge graph tab ----------
 
 export type KgStats = {
   backend: "neo4j" | "yaml";

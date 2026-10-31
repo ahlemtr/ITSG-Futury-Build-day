@@ -1,4 +1,4 @@
-# Step K4 (08 section 7). Out-of-scope names from VB 3.1.18, senders from 06 section 1.
+# Message types (Abgabegrund). Out-of-scope names from VB 3.1.18.
 message_types:
   - {code: "01", name: Entgeltbescheinigung Krankengeld, sender: employer, in_scope: true}
   - {code: "41", name: Anforderung anrechenbare Vorerkrankungen, sender: employer, in_scope: true}

@@ -1,4 +1,4 @@
-"""Spec diff (P5.1): port of plan/starter/tools/specdiff.py.
+"""Spec diff between two versions of a document.
 
 Line diff of two pdftotext outputs. Page footers, running headers and table-of-contents lines are
 ignored (TOC page numbers shift between versions and are not changes). Each change is attributed
@@ -89,6 +89,6 @@ def diff_pdfs(old_pdf: Path, new_pdf: Path, prefix: str) -> list[Change]:
 
 
 def impact(changes: list[Change] | list[str], kb: KnowledgeBase):
-    """P5.2: affected rules (recompute / review tiers) and test cases via the knowledge graph."""
+    """Affected rules (recompute / review tiers) and test cases via the knowledge graph."""
     keys = [c.key if isinstance(c, Change) else c for c in changes]
     return kb.get_affected_rules(keys)

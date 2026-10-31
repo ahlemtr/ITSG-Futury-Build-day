@@ -1,10 +1,10 @@
-# Chain-only extras for Peter Mustermann (decision D3). The case facts (AU periods, report date,
+# Chain-only extras for Peter Mustermann. The case facts (AU periods, report date,
 # employment end) come from the knowledge base (`kb.get_test_case`). Clones and Beispielpapier
 # cases without an own file inherit this one.
 #
 # Values marked "ITSG file" are read from fixtures/itsg/TEEL0-Test1-DBVO, "Hinweise" from
 # sources/Hinweise_DTA-EEL-Bespiel_Vorerkrankung_Testkonstellation.docx. "derived" = our assumption,
-# not given by ITSG (plan/02 section 9).
+# not given by ITSG.
 person:
   vsnr: 17241280Q497            # ITSG file
   geburtsdat: 1980-12-24        # ITSG file

@@ -1,4 +1,4 @@
-"""Requirements to criteria, LLM part (P8.2 steps 1, 2, 3b; BACKEND_IMPLEMENTATION_PLAN.md s.3.1).
+"""Requirements to criteria, LLM part.
 
 1. find: requirement sentences of a spec section, each with passage key and a verified quote
 2. translate: one testable `CriterionDraft` per requirement, with parameters and rule mapping

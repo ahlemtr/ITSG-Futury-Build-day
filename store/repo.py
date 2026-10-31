@@ -1,4 +1,4 @@
-"""App data store (P7.1). `PgRepo` on Postgres (psycopg v3), `MemoryRepo` with the same methods
+"""App data store. `PgRepo` on Postgres (psycopg v3), `MemoryRepo` with the same methods
 for tests and for running without a database. `get_repo()` picks Postgres when DATABASE_URL is set."""
 
 from __future__ import annotations

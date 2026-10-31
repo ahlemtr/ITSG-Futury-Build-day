@@ -1,5 +1,4 @@
-"""Requirements to criteria to test cases, deterministic part (P8.2 steps 3a, 3c, 4;
-BACKEND_IMPLEMENTATION_PLAN.md section 3.1).
+"""Requirements to criteria to test cases, deterministic part.
 
 3a measures criterion drafts against the approved rules and ITSG criteria by code (rule mapping and
 parameter values), 3c scores, 4 generates draft boundary test cases. Steps 1, 2 and 3b (LLM) are in

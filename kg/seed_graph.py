@@ -1,4 +1,4 @@
-"""Step K9.1: seed + layouts + passages + diff -> nodes and edges in memory (08 section 12.1)."""
+"""Seed + layouts + passages + diff -> nodes and edges in memory."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ from kg.common import (
 from kg.extract.pdf_text import join_strings
 
 DIFF_FILE = "spec_diff_13.3_13.4.json"
-# 08 section 10: a raw change line is matched by its first 40 characters; shorter needles
+# a raw change line is matched by its first 40 characters; shorter needles
 # (page numbers like "50") match everywhere and fall back to the block passage instead
 MATCH_CHARS = 40
 MIN_NEEDLE = 15
@@ -86,7 +86,7 @@ class GraphBuilder:
 
 
 def _expand(sources: list[str], vb_versions: list[str]) -> list[str]:
-    """'VB@V#3.12' -> both VB versions (08 section 9.2 shorthand)."""
+    """'VB@V#3.12' -> both VB versions (shorthand)."""
     out = []
     for s in sources:
         if s.startswith("VB@V#"):
@@ -260,7 +260,7 @@ def build_from(seed: Seed) -> dict:
                part=p.get("part"), field=p.get("field"), heading=p.get("heading") or "", text=p.get("text") or "",
                page=p.get("page"))
         g.edge("CONTAINS", "DocVersion", f"{p['doc']}@{p['version']}", "Passage", p["key"])
-        for c in passage_chunks(p):  # W7: retrieval runs on chunks, results are grouped per passage
+        for c in passage_chunks(p):  # retrieval runs on chunks, results are grouped per passage
             g.node("Chunk", c["key"], passage=p["key"], n=c["n"], heading=c["heading"], text=c["text"])
             g.edge("HAS_CHUNK", "Passage", p["key"], "Chunk", c["key"])
 
@@ -380,7 +380,7 @@ def _is_date_or_flag(f: dict) -> bool:
 
 
 def _compare_modes(seed: Seed, g: GraphBuilder) -> dict[str, dict]:
-    """Field key -> {mode, rule, source} (08 section 8). Unlisted fields are `compare`."""
+    """Field key -> {mode, rule, source}. Unlisted fields are `compare`."""
     known = {field_key(r, f) for r, lay in seed.layouts.items() for f in layout_fields(lay)}
     out: dict[str, dict] = {}
     for mode in ("ignore", "rule"):
@@ -400,7 +400,7 @@ def _compare_modes(seed: Seed, g: GraphBuilder) -> dict[str, dict]:
 
 
 def _rank(p: dict, block_sections: set[str]) -> int:
-    """Narrowest first: part > field > block > section (08 section 10 step 2)."""
+    """Narrowest first: part > field > block > section."""
     if p.get("part"):
         return 3
     if p.get("field"):

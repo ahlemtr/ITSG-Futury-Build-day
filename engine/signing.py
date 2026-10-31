@@ -1,4 +1,4 @@
-"""Signing (P6.3): SHA-256 of each input file and of the report JSON, Ed25519 signature."""
+"""Signing: SHA-256 of each input file and of the report JSON, Ed25519 signature."""
 
 from __future__ import annotations
 

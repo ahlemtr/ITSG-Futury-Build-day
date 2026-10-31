@@ -1,4 +1,4 @@
-"""OpenAI client (P8.1, plan/09 section 3).
+"""OpenAI client.
 
 - Structured Outputs: every answer is JSON validated against a Pydantic model; invalid = retry once,
   then fail.

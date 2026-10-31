@@ -1,4 +1,4 @@
-"""Verfahrensbeschreibung splitter: sections, field sub-sections, parts of the 3.12 intro (08 section 5.2)."""
+"""Verfahrensbeschreibung splitter: sections, field sub-sections, parts of the 3.12 intro."""
 
 from __future__ import annotations
 

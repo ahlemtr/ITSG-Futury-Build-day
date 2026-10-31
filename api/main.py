@@ -1,4 +1,4 @@
-"""FastAPI app (P7.4, plan/02 section 6). Thin routes over the engine.
+"""FastAPI app. Thin routes over the engine.
 
 State: `kb` (knowledge base), `repo` (app data), `ai` (LLM services, None when no OpenAI key and no
 cache), `data_root` (DATA_DIR). `create_app` takes them as arguments so tests inject the fake KB.

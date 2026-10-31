@@ -1,4 +1,4 @@
-"""Test runs in rounds (P5.7, plan/06 section 5).
+"""Test runs in rounds.
 
 `start` gives the vendor the story only. `submit` checks the round and builds the next insurer
 reply from the vendor's own file (REF-ID = their DATENSATZ-ID). `verdict` returns pass / fail per

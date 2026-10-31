@@ -1,4 +1,4 @@
-"""Tools the agents can call (P8.1, plan/09 section 3.3).
+"""Tools the agents can call.
 
 Knowledge graph tools = the methods of `kg/interface.py` except `add_precedent` and `subgraph`.
 Engine tools = deterministic code: parse_file, expected_result, evaluate_rule, diff_submission,

@@ -1,7 +1,7 @@
-"""Field and chain checks on parsed records (P2.5): F41-1..10, K61, K62, C-1..8.
+"""Field and chain checks on parsed records: F41-1..10, K61, K62, C-1..8.
 
 Each check returns `RuleResult`s; the checker turns failed ones into labels (F41 -> invalid,
-R41 / E / C -> bug, plan/03 section 8).
+R41 / E / C -> bug).
 """
 
 from __future__ import annotations

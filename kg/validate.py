@@ -1,4 +1,4 @@
-"""Step K9.2: validate the in-memory graph before loading (08 section 12.2). Errors stop the build."""
+"""Validate the in-memory graph before loading. Errors stop the build."""
 
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ KEY_FORMATS = {
 DEVIATION_KINDS = {"value_differs", "missing_block", "extra_block", "missing_message", "extra_message",
                    "missing_group", "extra_group", "order_differs"}
 
-# (label, property) -> allowed values (08 section 1.4)
+# (label, property) -> allowed values
 ENUMS = {
     ("Rule", "kind"): {"domain", "format", "reply", "chain", "efz", "calculation"},
     ("Rule", "status"): {"approved", "draft"},

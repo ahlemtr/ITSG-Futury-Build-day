@@ -1,5 +1,5 @@
-# Step K8 (08 section 11). Facts and expected values from 03 section 9
-# (recomputed with the 03 section 3 algorithm). Years in the BP examples: XX = 2026, YY = 2025.
+# Test cases: facts and expected values
+# (recomputed with the rules engine). Years in the BP examples: XX = 2026, YY = 2025.
 # steps: single = only the 41 decision is graded; chain = full message chain.
 # Periods are listed newest first (F41-8). Hidden cases are in the graph like the others;
 # the API decides what a vendor may see.

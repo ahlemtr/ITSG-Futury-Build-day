@@ -1,4 +1,4 @@
-"""Requirements to criteria (P8.2): extract, score against the ITSG criteria, draft test cases."""
+"""Requirements to criteria: extract, score against the ITSG criteria, draft test cases."""
 
 from __future__ import annotations
 

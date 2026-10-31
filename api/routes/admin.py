@@ -1,4 +1,4 @@
-"""Demo reset from the user menu (HANDOUT agenda 2): the same as `python -m tools.reset_baseline`, as a background
+"""Demo reset from the user menu: the same as `python -m tools.reset_baseline`, as a background
 job with stages for the AI overlay. Only from the machine itself (loopback) or with ALLOW_RESET=1."""
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
--- App data only (plan/diagrams/07_data_model.md). Spec versions, passages, rules, parameters,
+-- App data only. Spec versions, passages, rules, parameters,
 -- criteria and precedents live behind kg/. Pydantic documents are kept whole in jsonb columns
 -- next to the columns the diagram names, so the engine models round-trip without mapping code.
 
@@ -107,14 +107,14 @@ CREATE TABLE IF NOT EXISTS approval (
     at           timestamptz NOT NULL DEFAULT now()
 );
 
--- criterion drafts of the requirements-to-criteria pipeline (P8.2)
+-- criterion drafts of the requirements-to-criteria pipeline
 CREATE TABLE IF NOT EXISTS criterion_draft (
     id     text PRIMARY KEY,
     status text NOT NULL DEFAULT 'draft',
     doc    jsonb NOT NULL
 );
 
--- Spec upload (SPEC_UPDATE_WORKFLOW.md): one row per uploaded document version and its pipeline job
+-- Spec upload: one row per uploaded document version and its pipeline job
 CREATE TABLE IF NOT EXISTS ingest_job (
     id         text PRIMARY KEY,
     document   text NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS kg_event (
     doc   jsonb NOT NULL
 );
 
--- Calendar (HANDOUT agenda 1): vendor companies and the deadlines that come from events (test run rounds).
+-- Calendar: vendor companies and the deadlines that come from events (test run rounds).
 -- Rule-set deadlines (recertification, permanent test cases, catalogue, switch date) are derived on read.
 CREATE TABLE IF NOT EXISTS company (
     id   text PRIMARY KEY,

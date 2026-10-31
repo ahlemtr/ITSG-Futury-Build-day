@@ -1,4 +1,4 @@
-// Converts the record layouts (plan/starter/layouts/*.yaml) into one JSON file the browser can read.
+// Converts the record layouts (layouts/*.yaml) into one JSON file the browser can read.
 // Usage: npm run build:layouts   (run again when the YAML layouts change)
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import yaml from "js-yaml";

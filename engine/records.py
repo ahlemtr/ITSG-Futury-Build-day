@@ -1,8 +1,8 @@
-"""Parser and writer for DTA EEL fixed-width files (P1, plan/02 M1).
+"""Parser and writer for DTA EEL fixed-width files.
 
 Layouts come from `kb.get_layout`, seen through `engine.layouts`. DSLW lines are parsed into a fixed part plus the blocks whose
 MM flag is `J`, in `block_order`. DBVO has a repeating group counted by `ANZAHL-AU`. Envelope lines
-(VOSZ, DSKO, NCSZ) are kept as raw lines. Lengths are counted in characters, not bytes (plan/02 s.9).
+(VOSZ, DSKO, NCSZ) are kept as raw lines. Lengths are counted in characters, not bytes.
 Errors are data: every problem becomes a `ParseIssue`, the parser never raises on bad input.
 """
 
@@ -25,7 +25,7 @@ DEFAULT_VERSION = None  # = the newest version the knowledge base knows (layouts
 
 
 def decode(data: bytes) -> tuple[str, str]:
-    """UTF-8 first, Latin-1 as fallback (plan/02 section 9)."""
+    """UTF-8 first, Latin-1 as fallback."""
     try:
         return data.decode("utf-8"), "utf-8"
     except UnicodeDecodeError:

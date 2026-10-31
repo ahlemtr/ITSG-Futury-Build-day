@@ -1,4 +1,4 @@
-"""RAG chat assistant (HANDOUT agenda 4, llm/agents/chat.py): a question in, a cited answer out."""
+"""RAG chat assistant (llm/agents/chat.py): a question in, a cited answer out."""
 
 from __future__ import annotations
 

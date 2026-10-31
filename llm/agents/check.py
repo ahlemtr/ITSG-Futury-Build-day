@@ -1,5 +1,5 @@
-"""Check agent (P8.5, P8.8): proposes a label for an unclear deviation and drafts the report text.
-Never sets a final label: the advisor decides (plan/09 section 3.2)."""
+"""Check agent: proposes a label for an unclear deviation and drafts the report text.
+Never sets a final label: the advisor decides."""
 
 from __future__ import annotations
 

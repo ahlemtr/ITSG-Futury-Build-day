@@ -1,4 +1,4 @@
-"""The contract between the knowledge graph and the rest of the backend (02 section 5, 08 section 13).
+"""The contract between the knowledge graph and the rest of the backend.
 
 Both backends implement it: kg.yaml_backend (reference, no Neo4j or OpenAI needed) and kg.graph_backend.
 Every method except add_precedent and subgraph is also an OpenAI agent tool with the same name and arguments.
@@ -67,7 +67,7 @@ class KnowledgeBase(Protocol):
                     in_scope_only: bool = True) -> list[Change]: ...
 
     def get_affected_rules(self, change_keys: list[str]) -> Impact:
-        """{recompute, review, tests}; the builder uses recompute only (07 section 7)."""
+        """{recompute, review, tests}; the builder uses recompute only."""
         ...
 
     def get_test_cases(self, rule_id: str | None = None, include_hidden: bool = False) -> list[TestCaseRef]: ...

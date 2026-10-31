@@ -1,4 +1,4 @@
-"""Word files: BVORERK (one passage per ITSG criterion) and HINWEISE (facts + chain) (08 section 5.4)."""
+"""Word files: BVORERK (one passage per ITSG criterion) and HINWEISE (facts + chain)."""
 
 from __future__ import annotations
 

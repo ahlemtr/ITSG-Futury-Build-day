@@ -1,4 +1,4 @@
-"""Test builder (P5.3 to P5.6): recompute expectations, clones, boundary variants, test packages,
+"""Test builder: recompute expectations, clones, boundary variants, test packages,
 hidden variants. Everything the builder produces is a `draft` until a human approves it.
 """
 
@@ -42,7 +42,7 @@ class Recomputed(BaseModel):
 
 
 def recompute(kb: KnowledgeBase, test_cases: list[str | Case], old: str, new: str) -> list[Recomputed]:
-    """P5.3: expected results under both versions; `differs` marks the ones a spec change touches."""
+    """Expected results under both versions; `differs` marks the ones a spec change touches."""
     out = []
     for t in test_cases:
         tc = get_case(kb, t) if isinstance(t, str) else t
@@ -56,7 +56,7 @@ def recompute(kb: KnowledgeBase, test_cases: list[str | Case], old: str, new: st
 
 def clone(kb: KnowledgeBase, base: str | Case, branch_point: date | None, change: dict, new_id: str | None = None,
           targets: list[str] | None = None) -> Case:
-    """P5.4: copy a test case, apply `change` to its inputs (`current`, `priors`, `report_date`,
+    """Copy a test case, apply `change` to its inputs (`current`, `priors`, `report_date`,
     `employment_end`), keep `parent`. Status draft, origin builder."""
     b = get_case(kb, base) if isinstance(base, str) else base
     tc = b.model_copy(deep=True)
@@ -72,7 +72,7 @@ def clone(kb: KnowledgeBase, base: str | Case, branch_point: date | None, change
 
 
 def boundaries(kb: KnowledgeBase, rule: str, base: str | Case) -> list[Case]:
-    """Threshold -1 / = / +1 variants of one rule (P5.4).
+    """Threshold -1 / = / +1 variants of one rule.
 
     R41-4: totals from (smallest min_total_days - 1) to the largest one, by moving the current end.
     R41-2: one prior of 36 days ending 6 months + 1 day / exactly / - 1 day before the current start.
@@ -118,7 +118,7 @@ def boundaries(kb: KnowledgeBase, rule: str, base: str | Case) -> list[Case]:
     raise ValueError(f"no boundary generator for {rule}")
 
 
-# ---------------------------------------------------------------- hidden variants (P5.6)
+# ---------------------------------------------------------------- hidden variants
 
 
 def _month_ends(around: date) -> list[date]:
@@ -174,11 +174,11 @@ def hidden(kb: KnowledgeBase, test_case: str | Case, seed: int = 0) -> Case:
     return tc
 
 
-# ---------------------------------------------------------------- story and package (P5.5)
+# ---------------------------------------------------------------- story and package
 
 
 def story_text(tc: Case) -> str:
-    """Deterministic TA-style story (inputs only). P8 can replace it with an LLM story."""
+    """Deterministic TA-style story (inputs only). llm/story.py can replace it with an LLM story."""
     f = lambda d: d.strftime("%d.%m.%Y")
     i = tc.inputs
     lines = [f"Testfall {tc.id}", "", "Im System hinterlegte AU-Zeiten:"]

@@ -1,4 +1,4 @@
-# Step K1 (08 section 4). Versions join by valid_from, never by number:
+# Source documents and versions. Versions join by valid_from, never by number:
 # BP 13.3 belongs with VB 13.4 (both valid from 2027-01-01).
 documents:
   - code: VB

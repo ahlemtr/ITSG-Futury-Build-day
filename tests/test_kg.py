@@ -1,4 +1,4 @@
-"""Step K11 (08 section 14): every test runs against both backends."""
+"""Every test runs against both backends."""
 
 from __future__ import annotations
 

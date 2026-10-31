@@ -1,4 +1,4 @@
-"""PDF to clean lines with page numbers (08 section 5.1), and the heading rules shared by all splitters."""
+"""PDF to clean lines with page numbers, and the heading rules shared by all splitters."""
 
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ def pdf_to_text(pdf: Path, out_txt: Path) -> Path:
                                 capture_output=True, check=False)
         if result.returncode == 0:
             return out_txt
-    # Fallback (09 section 2): pdfplumber, pages joined by form feeds like pdftotext does
+    # Fallback: pdfplumber, pages joined by form feeds like pdftotext does
     print(f"WARNING: no working pdftotext, using pdfplumber for {pdf.name} (layout may differ)")
     import pdfplumber
 
@@ -77,7 +77,7 @@ def is_footer(text: str) -> bool:
 
 
 def clean(lines: list[Line]) -> list[Line]:
-    """Remove footers, page-number lines, running headers, GG footnotes and TOC lines (08 section 5.1).
+    """Remove footers, page-number lines, running headers, GG footnotes and TOC lines.
 
     A running header is a line directly after a footer (no blank line in between, at most 3 lines) whose
     text repeats after other footers too. Headings are never treated as running headers.
@@ -111,7 +111,7 @@ _KEEP_HYPHEN_BEFORE = {"und", "oder", "bzw.", "sowie", "bis"}
 
 
 def join_text(lines: list[Line]) -> str:
-    """Passage text: lines joined, whitespace collapsed, hyphenation removed (08 section 5.1 step 5)."""
+    """Passage text: lines joined, whitespace collapsed, hyphenation removed."""
     out = ""
     for line in lines:
         t = " ".join(line.text.split())
@@ -138,7 +138,7 @@ def num_tuple(num: str) -> tuple[int, ...]:
 def is_successor(cand: tuple[int, ...], prev: tuple[int, ...] | None, top_jump: int = 2, jump: int = 5) -> bool:
     """A heading number is accepted only if it plausibly follows the previous one.
 
-    Stricter than "greater than the previous" (08 section 5.2): body lines like "13. November 2007, ..."
+    Stricter than "greater than the previous": body lines like "13. November 2007, ..."
     are greater than 3.4 but jump chapters, and are rejected.
     """
     if prev is None:

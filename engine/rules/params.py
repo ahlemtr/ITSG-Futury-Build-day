@@ -1,4 +1,4 @@
-"""Versioned rule parameters (P2.1). A thin wrapper over `kb.get_param`."""
+"""Versioned rule parameters. A thin wrapper over `kb.get_param`."""
 
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ def load(kb: KnowledgeBase, version: str | None = None, on_date: date | None = N
 
 
 def version_on(kb: KnowledgeBase, on_date: date | None, document: str = "VB") -> str | None:
-    """The real version valid on a date. Never 'latest' (plan/06 section 3)."""
+    """The real version valid on a date. Never 'latest'."""
     if on_date is None:
         return None
     valid = [v for v in kb.get_versions(document) if not v.version.startswith("sim") and v.valid_from and v.valid_from <= on_date]

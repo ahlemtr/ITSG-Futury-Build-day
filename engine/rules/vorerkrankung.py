@@ -1,6 +1,6 @@
-"""Prior-illness rules (P2.2 to P2.4): when a 41 must be sent, which periods it lists, EFZ end.
+"""Prior-illness rules: when a 41 must be sent, which periods it lists, EFZ end.
 
-Exactly the algorithms of plan/03 sections 3 and 6. Every function returns a `Trace`.
+Every function returns a `Trace`.
 """
 
 from __future__ import annotations
@@ -106,7 +106,7 @@ def deciding_rule(current: AuPeriod, priors: list[AuPeriod], report_date: date |
     return "R41-2" if gap_margin <= total_margin else "R41-4"
 
 
-# ---------------------------------------------------------------- EFZ end (plan/03 section 6)
+# ---------------------------------------------------------------- EFZ end
 
 
 def _g(g: Mapping[str, Any], name: str) -> Any:

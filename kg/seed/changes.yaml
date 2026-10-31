@@ -1,8 +1,8 @@
-# Step K7 (08 section 10): curated layer on top of the raw diff (kg/seed/spec_diff_13.3_13.4.json).
+# Curated layer on top of the raw diff (kg/seed/spec_diff_13.3_13.4.json).
 # `raw_match` is resolved by the build against the raw changes (all given conditions must hold):
 #   block, field_prefix, old_contains, new_contains.
 # Out of scope (raw changes stay in_scope: false, label unknown): seafarers (DBAE, DBFR, DBSF),
-# DBAE BRUTTO-1 hourly workers, DBFR home care, DSLW ABRECHNUNGSPROGRAMM wording (04 section 2).
+# DBAE BRUTTO-1 hourly workers, DBFR home care, DSLW ABRECHNUNGSPROGRAMM wording.
 document: VB
 old_version: "13.3"
 new_version: "13.4"

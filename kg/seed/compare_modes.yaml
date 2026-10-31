@@ -1,4 +1,4 @@
-# Step K5 (08 section 8, 05 section 4). Every field not listed is `compare`.
+# Compare mode per field. Every field not listed is `compare`.
 # "Dates and flags" = format date_yyyymmdd, or name starting with MM- / KZ-, or ending with GRUND.
 # rule: null = checked by the intake against the vendor's registration, not by a domain rule.
 ignore:
@@ -15,7 +15,7 @@ rule:
   - {field: DSLW.ABRECHNUNGSPROGRAMM,      rule: null,  source: VB@13.4#3.1.20}
   - {field: DBID.AKTENZEICHEN-VERURSACHER, rule: C-2,   source: VB@13.4#3.19.2}
   - {field: DBID.REFERENZ-ID,              rule: K61-1, source: VB@13.4#3.19.3}
-  # both point to other messages, like REFERENZ-ID (added by the backend, see HANDOUT.md)
+  # both point to other messages, like REFERENZ-ID (added by the backend)
   - {field: DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG, rule: C-3, source: VB@13.4#3.20}
   - {field: DBSD.AKTENZEICHEN-VERURSACHER,      rule: C-2, source: VB@13.4#3.20}
   - {record: DBAP, all_fields: true,       rule: null,  source: VB@13.4#3.18}

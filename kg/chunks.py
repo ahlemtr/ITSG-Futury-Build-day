@@ -1,4 +1,4 @@
-"""Chunks for retrieval (SPEC_UPDATE_WORKFLOW.md W7): a passage split into overlapping pieces of about CHUNK_CHARS
+"""Chunks for retrieval: a passage split into overlapping pieces of about CHUNK_CHARS
 characters at sentence borders, so search ranks the part of a long passage that matches, not the whole passage.
 Short passages are one chunk. Chunk keys: <passage key>~<n>."""
 

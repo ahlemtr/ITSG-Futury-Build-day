@@ -180,7 +180,7 @@ export type OverviewData = {
     testsToReapprove: number;
     hiddenVariantsReady: number;
   } | null;
-  /** Who settled this month's deviations (the pitch metric, doc 05 section 6). */
+  /** Who settled this month's deviations (the pitch metric). */
   resolution: {
     catalogueAndRules: number;
     aiConfirmedByAdvisor: number;

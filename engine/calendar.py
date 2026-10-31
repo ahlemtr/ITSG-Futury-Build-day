@@ -1,4 +1,4 @@
-"""Deadlines per vendor company (HANDOUT agenda 1): what is due when, and how the catalogue evolved.
+"""Deadlines per vendor company: what is due when, and how the catalogue evolved.
 
 Stored deadlines come from events: starting a test run opens round 1, every accepted round closes its
 deadline and opens the next one. Rule-set deadlines are derived on read from the knowledge base and the
@@ -9,12 +9,12 @@ companies' certificates, so they always match the versions the platform knows:
   changes recompute, plus the tests the upload drafted) by the day before the version takes effect; done once
   it passed a run of each of them under the new version. Overdue after the switch until it has;
 - first certification: a company without a certificate (new software) runs the full catalogue of the rule set
-  in force, with no fixed date (plan/06 event D); `view` reports its progress per company;
+  in force, with no fixed date (new software); `view` reports its progress per company;
 - permanent test cases (PTA 8.4): certified companies send them every month, due on the last day;
   done once a submission of that company arrived in the month;
 - ITSG: next year's catalogue approved CATALOGUE_LEAD_DAYS before the switch date; the switch date itself.
 
-The day counts are assumptions until ITSG confirms them (HANDOUT agenda 1, "open").
+The day counts are assumptions until ITSG confirms them.
 """
 
 from __future__ import annotations

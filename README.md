@@ -124,12 +124,14 @@ cd ui && npm run dev
 
 Then open **Spec changes** and upload V13.4 to watch the whole flow. Run the tests with `uv run pytest -q`.
 
-More detail: [`ui/README.md`](ui/README.md) (running the UI), [`docs/HANDOUT.md`](docs/HANDOUT.md) (architecture and state), [`docs/SPEC_UPDATE_WORKFLOW.md`](docs/SPEC_UPDATE_WORKFLOW.md) (the core flow), [`docs/VM_DEPLOYMENT.md`](docs/VM_DEPLOYMENT.md) (deployment).
+On Windows, `./dev.ps1` starts the databases, the API and the UI in one go (`./dev.ps1 -Reset` goes back to the VB 13.3 starting point first).
+
+More detail: [`PROJECT_REPORT.md`](PROJECT_REPORT.md) (what the project is, what it delivers, decisions, next steps), [`ui/README.md`](ui/README.md) (running the UI), [`docs/VM_DEPLOYMENT.md`](docs/VM_DEPLOYMENT.md) (deployment).
 
 <details>
 <summary><b>Knowledge graph build details</b></summary>
 
-Built per [`plan/08_KG_SEEDING_GUIDE.md`](plan/08_KG_SEEDING_GUIDE.md). Needs `uv`, poppler (`pdftotext`) and, for the graph backend, Neo4j 5.13+.
+Needs `uv`, poppler (`pdftotext`) and, for the graph backend, Neo4j 5.13+.
 
 ```bash
 uv run python -m kg.build                 # extract -> build -> validate -> load -> embed
@@ -139,23 +141,6 @@ uv run pytest tests/test_kg.py            # both backends; graph tests skip with
 
 `KG_BACKEND=yaml` (default) answers from `kg/seed/`, `layouts/` and `kg/build/passages.yaml` without Neo4j or OpenAI.
 `KG_BACKEND=graph` uses Neo4j. Without `OPENAI_API_KEY` the embed step is skipped and search uses the full-text index.
-
-</details>
-
-<details>
-<summary><b>Project docs</b></summary>
-
-Start with [`plan/00_PROJECT_OVERVIEW.md`](plan/00_PROJECT_OVERVIEW.md).
-
-| File | Topic |
-|---|---|
-| [`plan/01_DIAGRAMS.md`](plan/01_DIAGRAMS.md) | diagrams |
-| [`plan/03_DOMAIN_RULES_VORERKRANKUNG.md`](plan/03_DOMAIN_RULES_VORERKRANKUNG.md) | prior-illness rules |
-| [`plan/04_SPEC_DIFF_13.3_TO_13.4.md`](plan/04_SPEC_DIFF_13.3_TO_13.4.md) | what changed from V13.3 to V13.4 |
-| [`plan/05_CHECKING_AND_DEVIATIONS.md`](plan/05_CHECKING_AND_DEVIATIONS.md) | how deviations are judged |
-| [`plan/06_LIFECYCLE_AND_HIDDEN_TESTS.md`](plan/06_LIFECYCLE_AND_HIDDEN_TESTS.md) | test lifecycle and hidden twins |
-| [`plan/07_KNOWLEDGE_GRAPH.md`](plan/07_KNOWLEDGE_GRAPH.md) | knowledge graph model |
-| [`plan/09_TECH_STACK.md`](plan/09_TECH_STACK.md) | tech stack |
 
 </details>
 

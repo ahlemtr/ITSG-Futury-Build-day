@@ -16,7 +16,7 @@ services:
       POSTGRES_DB: eel
     ports: ["5432:5432"]
     volumes: ["pg_data:/var/lib/postgresql/data"]
-  neo4j:  # filled by the KG teammate (plan/08 K0)
+  neo4j:
     image: neo4j:5.26-community
     environment:
       NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-changeme}

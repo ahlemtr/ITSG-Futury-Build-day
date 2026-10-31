@@ -1,8 +1,8 @@
-"""Scenarios and expected message chains (P3.1, P3.2).
+"""Scenarios and expected message chains.
 
 A scenario = case facts from the knowledge base (`kb.get_test_case`, as `Case`) + chain-only extras from
-`fixtures/scenarios/<id>.yaml` (decision D3). `build_chain` turns it into the expected messages
-under one rule set version. Clones are single-step tests: only the 41 decision (plan/03 s.9).
+`fixtures/scenarios/<id>.yaml`. `build_chain` turns it into the expected messages
+under one rule set version. Clones are single-step tests: only the 41 decision.
 """
 
 from __future__ import annotations

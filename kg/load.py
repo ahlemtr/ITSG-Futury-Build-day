@@ -1,4 +1,4 @@
-"""Step K9.3: load the validated graph into Neo4j (08 section 12.3). MERGE by key.
+"""Load the validated graph into Neo4j. MERGE by key.
 
 Reconcile generated layout membership so replaced placeholders no longer enter the parser.
 Historical nodes, uploaded versions and advisor decisions are preserved.
@@ -12,14 +12,14 @@ from collections import Counter, defaultdict
 
 from kg.common import env, to_date
 
-# Labels and relationship types come from this whitelist (07 section 3), never from input data.
+# Labels and relationship types come from this whitelist, never from input data.
 LABELS = ["Document", "DocVersion", "Passage", "MessageType", "Record", "Field", "Rule", "Criterion",
           "Parameter", "ParamValue", "Change", "TestCase", "Precedent", "Chunk", "FieldDefinition"]
 REL_TYPES = ["HAS_VERSION", "SUCCEEDS", "CONTAINS", "USES_BLOCK", "HAS_FIELD", "CARRIES", "DESCRIBED_IN",
              "APPLIES_TO", "CONSTRAINS", "SOURCED_FROM", "IMPLEMENTS", "USES_PARAM", "HAS_VALUE", "MODIFIES_OLD",
              "MODIFIES_NEW", "DERIVED_FROM", "CHANGES_PARAM", "TARGETS", "CLONE_OF", "HIDDEN_OF", "ABOUT",
              "JUSTIFIED_BY", "HAS_CHUNK", "ANNEX_OF", "DEFINES", "HAS_DEFINITION", "IN_CONTEXT", "COMPLEMENTS"]
-DATE_PROPS = {"published", "valid_from", "decided"}  # stored as Neo4j date() (08 section 1.5)
+DATE_PROPS = {"published", "valid_from", "decided"}  # stored as Neo4j date()
 BATCH = 500
 
 

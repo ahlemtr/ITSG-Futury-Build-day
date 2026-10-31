@@ -1,4 +1,4 @@
-"""Paths, key formats and small helpers shared by the build scripts and both backends (08 sections 1 and 2)."""
+"""Paths, key formats and small helpers shared by the build scripts and both backends."""
 
 from __future__ import annotations
 
@@ -15,10 +15,10 @@ SEED_DIR = KG_DIR / "seed"
 BUILD_DIR = KG_DIR / "build"
 LAYOUT_DIR = ROOT / "layouts"
 
-# Field names: layouts write BEGINN-AU-{nn}, files and examples BEGINN-AU-1 (08 section 1.3)
+# Field names: layouts write BEGINN-AU-{nn}, files and examples BEGINN-AU-1
 REPEAT_SUFFIX = re.compile(r"-(\{nn\}|\d+)$")
 
-# Documents whose file may be missing; their rule sources are optional (08 section 9.2)
+# Documents whose file may be missing; their rule sources are optional
 OPTIONAL_DOCS = {"BP", "HINWEISE", "BVORERK"}
 
 
@@ -82,7 +82,7 @@ MAX_SUBGRAPH_DEPTH = 3
 
 
 def resolve_vb(version: str, vb_versions: list[str]) -> str:
-    """VB version for passages: the version itself, or the newest real one for simulated versions (07 section 8).
+    """VB version for passages: the version itself, or the newest real one for simulated versions.
 
     vb_versions is sorted by valid_from."""
     if version in vb_versions:
@@ -140,5 +140,5 @@ def layout_fields(layout: dict) -> list[dict]:
 
 
 def numbered_fields(layout: dict) -> list[tuple[int, dict]]:
-    """Field sub-section numbers as the spec counts them: fields without `source`, from 1 (08 section 5.2)."""
+    """Field sub-section numbers as the spec counts them: fields without `source`, from 1."""
     return list(enumerate((f for f in layout_fields(layout) if "source" not in f), start=1))

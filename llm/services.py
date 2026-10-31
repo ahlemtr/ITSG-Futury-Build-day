@@ -50,7 +50,7 @@ class AIServices:
             log.info("LLM skipped: %s", e)
             return None
 
-    # P8.5: proposal for an unclear deviation; never a final label
+    # proposal for an unclear deviation; never a final label
     def read_document_metadata(self, filename: str, text: str):
         return self._safe(document_metadata.run, self.client, filename, text)
 
@@ -60,7 +60,7 @@ class AIServices:
             d.ai_proposal = prop
             d.resolved_by = "ai_proposal"
 
-    # P8.3
+    # explanation of a fail
     def explain(self, d: Deviation) -> str | None:
         passage = None
         for k in d.sources:
@@ -71,7 +71,7 @@ class AIServices:
                 continue
         return self._safe(explain_mod.explain, self.client, d, passage)
 
-    # P8.4
+    # test story
     def story(self, tc: Case) -> str | None:
         return self._safe(story_mod.story, self.client, tc)
 
@@ -84,21 +84,21 @@ class AIServices:
         return self._safe(calculation_analysis.run, self.client, self.tools, change, params, message_types,
                           self.cites_ok)
 
-    # P8.7
+    # spec-update agent
     def spec_update(self, document: str, old: str, new: str) -> dict | None:
         out = self._safe(spec_update.run, self.client, self.tools, document, old, new, self.cites_ok)
         return out.model_dump() if out else None
 
-    # P8.8
+    # report draft
     def report_draft(self, res: CheckResult) -> dict | None:
         out = self._safe(check_agent.report_draft, self.client, self.tools, res, self.cites_ok)
         return out.model_dump() if out else None
 
-    # chat assistant (HANDOUT agenda 4): None = no cited answer, the caller shows the retrieval only
+    # chat assistant: None = no cited answer, the caller shows the retrieval only
     def chat(self, question: str, history: list[dict], language: str, context: list[dict]):
         return self._safe(chat.answer, self.client, self.tools, question, history, language, context, self.cites_ok)
 
-    # P8.2
+    # requirements to criteria
     def criteria(self, document: str, version: str, section: str, decided: dict[str, CriterionReview] | None = None):
         ex = LLMExtractor(self.client, self.tools, self.cites_ok)
         return run_pipeline(self.kb, ex, document, version, section, decided)

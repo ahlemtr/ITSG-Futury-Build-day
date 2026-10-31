@@ -1,4 +1,4 @@
-"""Step K9.4: OpenAI embeddings per passage, cached by sha256 of the input (08 section 12.4).
+"""OpenAI embeddings per passage, cached by sha256 of the input.
 
 Without OPENAI_API_KEY the step is skipped; search then uses the full-text index.
 """

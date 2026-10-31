@@ -1,4 +1,4 @@
-"""RAG chat assistant (HANDOUT agenda 4): answers questions about the documents from the knowledge graph.
+"""RAG chat assistant: answers questions about the documents from the knowledge graph.
 
 Retrieval: chunk-level hybrid search (`search_passages`, with the matching sentence) plus graph context per
 passage (the rules sourced from it, the changes that modified it, the test cases on those rules, the rules'

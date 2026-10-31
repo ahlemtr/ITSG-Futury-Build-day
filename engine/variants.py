@@ -1,4 +1,4 @@
-"""Known-variant catalogue + precedent lookup (P4.4, decision D4)."""
+"""Known-variant catalogue + precedent lookup."""
 
 from __future__ import annotations
 

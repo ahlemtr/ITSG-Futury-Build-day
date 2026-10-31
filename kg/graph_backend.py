@@ -1,4 +1,4 @@
-"""Neo4j backend: one Cypher query per interface method (08 section 13, base queries in 07 section 8)."""
+"""Neo4j backend: one Cypher query per interface method."""
 
 from __future__ import annotations
 
@@ -209,7 +209,7 @@ class GraphBackend:
         return found[0]
 
     def search_passages(self, text: str, k: int = 5, version: str | None = None, on_date=None) -> list[Passage]:
-        """Hybrid search on chunks (W7): full-text and vector (needs embeddings and OPENAI_API_KEY) ranks merged by
+        """Hybrid search on chunks: full-text and vector (needs embeddings and OPENAI_API_KEY) ranks merged by
         reciprocal rank fusion, full-text weighted higher; a passage scores with its best chunk and comes back with
         the sentence that matched."""
         from neo4j.exceptions import Neo4jError

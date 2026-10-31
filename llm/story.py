@@ -1,4 +1,4 @@
-"""Story (P8.4): scenario -> TA-style test story (inputs only, never expected results)."""
+"""Story: scenario -> TA-style test story (inputs only, never expected results)."""
 
 from __future__ import annotations
 

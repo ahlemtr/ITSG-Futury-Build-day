@@ -1,9 +1,9 @@
-# Known-variant catalogue (decision D4, plan/05 section 6 step a). Owned by the backend.
-# signature = ABGABEGRUND|RECORD.FIELD|KIND (plan/08 section 1.3). Only `active: true` entries are used.
+# Known-variant catalogue. Owned by the backend.
+# signature = ABGABEGRUND|RECORD.FIELD|KIND. Only `active: true` entries are used.
 # Approved advisor decisions are NOT stored here: they are precedents behind the KG interface.
 variants:
   - signature: "41|DSLW.MM-ANSCHRIFT|extra_block"
     verdict: correct_variant
     reason: Beispielpapier 13.1 sets MM-ANSCHRIFT = J with a DBAN block on a 41; the ITSG file sends N.
     source: BP@13.3#13.1
-    active: false   # candidate only: activate once ITSG confirms (plan/05 section 6)
+    active: false   # candidate only: activate once ITSG confirms

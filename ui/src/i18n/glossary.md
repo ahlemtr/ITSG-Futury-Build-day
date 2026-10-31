@@ -1,6 +1,6 @@
 # Glossary for the English UI
 
-Rules (from `ui/UI_PLAN.md` section 6):
+Rules:
 
 - Legal and procedure terms stay **German** in both languages. English mode shows the meaning below as a tooltip. Source: `src/i18n/terms.ts`.
 - Field and block names (DSLW, DBVO, ABGABEGRUND, AU-AB-AG ...) are never translated.

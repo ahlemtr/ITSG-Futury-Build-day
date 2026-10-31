@@ -1,7 +1,7 @@
 """Reference backend: reads kg/seed, layouts/ and kg/build/passages.yaml, no Neo4j or OpenAI needed.
 
 It answers from the same in-memory graph seed_graph builds for Neo4j, so both backends give the
-same answers (08 section 15). Precedents are appended to kg/seed/precedents.yaml.
+same answers. Precedents are appended to kg/seed/precedents.yaml.
 """
 
 from __future__ import annotations
@@ -227,7 +227,7 @@ class YamlBackend:
         from kg.field_evidence import applicable_documents
 
         tokens = list(dict.fromkeys(t.lower() for t in _TOKEN.findall(text)))
-        if self._search_docs is None:  # W7: one search document per chunk, scored per passage by its best chunk
+        if self._search_docs is None:  # one search document per chunk, scored per passage by its best chunk
             self._search_docs = [(c["passage"], self.nodes[("Passage", c["passage"])],
                                   f"{c.get('heading') or ''}\n{c.get('text') or ''}".lower(), c.get("text") or "")
                                  for _key, c in self._labelled("Chunk")]

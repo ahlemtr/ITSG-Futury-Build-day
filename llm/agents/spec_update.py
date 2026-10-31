@@ -1,4 +1,4 @@
-"""Spec-update agent (P8.7): per curated change, decide no_change / update_test / new_test and draft
+"""Spec-update agent: per curated change, decide no_change / update_test / new_test and draft
 the test case. Output is stored as draft; ITSG approves before use."""
 
 from __future__ import annotations

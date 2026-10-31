@@ -1,4 +1,4 @@
-"""Explain (P8.3): a fail verdict in 2 to 4 plain sentences, quoting rule id and section."""
+"""Explain: a fail verdict in 2 to 4 plain sentences, quoting rule id and section."""
 
 from __future__ import annotations
 

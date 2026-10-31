@@ -1,4 +1,4 @@
-"""LLM services (P8) against a scripted transport. No real API call is made."""
+"""LLM services against a scripted transport. No real API call is made."""
 
 from datetime import date
 
@@ -22,7 +22,7 @@ def ai_with(kb, handlers, tmp_path):
     return AIServices(kb, LLMClient(transport=t, cache_dir=tmp_path / "cache")), t
 
 
-# ---------------------------------------------------------------- P8.1 client, tools, cache
+# ---------------------------------------------------------------- client, tools, cache
 
 
 class ParamAnswer(BaseModel):
@@ -66,7 +66,7 @@ def test_retry_once_then_fail(kb, tmp_path, seeds):
     assert res.deviations[0].ai_proposal is None and t.calls == ["AiProposal", "AiProposal"]
 
 
-# ---------------------------------------------------------------- P8.5, P8.6 triage, advisor, precedent
+# ---------------------------------------------------------------- triage, advisor, precedent
 
 TRIAGE = {"proposal": "likely_bug", "confidence": 0.7, "citations": ["BP@13.3#13.1"],
           "reasoning": "Beispielpapier 13.1 shows every 41 with MM-ANSPRECH = J and a DBAP block."}
@@ -88,7 +88,7 @@ def test_no_contact_flow(fresh_kb, tmp_path, monkeypatch):
     assert r["label"] == "bug" and r["deviations"][0]["resolved_by"] == "catalogue" and len(t.calls) == n
 
 
-# ---------------------------------------------------------------- P8.3, P8.4 explain and story
+# ---------------------------------------------------------------- explain and story
 
 
 def test_explain(kb, tmp_path, seeds):
@@ -115,7 +115,7 @@ def test_story(kb, tmp_path):
         assert d in text
 
 
-# ---------------------------------------------------------------- P8.7, P8.8 agents
+# ---------------------------------------------------------------- agents
 
 
 def test_spec_update_agent(kb, tmp_path):
@@ -155,7 +155,7 @@ def test_report_draft(kb, tmp_path, seeds):
     assert out["items"][0]["citations"] == ["VB@13.4#3.12/chaining"]
 
 
-# ---------------------------------------------------------------- P8.2 requirements to criteria
+# ---------------------------------------------------------------- requirements to criteria
 
 CRIT = {"R41-1": "f41c7278", "R41-2": "0cefe80e", "R41-3": "aade0289", "R41-4": "9c8c9b58"}
 
@@ -311,7 +311,7 @@ def test_transport_api_error_degrades():
         t([], [], {}, "x")
 
 
-# ---------------------------------------------------------------- chat assistant (HANDOUT agenda 4)
+# ---------------------------------------------------------------- chat assistant
 
 
 def test_chat_retrieval_has_graph_context(kb):

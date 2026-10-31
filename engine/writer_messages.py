@@ -1,6 +1,6 @@
-"""Expected chain -> files (P3.3). Employer messages become TEEL0 files (the model solution),
+"""Expected chain -> files. Employer messages become TEEL0 files (the model solution),
 insurer replies TEEK0 files. The envelope (VOSZ, DSKO, NCSZ) is copied from the ITSG reference
-file: its content is not graded (plan/05 section 4)."""
+file: its content is not graded."""
 
 from __future__ import annotations
 

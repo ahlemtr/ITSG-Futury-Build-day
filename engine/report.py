@@ -1,4 +1,4 @@
-"""Report (P6.1, P6.2): JSON model, HTML via Jinja2, PDF via WeasyPrint (optional)."""
+"""Report: JSON model, HTML via Jinja2, PDF via WeasyPrint (optional)."""
 
 from __future__ import annotations
 

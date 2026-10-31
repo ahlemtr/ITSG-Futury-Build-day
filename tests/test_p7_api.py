@@ -1,4 +1,4 @@
-"""One httpx test per endpoint against seeded data (P7.4). LLM services off (ai=False)."""
+"""One httpx test per endpoint against seeded data. LLM services off (ai=False)."""
 
 import io
 import json

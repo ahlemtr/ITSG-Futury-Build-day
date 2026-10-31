@@ -1,4 +1,4 @@
-# Step K6 (08 section 9.1), values from 03 section 2.
+# Versioned rule parameters.
 # sim-13.5 is simulated: returned only when asked by version, never by date.
 parameters:
   - name: min_total_days

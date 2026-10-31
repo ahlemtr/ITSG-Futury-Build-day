@@ -1,4 +1,4 @@
-"""Seed data (P7.2, plan/02 section 7): the test case catalogue and the 10 seed submissions.
+"""Seed data: the test case catalogue and the 10 seed submissions.
 
 `python -m store.seed` seeds the store selected by DATABASE_URL with the KG selected by KG_BACKEND.
 """

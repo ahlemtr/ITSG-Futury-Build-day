@@ -1,4 +1,4 @@
-"""Step K2: spec text -> kg/build/passages.yaml (08 section 5)."""
+"""Spec text -> kg/build/passages.yaml."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from kg.extract import docx as docx_split
 from kg.extract import field_tables, generic, vb
 from kg.extract.pdf_text import clean, pdf_to_text, read_lines
 
-# 08 section 5.2: these must hold on the generated passages (also checked by validate.py)
+# these must hold on the generated passages (also checked by validate.py)
 CHECKS_3_12 = [
     ("VB@13.3#3.12/chaining", "nicht mindestens 6 Monate", True),
     ("VB@13.4#3.12/chaining", "nicht mehr als 6 Monate", True),

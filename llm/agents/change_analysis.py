@@ -1,4 +1,4 @@
-"""Change analysis (spec upload, SPEC_UPDATE_WORKFLOW.md section 2): for one change of a newly uploaded spec version
+"""Change analysis (spec upload): for one change of a newly uploaded spec version
 that touches rules, say what changed in the rules. The model only answers; kg.ingest validates the answer and
 writes it into the knowledge graph. Dates and expected results always come from the rules engine."""
 

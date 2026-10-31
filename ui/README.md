@@ -1,6 +1,6 @@
 # EEL Review Assistant: UI
 
-React + TypeScript + Vite. Plan: `UI_PLAN.md`. Mockups: `mockups/`.
+React + TypeScript + Vite. Project state and history: `../PROJECT_REPORT.md`.
 
 ## Run it (Windows, VS Code terminal)
 
@@ -34,13 +34,13 @@ With `OPENAI_API_KEY` in `.env`, the AI proposals, the spec-update agent and the
 |---|---|
 | `npm run build` | type check + production build into `dist/` |
 | `npm run check:i18n` | lists texts missing in `de.json` or `en.json` |
-| `npm run build:layouts` | converts `plan/starter/layouts/*.yaml` into `src/records/layouts.generated.json` (run again when the layouts change) |
+| `npm run build:layouts` | converts `layouts/*.yaml` (repo root) into `src/records/layouts.generated.json` (run again when the layouts change) |
 
 ## Where things are
 
 | Folder | Content |
 |---|---|
-| `src/styles/tokens.css` | all colors, fonts, sizes (from `mockups/00_look_and_feel.png`) |
+| `src/styles/tokens.css` | all colors, fonts, sizes |
 | `src/components/` | top bar, left nav, shared pieces |
 | `src/screens/` | one file per screen |
 | `src/data/` | `api.ts` (backend calls and mapping to the UI types), stores, `runTexts.ts` (hand-written vendor run texts) |

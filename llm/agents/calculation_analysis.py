@@ -1,4 +1,4 @@
-"""Calculation analysis (SPEC_UPDATE_WORKFLOW.md W8): for one change of a new edition of the insurers' Rundschreiben,
+"""Calculation analysis: for one change of a new edition of the insurers' Rundschreiben,
 find the calculation rules it sets (amounts, percentages, periods, thresholds). The model only answers; kg.ingest
 validates and writes. Rules the engine does not compute are stored as drafts ("needs implementation"); a value
 that matches an engine parameter is a proposal for ITSG, never applied by itself."""

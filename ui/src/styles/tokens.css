@@ -1,4 +1,4 @@
-/* Design tokens from ui/mockups/00_look_and_feel.png. Change values here only. */
+/* Design tokens. Change values here only. */
 :root {
   /* Brand: wordmark and the one primary action per screen. Never for status. */
   --itsg-red: #d50032;

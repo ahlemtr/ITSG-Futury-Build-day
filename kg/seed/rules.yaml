@@ -1,8 +1,8 @@
-# Step K6 (08 section 9.2). Rule text from 03 sections 3 to 7.
+# Rules of the engine.
 # Sources cite the narrowest passage, in both VB versions where the text exists in both.
 # BP, HINWEISE and BVORERK sources are optional: dropped with a warning if the file is missing.
 rules:
-  # --- 03 section 3: when must the employer send a 41?
+  # --- when must the employer send a 41?
   - id: R41-1
     title: 41 only if the current AU and at least one prior AU are certified
     description: >-
@@ -77,7 +77,7 @@ rules:
     params: [open_end_days]
     sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions, BP@13.3#13.5]
 
-  # --- 03 section 4: format rules for an employer 41 record
+  # --- format rules for an employer 41 record
   - id: F41-1
     title: ABGABEGRUND = 41
     description: DSLW.ABGABEGRUND = 41.
@@ -181,7 +181,7 @@ rules:
     params: []
     sources: [VB@13.3#3.1.11, VB@13.4#3.1.11]
 
-  # --- 03 section 5: insurer reply 61 and 62
+  # --- insurer reply 61 and 62
   - id: K61-1
     title: REFERENZ-ID = DATENSATZ-ID of the employer's 41
     description: DBID.REFERENZ-ID = DATENSATZ-ID of the employer's 41.
@@ -279,7 +279,7 @@ rules:
     params: []
     sources: [VB@13.3#3.7.3, VB@13.4#3.7.3, VB@13.3#3.7.4, VB@13.4#3.7.4]
 
-  # --- 03 section 6: EFZ end after a 61
+  # --- EFZ end after a 61
   - id: E-1
     title: the 01 carries DBAL.DATUM-EGZBIS = efz_end
     description: >-
@@ -315,7 +315,7 @@ rules:
     params: []
     sources: [VB@13.3#3.12.4, VB@13.4#3.12.4, VB@13.3#3.12.12, VB@13.4#3.12.12]
 
-  # --- 03 section 7: chain rules
+  # --- chain rules
   - id: C-1
     title: every employer message has a unique DATENSATZ-ID
     description: Every employer message has a unique DATENSATZ-ID.

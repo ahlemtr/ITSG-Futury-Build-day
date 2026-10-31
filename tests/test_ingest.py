@@ -1,4 +1,4 @@
-"""Spec upload pipeline (SPEC_UPDATE_WORKFLOW.md W2): starting point VB 13.3, upload of the real VB 13.4 PDF."""
+"""Spec upload pipeline: starting point VB 13.3, upload of the real VB 13.4 PDF."""
 
 from datetime import date
 from pathlib import Path

@@ -1,4 +1,4 @@
-"""Splitter for GG, PTA, BP and the Rundschreiben (08 section 5.3)."""
+"""Splitter for GG, PTA, BP and the Rundschreiben."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ ANNEX_HEADING_RE = re.compile(r"^ *(?P<num>\d{1,2})\s+(?P<title>[A-ZÄÖÜ][^=]*
 # A heading-shaped line ending in a page number is a TOC entry (RS-ANL3 has one per chapter, without dots)
 TOC_ENTRY_RE = re.compile(r"\s\d{1,3}\s*$")
 
-# Sections that must exist per document (08 section 5.3)
+# Sections that must exist per document
 REQUIRED = {
     "GG": ["2.1.1", "2.1.2", "2.2.1", "2.2.2", "2.5"],
     "PTA": ["5.14"],

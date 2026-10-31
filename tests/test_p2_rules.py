@@ -27,7 +27,7 @@ def test_params_by_date_and_version(kb):
 @pytest.mark.parametrize("version", VERSIONS)
 @pytest.mark.parametrize("case", CASES)
 def test_rules_table(kb, case, version):
-    """Every row of plan/03 section 9 under 13.3, 13.4 and sim-13.5."""
+    """Every Beispielpapier and Peter row under 13.3, 13.4 and sim-13.5."""
     tc = get_case(kb, case)
     exp = tc.expected[version]
     d = must_send_41(tc.inputs.current, tc.inputs.priors, tc.inputs.report_date, params.load(kb, version=version))
