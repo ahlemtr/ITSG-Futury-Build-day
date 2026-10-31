@@ -126,7 +126,7 @@ Then open **Spec changes** and upload V13.4 to watch the whole flow. Run the tes
 
 On Windows, `./dev.ps1` starts the databases, the API and the UI in one go (`./dev.ps1 -Reset` goes back to the VB 13.3 starting point first).
 
-More detail: [`PROJECT_REPORT.md`](PROJECT_REPORT.md) (what the project is, what it delivers, decisions, next steps), [`ui/README.md`](ui/README.md) (running the UI), [`docs/VM_DEPLOYMENT.md`](docs/VM_DEPLOYMENT.md) (deployment).
+More detail: [`PROJECT_REPORT.md`](PROJECT_REPORT.md) (what the project is, what it delivers, decisions, next steps), [`ui/README.md`](ui/README.md) (running the UI).
 
 <details>
 <summary><b>Knowledge graph build details</b></summary>

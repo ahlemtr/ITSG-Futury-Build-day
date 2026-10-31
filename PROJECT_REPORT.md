@@ -44,10 +44,10 @@ Pitch lines used: "One platform for EEL testing: it receives the files, answers 
 | API | `api/main.py`, `api/routes/*` | FastAPI, 46 endpoints (health, parse, submissions/check/diff/report, advisor queue + decide, runs, test cases + approve, builder, specdiff, spec upload + jobs, criteria, rules/versions/passages, kg stats/events/ask/subgraph/field definitions, calendar, chat, calc, admin reset) |
 | UI | `ui/` | React 18 + Vite + TypeScript, German default and English on a button. ITSG view: Overview, Fristen (calendar), Prüfrechner (calculator), Spec-Änderungen, Testkatalog, Wissensgraph, Einreichungen, Klärungsfälle, Prüfberichte. Vendor view ("Hersteller"): my tests, test run per round, calendar, results, reports. AI activity overlay, chat drawer |
 | Tools | `tools/` | `reset_baseline` (demo reset), `make_submissions`, `make_vendor_uploads`, `extract_key_values` (GG Anlage 2 code tables), `compare_anlage1`, `kg_bundle` (export/import passages, embeddings, AI cache) |
-| Deployment | `Dockerfile`, `docker-compose.yml` (local Postgres + Neo4j), `compose.vm.yaml`, `deploy/` (UI image, nginx, env helper), `docs/VM_DEPLOYMENT.md`, untracked `dev.ps1` (one-command local start on Windows) |
+| Deployment | `Dockerfile` (API image), `docker-compose.yml` (local Postgres + Neo4j + API), `dev.ps1` (one-command local start on Windows). The TU VM setup was removed on 2026-10-31; Google Cloud deployment is still to be written |
 | Sources | `sources/` | VB 13.3, GG 13.1 + Anlagen 1–3, VB Anlage 1 13.1.3 and 13.1.4, Beispielpapier, Pool-Testaufgaben, Rundschreiben Anl. 1–3, the two ITSG DOCX files, the challenge deck. VB 13.4 is kept local only (gitignored) because it is uploaded live in the demo |
 
-Team (from the commit history): Ahlem Trabelsi (backend engine P0–P8), Mohamed Hizem (knowledge graph), Slim Frikha (UI shell, vendor view, advisor queue), Ghassen Zaara (plans, integration I1–I8, spec workflow W0–W8, calendar, reset, chat, deployment). 56 commits, 26–27.10.2026.
+Hackathon team (from the commit history): Ahlem Trabelsi (backend engine), Mohamed Hizem (knowledge graph), Slim Frikha (UI shell, vendor view, advisor queue, README showcase), Ghassen Zaara (plans, integration, spec update workflow, calendar, reset, chat, deployment). 56 commits, 26–27.10.2026. From here on Ghassen carries the project, with occasional help.
 
 ## 5. Promised vs. delivered
 
@@ -68,7 +68,6 @@ Team (from the commit history): Ahlem Trabelsi (backend engine P0–P8), Mohamed
 | RAG chat with inline citations that must resolve to real passages | done |
 | GG annexes as cited evidence; S-1 checks every code field against Anlage 2 | done |
 | Deadline calendar per vendor company, demo reset from the user menu, "less text" UI pass | done (deadline rules are assumptions, see 5.3) |
-| VM deployment (`http://130.83.85.181:31080`) | configured and documented |
 
 Checks run on 2026-10-31 on this machine: `pytest` 207 passed, **1 failed**, 27 skipped (graph tests need `NEO4J_TESTS=1`); `ruff check .` clean; `tsc -b` clean; i18n check: 564 keys, both languages complete.
 
@@ -88,7 +87,7 @@ These are the honest gaps. They matter for December because a jury that read the
 8. **No login.** The ITSG/vendor switch is a demo toggle, all endpoints are open. Hidden tests are protected only by the UI not calling `GET /test-cases/{id}`. The reset endpoint is allowed from loopback or with `ALLOW_RESET=1`.
 9. **Not a vendor-side tool.** The optional "run locally at the vendor" idea from the deck is not built (same engine, packaging only).
 10. **Search quality** has a known miss: "Ansprechpartner DBAP" ranks VB 2.2.3.1 above 3.18; `test_search_finds_chaining[graph]` fails on Neo4j's German full-text ranking.
-11. **Data protection.** ITSG documents and (in production) vendor files go to OpenAI. For a German social-insurance body this will be asked about; an EU-hosted or local model option does not exist yet.
+11. **Data protection.** ITSG documents and vendor files go to OpenAI. Decided for December: only test data goes through the platform, so OpenAI stays; expect the question from the GKV audience anyway.
 
 ### 5.3 Operational weight
 
@@ -109,7 +108,7 @@ Running it needs Docker (Postgres + Neo4j), Python 3.12 with `uv`, Node, `pdftot
 11. Neo4j holds the knowledge (documents, passages, chunks, rules, parameters, layouts, test definitions, precedents); Postgres holds operations (submissions, checks, runs, reports, catalogue status, upload jobs, growth log, companies, deadlines). Files under `DATA_DIR`.
 12. The starting point (`SPEC_BASELINE=VB@13.3`) has Peter only and no submissions; the full seed (13.3 + 13.4, 18 test cases, 10 submissions) is what the tests use.
 
-## 7. How to run (unchanged)
+## 7. How to run
 
 ```
 docker compose up -d postgres neo4j
@@ -119,36 +118,44 @@ SPEC_BASELINE=VB@13.3 SEED_ON_START=0 uv run uvicorn api.main:app --port 8000
 cd ui && npm run dev                                                       # http://127.0.0.1:5173
 ```
 
-Or `./dev.ps1` (add `-Reset` to reset first). Without Docker: leave `DATABASE_URL` and `KG_BACKEND` empty (in-memory store, YAML knowledge base). Sample vendor files: `python -m tools.make_vendor_uploads` (writes `samples/vendor_uploads/`). VM: see `docs/VM_DEPLOYMENT.md`.
+Or `./dev.ps1` (add `-Reset` to reset first). Without Docker: leave `DATABASE_URL` and `KG_BACKEND` empty (in-memory store, YAML knowledge base). Sample vendor files: `python -m tools.make_vendor_uploads` (writes `samples/vendor_uploads/`). The old demo state was deleted from `data/`; run `./dev.ps1 -Reset` once so Postgres and Neo4j match it again.
 
 ## 8. Cleanup done on 2026-10-31
 
-Deleted plans and handouts (all already implemented or superseded by this report): `HANDOUT.md`, `INTEGRATION_PLAN.md`, `SPEC_UPDATE_WORKFLOW.md`, `BACKEND_IMPLEMENTATION_PLAN.md`, `plan/` (00–09, diagrams, `starter/` copies of layouts, spec diff script and JSON that now live in `layouts/`, `engine/specdiff.py` and `kg/seed/`), `ui/UI_PLAN.md`, `ui/mockups/`.
+The repo was reduced to what is needed to continue (commits `fbf69c7` and the one after it):
 
-Deleted duplicates and unused files: `sources/TEEL0-Test1-DBVO` (identical to `fixtures/itsg/TEEL0-Test1-DBVO`, which the code uses), `sources/2026-10-26 Translation Assistance.pdf` (glossary, not loaded by the graph; `ui/src/i18n/glossary.md` covers it).
+- **Removed:** all hackathon plans and handouts (`plan/`, `HANDOUT.md`, `INTEGRATION_PLAN.md`, `SPEC_UPDATE_WORKFLOW.md`, `BACKEND_IMPLEMENTATION_PLAN.md`, `ui/UI_PLAN.md`, `ui/mockups/`; their content is summarised in this report and stays in Git history), duplicate sources (`sources/TEEL0-Test1-DBVO`, the translation glossary PDF, the archived VB 13.4 upload), the TU VM deployment (`compose.vm.yaml`, `deploy/`, `docs/VM_DEPLOYMENT.md`, `.gitattributes`), all caches and generated output (`__pycache__`, `.pytest_cache`, `.ruff_cache`, `ui/dist`, `bundles/`, `samples/`, `data/report-preview/`) and the old demo runtime state (`data/ingested/`, `data/submissions/`).
+- **Comments:** dead references to the deleted plans (`plan/02`, `(08 section 5.2)`, `Step K9.1`, `HANDOUT agenda`, milestone tags like `P8.5`) were removed from comments and docstrings only; no code or prompt text changed.
+- **README:** Slim's showcase README (from `origin/main`) is kept; only its links to deleted files were fixed.
+- **Kept on purpose:** `kg/build/` (156 MB, includes 142 MB of paid embeddings), `data/llm_cache/` (AI answers, offline demo), `data/keys/` (report signing key), `.venv/`, `ui/node_modules/`, `.env`, the challenge deck.
+- **Checked:** every tracked file is referenced by the code or read by convention (config files, entry points, CLI tools). After the cleanup: `pytest` 207 passed, 1 failed (the Windows/Linux `pdftotext` annex test), 27 skipped; `ruff` and `tsc` clean.
 
-Deleted caches and generated output: all `__pycache__/`, `.pytest_cache/`, `.ruff_cache/`, `ui/dist/`, `ui/tsconfig.tsbuildinfo`, `bundles/` (two exports of `kg/build` + AI cache; recreate with `python -m tools.kg_bundle export`), `data/report-preview/` (scratch renders of the report, a throwaway preview key, a Chrome profile), `samples/` (regenerate with `python -m tools.make_vendor_uploads`).
+## 9. Decisions for December (2026-10-31)
 
-Kept on purpose: `kg/build/` (paid embeddings, needed to run), `data/llm_cache/`, `data/keys/` (signing key), `.venv/`, `ui/node_modules/`, `.env`, `VM_DEPLOYMENT.md`, `dev.ps1`, the challenge deck.
+| Topic | Decision |
+|---|---|
+| Event | **11 December 2026**: pitch with live demo to the GKV and other key stakeholders; a pilot discussion with ITSG is likely afterwards. The product must be close to finished, not a scoped demo |
+| People | Ghassen alone, working with Claude Code; teammates help occasionally. The roadmap is a list of independent goals and tasks, no role assignment |
+| Phases | 1) widen EEL scope, 2) real AI rule derivation from the spec text, 3) harden for real use (login, security). Planned in advance, worked in that order |
+| Scope | All of EEL: certificates 01 (Krankengeld), 02 (Kinderkrankengeld), 03 (Mutterschaftsgeld), the other messages (42, 51, 73, 62/71/72, 66/67 errors, 99), including error cases, to show robust and complex situations |
+| Demo story | The same arc with full EEL coverage (vendor run, deviations judged, VB 13.4 upload, tests update, signed report), plus automations, e.g. a newly signed vendor completes the whole yearly catalogue, gets the certified label, and that unlocks the permanent test cases |
+| Kept features | Krankengeld calculator, deadline calendar, RAG chat, knowledge graph tab |
+| Language | German only: the English UI will be dropped |
+| Login | Two roles, ITSG staff and vendor accounts, email + password in our own user table; ITSG creates the vendor accounts (no self sign-up) |
+| Data | Only test data goes through the platform (test employees like Peter); OpenAI stays the AI provider |
+| Architecture | Keep Neo4j + Postgres |
+| Hosting | Google Cloud ($300 free credits), Google's default HTTPS URL, no own domain |
+| ITSG | There is a contact who can answer domain questions and provide data |
+| Git | Fork `ahlemtr/ITSG-Futury-Build-day`, one branch + pull request per feature into her `main`; GitHub Actions (Linux) runs pytest, ruff, tsc and the i18n check on every PR |
 
-No behaviour was changed. Comments and docstrings in about 80 files cited the deleted plans (`plan/02`, `(08 section 5.2)`, `Step K9.1`, `HANDOUT agenda`, `SPEC_UPDATE_WORKFLOW.md W7`, `decision D3`, milestone tags like `P8.5`, `M4.1`); those dead references were removed or replaced by a plain description, by exact string replacement on comment lines only (no prompt text, so the AI cache keys are unchanged). `README.md`, `ui/README.md`, `layouts/README.md` and `ui/src/i18n/glossary.md` were updated to match. After the cleanup: `pytest` 207 passed, 1 failed (the same annex test), 27 skipped; `ruff` and `tsc` clean.
+### Questions for the ITSG contact
 
-Also deleted: `sources/uploads/VB@13.4.pdf`, a byte-identical archive copy of the local VB 13.4 PDF that the upload pipeline writes but nothing reads.
-
-Usage check: a script searched the repo for references to every tracked file. The only files nothing refers to by name are config read by convention (`.gitignore`, `.dockerignore`, `.gitattributes`, `.python-version`, `docker-compose.yml`, `ui/tsconfig.json`, `ui/src/vite-env.d.ts`), entry points (`kg/extract/__main__.py` for `python -m kg.extract`), `llm/agents/spec_update.py` and `ui/src/i18n/index.ts` (imported as a package and as `./i18n`), and two CLI tools: `tools/extract_key_values.py` (regenerates `kg/seed/key_values.yaml` from GG Anlage 2) and `tools/compare_anlage1.py` (checks `layouts/` against the Anlage 1 table cells when layouts change). All are needed; every source document except the challenge deck is listed in `kg/seed/documents.yaml`.
-
-Runtime state from the last demo rehearsal (`data/ingested/VB@13.4/`, `data/submissions/`) was deleted. Postgres and Neo4j still hold rows from that rehearsal that point to these files, so **start the next session with `./dev.ps1 -Reset`** (or `python -m tools.reset_baseline`): it brings both databases back to the VB 13.3 starting point and keeps the AI cache and embeddings. Re-uploading the VB 13.4 PDF afterwards replays from the AI cache.
-
-Not removable without admin rights: two empty folders `data/report-preview/pytest-cache` and `pytest-temp` (created with a restrictive ACL). From an elevated terminal: `takeown /f data\report-preview /r /d y` then `rmdir /s /q data\report-preview`.
-
-## 9. Where to go next (for the December goal)
-
-Suggested order, to be decided with the team:
-
-1. Fix the one failing test and the stale doc references; commit `dev.ps1`.
-2. Get answers from ITSG on the open questions (6-month counting, month ends, Anlage 3, eVpT ignore list, deadline rules) and real TA 167/168 solutions and TEEK0 files.
-3. Widen the scope where the jury will look: at least one more benefit type (sickness benefit certificate 01 in full, or maternity 03), so "EEL" is more than one topic.
-4. Prove the update pipeline on a second real change, not only 13.3 → 13.4.
-5. Make "requirements → criteria → tests" visible in the UI (the criteria pipeline exists in the API only).
-6. Login and roles (ITSG vs. vendor), hidden-test protection on the API side.
-7. A data-protection answer: EU-hosted or local model option.
+1. TA 167 and TA 168: solutions and TEEK0 reply files, and a sample eVpT deviation report.
+2. Anlage 3 of the Verfahrensbeschreibung (data blocks per Abgabegrund): is DBAP mandatory on a 41? Beispielpapier 13.1 sets MM-ANSCHRIFT = J (DBAN), ITSG's reference file sends N; layout of DBAN.
+3. "6 months" in VB 3.12: counted from the end date or from the day after? Month ends: is 31.08 + 6 months = 28.02?
+4. Which 6-month wording is authoritative for 2027: VB 13.4 changed only the employer sentence; the insurer paragraph and 3.12.7 still use the old wording.
+5. Kurz-AU directly followed by a certified AU: one merged period or the certified part only?
+6. Which fields eVpT's Vorbewertung ignores (our list: DATUM-ERSTELLUNG, DATUM-VERARBEITUNG, AKTENZEICHEN-SV, salary amounts of the 01).
+7. Deadline rules: when each test round is due, how often certified vendors submit permanent test cases (monthly per PTA 8.4?), when the catalogue must be approved before a new version takes effect.
+8. Certification rules: what a new vendor must pass to be certified, and what the certified label unlocks.
+9. Can payroll software clone an employee to start a test branch? What share of eVpT deviations turn out to be allowed variants?
