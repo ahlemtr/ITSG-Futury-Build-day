@@ -142,13 +142,23 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 | Demo story | The same arc with full EEL coverage (vendor run, deviations judged, VB 13.4 upload, tests update, signed report), plus automations, e.g. a newly signed vendor completes the whole yearly catalogue, gets the certified label, and that unlocks the permanent test cases |
 | Kept features | Krankengeld calculator, deadline calendar, RAG chat, knowledge graph tab |
 | Language | German only: the English UI will be dropped |
-| Login | Two roles, ITSG staff and vendor accounts, email + password in our own user table; ITSG creates the vendor accounts (no self sign-up) |
+| Login | Two roles, ITSG staff and vendor accounts, through **Clerk** (decided 2026-11-01, replaces the own user table); sign-up restricted, ITSG invites the vendor accounts; where Clerk stores account data must be checked and documented |
 | Data | Only test data goes through the platform (test employees like Peter); OpenAI stays the AI provider |
 | Architecture | Keep Neo4j + Postgres |
-| Hosting | Google Cloud ($300 free credits), Google's default HTTPS URL, no own domain |
+| Hosting | Google Cloud ($300 free credits), region Frankfurt (`europe-west3`), Google's default HTTPS URL, no own domain; Neo4j Community on a small Compute Engine VM, Postgres on Cloud SQL |
 | ITSG | There is a contact who can answer domain questions and provide data |
 | Git | Work in `ahlemtr/ITSG-Futury-Build-day` itself (no fork), so the whole team sees progress on `main`; one branch + pull request per feature; GitHub Actions (Linux) runs pytest, ruff, tsc and the i18n check on every PR |
-| Roadmap | [`ROADMAP.md`](ROADMAP.md): goals G0–G17 by phase, each one independent, ticked on `main` as work lands |
+| Roadmap | [`ROADMAP.md`](ROADMAP.md): goals G0–G18 by phase, each one independent, ticked on `main` as work lands |
+| Scope order | 02 and 03 are built side by side after the engine is generalised (G2) |
+| Test data | Written by us from the VB and Beispielpapier text, replaced or validated with ITSG's cases when they arrive |
+| Insurer checks | `check_61` / `check_62` become a self-check of the insurer simulator; the platform certifies payroll software only |
+| Calculator | Connected to the 01: expected salary values are computed, not typed into the test data |
+| Expert decisions | A decision applies to its exact signature by default, the expert can widen it to a named pattern; a share of confident verdicts is spot-checked per category; groups of similar decisions become proposed rule definitions; real eVpT decisions are requested from ITSG, synthetic cases until then |
+| Rules as data | Own YAML rule types, readable by domain experts |
+| AI quality bar | A derived rule is accepted only with the same results as the known rule on every test table, plus expert approval |
+| Code agent | Allowed after G11, gated: own branch, rule and calculator modules only, all tests and expert cases must pass, a human merges |
+| AI model | The strongest available OpenAI model for all agents (invalidates the cache once) |
+| Demo AI | Live calls during the demo, cached answers as automatic fallback |
 
 ### Questions for the ITSG contact
 
@@ -161,3 +171,4 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 7. Deadline rules: when each test round is due, how often certified vendors submit permanent test cases (monthly per PTA 8.4?), when the catalogue must be approved before a new version takes effect.
 8. Certification rules: what a new vendor must pass to be certified, and what the certified label unlocks.
 9. Can payroll software clone an employee to start a test branch? What share of eVpT deviations turn out to be allowed variants?
+10. Real past eVpT deviations with the advisor's verdict and reason, as the starting set for expert decisions; example cases with solution files for 02, 03 and the other messages.

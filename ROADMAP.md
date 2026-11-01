@@ -4,7 +4,7 @@ The goal: a near-finished EEL test platform for a live demo to the GKV and ITSG 
 
 How to read this file:
 
-- Work is split into **goals** (G0 to G17). Each goal can be picked up and finished alone. A goal lists what it needs first under "Needs".
+- Work is split into **goals** (G0 to G18). Each goal can be picked up and finished alone. A goal lists what it needs first under "Needs".
 - Phases follow the decided order: **scope → AI rule derivation → hardening**, then demo preparation. There is no schedule: each goal is worked until it is done properly.
 - A task is done when its tests pass in CI. A goal is done when its "Done when" line holds.
 - Tick the boxes on `main` as work lands, so everyone sees the current state.
@@ -13,9 +13,9 @@ How to read this file:
 |---|---|
 | 0 Foundation | G0, G1 |
 | 1 Full EEL scope | G2–G8 |
-| 2 Expert knowledge and AI rule derivation | G9–G12 |
-| 3 Hardening | G13–G16 |
-| 4 Demo | G17 |
+| 2 Expert knowledge and AI rule derivation | G9–G13 |
+| 3 Hardening | G14–G17 |
+| 4 Demo | G18 |
 
 ---
 
@@ -37,7 +37,7 @@ Done when: every push to `main` and every PR shows a green check.
 
 Why: answers from the ITSG contact unblock several scope goals; the English UI is extra work on every new screen.
 
-- [ ] Send the 9 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for VB Anlage 3 and sample files for 02 and 03
+- [ ] Send the 10 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for VB Anlage 3 and example cases with solution files for 02, 03 and the other messages
 - [ ] Record each answer in `PROJECT_REPORT.md` and in the affected rule or parameter
 - [ ] Remove the English locale and the language switch; keep the i18n key structure so texts stay in one place
 - [ ] Update the i18n check to German only
@@ -50,7 +50,7 @@ Needs: nothing.
 
 ## Phase 1: Full EEL scope
 
-Scope as decided: certificates 01, 02, 03, the other messages and error cases. Each certificate goal follows the same pattern: layouts, rules with spec citations, expected chains, test cases (boundary clones and hidden variants), checker labels, insurer replies.
+Scope as decided: certificates 01, 02, 03, the other messages and error cases. G4 (02) and G5 (03) are built side by side. Test cases are written from the VB and Beispielpapier text, then replaced or validated with ITSG's cases when they arrive. Each certificate goal follows the same pattern: layouts, rules with spec citations, expected chains, test cases (boundary clones and hidden variants), checker labels, insurer replies.
 
 ### G2. Generalise the engine beyond prior illnesses
 
@@ -63,7 +63,7 @@ Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scen
 - [ ] Complete the existing rules (`PROJECT_REPORT.md` section 5.2, item 12):
   - [ ] Implement E-3 (an update only in interim flags 3 or 4 does not cancel the earlier 61); today it has a rule card and no code
   - [ ] Compute K61-4 (KZ-NACHWEIS) and K61-5 (KZ-AU) from the case facts; today they are typed into the test data
-  - [ ] Call `check_61` and `check_62` (K61-1..3, K62-1) as a self-check of the insurer simulator, or delete them; today they are never called
+  - [ ] Call `check_61` and `check_62` (K61-1..3, K62-1) on every 61/62 the insurer simulator writes, as a self-check; today they are never called
   - [ ] Complete the DBAN layout (today only KENNUNG)
   - [ ] One test per rule ID, so every rule is shown to be covered
 
@@ -76,7 +76,8 @@ Needs: G0.
 Why: 01 appears in Peter's chain, but only the fields that touch the chain are checked.
 
 - [ ] Rules for all 01 fields and blocks (salary data, working time, one-off payments, contact data) with VB citations
-- [ ] Use the Krankengeld calculator logic for expected salary values where the spec defines them
+- [ ] Connect the Krankengeld calculator: expected salary values on the 01 are computed, not typed into the test data
+- [ ] Extend the calculator to the cases it lacks (Entgeltumwandlung, flexible working time, Altersteilzeit, output-based pay, the special cases of RS Anl. 3 4.1.1.1.1.2)
 - [ ] Test cases: monthly pay, hourly pay, part time, one-off payment, start of employment mid-month, plus hidden variants
 - [ ] Insurer replies to a 01 (62 benefit end, error replies)
 
@@ -139,7 +140,7 @@ Why: the demo story includes a new vendor completing the yearly catalogue and ea
 
 Done when: a fresh vendor account goes from zero to certified in the UI, and the permanent cases appear.
 
-Needs: G2; G13 for real accounts (works with the demo toggle before that).
+Needs: G2; G14 for real accounts (works with the demo toggle before that).
 
 ---
 
@@ -150,23 +151,23 @@ Needs: G2; G13 for real accounts (works with the demo toggle before that).
 Why: the experts who retire take the reasons with them: why a deviation is acceptable, how they read an unclear passage. Today an advisor decision is stored as a precedent with a short optional reason, matched only by its exact signature, with no spec version and no review. Decided cases become the asset the system learns from and the tests every rule change must pass.
 
 - [ ] A decided case stores: the deviation and the case facts, verdict, reason in the expert's words (required), the passages relied on (required), author, date, the spec version or validity date it holds for
-- [ ] Scope per decision: exact signature only, or a wider pattern the expert names
+- [ ] Scope per decision: exact signature by default; the expert can widen it to a named pattern (e.g. any missing DBAP on a 41)
 - [ ] Conflicting decisions on the same situation are flagged and must be resolved; the resolution is recorded
-- [ ] A random sample of confident verdicts (rules, catalogue, precedents) goes to an expert for review, not only the unclear ones
+- [ ] A random sample of confident verdicts (rules, catalogue, precedents) goes to an expert for review, not only the unclear ones; the share is set per category, higher while a category is new and lower as agreement grows
 - [ ] Every confirmed case becomes a regression test that runs in CI
-- [ ] Groups of similar decisions are proposed as a rule or a known variant; an expert approves before it is used
+- [ ] Groups of similar decisions are proposed as a rule definition in the G10 format; an expert approves before it is used
 - [ ] Agreement rate between AI proposal and expert verdict, per category, shown in the UI as the measure of readiness
-- [ ] Ask the ITSG contact for real past eVpT deviations with the advisor's verdict as the starting set
+- [ ] Ask the ITSG contact for real past eVpT deviations with the advisor's verdict as the starting set; until they arrive, use synthetic decided cases, marked as such
 
 Done when: an advisor decision carries its reason, passages and validity, a conflicting decision is caught, and the decision runs as a test.
 
-Needs: G0.
+Needs: G0; G10 for promoting decisions to rules.
 
 ### G10. Rules as data
 
 Why: today rules are hand-coded and the AI only adjusts existing parameters (gap 2 in section 5.2). G10 to G12 let the AI turn spec text into executable rules, while still never computing results itself.
 
-- [ ] Declarative rule types that cover the hand-coded rules: date window, day sum, period chaining, field format, code list, block presence, cross-field consistency
+- [ ] Own YAML rule types, readable by ITSG experts and stored next to `kg/seed/rules.yaml`, that cover the hand-coded rules: date window, day sum, period chaining, field format, code list, block presence, cross-field consistency
 - [ ] The engine interprets these rule definitions; expected results stay deterministic
 - [ ] Re-express the existing 37 rules as data; the old Python and the new definitions must give identical results on all test tables
 
@@ -181,6 +182,7 @@ Needs: G2.
 - [ ] ITSG reviews proposals in the UI (diff against the current rule, affected tests, approve or reject); only approved rules become active
 - [ ] Wire the existing criteria pipeline (`/criteria/extract`) into the UI
 - [ ] A new rule from a spec change creates new test cases through the builder
+- [ ] Switch the agents to the strongest available OpenAI model; re-run the VB 13.4 analysis once so the cache holds the new answers
 
 Done when: uploading a spec change that needs new logic (not just a parameter) ends with an approved, executable rule and new test cases, without a developer.
 
@@ -194,19 +196,35 @@ Needs: G10.
 - [ ] Prompt versions recorded with cached answers so cache invalidation is deliberate
 - [ ] Second real document path: a Rundschreiben or GG update end to end
 
+Quality bar: a derived rule is accepted only if it gives the same results as the known rule on every test table, and an expert approves it.
+
 Done when: the match rate is known and shown in the report, and a prompt change cannot silently lower it.
 
 Needs: G11.
+
+### G13. Gated code agent
+
+Why: some new rules (e.g. a calculation the rule types cannot express) still need code. An agent may write it, but only behind the same guardrails a human change has.
+
+- [ ] Agent works on its own branch and may only change rule and calculator modules, never the checker, the signing or the tests
+- [ ] Its change must pass every existing test, every expert decided case (G9) and the G12 quality bar
+- [ ] It opens a pull request with the diff, the spec passages and the test results; a human merges
+- [ ] Every change is versioned and can be rolled back
+
+Done when: a spec change that needs new code ends in a pull request that passes CI and a human can merge.
+
+Needs: G11, G12.
 
 ---
 
 ## Phase 3: Hardening
 
-### G13. Login and roles
+### G14. Login and roles
 
-- [ ] User table in Postgres: email, password hash (argon2), role (ITSG staff, vendor), company
-- [ ] Login, logout, sessions with secure cookies; password reset by ITSG staff
-- [ ] ITSG staff create vendor accounts; no self sign-up
+- [ ] Login with Clerk: its React components in the UI, its session token verified in FastAPI on every request
+- [ ] Role (ITSG staff, vendor) and company stored on the Clerk user or organisation, mirrored in Postgres for joins
+- [ ] Sign-up restricted: ITSG staff invite vendor accounts; no self sign-up
+- [ ] Check where Clerk stores account data and record it in `PROJECT_REPORT.md` (the GKV audience will ask)
 - [ ] Every endpoint checks role and company; vendors see only their own runs and reports
 - [ ] Hidden test expectations and the reset endpoint protected on the server, not only in the UI
 - [ ] Replace the ITSG/vendor demo toggle with real accounts; seed demo accounts for the pitch
@@ -215,34 +233,34 @@ Done when: tests prove a vendor cannot read another vendor's data or any hidden 
 
 Needs: G0.
 
-### G14. Security measures
+### G15. Security measures
 
 - [ ] Upload limits (size, type, count), safe file names, no path traversal under `DATA_DIR`
 - [ ] Rate limits on login and AI endpoints; AI cost cap per day
 - [ ] CORS limited to the UI origin; security headers; HTTPS only
 - [ ] Audit log of logins, uploads, approvals and advisor decisions
-- [ ] Secrets (OpenAI key, DB passwords, signing key) in Google Secret Manager, never in the image
+- [ ] Secrets (OpenAI key, Clerk keys, DB passwords, signing key) in Google Secret Manager, never in the image
 - [ ] Dependency and container scanning in CI
 
 Done when: a checklist review passes and is recorded in `PROJECT_REPORT.md`.
 
-Needs: G13.
+Needs: G14.
 
-### G15. Google Cloud deployment
+### G16. Google Cloud deployment
 
-Budget: $300 free credits; keep a budget alert.
+Budget: $300 free credits; keep a budget alert. Region: Frankfurt (`europe-west3`), so data stays in Germany.
 
 - [ ] API and UI on Cloud Run (UI as static files behind the API or its own service)
-- [ ] Postgres on Cloud SQL (smallest instance), Neo4j on a small Compute Engine VM
+- [ ] Postgres on Cloud SQL (smallest instance), Neo4j Community in Docker on a small Compute Engine VM in the same region
 - [ ] `DATA_DIR` files, `kg/build/` and `data/llm_cache/` on Cloud Storage
 - [ ] Deploy from `main` with GitHub Actions after CI passes
 - [ ] Budget alert and a cost estimate in `PROJECT_REPORT.md`
 
 Done when: the platform runs on Google's default HTTPS URL and a push to `main` updates it.
 
-Needs: G0; G14 for the secrets part.
+Needs: G0; G15 for the secrets part.
 
-### G16. Reliability
+### G17. Reliability
 
 - [ ] PDF reports work in the deployed image (WeasyPrint)
 - [ ] Health checks, structured logs, error pages that do not leak internals
@@ -252,17 +270,17 @@ Needs: G0; G14 for the secrets part.
 
 Done when: a restore from backup and a full demo run work on the deployed instance.
 
-Needs: G15.
+Needs: G16.
 
 ---
 
 ## Phase 4: Demo
 
-### G17. Demo for 11 December
+### G18. Demo for 11 December
 
 - [ ] Demo script: vendor run with full EEL coverage, deviations judged, VB 13.4 upload, rules and tests update, signed report, new vendor reaching the certified label
 - [ ] Demo data and accounts, seeded by one command
-- [ ] Offline fallback: cached AI answers and a local run if the network fails
+- [ ] AI calls run live during the demo; cached answers take over automatically if the network or OpenAI fails; a local run as last resort
 - [ ] Answers ready for expected questions (data protection, AI errors, cost, how ITSG would run it)
 - [ ] Update `README.md` and `PROJECT_REPORT.md` to the delivered state; slides
 - [ ] Two full rehearsals on the deployed instance
