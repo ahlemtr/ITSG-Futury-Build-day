@@ -1,5 +1,7 @@
 from datetime import date
 
+import pytest
+
 from engine.expected import build_chain, load_scenario
 from engine.records import parse_file
 from engine.writer_messages import chain_files, write_file
@@ -15,6 +17,7 @@ def test_scenarios_load(kb):
         assert sc.extras["person"]["familienname"] == "Mustermann"
 
 
+@pytest.mark.rules("K62-2")
 def test_peter_chain(kb):
     ch = build_chain(load_scenario(kb, "peter"), "13.4", kb)
     assert [m.abgabegrund for m in ch.messages] == ["41", "61", "01", "61", "88", "01", "62"]

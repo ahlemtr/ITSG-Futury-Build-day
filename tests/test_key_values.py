@@ -2,6 +2,8 @@
 
 from datetime import date
 
+import pytest
+
 from engine.checker import Checker
 from engine.records import parse_file
 from engine.rules import formats
@@ -32,6 +34,7 @@ def test_itsg_file_passes(kb):
     assert all(formats.check_key_values(m) == [] for m in msgs)
 
 
+@pytest.mark.rules("S-1")
 def test_unknown_code_is_invalid(kb):
     rec = next(m for m in parse_file(_with_grundav(kb, "7"), kb, "13.3").messages if m.abgabegrund == "41")
     [r] = formats.check_key_values(rec)

@@ -1,0 +1,1621 @@
+{
+ "chains": {
+  "bp-13-1": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-25"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-bp-13-1-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260831000000000000000000120260601202606250000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 32
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-25"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-bp-13-1-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260831000000000000000000120260601202606250000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 32
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-25"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-bp-13-1-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260831000000000000000000120260601202606250000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 32
+   }
+  },
+  "bp-13-2": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-25"
+     ],
+     [
+      "2026-05-03",
+      "2026-05-06"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-bp-13-2-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO12026083100000000000000000022026060120260625000000000000000000000000000000000020260503202605060000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 36
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-25"
+     ],
+     [
+      "2026-05-03",
+      "2026-05-06"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-bp-13-2-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO12026083100000000000000000022026060120260625000000000000000000000000000000000020260503202605060000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 36
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-25"
+     ],
+     [
+      "2026-05-03",
+      "2026-05-06"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-bp-13-2-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO12026083100000000000000000022026060120260625000000000000000000000000000000000020260503202605060000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 36
+   }
+  },
+  "bp-13-3": {
+   "13.3": {
+    "chain": [],
+    "efz": {},
+    "failed": [
+     "R41-2"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": null
+   },
+   "13.4": {
+    "chain": [],
+    "efz": {},
+    "failed": [
+     "R41-2"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": null
+   },
+   "sim-13.5": {
+    "chain": [],
+    "efz": {},
+    "failed": [
+     "R41-2"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": null
+   }
+  },
+  "bp-13-4": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-10"
+     ],
+     [
+      "2026-05-03",
+      "2026-05-06"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 23
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-10"
+     ],
+     [
+      "2026-05-03",
+      "2026-05-06"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 23
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-10"
+     ],
+     [
+      "2026-05-03",
+      "2026-05-06"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 23
+   }
+  },
+  "bp-13-5": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-10"
+     ],
+     [
+      "2026-05-03",
+      "2026-05-06"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 23
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-10"
+     ],
+     [
+      "2026-05-03",
+      "2026-05-06"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 23
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-06-01",
+      "2026-06-10"
+     ],
+     [
+      "2026-05-03",
+      "2026-05-06"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 23
+   }
+  },
+  "peter": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {
+     "after_corrected_61": "2026-03-27",
+     "after_first_61": "2026-03-30"
+    },
+    "failed": [],
+    "files": {
+     "TEEK0-peter-s2-61": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       61616161-0001-4000-8000-000000000001               0000000000000000000000000000                      N61000JNNNNNNNNNJNNNNNNJNDBNAMustermann                    Peter                                                                                      DBVO120260311202603110202507140420260301202603034000000000000000030000000000000000202512012025120310000000000000000100000000000000002025100120251017100000000000000001000000000000000020250714202507151000000000000000010000000000000000DBID                    1234-5678-007       11111111-2222-AAAA-EEEE-111111111111\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEK0-peter-s4-61": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       61616161-0002-4000-8000-000000000002               0000000000000000000000000000                      N61000JNNNNNNNNNJNNNNNNJNDBNAMustermann                    Peter                                                                                      DBVO120260311202603110202507140420260301202603031000000000000000010000000000000000202512012025120310000000000000000100000000000000002025100120251017100000000000000001000000000000000020250714202507151000000000000000010000000000000000DBID                    1234-5678-007       11111111-2222-AAAA-EEEE-111111111111\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEK0-peter-s7-62": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       62626262-0001-4000-8000-000000000001               0000000000000000000000000000                      N62000JNNNNJNNNNNNNNNNNJNDBNAMustermann                    Peter                                                                                      DBEE20260328202603282026033199DBID                    1234-5678-007       11112222-FFFF-3333-5555-CCCCCCCCCCCC\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEL0-peter-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000420260301202603030000000000000000000000000000000000202512012025120300000000000000000000000000000000002025100120251017000000000000000000000000000000000020250714202507150000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEL0-peter-r2": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       AAAAAAAA-EEEE-2222-4444-BBBBBBBBBBBB765432166666XXX0000000000000000000000000000                      N01001JNJJNNNNNNNNNNNNJJNDBNAMustermann                    Peter                                                                                      DBAL20260311020260330202603310000000000N0N0000000000000000000000000000000000000000000000000DBAE00000000000000002026020120260228003500000023000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEL0-peter-r3": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       BBBBBBBB-8888-5555-CCCC-121212121212765432166666XXX0000000000000000000000000000                      N88011NNNNNNNNNNNNNNNNNNJDBSDAAAAAAAA-EEEE-2222-4444-BBBBBBBBBBBBPeter                         Mustermann                    1234-5678-007       \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11112222-FFFF-3333-5555-CCCCCCCCCCCC765432166666XXX0000000000000000000000000000                      N01001JNJJNNNNNNNNNNNNJJNDBNAMustermann                    Peter                                                                                      DBAL20260311020260327202603310000000000N0N0000000000000000000000000000000000000000000000000DBAE00000000000000002026020120260228003500000023000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ],
+     [
+      2,
+      1,
+      "insurer",
+      "61"
+     ],
+     [
+      3,
+      2,
+      "employer",
+      "01"
+     ],
+     [
+      4,
+      2,
+      "insurer",
+      "61"
+     ],
+     [
+      5,
+      3,
+      "employer",
+      "88"
+     ],
+     [
+      6,
+      3,
+      "employer",
+      "01"
+     ],
+     [
+      7,
+      3,
+      "insurer",
+      "62"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 35
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {
+     "after_corrected_61": "2026-03-27",
+     "after_first_61": "2026-03-30"
+    },
+    "failed": [],
+    "files": {
+     "TEEK0-peter-s2-61": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       61616161-0001-4000-8000-000000000001               0000000000000000000000000000                      N61000JNNNNNNNNNJNNNNNNJNDBNAMustermann                    Peter                                                                                      DBVO120260311202603110202507140420260301202603034000000000000000030000000000000000202512012025120310000000000000000100000000000000002025100120251017100000000000000001000000000000000020250714202507151000000000000000010000000000000000DBID                    1234-5678-007       11111111-2222-AAAA-EEEE-111111111111\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEK0-peter-s4-61": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       61616161-0002-4000-8000-000000000002               0000000000000000000000000000                      N61000JNNNNNNNNNJNNNNNNJNDBNAMustermann                    Peter                                                                                      DBVO120260311202603110202507140420260301202603031000000000000000010000000000000000202512012025120310000000000000000100000000000000002025100120251017100000000000000001000000000000000020250714202507151000000000000000010000000000000000DBID                    1234-5678-007       11111111-2222-AAAA-EEEE-111111111111\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEK0-peter-s7-62": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       62626262-0001-4000-8000-000000000001               0000000000000000000000000000                      N62000JNNNNJNNNNNNNNNNNJNDBNAMustermann                    Peter                                                                                      DBEE20260328202603282026033199DBID                    1234-5678-007       11112222-FFFF-3333-5555-CCCCCCCCCCCC\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEL0-peter-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000420260301202603030000000000000000000000000000000000202512012025120300000000000000000000000000000000002025100120251017000000000000000000000000000000000020250714202507150000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEL0-peter-r2": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       AAAAAAAA-EEEE-2222-4444-BBBBBBBBBBBB765432166666XXX0000000000000000000000000000                      N01001JNJJNNNNNNNNNNNNJJNDBNAMustermann                    Peter                                                                                      DBAL20260311020260330202603310000000000N0N0000000000000000000000000000000000000000000000000DBAE00000000000000002026020120260228003500000023000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEL0-peter-r3": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       BBBBBBBB-8888-5555-CCCC-121212121212765432166666XXX0000000000000000000000000000                      N88011NNNNNNNNNNNNNNNNNNJDBSDAAAAAAAA-EEEE-2222-4444-BBBBBBBBBBBBPeter                         Mustermann                    1234-5678-007       \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11112222-FFFF-3333-5555-CCCCCCCCCCCC765432166666XXX0000000000000000000000000000                      N01001JNJJNNNNNNNNNNNNJJNDBNAMustermann                    Peter                                                                                      DBAL20260311020260327202603310000000000N0N0000000000000000000000000000000000000000000000000DBAE00000000000000002026020120260228003500000023000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ],
+     [
+      2,
+      1,
+      "insurer",
+      "61"
+     ],
+     [
+      3,
+      2,
+      "employer",
+      "01"
+     ],
+     [
+      4,
+      2,
+      "insurer",
+      "61"
+     ],
+     [
+      5,
+      3,
+      "employer",
+      "88"
+     ],
+     [
+      6,
+      3,
+      "employer",
+      "01"
+     ],
+     [
+      7,
+      3,
+      "insurer",
+      "62"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 35
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {
+     "after_corrected_61": "2026-03-27",
+     "after_first_61": "2026-03-30"
+    },
+    "failed": [],
+    "files": {
+     "TEEK0-peter-s2-61": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       61616161-0001-4000-8000-000000000001               0000000000000000000000000000                      N61000JNNNNNNNNNJNNNNNNJNDBNAMustermann                    Peter                                                                                      DBVO120260311202603110202507140420260301202603034000000000000000030000000000000000202512012025120310000000000000000100000000000000002025100120251017100000000000000001000000000000000020250714202507151000000000000000010000000000000000DBID                    1234-5678-007       11111111-2222-AAAA-EEEE-111111111111\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEK0-peter-s4-61": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       61616161-0002-4000-8000-000000000002               0000000000000000000000000000                      N61000JNNNNNNNNNJNNNNNNJNDBNAMustermann                    Peter                                                                                      DBVO120260311202603110202507140420260301202603031000000000000000010000000000000000202512012025120310000000000000000100000000000000002025100120251017100000000000000001000000000000000020250714202507151000000000000000010000000000000000DBID                    1234-5678-007       11111111-2222-AAAA-EEEE-111111111111\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEK0-peter-s7-62": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       62626262-0001-4000-8000-000000000001               0000000000000000000000000000                      N62000JNNNNJNNNNNNNNNNNJNDBNAMustermann                    Peter                                                                                      DBEE20260328202603282026033199DBID                    1234-5678-007       11112222-FFFF-3333-5555-CCCCCCCCCCCC\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEL0-peter-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000420260301202603030000000000000000000000000000000000202512012025120300000000000000000000000000000000002025100120251017000000000000000000000000000000000020250714202507150000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEL0-peter-r2": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       AAAAAAAA-EEEE-2222-4444-BBBBBBBBBBBB765432166666XXX0000000000000000000000000000                      N01001JNJJNNNNNNNNNNNNJJNDBNAMustermann                    Peter                                                                                      DBAL20260311020260330202603310000000000N0N0000000000000000000000000000000000000000000000000DBAE00000000000000002026020120260228003500000023000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+     "TEEL0-peter-r3": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       BBBBBBBB-8888-5555-CCCC-121212121212765432166666XXX0000000000000000000000000000                      N88011NNNNNNNNNNNNNNNNNNJDBSDAAAAAAAA-EEEE-2222-4444-BBBBBBBBBBBBPeter                         Mustermann                    1234-5678-007       \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11112222-FFFF-3333-5555-CCCCCCCCCCCC765432166666XXX0000000000000000000000000000                      N01001JNJJNNNNNNNNNNNNJJNDBNAMustermann                    Peter                                                                                      DBAL20260311020260327202603310000000000N0N0000000000000000000000000000000000000000000000000DBAE00000000000000002026020120260228003500000023000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ],
+     [
+      2,
+      1,
+      "insurer",
+      "61"
+     ],
+     [
+      3,
+      2,
+      "employer",
+      "01"
+     ],
+     [
+      4,
+      2,
+      "insurer",
+      "61"
+     ],
+     [
+      5,
+      3,
+      "employer",
+      "88"
+     ],
+     [
+      6,
+      3,
+      "employer",
+      "01"
+     ],
+     [
+      7,
+      3,
+      "insurer",
+      "62"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 35
+   }
+  },
+  "peter-b27": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 27
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 27
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 27
+   }
+  },
+  "peter-b28": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 28
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 28
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-b28-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000420260301202603030000000000000000000000000000000000202512012025120300000000000000000000000000000000002025100120251017000000000000000000000000000000000020250714202507150000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 28
+   }
+  },
+  "peter-b29": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 29
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 29
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-b29-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000420260301202603030000000000000000000000000000000000202512012025120300000000000000000000000000000000002025100120251017000000000000000000000000000000000020250714202507150000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 29
+   }
+  },
+  "peter-b30": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-b30-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000420260301202603030000000000000000000000000000000000202512012025120300000000000000000000000000000000002025100120251017000000000000000000000000000000000020250714202507150000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 30
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-b30-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000420260301202603030000000000000000000000000000000000202512012025120300000000000000000000000000000000002025100120251017000000000000000000000000000000000020250714202507150000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 30
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-10-01",
+      "2025-10-17"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-b30-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000420260301202603030000000000000000000000000000000000202512012025120300000000000000000000000000000000002025100120251017000000000000000000000000000000000020250714202507150000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 30
+   }
+  },
+  "peter-gap-exact": {
+   "13.3": {
+    "chain": [],
+    "efz": {},
+    "failed": [
+     "R41-2"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": null
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2025-08-07",
+      "2025-09-11"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-gap-exact-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000120250807202509110000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 46
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2025-08-07",
+      "2025-09-11"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-gap-exact-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000120250807202509110000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 46
+   }
+  },
+  "peter-gap-exact-hidden": {
+   "13.3": {
+    "chain": [],
+    "efz": {},
+    "failed": [
+     "R41-2"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": null
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2025-07-27",
+      "2025-08-31"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-gap-exact-hidden-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260228000000000000000000120250727202508310000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 46
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2025-07-27",
+      "2025-08-31"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-gap-exact-hidden-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260228000000000000000000120250727202508310000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 46
+   }
+  },
+  "peter-gap-in": {
+   "13.3": {
+    "chain": [
+     [
+      "2025-08-08",
+      "2025-09-12"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-gap-in-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000120250808202509120000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 46
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2025-08-08",
+      "2025-09-12"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-gap-in-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000120250808202509120000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 46
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2025-08-08",
+      "2025-09-12"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-gap-in-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260311000000000000000000120250808202509120000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 46
+   }
+  },
+  "peter-gap-out": {
+   "13.3": {
+    "chain": [],
+    "efz": {},
+    "failed": [
+     "R41-2"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": null
+   },
+   "13.4": {
+    "chain": [],
+    "efz": {},
+    "failed": [
+     "R41-2"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": null
+   },
+   "sim-13.5": {
+    "chain": [],
+    "efz": {},
+    "failed": [
+     "R41-2"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": null
+   }
+  },
+  "peter-hidden": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-04-07",
+      "2026-04-09"
+     ],
+     [
+      "2026-01-07",
+      "2026-01-09"
+     ],
+     [
+      "2025-11-07",
+      "2025-11-23"
+     ],
+     [
+      "2025-08-20",
+      "2025-08-21"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-hidden-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260417000000000000000000420260407202604090000000000000000000000000000000000202601072026010900000000000000000000000000000000002025110720251123000000000000000000000000000000000020250820202508210000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 35
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-04-07",
+      "2026-04-09"
+     ],
+     [
+      "2026-01-07",
+      "2026-01-09"
+     ],
+     [
+      "2025-11-07",
+      "2025-11-23"
+     ],
+     [
+      "2025-08-20",
+      "2025-08-21"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-hidden-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260417000000000000000000420260407202604090000000000000000000000000000000000202601072026010900000000000000000000000000000000002025110720251123000000000000000000000000000000000020250820202508210000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 35
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-04-07",
+      "2026-04-09"
+     ],
+     [
+      "2026-01-07",
+      "2026-01-09"
+     ],
+     [
+      "2025-11-07",
+      "2025-11-23"
+     ],
+     [
+      "2025-08-20",
+      "2025-08-21"
+     ]
+    ],
+    "efz": {},
+    "failed": [],
+    "files": {
+     "TEEL0-peter-hidden-r1": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST99302811       00000000       13202602140941080000000017241280Q4971980122499302811       11111111-2222-AAAA-EEEE-111111111111765432166666XXX0000000000000000000000000000                      N41001JNNNNNNNNNJNNNNNJJNDBNAMustermann                    Peter                                                                                      DBVO120260417000000000000000000420260407202604090000000000000000000000000000000000202601072026010900000000000000000000000000000000002025110720251123000000000000000000000000000000000020250820202508210000000000000000000000000000000000DBAPMia Testfrau                  069-8700                                systemuntersuchung@itsg.de                                            Testfirma Qualitätskontrolle  Einzugsstellen-SVT            ITSG GmbH                     63067     Offenbach                         Kaiserleistrasse                 10-16    DBID                    1234-5678-007                                           \r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n"
+    },
+    "messages": [
+     [
+      1,
+      1,
+      "employer",
+      "41"
+     ]
+    ],
+    "send_41": true,
+    "total_days": 35
+   }
+  },
+  "peter-noteless": {
+   "13.3": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 18
+   },
+   "13.4": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 18
+   },
+   "sim-13.5": {
+    "chain": [
+     [
+      "2026-03-01",
+      "2026-03-03"
+     ],
+     [
+      "2025-12-01",
+      "2025-12-03"
+     ],
+     [
+      "2025-07-14",
+      "2025-07-15"
+     ]
+    ],
+    "efz": {},
+    "failed": [
+     "R41-4"
+    ],
+    "files": {},
+    "messages": [],
+    "send_41": false,
+    "total_days": 18
+   }
+  },
+  "ta-167": {
+   "13.3": {
+    "error": "AttributeError: 'NoneType' object has no attribute 'model_dump'"
+   },
+   "13.4": {
+    "error": "AttributeError: 'NoneType' object has no attribute 'model_dump'"
+   },
+   "sim-13.5": {
+    "error": "AttributeError: 'NoneType' object has no attribute 'model_dump'"
+   }
+  },
+  "ta-168": {
+   "13.3": {
+    "error": "AttributeError: 'NoneType' object has no attribute 'model_dump'"
+   },
+   "13.4": {
+    "error": "AttributeError: 'NoneType' object has no attribute 'model_dump'"
+   },
+   "sim-13.5": {
+    "error": "AttributeError: 'NoneType' object has no attribute 'model_dump'"
+   }
+  }
+ },
+ "checks": {
+  "s-insurer-field@2027-01-01": {
+   "counts": {
+    "invalid": 1
+   },
+   "deviations": [
+    {
+     "abgabegrund": "41",
+     "actual": "2026-03-11",
+     "expected": null,
+     "field": "AU-AB-SV",
+     "kind": "value_differs",
+     "label": "invalid",
+     "record": "DBVO",
+     "resolved_by": "rules",
+     "rule": "F41-6",
+     "step": 1
+    }
+   ],
+   "label": "invalid",
+   "version": "13.4"
+  },
+  "s-itsg-ref@2027-01-01": {
+   "counts": {},
+   "deviations": [],
+   "label": "exact_match",
+   "version": "13.4"
+  },
+  "s-legacy-1@2026-11-01": {
+   "counts": {},
+   "deviations": [],
+   "label": "exact_match",
+   "version": "13.3"
+  },
+  "s-legacy-1@2027-01-01": {
+   "counts": {
+    "bug": 1
+   },
+   "deviations": [
+    {
+     "abgabegrund": "41",
+     "actual": null,
+     "expected": "41",
+     "field": "ABGABEGRUND",
+     "kind": "missing_message",
+     "label": "bug",
+     "record": "DSLW",
+     "resolved_by": "rules",
+     "rule": "R41-2",
+     "step": 1
+    }
+   ],
+   "label": "bug",
+   "version": "13.4"
+  },
+  "s-legacy-hidden@2027-01-01": {
+   "counts": {
+    "bug": 1
+   },
+   "deviations": [
+    {
+     "abgabegrund": "41",
+     "actual": null,
+     "expected": "41",
+     "field": "ABGABEGRUND",
+     "kind": "missing_message",
+     "label": "bug",
+     "record": "DSLW",
+     "resolved_by": "rules",
+     "rule": "R41-2",
+     "step": 1
+    }
+   ],
+   "label": "bug",
+   "version": "13.4"
+  },
+  "s-missing-july@2027-01-01": {
+   "counts": {
+    "bug": 1
+   },
+   "deviations": [
+    {
+     "abgabegrund": "41",
+     "actual": null,
+     "expected": "2025-07-14..2025-07-15",
+     "field": "BEGINN-AU",
+     "kind": "missing_group",
+     "label": "bug",
+     "record": "DBVO",
+     "resolved_by": "rules",
+     "rule": "R41-3",
+     "step": 1
+    }
+   ],
+   "label": "bug",
+   "version": "13.4"
+  },
+  "s-no-contact@2027-01-01": {
+   "counts": {
+    "unclear": 1
+   },
+   "deviations": [
+    {
+     "abgabegrund": "41",
+     "actual": "N",
+     "expected": "J",
+     "field": "MM-ANSPRECH",
+     "kind": "missing_block",
+     "label": "unclear",
+     "record": "DSLW",
+     "resolved_by": null,
+     "rule": null,
+     "step": 1
+    }
+   ],
+   "label": "unclear",
+   "version": "13.4"
+  },
+  "s-stale-efz@2027-01-01": {
+   "counts": {
+    "bug": 2
+   },
+   "deviations": [
+    {
+     "abgabegrund": "88",
+     "actual": null,
+     "expected": "88",
+     "field": "ABGABEGRUND",
+     "kind": "missing_message",
+     "label": "bug",
+     "record": "DSLW",
+     "resolved_by": "rules",
+     "rule": "E-2",
+     "step": 5
+    },
+    {
+     "abgabegrund": "01",
+     "actual": "2026-03-30",
+     "expected": "2026-03-27",
+     "field": "DATUM-EGZBIS",
+     "kind": "value_differs",
+     "label": "bug",
+     "record": "DBAL",
+     "resolved_by": "rules",
+     "rule": "E-1",
+     "step": 6
+    }
+   ],
+   "label": "bug",
+   "version": "13.4"
+  },
+  "s-three-periods@2027-01-01": {
+   "counts": {
+    "correct_variant": 1
+   },
+   "deviations": [
+    {
+     "abgabegrund": "41",
+     "actual": null,
+     "expected": "2025-12-01..2025-12-03",
+     "field": "BEGINN-AU",
+     "kind": "missing_group",
+     "label": "correct_variant",
+     "record": "DBVO",
+     "resolved_by": "rules",
+     "rule": "R41-3",
+     "step": 1
+    }
+   ],
+   "label": "correct_variant",
+   "version": "13.4"
+  },
+  "s-variant@2027-01-01": {
+   "counts": {},
+   "deviations": [],
+   "label": "exact_match",
+   "version": "13.4"
+  },
+  "s-wrong-order@2027-01-01": {
+   "counts": {
+    "bug": 1
+   },
+   "deviations": [
+    {
+     "abgabegrund": "41",
+     "actual": "['2025-07-14..2025-07-15', '2025-10-01..2025-10-17', '2025-12-01..2025-12-03', '2026-03-01..2026-03-03']",
+     "expected": "['2026-03-01..2026-03-03', '2025-12-01..2025-12-03', '2025-10-01..2025-10-17', '2025-07-14..2025-07-15']",
+     "field": "BEGINN-AU",
+     "kind": "order_differs",
+     "label": "bug",
+     "record": "DBVO",
+     "resolved_by": "rules",
+     "rule": "F41-8",
+     "step": 1
+    }
+   ],
+   "label": "bug",
+   "version": "13.4"
+  }
+ },
+ "peter_run": {
+  "last_round": 4,
+  "rounds": [
+   {
+    "ended": false,
+    "outcomes": [
+     [
+      "R41-1",
+      "pass"
+     ],
+     [
+      "R41-2",
+      "pass"
+     ],
+     [
+      "R41-3",
+      "pass"
+     ],
+     [
+      "R41-4",
+      "pass"
+     ],
+     [
+      "R41-5",
+      "pass"
+     ],
+     [
+      "R41-6",
+      "pass"
+     ]
+    ],
+    "reply": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       61616161-0001-4000-8000-000000000001               0000000000000000000000000000                      N61000JNNNNNNNNNJNNNNNNJNDBNAMustermann                    Peter                                                                                      DBVO120260311202603110202507140420260301202603034000000000000000030000000000000000202512012025120310000000000000000100000000000000002025100120251017100000000000000001000000000000000020250714202507151000000000000000010000000000000000DBID                    1234-5678-007       11111111-2222-AAAA-EEEE-111111111111\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+    "reply_name": "TEEK0-peter-r1",
+    "round": 1
+   },
+   {
+    "ended": false,
+    "outcomes": [],
+    "reply": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       61616161-0002-4000-8000-000000000002               0000000000000000000000000000                      N61000JNNNNNNNNNJNNNNNNJNDBNAMustermann                    Peter                                                                                      DBVO120260311202603110202507140420260301202603031000000000000000010000000000000000202512012025120310000000000000000100000000000000002025100120251017100000000000000001000000000000000020250714202507151000000000000000010000000000000000DBID                    1234-5678-007       11111111-2222-AAAA-EEEE-111111111111\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+    "reply_name": "TEEK0-peter-r2",
+    "round": 2
+   },
+   {
+    "ended": false,
+    "outcomes": [],
+    "reply": "VOSZAGEEL99302811       00000000       20260214000001ITSG GmbH                                         01\r\nDSKOLEIST99302811       00000000       04202602141313030000000012587964       765432166666XXXMia Testfrau                                                                              63067     Offenbach                         Kaiserleistraße                           WTestfrau                      069/8700                                systemuntersuchung@gmx.de                                      \r\nDSLWLEIST00000000       99302811       13202602140941080000000017241280Q4971980122499302811       62626262-0001-4000-8000-000000000001               0000000000000000000000000000                      N62000JNNNNJNNNNNNNNNNNJNDBNAMustermann                    Peter                                                                                      DBEE20260328202603282026033199DBID                    1234-5678-007       11112222-FFFF-3333-5555-CCCCCCCCCCCC\r\nNCSZAGEEL99302811       00000000       202602140000010000000201\r\n",
+    "reply_name": "TEEK0-peter-r3",
+    "round": 3
+   },
+   {
+    "ended": false,
+    "outcomes": [],
+    "reply": null,
+    "reply_name": null,
+    "round": 4
+   }
+  ],
+  "status": "passed"
+ }
+}

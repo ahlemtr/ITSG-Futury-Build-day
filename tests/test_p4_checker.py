@@ -30,6 +30,7 @@ def test_diff_reference_vs_generated(kb, itsg_bytes):
     assert [x.kind for x in d] == ["missing_message"]
 
 
+@pytest.mark.rules("R41-2", "R41-3", "F41-6", "F41-8", "E-1", "E-2")
 @pytest.mark.parametrize("sid", [x[0] for x in SEED_TABLE])
 def test_seed_labels(kb, sid, seeds):
     s = seeds[sid]
@@ -53,6 +54,7 @@ def test_legacy_rule_set_by_date(kb, seeds):
     assert "BVORERK@1#0cefe80e" in res.deviations[0].sources
 
 
+@pytest.mark.rules("C-1", "C-2")
 def test_reused_dsid_and_azvu(kb):
     _, files = _peter(kb)
     r2 = files["TEEL0-peter-r2"].replace("AAAAAAAA-EEEE-2222-4444-BBBBBBBBBBBB", "11111111-2222-AAAA-EEEE-111111111111")

@@ -24,6 +24,7 @@ def test_params_by_date_and_version(kb):
     assert params.version_on(kb, D("2026-11-01")) == "13.3"
 
 
+@pytest.mark.rules("R41-1", "R41-2", "R41-3", "R41-4", "R41-5")
 @pytest.mark.parametrize("version", VERSIONS)
 @pytest.mark.parametrize("case", CASES)
 def test_rules_table(kb, case, version):
@@ -37,6 +38,7 @@ def test_rules_table(kb, case, version):
         assert d.total_days == exp.total_days
 
 
+@pytest.mark.rules("R41-6")
 def test_bp_13_5_counts_until_0809(kb):
     tc = get_case(kb, "bp-13-5")
     d = must_send_41(tc.inputs.current, tc.inputs.priors, tc.inputs.report_date, params.load(kb, version="13.4"))
@@ -54,6 +56,7 @@ def test_month_end():
     assert add_months(D("2025-08-31"), 6) == D("2026-02-28")
 
 
+@pytest.mark.rules("R41-2", "R41-4")
 def test_deciding_rule(kb):
     p = params.load(kb, version="13.4")
     for case, rule in [("peter-gap-exact", "R41-2"), ("peter-b30", "R41-4")]:
@@ -65,6 +68,7 @@ def _g(s, e, nw, au):
     return {"BEGINN-AU": D(s), "ENDE-AU": D(e), "KZ-NACHWEIS": nw, "KZ-AU": au}
 
 
+@pytest.mark.rules("E-1")
 def test_efz_end(kb):
     p = params.load(kb, version="13.4")
     first = [_g("2026-03-01", "2026-03-03", 4, 3), _g("2025-12-01", "2025-12-03", 1, 1),
@@ -74,6 +78,7 @@ def test_efz_end(kb):
     assert efz_end(D("2026-03-11"), corrected, p)[0] == D("2026-03-27")
 
 
+@pytest.mark.rules("F41-6", "C-1")
 def test_format_checks(kb, itsg_bytes):
     m = parse_file(itsg_bytes, kb).messages[0]
     res = formats.check_41_format(m, D("2026-03-11"))
