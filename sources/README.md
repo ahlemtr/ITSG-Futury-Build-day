@@ -19,6 +19,6 @@ Everything the platform reads or is checked against. File names are kept as publ
 
 ## Not yet wired in
 
-VB Anlagen 2 and 3, `beispielpapier/` BP 13.2 and everything in `pflichtenheft/` are not in `kg/seed/documents.yaml` yet (roadmap G2 and G11a). `EEL/` (the official core check, internal code of AOK Systems) is kept out of Git: copy it in locally (roadmap G7). The seed still cites the 2027 Beispielpapier as `BP@13.3` for 2026 as well; G2 fixes the labels.
+VB Anlage 2 and everything in `pflichtenheft/` are not in `kg/seed/documents.yaml` yet (roadmap G7 and G11a); the Pflichtenheft Anlage 19 was read by hand for the DBAN layout and the criterion IDs of R41-5 to R41-8. VB Anlage 3 and BP 13.2 are wired in since G2 (BP 13.2 is cited for 2026, BP 13.3 for 2027). `EEL/` (the official core check, internal code of AOK Systems) is kept out of Git: copy it in locally (roadmap G7).
 
 These documents keep their publishers' copyright notices.
