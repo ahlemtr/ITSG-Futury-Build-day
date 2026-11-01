@@ -37,7 +37,7 @@ Done when: every push to `main` and every PR shows a green check.
 
 Why: answers from the ITSG contact unblock several scope goals; the English UI is extra work on every new screen.
 
-- [ ] Send the 14 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for example cases with solution files for 02, 03 and the other messages
+- [ ] Send the 14 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for VB Anlage 2 (error catalogue) and example cases with solution files for 02, 03 and the other messages
 - [ ] Record each answer in `PROJECT_REPORT.md` and in the affected rule or parameter
 - [ ] Remove the English locale and the language switch; keep the i18n key structure so texts stay in one place
 - [ ] Update the i18n check to German only
