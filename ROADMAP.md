@@ -37,7 +37,7 @@ Done when: every push to `main` and every PR shows a green check.
 
 Why: answers from the ITSG contact unblock several scope goals; the English UI is extra work on every new screen.
 
-- [ ] Send the 14 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for VB Anlage 2 (error catalogue) and example cases with solution files for 02, 03 and the other messages
+- [ ] Send the 14 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for example cases with solution files for 02, 03 and the other messages
 - [ ] Record each answer in `PROJECT_REPORT.md` and in the affected rule or parameter
 - [ ] Remove the English locale and the language switch; keep the i18n key structure so texts stay in one place
 - [ ] Update the i18n check to German only
@@ -153,6 +153,8 @@ Why: the demo should show complex situations, not only the happy path.
 
 - [ ] **Official core check as the first checking step** (`sources/EEL/`, Kernprüfung EEL 13.00.05 by AOK Systems, the same check the insurers run on every file): run it as a small Java sidecar (Java 11+) from the intake step; a form error becomes "invalid" with the official error number and text (657 texts, all data blocks of all 22 codes)
 - [ ] Retire our own format rules (F41, S-1) where the core check covers them; keep only what it does not check
+- [ ] Check the file envelope ourselves: VB Anlage 2 says the checks of VOSZ, DSKO and NCSZ (about 50 error numbers) are not in the core check and every receiver implements them itself
+- [ ] Error texts and severity from VB Anlage 2 (`sources/vb/`, 13.1.3 and 13.1.4, picked by validity date): a numeric 5th character is a core-check error, "v" a binding check, "e" only recommended (a warning, not "invalid"), "H" a hint, A/D/E/I/K/L a check of one insurer association; checking stops after more than 8 errors
 - [ ] Turn the core check's 247 test files (broken records, each with the error number it must produce) into the broken-files corpus
 - [ ] Store core-check releases with their dates and the Anlage 1 version they check (13.00.05 for 13.1.3); pick the release by the case's validity date
 - [ ] The core check is internal code of AOK Systems: never in Git (`.gitignore`); each machine and the cloud image get it from outside the repo; written permission from ITSG (question 14)

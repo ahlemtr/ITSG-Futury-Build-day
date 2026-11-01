@@ -4,7 +4,7 @@ Everything the platform reads or is checked against. File names are kept as publ
 
 | Folder | What it holds | Valid from |
 |---|---|---|
-| `vb/` | Verfahrensbeschreibung DTA EEL (the rule book): 13.3, 13.4; VB Anlage 1 (record layouts with checks): 13.1.3, 13.1.4; VB Anlage 2 (error catalogue with long and short texts) is missing; VB Anlage 3 13.3 (which data blocks each Abgabegrund must, may or must not carry, and when a change of benefit needs a new report) | 13.3 and 13.1.3: 01.01.2026 · 13.4: 01.01.2027 · 13.1.4: 01.07.2027 |
+| `vb/` | Verfahrensbeschreibung DTA EEL (the rule book): 13.3, 13.4; VB Anlage 1 (record layouts with checks): 13.1.3, 13.1.4; VB Anlage 2 (error catalogue: every error number with short and long text): 13.1.3, 13.1.4; VB Anlage 3 13.3 (which data blocks each Abgabegrund must, may or must not carry, and when a change of benefit needs a new report) | 13.3 and Anlagen 13.1.3: 01.01.2026 · 13.4: 01.01.2027 · Anlagen 13.1.4: 01.07.2027 |
 | `gg/` | Gemeinsame Grundsätze EEL 13.1 and Anlagen 1 (record layouts), 2 (code values), 3 (exceptions) | 01.01.2026 |
 | `beispielpapier/` | VB Anlage 4 "Beispiele zum fachlichen Inhalt": worked examples, with their own numbering: BP 13.2 belongs to VB 13.3, BP 13.3 belongs to VB 13.4 | 13.2: 01.01.2026 · 13.3: 01.01.2027 |
 | `rundschreiben/` | Common circulars of the insurers on benefits (Krankengeld calculation, child sickness ...). They only propose parameter values | on publication |
