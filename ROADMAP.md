@@ -13,7 +13,7 @@ How to read this file:
 |---|---|
 | 0 Foundation | G0, G1 |
 | 1 Full EEL scope | G2–G8 (incl. G6b) |
-| 2 Expert knowledge and AI rule derivation | G9–G13 |
+| 2 Expert knowledge and AI rule derivation | G9, G9b, G10–G13 |
 | 3 Hardening | G14–G17 |
 | 4 Demo | G18 |
 
@@ -184,6 +184,23 @@ Done when: an advisor decision carries its reason, passages and validity, a conf
 
 Needs: G0; G10 for promoting decisions to rules.
 
+### G9b. Knowledge graph as an asset
+
+Why: today 95% of the graph is text (4,452 chunks, 1,935 passages, 1,025 field definitions); the typed knowledge is 37 rules, 6 parameters, 4 criteria, 1 test case and no decisions. Agents get "the top chunks" instead of a small, complete, correct context. The graph should hold the knowledge the agents need and hand it over per topic and version.
+
+- [ ] Requirement nodes from the Pflichtenheft baseline (G11a import): ID, text, block, message type, sources, checkable yes/no; every rule linked to its item
+- [ ] Decided cases (G9) and all test cases as nodes, with a locked flag
+- [ ] Conflict nodes: two passages that disagree, with status (open, asked, answered by ITSG); expert interpretation nodes tied to a version
+- [ ] Link text to structure: each passage to the message types, blocks and fields it mentions; cross-references ("siehe Ziffer ...") as edges; Pflichtenheft sources to passages; passages linked across versions
+- [ ] Context pack query: for one topic (e.g. 41 / DBVO.BEGINN-AU) and one validity date, return the requirements, rules, passages, decided cases and open conflicts; the change, reviewer, check and chat agents use it instead of plain top-k search
+- [ ] Agent memory: change-agent and reviewer runs stored (what changed, outcomes locked, disagreements, who approved)
+- [ ] Retrieval test set (~50 questions, each with the passages it must find), recall reported in CI; fixes the known "Ansprechpartner DBAP" miss
+- [ ] Text chunks stay as the search index; the value is in the typed nodes and links
+
+Done when: the agents' context comes from context packs, the retrieval test runs in CI, and the graph holds requirements, decisions, tests and conflicts.
+
+Needs: G9; the requirement import of G11a.
+
 ### G10. Rules as data
 
 Why: today rules are hand-coded and the AI only adjusts existing parameters (gap 2 in section 5.2). G10 to G12 let the AI turn spec text into executable rules, while still never computing results itself.
@@ -226,7 +243,7 @@ Needs: G0.
 
 Done when: a spec change that needs new logic (not just a parameter) ends with approved items, rules that pass every locked test, and new test cases, without a developer.
 
-Needs: G10, G11a.
+Needs: G10, G11a, G9b.
 
 ### G12. Measure the AI
 
