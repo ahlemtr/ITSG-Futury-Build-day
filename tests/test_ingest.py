@@ -11,7 +11,7 @@ from kg.common import ROOT
 from llm.agents.change_analysis import ChangeAnalysis, ParamChange
 from store.repo import MemoryRepo
 
-VB_13_4 = ROOT / "sources" / "2026_03_10_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.4_ab_01.01.2027.pdf"
+VB_13_4 = ROOT / "sources" / "vb" / "2026_03_10_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.4_ab_01.01.2027.pdf"
 
 
 class ScriptedAI:
@@ -108,7 +108,7 @@ def test_version_valid_now_rechecks_submissions(baseline, tmp_path):
     assert repo.get_check(sub.submission_id).version == "13.4"
 
 
-RS_ANL3 = ROOT / "sources" / ("2024_12_11_NS_FLB_TOP_02_24c24i4444b45SGBV45SGBVII47SGBXIV_Aktualisierung_der_GR_zu_"
+RS_ANL3 = ROOT / "sources" / "rundschreiben" / ("2024_12_11_NS_FLB_TOP_02_24c24i4444b45SGBV45SGBVII47SGBXIV_Aktualisierung_der_GR_zu_"
                               "Entgeltersatzleistungen_Anl3.pdf")
 
 

@@ -38,7 +38,7 @@ def test_upload_reads_cover_of_renamed_pdf_before_pipeline(kb, monkeypatch, tmp_
     monkeypatch.setattr(kb, "get_versions", lambda *args: [])
     monkeypatch.setattr("api.routes.specs.ingest.Pipeline", Pipeline)
     app = create_app(kb=kb, repo=MemoryRepo(), ai=False, data_root=tmp_path)
-    pdf = ROOT / "sources/GG_EEL_V13.1_Anlage_1_24.03.2025.pdf"
+    pdf = ROOT / "sources/gg/GG_EEL_V13.1_Anlage_1_24.03.2025.pdf"
     response = TestClient(app).post("/spec-versions", data={"document": "GG-ANL1"},
                                     files={"file": ("upload.pdf", pdf.read_bytes(), "application/pdf")})
     assert response.status_code == 202, response.text

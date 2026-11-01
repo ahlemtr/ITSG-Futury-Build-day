@@ -10,8 +10,8 @@ from engine.records import parse_file
 from engine.writer_messages import chain_files
 
 ROOT = Path(__file__).resolve().parents[1]
-VB133 = ROOT / "sources/2025_11_24_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.3.pdf"
-VB134 = ROOT / "sources/2026_03_10_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.4_ab_01.01.2027.pdf"
+VB133 = ROOT / "sources/vb/2025_11_24_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.3.pdf"
+VB134 = ROOT / "sources/vb/2026_03_10_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.4_ab_01.01.2027.pdf"
 D = date.fromisoformat
 
 

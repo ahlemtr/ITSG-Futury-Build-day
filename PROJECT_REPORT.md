@@ -4,7 +4,7 @@ State on 2026-10-31, branch `main` at `0f48295` ("final changes"). Written after
 
 ## 1. The challenge
 
-Futury Build Days, ITSG challenge "AI review assistant for system review" (deck of 23.10.2026, `sources/Futury-Hackathon-2026-Englisch.pdf`).
+Futury Build Days, ITSG challenge "AI review assistant for system review" (deck of 23.10.2026, `sources/itsg-hackathon/Futury-Hackathon-2026-Englisch.pdf`).
 
 - ITSG certifies payroll programs (SAP, DATEV, Lexware ...) before they may send data to the social insurers (§ 95b SGB IV): about 100 programs, 800 million messages a year, specifications spread over about 100 documents, an initial approval and then a yearly audit.
 - Task: design an AI solution that supports and potentially replaces the testing processes, focused on income replacement benefits (Entgeltersatzleistungen, EEL), "e.g. maternity benefit and sickness benefit". It should check automatically whether a program meets all applicable specifications in that scope.

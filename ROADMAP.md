@@ -217,7 +217,7 @@ Needs: G2.
 
 Why: today ITSG's experts update the checklist of requirements (the Pflichtenheft) by hand, version by version (2026.1, 2026.2 ...). The platform should do it: start from the current Pflichtenheft, read a spec change, and hand out the next version in ITSG's own format, with a change list (Alt / Neu / Gelöscht).
 
-- [ ] Import the EEL part of `sources/Pflichtenheft_EA_2026.2.pdf` as data: item ID, number, text, sources (Fundstellen), module / topic / block. 112 items in the base module, 44 in the UV/RV module. These become requirement nodes in the knowledge graph
+- [ ] Import the EEL part of `sources/pflichtenheft/Pflichtenheft_EA_2026.2.pdf` as data: item ID, number, text, sources (Fundstellen), module / topic / block. 112 items in the base module, 44 in the UV/RV module. These become requirement nodes in the knowledge graph
 - [ ] Hold out a few sections (e.g. DBMU) from the baseline for grading in G12; the agents never see them
 - [ ] Mark each item: checkable from the vendor's files (gets a rule) or only visible in the software (checked at the review appointment, no rule)
 - [ ] Link every rule to its item ID (`criterion:` on the rule card)
