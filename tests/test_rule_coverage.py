@@ -1,7 +1,8 @@
 """Every rule card must be proved by a test and named by a test case.
 
 A test proves a rule when it carries `@pytest.mark.rules("<id>", ...)` and fails if the rule's code is wrong.
-The gap lists below are the rules not covered yet; they may only shrink (roadmap G2: one test per rule ID).
+Every rule is proved by a test (roadmap G2: one test per rule ID). A rule may be untargeted by test cases only
+while no family uses it yet (listed below).
 """
 
 from __future__ import annotations
@@ -15,12 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 MARK = re.compile(r"mark\.rules\(([^)]*)\)")
 ID = re.compile(r"[\"']([^\"']+)[\"']")
 
-# rules no test proves yet
-UNTESTED = {
-    "F41-1", "F41-2", "F41-3", "F41-4", "F41-5", "F41-7", "F41-9", "F41-10",
-    "K61-6", "K61-7",
-    "C-3", "C-4", "C-5", "C-8",
-}
+# rules no test proves yet: none since G2; a new rule card needs its test in the same change
+UNTESTED: set[str] = set()
 # rules no test case names in its targets
 UNTARGETED = {"A3-2", "A3-3"}  # continuity of benefits: no family chains two benefits yet (G3-G6)
 
