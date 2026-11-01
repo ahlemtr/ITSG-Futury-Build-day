@@ -25,12 +25,12 @@ How to read this file:
 
 Why: every later goal relies on a green, reproducible check.
 
-- [ ] GitHub Actions workflow on Linux: `uv run pytest -q`, `uv run ruff check .`, `npm run build` (includes `tsc`), `npm run check:i18n`
-- [ ] Install `poppler-utils` in CI so the annex tests run as intended
+- [x] GitHub Actions workflow on Linux: `uv run pytest -q`, `uv run ruff check .`, `npm run build` (includes `tsc`), `npm run check:i18n`
+- [x] Install `poppler-utils` in CI so the annex tests run as intended
 - [x] Make `test_vb_annex_centered_chapters_work_with_linux_poppler_indentation` pass on Windows too, or mark it Linux-only with a clear reason (it was a splitter bug on every platform, not poppler: fixed in `kg/extract/generic.py`, test renamed `test_vb_annex_centered_chapters_are_headings`)
-- [ ] Commit the VB 13.4 PDF so a fresh checkout (and CI) has the full seed; 21 tests need its passages
-- [ ] Neo4j service container in a second CI job with `NEO4J_TESTS=1`
-- [ ] Fix or document `test_search_finds_chaining[graph]` (German full-text ranking)
+- [x] Commit the VB 13.4 PDF so a fresh checkout (and CI) has the full seed; 21 tests need its passages
+- [x] Neo4j service container in a second CI job with `NEO4J_TESTS=1`
+- [x] Fix or document `test_search_finds_chaining[graph]` (it was not German full-text ranking: the fusion in `kg/graph_backend.py` added up every chunk of a passage, so a long passage with many weak chunks beat one strong chunk; now each passage counts once per list, at its best chunk)
 
 Done when: every push and every pull request into upstream `main` shows a green check.
 
