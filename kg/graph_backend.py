@@ -110,6 +110,7 @@ class GraphBackend:
         rows = self._q(RULES_QUERY, keys=list(keys), vb=vb)
         return [Rule(id=r["r"]["key"], title=r["r"]["title"], description=r["r"].get("description") or "",
                      kind=r["r"]["kind"], status=r["r"]["status"], criterion=r["criterion"],
+                     family=r["r"].get("family") or "common",
                      applies_to=sorted(r["applies_to"]), fields=sorted(r["fields"]), params=sorted(r["params"]),
                      sources=sorted(r["sources"])) for r in rows]
 
@@ -123,7 +124,8 @@ class GraphBackend:
         for r in self._q(TEST_REFS_QUERY, keys=list(keys)):
             t = r["t"]
             ref = {"key": t["key"], "kind": t["kind"], "origin": t["origin"], "status": t["status"], "hidden": t["hidden"],
-                       "steps": t["steps"], "parent": t.get("parent"), "targets": r["targets"]}
+                       "steps": t["steps"], "parent": t.get("parent"), "targets": r["targets"],
+                   "family": t.get("family") or "vorerkrankung"}
             if full:
                 out.append(TestCase(**ref, inputs=json.loads(t["inputs"]), expected=json.loads(t["expected"]),
                                     sources=sorted(r["sources"])))

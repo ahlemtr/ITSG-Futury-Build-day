@@ -324,7 +324,7 @@ def build_from(seed: Seed) -> dict:
     # --- K6: rules and criteria
     for order, r in enumerate(seed.rules, start=1):
         g.node("Rule", r["id"], title=r["title"], description=r.get("description", ""), kind=r["kind"],
-               status=r["status"], order=order)
+               status=r["status"], family=r.get("family") or "common", order=order)
         for code in r.get("applies_to", []):
             g.edge("APPLIES_TO", "Rule", r["id"], "MessageType", str(code))
         for fk in r.get("fields", []):
@@ -349,6 +349,7 @@ def build_from(seed: Seed) -> dict:
     for order, tc in enumerate(seed.test_cases, start=1):
         g.node("TestCase", tc["id"], kind=tc["kind"], origin=tc["origin"], status=tc["status"],
                hidden=bool(tc.get("hidden", False)), steps=tc["steps"], parent=tc.get("parent"), order=order,
+               family=tc.get("family") or "vorerkrankung",
                inputs=to_json(tc.get("inputs") or {}), expected=to_json(tc.get("expected") or {}))
         for rid in tc.get("targets", []):
             g.edge("TARGETS", "TestCase", tc["id"], "Rule", rid)

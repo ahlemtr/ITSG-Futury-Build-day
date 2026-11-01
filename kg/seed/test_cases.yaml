@@ -5,6 +5,7 @@
 # the API decides what a vendor may see.
 test_cases:
   - id: peter
+    family: vorerkrankung
     kind: reference
     origin: itsg
     status: approved
@@ -36,6 +37,7 @@ test_cases:
     sources: [HINWEISE@1#facts, HINWEISE@1#chain]
 
   - id: peter-gap-exact
+    family: vorerkrankung
     kind: clone
     origin: builder
     status: approved
@@ -56,6 +58,7 @@ test_cases:
     sources: [VB@13.4#3.12/chaining]
 
   - id: peter-gap-in
+    family: vorerkrankung
     kind: clone
     origin: builder
     status: approved
@@ -76,6 +79,7 @@ test_cases:
     sources: [VB@13.4#3.12/chaining]
 
   - id: peter-gap-out
+    family: vorerkrankung
     kind: clone
     origin: builder
     status: approved
@@ -96,6 +100,7 @@ test_cases:
     sources: [VB@13.4#3.12/chaining]
 
   - id: peter-b27
+    family: vorerkrankung
     kind: clone
     origin: builder
     status: approved
@@ -119,6 +124,7 @@ test_cases:
     sources: [VB@13.4#3.12/conditions]
 
   - id: peter-b28
+    family: vorerkrankung
     kind: clone
     origin: builder
     status: approved
@@ -139,6 +145,7 @@ test_cases:
     sources: [VB@13.4#3.12/conditions]
 
   - id: peter-b29
+    family: vorerkrankung
     kind: clone
     origin: builder
     status: approved
@@ -159,6 +166,7 @@ test_cases:
     sources: [VB@13.4#3.12/conditions]
 
   - id: peter-b30
+    family: vorerkrankung
     kind: clone
     origin: builder
     status: approved
@@ -179,6 +187,7 @@ test_cases:
     sources: [VB@13.4#3.12/conditions]
 
   - id: peter-noteless
+    family: vorerkrankung
     kind: clone
     origin: builder
     status: approved
@@ -202,6 +211,7 @@ test_cases:
     sources: [VB@13.4#3.12/chaining, VB@13.4#3.12/conditions]
 
   - id: peter-hidden
+    family: vorerkrankung
     kind: hidden
     origin: builder
     status: approved
@@ -229,6 +239,7 @@ test_cases:
     sources: [HINWEISE@1#facts]
 
   - id: peter-gap-exact-hidden
+    family: vorerkrankung
     kind: hidden
     origin: builder
     status: approved
@@ -250,6 +261,7 @@ test_cases:
     sources: [VB@13.4#3.12/chaining]
 
   - id: bp-13-1
+    family: vorerkrankung
     kind: reference
     origin: beispielpapier
     status: approved
@@ -270,6 +282,7 @@ test_cases:
     sources: [BP@13.3#13.1]
 
   - id: bp-13-2
+    family: vorerkrankung
     kind: reference
     origin: beispielpapier
     status: approved
@@ -291,6 +304,7 @@ test_cases:
     sources: [BP@13.3#13.2]
 
   - id: bp-13-3
+    family: vorerkrankung
     kind: reference
     origin: beispielpapier
     status: approved
@@ -310,6 +324,7 @@ test_cases:
     sources: [BP@13.3#13.3]
 
   - id: bp-13-4
+    family: vorerkrankung
     kind: reference
     origin: beispielpapier
     status: approved
@@ -330,6 +345,7 @@ test_cases:
     sources: [BP@13.3#13.4]
 
   - id: bp-13-5
+    family: vorerkrankung
     kind: reference
     origin: beispielpapier
     status: approved
@@ -352,6 +368,7 @@ test_cases:
 
   # Official test tasks: inputs only, no solution available yet, so no targets (allowed for origin pta)
   - id: ta-167
+    family: vorerkrankung
     kind: reference
     origin: pta
     status: draft
@@ -364,6 +381,7 @@ test_cases:
     expected: {}
     sources: [PTA@2025-2026-v3#5.14]
   - id: ta-168
+    family: vorerkrankung
     kind: reference
     origin: pta
     status: draft

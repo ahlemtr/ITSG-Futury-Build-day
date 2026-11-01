@@ -7,7 +7,7 @@ import datetime as dt
 import re
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, SerializeAsAny, model_validator
 
 RuleKind = Literal["domain", "format", "reply", "chain", "efz", "calculation"]
 DeviationKind = Literal[
@@ -79,6 +79,7 @@ class Rule(BaseModel):
     description: str = ""
     kind: RuleKind
     status: Literal["approved", "draft"]
+    family: str = "common"  # scenario family (engine/families/); common = every family
     criterion: str | None = None
     applies_to: list[str] = Field(default_factory=list)
     fields: list[str] = Field(default_factory=list)
@@ -126,6 +127,7 @@ class TestCaseRef(BaseModel):
     steps: Literal["single", "chain"]
     parent: str | None = None
     targets: list[str] = Field(default_factory=list)
+    family: str = "vorerkrankung"  # scenario family (engine/families/)
 
 
 class TestCase(TestCaseRef):
@@ -254,21 +256,38 @@ class Case(BaseModel):
     parent: str | None = None
     targets: list[str] = Field(default_factory=list)
     steps: Literal["single", "chain"] = "single"
-    inputs: TestInputs
-    expected: dict[str, ExpectedOutcome] = Field(default_factory=dict)
+    family: str = "vorerkrankung"  # scenario family (engine/families/): types inputs and expected
+    inputs: SerializeAsAny[BaseModel]  # the family's Inputs (vorerkrankung: TestInputs)
+    expected: dict[str, SerializeAsAny[BaseModel]] = Field(default_factory=dict)  # family Outcome per version
     sources: list[str] = Field(default_factory=list)
     branch_point: dt.date | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _typed_by_family(cls, data: Any) -> Any:
+        """Plain dicts (seed, store, API) become the family's Inputs and Outcome models."""
+        if not isinstance(data, dict):
+            return data
+        from engine import families
+
+        fam = families.get(data.get("family"))
+        data = dict(data)
+        if isinstance(data.get("inputs"), dict):
+            data["inputs"] = fam.Inputs.model_validate(data["inputs"])
+        if isinstance(data.get("expected"), dict):
+            data["expected"] = {v: fam.Outcome.model_validate(e) if isinstance(e, dict) else e
+                                for v, e in data["expected"].items()}
+        return data
 
     @classmethod
     def from_kb(cls, tc: TestCase) -> Case:
         return cls(id=tc.key, kind=tc.kind, origin=tc.origin, status=tc.status, hidden=tc.hidden, parent=tc.parent,
-                   targets=tc.targets, steps=tc.steps, inputs=TestInputs.model_validate(tc.inputs),
-                   expected={v: ExpectedOutcome.model_validate(e) for v, e in tc.expected.items()},
-                   sources=tc.sources)
+                   targets=tc.targets, steps=tc.steps, family=tc.family, inputs=dict(tc.inputs),
+                   expected={v: dict(e) for v, e in tc.expected.items()}, sources=tc.sources)
 
     def to_kb(self) -> TestCase:
         return TestCase(key=self.id, kind=self.kind, origin=self.origin, status=self.status, hidden=self.hidden,
-                        steps=self.steps, parent=self.parent, targets=self.targets,
+                        steps=self.steps, parent=self.parent, targets=self.targets, family=self.family,
                         inputs=self.inputs.model_dump(mode="json"),
                         expected={v: e.model_dump(mode="json") for v, e in self.expected.items()},
                         sources=self.sources)

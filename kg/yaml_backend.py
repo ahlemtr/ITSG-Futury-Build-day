@@ -134,7 +134,7 @@ class YamlBackend:
         criteria = self._targets("Rule", key, "IMPLEMENTS")
         return Rule(
             id=key, title=p["title"], description=p.get("description") or "", kind=p["kind"], status=p["status"],
-            criterion=criteria[0] if criteria else None,
+            family=p.get("family") or "common", criterion=criteria[0] if criteria else None,
             applies_to=sorted(self._targets("Rule", key, "APPLIES_TO")),
             fields=sorted(self._targets("Rule", key, "CONSTRAINS")),
             params=sorted(self._targets("Rule", key, "USES_PARAM")),
@@ -148,7 +148,8 @@ class YamlBackend:
         p = self._props("TestCase", key)
         targets = sorted(self._targets("TestCase", key, "TARGETS"), key=self._rule_order)
         return cls(key=key, kind=p["kind"], origin=p["origin"], status=p["status"], hidden=p["hidden"],
-                   steps=p["steps"], parent=p.get("parent"), targets=targets, **extra)
+                   steps=p["steps"], parent=p.get("parent"), targets=targets,
+                   family=p.get("family") or "vorerkrankung", **extra)
 
     def _precedent(self, key: str) -> Precedent:
         p = self._props("Precedent", key)

@@ -9,6 +9,7 @@ rules:
       A 41 may only be sent if the current AU and at least one prior AU are certified (sick note:
       eAU or paper at the employer).
     kind: domain
+    family: vorerkrankung
     status: approved
     criterion: f41c7278-b5a5-4ec3-b321-39bca5c3aeeb
     applies_to: ["41"]
@@ -22,6 +23,7 @@ rules:
       gap_inclusive = true (13.4) a gap of exactly 6 months (next_start == prior_end + 6 months) still
       chains; with false (13.3) it does not.
     kind: domain
+    family: vorerkrankung
     status: approved
     criterion: 0cefe80e-4fd9-41e1-be4f-3ae1ecbde646
     applies_to: ["41"]
@@ -34,6 +36,7 @@ rules:
       Chain back: include a prior AU only while the gap to the next one is at most gap_months
       (Daumenkriterium), no time limit. Newest first; stop at the first gap larger than gap_months.
     kind: domain
+    family: vorerkrankung
     status: approved
     criterion: aade0289-e8f9-4e12-9c49-464cf6cd0789
     applies_to: ["41"]
@@ -46,6 +49,7 @@ rules:
       Prior days in the last sum_window_months plus the current AU days must be at least
       min_total_days.
     kind: domain
+    family: vorerkrankung
     status: approved
     criterion: 9c8c9b58-4d0f-4066-98ac-973095418d63
     applies_to: ["41"]
@@ -58,6 +62,7 @@ rules:
       Uncertified short absences (Kurz-AU) are never listed, unless a certified AU follows seamlessly
       (then they belong to it; listing format: ask ITSG, 00 question 12).
     kind: domain
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -70,6 +75,7 @@ rules:
       An open-ended current AU counts until report date + open_end_days - 1 (one week including the
       report date, BP 13.5: 02.09 -> 08.09).
     kind: domain
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -82,6 +88,7 @@ rules:
     title: ABGABEGRUND = 41
     description: DSLW.ABGABEGRUND = 41.
     kind: format
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -92,6 +99,7 @@ rules:
     title: KORR-ABGABEGRUND = 00
     description: DSLW.KORR-ABGABEGRUND = 00.
     kind: format
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -102,6 +110,7 @@ rules:
     title: MM-VOER = J, and every MM flag matches the blocks present
     description: DSLW.MM-VOER = J, and every MM flag matches the blocks present.
     kind: format
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -112,6 +121,7 @@ rules:
     title: GRUNDAV = 1 (sickness)
     description: DBVO.GRUNDAV = 1 (sickness).
     kind: format
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -122,6 +132,7 @@ rules:
     title: AU-AB-AG = current AU start
     description: DBVO.AU-AB-AG = start of the current AU.
     kind: format
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -132,6 +143,7 @@ rules:
     title: AU-AB-SV, KZ-AK-AU, 12-MONATSFRIST-AB zero (insurer-only fields)
     description: DBVO.AU-AB-SV, KZ-AK-AU and 12-MONATSFRIST-AB are zero (insurer-only fields).
     kind: format
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -142,6 +154,7 @@ rules:
     title: ANZAHL-AU = number of groups, at least 1
     description: DBVO.ANZAHL-AU = number of groups, at least 1.
     kind: format
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -152,6 +165,7 @@ rules:
     title: groups newest first
     description: The DBVO groups are listed newest first (VB 3.12.7).
     kind: format
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -162,6 +176,7 @@ rules:
     title: per group KZ-NACHWEIS, TEIL-*, KZ-AU zero (insurer-only fields)
     description: Per group KZ-NACHWEIS, TEIL-NACHWEIS-*, KZ-AU and TEIL-ANR-* are zero (insurer-only fields).
     kind: format
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -174,6 +189,7 @@ rules:
       DSLW.DATENSATZ-ID is unique and in 8-4-4-4-12 hex format (no RFC 4122 version check: ITSG's own
       IDs like 11111111-2222-AAAA-EEEE-111111111111 would fail it).
     kind: format
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
@@ -186,6 +202,7 @@ rules:
     title: REFERENZ-ID = DATENSATZ-ID of the employer's 41
     description: DBID.REFERENZ-ID = DATENSATZ-ID of the employer's 41.
     kind: reply
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["61"]
@@ -196,6 +213,7 @@ rules:
     title: BBNR-VU = the employer's BBNR-VU
     description: DSLW.BBNR-VU = the employer's BBNR-VU (clarified in V13.4, VB 3.1.10).
     kind: reply
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["61"]
@@ -206,6 +224,7 @@ rules:
     title: DBVO groups = same periods, same order as the 41; extra periods appended
     description: DBVO groups carry the same periods in the same order as the 41; extra periods are appended after.
     kind: reply
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["61"]
@@ -216,6 +235,7 @@ rules:
     title: KZ-NACHWEIS 1 present, 2 partly, 4 missing
     description: KZ-NACHWEIS-nn is 1 present, 2 partly, 4 missing.
     kind: reply
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["61"]
@@ -228,6 +248,7 @@ rules:
       KZ-AU-nn is 1 counts, 2 does not count, 5 partly counts (TEIL-ANR range), 3 further check
       (interim), 0 not checked (e.g. current sick note missing, BP 16.7).
     kind: reply
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["61"]
@@ -240,6 +261,7 @@ rules:
       12-MONATSFRIST-AB = start of the 12-month period = start of the earliest counted period
       (Peter: 14.07.2025, Hinweise; BP 16.1).
     kind: reply
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["61"]
@@ -250,6 +272,7 @@ rules:
     title: KZ-AK-AU = 4 if the current sick note is missing, else 0
     description: KZ-AK-AU = 4 if the current sick note is missing, else 0.
     kind: reply
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["61"]
@@ -260,6 +283,7 @@ rules:
     title: REFERENZ-ID = DATENSATZ-ID of the latest valid 01
     description: "DBID.REFERENZ-ID = DATENSATZ-ID of the latest valid 01 (Peter: the new 01 of step 6, Hinweise table)."
     kind: reply
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["62"]
@@ -272,6 +296,7 @@ rules:
       DBEE.EEL-ENDE and DBEE.EEL-ENDE-GRUND: 31.03.2026 and 99 for Peter (Hinweise table), never after
       the end of employment (C-6).
     kind: reply
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["62"]
@@ -286,6 +311,7 @@ rules:
       The 01 certificate carries DBAL.DATUM-EGZBIS = efz_end, where efz_end = current start +
       (efz_days - used - 1) days and used counts the periods the 61 marks as counting.
     kind: efz
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["01"]
@@ -296,6 +322,7 @@ rules:
     title: a corrected 61 that changes efz_end requires 88 + new 01
     description: A corrected 61 that changes efz_end requires an 88 (cancel the old 01) and a new 01.
     kind: efz
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["01", "88"]
@@ -308,6 +335,7 @@ rules:
       An updated 61 whose only change is in interim flags 3 or 4 (KZ-AK-AU, KZ-AU-nn) does not cancel
       the earlier 61.
     kind: efz
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["61"]
@@ -320,6 +348,7 @@ rules:
     title: every employer message has a unique DATENSATZ-ID
     description: Every employer message has a unique DATENSATZ-ID.
     kind: chain
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["01", "41", "88"]
@@ -332,6 +361,7 @@ rules:
       AKTENZEICHEN-VERURSACHER is identical across all employer messages of the case (DBID on 41 and
       01, DBSD on the 88).
     kind: chain
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["01", "41", "88"]
@@ -342,6 +372,7 @@ rules:
     title: the 88 points to the DATENSATZ-ID of the cancelled 01
     description: The 88's DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG = DATENSATZ-ID of the 01 being cancelled.
     kind: chain
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["88"]
@@ -352,6 +383,7 @@ rules:
     title: the 88's VORNAME / FAMILIENNAME = names in the cancelled record
     description: The 88's DBSD.VORNAME / FAMILIENNAME = names in the cancelled record (clarified in V13.4, VB 3.20).
     kind: chain
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["88"]
@@ -362,6 +394,7 @@ rules:
     title: the new 01 comes after the 88
     description: The new 01 comes after the 88.
     kind: chain
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["01", "88"]
@@ -372,6 +405,7 @@ rules:
     title: the insurer's 62 end date is not after the end of employment
     description: The insurer's 62 end date is not after the end of employment (clarified in V13.4, VB 3.7.3).
     kind: chain
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["62"]
@@ -384,6 +418,7 @@ rules:
       The insurer's 61 repeats DBID.AKTENZEICHEN-VERURSACHER unchanged, or leaves it blank if the
       employer sent none (clarified in V13.4, VB 3.19).
     kind: chain
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["61"]
@@ -394,6 +429,7 @@ rules:
     title: the 88 carries only DBSD (MM-SD = J, every other MM flag N)
     description: "The 88 carries only DBSD: MM-SD = J, every other MM flag N (Beispielpapier 23)."
     kind: chain
+    family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["88"]
@@ -409,6 +445,7 @@ rules:
       ABRECHNUNGSPROGRAMM, MM-KUG, ENTGART, KEINEFREIST, GRUNDAV, KZ-NACHWEIS, KZ-AU) carries one of the codes
       of GG Anlage 2. Whether a field must be filled is checked elsewhere; Grundstellung is not judged here.
     kind: format
+    family: common
     status: approved
     criterion: null
     applies_to: ["01", "41", "61", "62", "88"]
