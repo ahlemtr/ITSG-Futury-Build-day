@@ -455,6 +455,35 @@ rules:
     params: []
     sources: [VB-ANL3@13.3#2, VB-ANL3@13.3#2.2]
 
+  # --- VB Anlage 3 chapter 3: continuity of benefits, § 69 SGB IX (kg/seed/continuity.yaml)
+  - id: A3-2
+    title: a gap of at least one calendar day between two benefits always needs a new certificate
+    description: >-
+      If at least one calendar day (non-working days included) lies between two benefit periods, the employer
+      always sends a new certificate for the second one.
+    kind: chain
+    family: common
+    status: approved
+    criterion: null
+    applies_to: ["01", "02", "03", "04", "11", "12", "21", "22", "23", "31"]
+    fields: []
+    params: []
+    sources: [VB-ANL3@13.3#3]
+  - id: A3-3
+    title: directly following benefits need a new certificate only where VB Anlage 3 says so
+    description: >-
+      When a second benefit directly follows the first, the table of VB Anlage 3 chapter 3 decides whether the
+      employer sends a new certificate (e.g. Krankengeld followed by Mutterschaftsgeld: yes; Übergangsgeld
+      followed by Krankengeld: no; Kinderkrankengeld for the same child: no, for another child: yes).
+    kind: chain
+    family: common
+    status: approved
+    criterion: null
+    applies_to: ["01", "02", "03", "04", "11", "12", "21", "22", "23", "31"]
+    fields: []
+    params: []
+    sources: [VB-ANL3@13.3#3]
+
   # --- GG Anlage 2: Schlüsselzahlen (kg/seed/key_values.yaml), all message types
   - id: S-1
     title: Codes are Schlüsselzahlen of GG Anlage 2

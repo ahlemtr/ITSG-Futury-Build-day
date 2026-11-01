@@ -22,7 +22,7 @@ UNTESTED = {
     "E-3", "C-3", "C-4", "C-5", "C-6", "C-7", "C-8",
 }
 # rules no test case names in its targets
-UNTARGETED: set[str] = set()
+UNTARGETED = {"A3-2", "A3-3"}  # continuity of benefits: no family chains two benefits yet (G3-G6)
 
 
 def _rule_ids() -> set[str]:
