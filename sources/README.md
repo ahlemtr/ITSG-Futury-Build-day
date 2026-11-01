@@ -8,7 +8,7 @@ Everything the platform reads or is checked against. File names are kept as publ
 | `gg/` | Gemeinsame Grundsätze EEL 13.1 and Anlagen 1 (record layouts), 2 (code values), 3 (exceptions) | 01.01.2026 |
 | `beispielpapier/` | Worked examples for the VB, with their own numbering: BP 13.2 belongs to VB 13.3, BP 13.3 belongs to VB 13.4 | 13.2: 01.01.2026 · 13.3: 01.01.2027 |
 | `rundschreiben/` | Common circulars of the insurers on benefits (Krankengeld calculation, child sickness ...). They only propose parameter values | on publication |
-| `pflichtenheft/` | ITSG's checklist of requirements for certifying payroll software, version 2026.2 (EEL: 112 items in the base module, 44 in the UV/RV module). `anlagen/`: 19 (EEL fields, DBAN layout, eVpT test numbers) and 03 (absence types) matter for EEL; 04a, 11, 21, 22, 45 do not | 01.07.2026 |
+| `pflichtenheft/` | ITSG's checklist of requirements for certifying payroll software, version 2026.2 (EEL: 112 items in the base module, 44 in the UV/RV module). `anlagen/`: 19 (EEL fields, DBAN layout, eVpT test numbers) and 03 (absence types); the other annexes are not about EEL and were not kept | 01.07.2026 |
 | `testaufgaben/` | Pool-Testaufgaben 2025/2026, version 3: the official exam tasks (TA 167, TA 168 for EEL) | 2025/2026 |
 | `itsg-hackathon/` | Material ITSG gave the hackathon: the challenge deck, the Peter scenario (Hinweise) and the prior-illness criteria (an excerpt of the Pflichtenheft) | — |
 | `uploads/` | Runtime: documents uploaded through Spec-Änderungen. Not in Git | — |
