@@ -182,38 +182,44 @@ Done when: the hand-coded rules are deleted or reduced to the interpreter, and a
 
 Needs: G2.
 
-### G11a. Spec text to checklist
+### G11a. Checklist baseline and change agent
 
-Why: today ITSG's experts write the checklist of requirements (the Pflichtenheft) by hand from the spec documents. The platform should write it: each item a sentence "the software must ...", with the spec passage it comes from.
+Why: today ITSG's experts update the checklist of requirements (the Pflichtenheft) by hand, version by version (2026.1, 2026.2 ...). The platform should do it: start from the current Pflichtenheft, read a spec change, and hand out the next version in ITSG's own format, with a change list (Alt / Neu / Gelöscht).
 
-- [ ] Agent reads VB, GG and Rundschreiben sections and proposes requirement items in Pflichtenheft style, each with a source passage that must resolve
-- [ ] Each item is marked as checkable from the vendor's files, or only visible in the software itself (shown at the review appointment)
-- [ ] ITSG experts review and approve items in the UI; approved items become requirement nodes in the knowledge graph
-- [ ] When a spec changes, the agent proposes which items are added, changed or deleted
-- [ ] The real Pflichtenheft (`sources/Pflichtenheft_EA_2026.2.pdf`) is a hidden answer key: kept out of the knowledge base and every agent's tools, used only by the G12 evaluation
+- [ ] Import the EEL part of `sources/Pflichtenheft_EA_2026.2.pdf` as data: item ID, number, text, sources (Fundstellen), module / topic / block. 112 items in the base module, 44 in the UV/RV module. These become requirement nodes in the knowledge graph
+- [ ] Hold out a few sections (e.g. DBMU) from the baseline for grading in G12; the agents never see them
+- [ ] Mark each item: checkable from the vendor's files (gets a rule) or only visible in the software (checked at the review appointment, no rule)
+- [ ] Link every rule to its item ID (`criterion:` on the rule card)
+- [ ] **Change agent:** reads a spec change and proposes item changes (new, changed, deleted; changed items keep their ID). It may answer "no item change needed" (example: VB 13.4, where the Pflichtenheft already said "nicht mehr als 6 Monate")
+- [ ] **Reviewer agent**, separate from the change agent: reads the same spec change *without* seeing the change agent's draft and writes the expected outcomes in plain language (e.g. "a gap of exactly 6 months now chains"); a different OpenAI model than the change agent
+- [ ] Where the two agents agree, the outcomes become the locked tests for the new version; where they disagree, an ITSG expert decides first
+- [ ] Hand-off package: proposed Pflichtenheft version (EEL part, ITSG's structure, marked as a platform draft), change list against the previous version, updated rules and test cases, test results, full trace of both agents
+- [ ] Expert approves the package; it becomes the new baseline
 
-Done when: the agent produces a checklist for the EEL part of the VB, an expert can approve it, and G12 can grade it against the Pflichtenheft.
+Done when: uploading VB 13.4 ends with a reviewed package (item changes or "no change needed" with reasons, locked outcomes, trace) that an expert can approve in the UI.
 
 Needs: G0.
 
-### G11b. Checklist to executable rule
+### G11b. Rules and tests in the loop
 
-- [ ] Agent reads an approved checklist item and its spec passage and proposes rule definitions in the G10 schema, with citations that must resolve to real passages
-- [ ] Code validates each proposal (schema, parameter types, referenced fields exist in the layouts) and runs it against the existing test tables
-- [ ] ITSG reviews proposals in the UI (diff against the current rule, affected tests, approve or reject); only approved rules become active
-- [ ] Wire the existing criteria pipeline (`/criteria/extract`) into the UI
-- [ ] A new rule from a spec change creates new test cases through the builder
+- [ ] For each changed checkable item, the change agent proposes rule definitions in the G10 schema, with citations that must resolve to real passages
+- [ ] Code validates each proposal (schema, parameter types, referenced fields exist in the layouts)
+- [ ] The engine runs the rules against the locked tests (Peter, Beispielpapier, ITSG solutions, expert decided cases, the outcomes locked in G11a); the agent reads failures and fixes its draft until all pass or its budget per change runs out ("unfinished, here is why")
+- [ ] The agent may add test cases and update unlocked ones related to the change; it can never change or delete a locked test
+- [ ] It only touches rules linked to the changed items; anything else is flagged in the package
+- [ ] Wire the existing criteria pipeline (`/criteria/extract`) into the change agent
 - [ ] Switch the agents to the strongest available OpenAI model; re-run the VB 13.4 analysis once so the cache holds the new answers
 
-Done when: uploading a spec change that needs new logic (not just a parameter) ends with an approved checklist item, an approved executable rule and new test cases, without a developer.
+Done when: a spec change that needs new logic (not just a parameter) ends with approved items, rules that pass every locked test, and new test cases, without a developer.
 
 Needs: G10, G11a.
 
 ### G12. Measure the AI
 
 - [ ] Golden set: spec sections paired with the known correct rule definitions (from G10)
-- [ ] Checklist grading against the hidden Pflichtenheft: of ITSG's 112 EEL items (156 with the UV/RV module), how many the agent found, how many it invented, how many it missed, and whether it named the same source
+- [ ] Checklist grading on the held-out sections: the change agent regenerates them from the spec text; how many of ITSG's items it found, invented and missed, and whether it named the same source
 - [ ] Change grading against the Pflichtenheft's own change log (2026.1 to 2026.2: items added, changed, deleted)
+- [ ] Agreement rate between change agent and reviewer agent, and how often the expert sided with each
 - [ ] Items that do not come from the spec text (meeting decisions, laws, items marked "wird im Rahmen der QK 2026 erneut besprochen") are counted separately, since the agent cannot find them in the VB
 - [ ] Evaluation script reports match rate, wrong citations, rejected proposals; run it on every prompt change
 - [ ] Report the agreement rate with expert decisions (G9) next to the match rate
