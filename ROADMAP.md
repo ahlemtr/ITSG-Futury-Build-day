@@ -65,6 +65,7 @@ Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scen
   - [ ] Compute K61-4 (KZ-NACHWEIS) and K61-5 (KZ-AU) from the case facts; today they are typed into the test data
   - [ ] Call `check_61` and `check_62` (K61-1..3, K62-1) on every 61/62 the insurer simulator writes, as a self-check; today they are never called
   - [ ] Complete the DBAN layout (today only KENNUNG)
+  - [ ] Reword the R41-5 rule card: a Kurz-AU is never listed, even when a certified AU follows (provisional answer to ITSG question 5)
   - [ ] One test per rule ID, so every rule is shown to be covered
 
 Done when: Peter still passes unchanged, all 37 existing rules have code and a test, and a second family can be added by adding files, not by editing the checker.
