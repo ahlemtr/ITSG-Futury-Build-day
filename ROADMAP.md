@@ -64,8 +64,10 @@ Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scen
   - [ ] Implement E-3 (an update only in interim flags 3 or 4 does not cancel the earlier 61); today it has a rule card and no code
   - [ ] Compute K61-4 (KZ-NACHWEIS) and K61-5 (KZ-AU) from the case facts; today they are typed into the test data
   - [ ] Call `check_61` and `check_62` (K61-1..3, K62-1) on every 61/62 the insurer simulator writes, as a self-check; today they are never called
-  - [ ] Complete the DBAN layout (today only KENNUNG)
-  - [ ] Reword the R41-5 rule card: a Kurz-AU is never listed, even when a certified AU follows (provisional answer to ITSG question 5)
+  - [ ] Reword the R41-5 rule card once ITSG answers question 5 (the Pflichtenheft and ITSG's criteria file disagree)
+  - [ ] Link R41-5 to Pflichtenheft item a4770b2b and R41-6 to item ac3b56af (today only R41-1..4 carry their item ID)
+  - [ ] New rules for the two prior-illness items with no rule: a 41 only for people with statutory health insurance, addressed to their insurer; never for privately insured people or employee groups 109 and 110
+  - [ ] Complete the DBAN layout from Pflichtenheft Anlage 19 (KENNUNG, LAENDERKENNZ, PLZ, WOHNORT, STRASSE, HAUS-NR, ADR-ZUSATZ)
   - [ ] One test per rule ID, so every rule is shown to be covered
 
 Done when: Peter still passes unchanged, all 37 existing rules have code and a test, and a second family can be added by adding files, not by editing the checker.
@@ -110,6 +112,7 @@ Needs: G2.
 
 - [ ] For each Abgabegrund: layout check, rules, when it is due, expected reply
 - [ ] Insurer simulator sends 66/67 error replies when the vendor's file is wrong, so the vendor has to react
+- [ ] Expected vendor reactions from the Pflichtenheft (EEL, 01 Allgemeines): after a 66, cancel and resend with the corrected type; after a 67, no cancellation; a 72 is answered with a 73; a 99 only while a benefit is running; a 71 is read in
 - [ ] Cancel (88) and correction paths for every certificate, not only Peter's
 
 Done when: every in-scope Abgabegrund has at least one executable test case.
@@ -123,6 +126,7 @@ Why: the demo should show complex situations, not only the happy path.
 - [ ] Test cases built from wrong vendor files: invalid codes, missing mandatory blocks, wrong order, duplicates, wrong envelope, encoding errors
 - [ ] Format check returns precise, cited errors for each; no crash on any malformed upload (fuzz the parser)
 - [ ] Mixed chains: two certificates for one employee, overlapping periods, change of insurer
+- [ ] Test cases with deliberate mistakes in the task itself that good software must catch (the Pflichtenheft says official test tasks may contain them)
 - [ ] Checker labels stay correct under these cases (invalid > bug > unclear > correct variant > exact match)
 
 Done when: a corpus of broken files runs in CI and each gets the expected label.
@@ -136,7 +140,9 @@ Why: the demo story includes a new vendor completing the yearly catalogue and ea
 - [ ] Vendor lifecycle: new, in certification, certified, under yearly audit
 - [ ] Yearly catalogue per vendor; progress per test case and family
 - [ ] Certified label when every required case passes; label unlocks the permanent test cases
-- [ ] Deadlines in the calendar from ITSG's real rules (G1 answers), reminders in the vendor view
+- [ ] Real rules from the Pflichtenheft (Systemuntersuchung 0113) replace our assumptions: permanent test cases every month through eVpT; ITSG reviews at least once a year, a pass gives a new modification ID, a final fail stops data transmission after 3 months; Pflichtenheft changes must be implemented within 3 months; quality-management errors within 30 working days or the status is lost
+- [ ] Certified when every base-module item is met, the test tasks are processed correctly and at least 2 pilot users approve; the label is the GKV certificate "systemuntersucht"
+- [ ] Deadlines of single test rounds still from ITSG (question 7), reminders in the vendor view
 - [ ] Signed certification report in addition to per-run reports
 
 Done when: a fresh vendor account goes from zero to certified in the UI, and the permanent cases appear.
@@ -176,22 +182,39 @@ Done when: the hand-coded rules are deleted or reduced to the interpreter, and a
 
 Needs: G2.
 
-### G11. Spec text to executable rule
+### G11a. Spec text to checklist
 
-- [ ] Agent reads a spec section and proposes rule definitions in the G10 schema, with citations that must resolve to real passages
+Why: today ITSG's experts write the checklist of requirements (the Pflichtenheft) by hand from the spec documents. The platform should write it: each item a sentence "the software must ...", with the spec passage it comes from.
+
+- [ ] Agent reads VB, GG and Rundschreiben sections and proposes requirement items in Pflichtenheft style, each with a source passage that must resolve
+- [ ] Each item is marked as checkable from the vendor's files, or only visible in the software itself (shown at the review appointment)
+- [ ] ITSG experts review and approve items in the UI; approved items become requirement nodes in the knowledge graph
+- [ ] When a spec changes, the agent proposes which items are added, changed or deleted
+- [ ] The real Pflichtenheft (`sources/Pflichtenheft_EA_2026.2.pdf`) is a hidden answer key: kept out of the knowledge base and every agent's tools, used only by the G12 evaluation
+
+Done when: the agent produces a checklist for the EEL part of the VB, an expert can approve it, and G12 can grade it against the Pflichtenheft.
+
+Needs: G0.
+
+### G11b. Checklist to executable rule
+
+- [ ] Agent reads an approved checklist item and its spec passage and proposes rule definitions in the G10 schema, with citations that must resolve to real passages
 - [ ] Code validates each proposal (schema, parameter types, referenced fields exist in the layouts) and runs it against the existing test tables
 - [ ] ITSG reviews proposals in the UI (diff against the current rule, affected tests, approve or reject); only approved rules become active
 - [ ] Wire the existing criteria pipeline (`/criteria/extract`) into the UI
 - [ ] A new rule from a spec change creates new test cases through the builder
 - [ ] Switch the agents to the strongest available OpenAI model; re-run the VB 13.4 analysis once so the cache holds the new answers
 
-Done when: uploading a spec change that needs new logic (not just a parameter) ends with an approved, executable rule and new test cases, without a developer.
+Done when: uploading a spec change that needs new logic (not just a parameter) ends with an approved checklist item, an approved executable rule and new test cases, without a developer.
 
-Needs: G10.
+Needs: G10, G11a.
 
 ### G12. Measure the AI
 
 - [ ] Golden set: spec sections paired with the known correct rule definitions (from G10)
+- [ ] Checklist grading against the hidden Pflichtenheft: of ITSG's 112 EEL items (156 with the UV/RV module), how many the agent found, how many it invented, how many it missed, and whether it named the same source
+- [ ] Change grading against the Pflichtenheft's own change log (2026.1 to 2026.2: items added, changed, deleted)
+- [ ] Items that do not come from the spec text (meeting decisions, laws, items marked "wird im Rahmen der QK 2026 erneut besprochen") are counted separately, since the agent cannot find them in the VB
 - [ ] Evaluation script reports match rate, wrong citations, rejected proposals; run it on every prompt change
 - [ ] Report the agreement rate with expert decisions (G9) next to the match rate
 - [ ] Prompt versions recorded with cached answers so cache invalidation is deliberate
@@ -199,9 +222,9 @@ Needs: G10.
 
 Quality bar: a derived rule is accepted only if it gives the same results as the known rule on every test table, and an expert approves it.
 
-Done when: the match rate is known and shown in the report, and a prompt change cannot silently lower it.
+Done when: the checklist score and the rule match rate are known and shown in the report, and a prompt change cannot silently lower them.
 
-Needs: G11.
+Needs: G11a, G11b.
 
 ### G13. Gated code agent
 
@@ -214,7 +237,7 @@ Why: some new rules (e.g. a calculation the rule types cannot express) still nee
 
 Done when: a spec change that needs new code ends in a pull request that passes CI and a human can merge.
 
-Needs: G11, G12.
+Needs: G11b, G12.
 
 ---
 
@@ -279,6 +302,7 @@ Needs: G16.
 
 ### G18. Demo for 11 December
 
+- [ ] Reframe the 6-month story: the Pflichtenheft already required "nicht mehr als 6 Monate" while VB 13.3 said "nicht mindestens"; the platform found that ITSG's documents contradicted each other
 - [ ] Demo script: vendor run with full EEL coverage, deviations judged, VB 13.4 upload, rules and tests update, signed report, new vendor reaching the certified label
 - [ ] Demo data and accounts, seeded by one command
 - [ ] AI calls run live during the demo; cached answers take over automatically if the network or OpenAI fails; a local run as last resort

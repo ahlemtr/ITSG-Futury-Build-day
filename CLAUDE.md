@@ -27,5 +27,6 @@ Known: `tests/test_annex_evidence.py::test_vb_annex_centered_chapters_work_with_
 - Parameters are versioned with the Verfahrensbeschreibung; a Rundschreiben only proposes values.
 - UI is German only (legal terms stay German). OpenAI stays the provider. Only test data goes through the platform.
 - Login goes through Clerk (ITSG staff and vendor roles, invite only). Cloud is Google Cloud in `europe-west3`.
+- `sources/Pflichtenheft_EA_2026.2.pdf` (ITSG's checklist of requirements) is a hidden answer key: never load it into the knowledge base or any agent's tools; only the G12 evaluation reads it.
 - Keep `kg/build/` (paid embeddings) and `data/llm_cache/`; changing prompt text invalidates cached answers.
 - Git: work in `ahlemtr/ITSG-Futury-Build-day` (no fork), one branch + PR per feature into `main`. Tick `ROADMAP.md` boxes as work lands.
