@@ -31,4 +31,4 @@ Known: `tests/test_annex_evidence.py::test_vb_annex_centered_chapters_work_with_
 - The agent that drafts a change never reviews it: a separate reviewer agent writes expected outcomes blind; locked tests are never changed by an agent.
 - `sources/EEL/` (official EEL core check by AOK Systems) is internal code: never commit it.
 - Keep `kg/build/` (paid embeddings) and `data/llm_cache/`; changing prompt text invalidates cached answers.
-- Git: work in `ahlemtr/ITSG-Futury-Build-day` (no fork), one branch + PR per feature into `main`. Tick `ROADMAP.md` boxes as work lands.
+- Git: work in a fork; `upstream` is `ahlemtr/ITSG-Futury-Build-day`. One branch per feature, PR into upstream `main`; sync the fork from upstream before branching. Tick `ROADMAP.md` boxes as work lands.

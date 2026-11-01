@@ -147,7 +147,7 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 | Architecture | Keep Neo4j + Postgres |
 | Hosting | Google Cloud ($300 free credits), region Frankfurt (`europe-west3`), Google's default HTTPS URL, no own domain; Neo4j Community on a small Compute Engine VM, Postgres on Cloud SQL |
 | ITSG | There is a contact who can answer domain questions and provide data |
-| Git | Work in `ahlemtr/ITSG-Futury-Build-day` itself (no fork), so the whole team sees progress on `main`; one branch + pull request per feature; GitHub Actions (Linux) runs pytest, ruff, tsc and the i18n check on every PR |
+| Git | Work in a fork with `ahlemtr/ITSG-Futury-Build-day` as upstream (changed 2026-11-01); one branch per feature, pull request into upstream `main` so the team sees progress there; GitHub Actions (Linux) runs pytest, ruff, tsc and the i18n check on every PR |
 | Roadmap | [`ROADMAP.md`](ROADMAP.md): goals G0–G18 by phase, each one independent, ticked on `main` as work lands |
 | Scope order | 02 and 03 are built side by side after the engine is generalised (G2) |
 | Test data | Written by us from the VB and Beispielpapier text, replaced or validated with ITSG's cases when they arrive |
