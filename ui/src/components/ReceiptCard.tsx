@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import type { Receipt } from "../data/types";
-import { pick } from "../format";
 
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
@@ -10,7 +9,7 @@ function formatTimestamp(iso: string): string {
 
 /** Receipt for an upload, like eVpT's processing confirmation. */
 export function ReceiptCard({ receipt }: { receipt: Receipt }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   return (
     <section className="sub-card">
       <div className="sub-card-head">
@@ -70,7 +69,7 @@ export function ReceiptCard({ receipt }: { receipt: Receipt }) {
                   <td>{issue.record}</td>
                   <td>{issue.field ?? "–"}</td>
                   <td>{issue.position ?? "–"}</td>
-                  <td>{pick(issue.message, i18n.language)}</td>
+                  <td>{issue.message}</td>
                 </tr>
               ))}
             </tbody>

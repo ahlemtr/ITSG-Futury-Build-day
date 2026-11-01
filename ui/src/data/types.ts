@@ -1,9 +1,6 @@
 // Data shapes the UI expects. The backend API should send the same shapes,
 // the adapters in ./api map the backend JSON to them.
 
-/** Text the backend provides in both languages (e.g. explanations). */
-export type Localized = { de: string; en: string };
-
 /** Result label of a deviation or a whole submission (doc 05, section 5). */
 export type Label = "exact" | "variant" | "bug" | "invalid" | "unclear";
 
@@ -27,13 +24,13 @@ export type SpecRef = {
 export type Deviation = {
   id: string;
   label: Exclude<Label, "exact">;
-  title: Localized;
+  title: string;
   decidedBy: DecidedBy;
-  rule: { id: string; text: Localized };
+  rule: { id: string; text: string };
   /** missing when no rule or passage covers the deviation (unclear) */
   spec?: SpecRef;
-  criterion?: { id: string; text: Localized };
-  reasoning: Localized;
+  criterion?: { id: string; text: string };
+  reasoning: string;
 };
 
 export type FieldRow = {
@@ -51,7 +48,7 @@ export type FieldRow = {
   /** vendor's field name when matching paired it with a differently numbered field */
   vendorField?: string;
   /** why the field is ignored or checked by rule */
-  note?: Localized;
+  note?: string;
   source?: SpecRef;
 };
 
@@ -69,17 +66,17 @@ export type SubmissionSummary = {
 
 // ---------- Vendor view: test runs in rounds (06, section 5) ----------
 
-export type RuleRef = { id: string; text: Localized };
+export type RuleRef = { id: string; text: string };
 
 export type ReplyDef = {
   abgabegrund: string;
   fileName: string;
-  title: Localized;
+  title: string;
 };
 
 export type RoundDef = {
   nr: number;
-  instruction: Localized;
+  instruction: string;
   /** Abgabegründe the software must produce; [] = no message (import only) */
   expects: string[];
   rules: RuleRef[];
@@ -88,12 +85,12 @@ export type RoundDef = {
 
 export type RunDef = {
   testCaseId: string;
-  title: Localized;
+  title: string;
   ruleSet: string;
   /** hidden variant: the vendor gets the story only, never expected values */
   hidden: boolean;
-  story: Localized;
-  facts: { label: Localized; value: string }[];
+  story: string;
+  facts: { label: string; value: string }[];
   rounds: RoundDef[];
 };
 
@@ -108,7 +105,7 @@ export type Receipt = {
     sha256: string;
     records: { abgabegrund: string; datensatzId: string }[];
   }[];
-  issues: { file: string; line: number; record: string; field?: string; position?: number; message: Localized }[];
+  issues: { file: string; line: number; record: string; field?: string; position?: number; message: string }[];
 };
 
 export type RoundOutcome = {
@@ -116,7 +113,7 @@ export type RoundOutcome = {
   label: Label;
   rules: { id: string; passed: boolean }[];
   /** shown for public tests only */
-  message?: Localized;
+  message?: string;
 };
 
 // ---------- Advisor queue (doc 05, steps c and d) ----------
@@ -126,7 +123,7 @@ export type AiProposal = {
   label: Exclude<Label, "exact">;
   /** 0..1 */
   confidence: number;
-  reasoning: Localized;
+  reasoning: string;
   citations: SpecRef[];
   /** ids of similar precedents */
   precedents: string[];
@@ -134,7 +131,7 @@ export type AiProposal = {
 
 export type AdvisorItem = {
   id: string;
-  title: Localized;
+  title: string;
   vendor: string;
   testCaseId: string;
   ruleSet: string;
@@ -142,8 +139,8 @@ export type AdvisorItem = {
   record: string;
   field: string;
   kind: string;
-  expected: Localized;
-  actual: Localized;
+  expected: string;
+  actual: string;
   proposal?: AiProposal;
 };
 
@@ -156,7 +153,7 @@ export type Precedent = {
   advisor: string;
   /** ISO timestamp */
   at: string;
-  itemTitle: Localized;
+  itemTitle: string;
 };
 
 /** Figures for the Overview: one catalogue, today's and next year's rule version (06, section 3). */

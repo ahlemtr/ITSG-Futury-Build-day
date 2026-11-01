@@ -59,7 +59,7 @@ function Calendar({ data, vendor }: { data: CalendarData; vendor: boolean }) {
 // ---------- Vendor: what is due next ----------
 
 function Reminders({ deadlines }: { deadlines: Deadline[] }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const pressing = deadlines.filter(isPressing);
   const next = deadlines.find((d) => !d.done);
   const shown = pressing.length ? pressing : next ? [next] : [];
@@ -74,7 +74,7 @@ function Reminders({ deadlines }: { deadlines: Deadline[] }) {
             <span className="reminder-days tabular">{d.days < 0 ? `+${-d.days}` : d.days}</span>
             <span className="reminder-unit">{t(d.days < 0 ? "calendar.reminders.daysLate" : "calendar.reminders.daysLeft", { count: Math.abs(d.days) })}</span>
             <span className="reminder-text">
-              <strong>{deadlineTitle(t, d, i18n.language)}</strong>
+              <strong>{deadlineTitle(t, d)}</strong>
               <span className="cell-hint">{t("calendar.dueOn", { date: formatDate(d.due) })}</span>
             </span>
             {d.kind === "round" && d.params.test_case && (
@@ -94,7 +94,7 @@ function Reminders({ deadlines }: { deadlines: Deadline[] }) {
 type Row = { id: string | null; name: string; sub: string; deadlines: Deadline[] };
 
 function Timeline({ data, vendor }: { data: CalendarData; vendor: boolean }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const today = toDate(data.today);
   const start = addDays(today, -BACK);
   const span = BACK + AHEAD;
@@ -140,7 +140,7 @@ function Timeline({ data, vendor }: { data: CalendarData; vendor: boolean }) {
             <div className="tl-track" role="columnheader">
               {months.map((m) => (
                 <span key={m.iso} className="tl-month" style={{ left: `${m.left}%` }}>
-                  {monthLabel(m.iso.slice(0, 7), i18n.language, "short")}
+                  {monthLabel(m.iso.slice(0, 7), "short")}
                 </span>
               ))}
               <span className="tl-today-label" style={{ left: `${at(data.today)}%` }}>
@@ -172,9 +172,9 @@ function Timeline({ data, vendor }: { data: CalendarData; vendor: boolean }) {
                         key={d.id}
                         className={`tl-bar tl-${d.status}`}
                         style={{ left: `${left}%`, width: `${width}%` }}
-                        title={`${deadlineTitle(t, d, i18n.language)} · ${formatDate(d.due)} · ${dueText(t, d)}`}
+                        title={`${deadlineTitle(t, d)} · ${formatDate(d.due)} · ${dueText(t, d)}`}
                       >
-                        {width > 9 ? deadlineTitle(t, d, i18n.language) : deadlineCode(t, d)}
+                        {width > 9 ? deadlineTitle(t, d) : deadlineCode(t, d)}
                       </span>
                     );
                   })}
@@ -205,11 +205,11 @@ function marks(deadlines: Deadline[]): Deadline[][] {
 }
 
 function Mark({ group, left }: { group: Deadline[]; left: number }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const lead = group[0];
   // one status for the mark: overdue wins, then soon; done only when all are done
   const status = group.find((d) => d.status === "overdue")?.status ?? group.find((d) => d.status === "soon")?.status ?? (group.every((d) => d.done) ? "done" : "open");
-  const title = group.map((d) => `${deadlineTitle(t, d, i18n.language)} · ${dueText(t, d)}`).join("\n");
+  const title = group.map((d) => `${deadlineTitle(t, d)} · ${dueText(t, d)}`).join("\n");
   const label = group.map((d) => deadlineCode(t, d)).join(" + ");
   return (
     <span className={`tl-mark tl-mark-${lead.kind} tl-${status}`} style={{ left: `${left}%` }} title={`${formatDate(lead.due)}\n${title}`}>
@@ -261,7 +261,7 @@ function DeadlineList({
   filter: Filter;
   onFilter: (f: Filter) => void;
 }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const names = new Map(companies.map((c) => [c.id, c.name]));
   return (
     <section className="panel panel-flush" aria-labelledby="deadline-list-title">
@@ -289,7 +289,7 @@ function DeadlineList({
             <tr key={d.id} className={d.done ? "row-quiet" : undefined}>
               <td className="tabular cell-field">{formatDate(d.due)}</td>
               {!vendor && <td>{d.company_id ? names.get(d.company_id) : "ITSG"}</td>}
-              <td>{deadlineTitle(t, d, i18n.language)}</td>
+              <td>{deadlineTitle(t, d)}</td>
               <td>
                 <span className={`badge badge-${d.status === "overdue" ? "bug" : d.done ? "exact" : "neutral"}`}>{dueText(t, d)}</span>
               </td>

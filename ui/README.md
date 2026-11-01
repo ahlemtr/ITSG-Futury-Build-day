@@ -33,7 +33,7 @@ With `OPENAI_API_KEY` in `.env`, the AI proposals, the spec-update agent and the
 | Command | What it does |
 |---|---|
 | `npm run build` | type check + production build into `dist/` |
-| `npm run check:i18n` | lists texts missing in `de.json` or `en.json` |
+| `npm run check:i18n` | checks `de.json` (the only language file): no empty texts, every literal key the code uses exists |
 | `npm run build:layouts` | converts `layouts/*.yaml` (repo root) into `src/records/layouts.generated.json` (run again when the layouts change) |
 
 ## Where things are
@@ -44,4 +44,4 @@ With `OPENAI_API_KEY` in `.env`, the AI proposals, the spec-update agent and the
 | `src/components/` | top bar, left nav, shared pieces |
 | `src/screens/` | one file per screen |
 | `src/data/` | `api.ts` (backend calls and mapping to the UI types), stores, `runTexts.ts` (hand-written vendor run texts) |
-| `src/i18n/` | `de.json`, `en.json`, legal terms (`terms.ts`) and `glossary.md` |
+| `src/i18n/` | `de.json` (all UI texts, German only), legal terms (`terms.ts`) and the German vocabulary (`glossary.md`) |

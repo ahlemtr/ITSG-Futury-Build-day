@@ -71,7 +71,7 @@ Payroll software (SAP, DATEV, Lexware, …) must be certified by **ITSG** before
   </tr>
 </table>
 
-The UI is in **German by default** with an English switch. Legal terms, field names and spec passages always stay German, so the meaning of the law never changes in translation.
+The UI is **German only**, the language of the GKV and ITSG users. Legal terms, field names and spec passages appear exactly as the specification writes them.
 
 ## ⚙️ How it works
 
@@ -95,7 +95,7 @@ flowchart LR
 
 | Layer | Where | Tech |
 |---|---|---|
-| UI | [`ui/`](ui/) | React, TypeScript, Vite, i18n DE/EN |
+| UI | [`ui/`](ui/) | React, TypeScript, Vite, German texts in one i18n file |
 | API | [`api/`](api/) | FastAPI |
 | Engine | [`engine/`](engine/) | fixed-width record parser/writer, rules, checker, spec diff, Ed25519 signing |
 | Knowledge graph | [`kg/`](kg/) | Neo4j (or a YAML backend with no database) |
@@ -122,7 +122,7 @@ SPEC_BASELINE=VB@13.3 SEED_ON_START=0 uv run uvicorn api.main:app --port 8000
 cd ui && npm run dev
 ```
 
-Then open **Spec changes** and upload V13.4 to watch the whole flow. Run the tests with `uv run pytest -q`.
+Then open **Spec-Änderungen** and upload V13.4 (`sources/vb/2026_03_10_…_Version_13.4_ab_01.01.2027.pdf`) to watch the whole flow. Run the tests with `uv run pytest -q`; GitHub Actions runs them, ruff, the UI build and the graph tests on every push and pull request (`.github/workflows/ci.yml`).
 
 On Windows, `./dev.ps1` starts the databases, the API and the UI in one go (`./dev.ps1 -Reset` goes back to the VB 13.3 starting point first).
 
@@ -136,7 +136,7 @@ Needs `uv`, poppler (`pdftotext`) and, for the graph backend, Neo4j 5.13+.
 ```bash
 uv run python -m kg.build                 # extract -> build -> validate -> load -> embed
 uv run python -m kg.build --skip-load     # offline: passages + graph.json + validation only
-uv run pytest tests/test_kg.py            # both backends; graph tests skip without Neo4j
+uv run pytest tests/test_kg.py            # both backends; graph tests run only with NEO4J_TESTS=1 and a full graph (they write to it)
 ```
 
 `KG_BACKEND=yaml` (default) answers from `kg/seed/`, `layouts/` and `kg/build/passages.yaml` without Neo4j or OpenAI.

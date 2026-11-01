@@ -41,8 +41,8 @@ const EXAMPLE: Form = {
 /** "1.234,5" or "1234.5" -> "1234.5" */
 const num = (s: string) => (s.includes(",") ? s.replace(/\./g, "").replace(",", ".") : s).trim();
 
-const eur = (v: string, lang: string) =>
-  Number(v).toLocaleString(lang === "en" ? "en-GB" : "de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const eur = (v: string) =>
+  Number(v).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const MONEY = new Set([
   "regelentgelt_laufend", "netto_laufend", "hinzurechnung_brutto", "regelentgelt_kumuliert", "hoechstregelentgelt",
@@ -52,7 +52,7 @@ const MONEY = new Set([
 
 /** The advisors' calculator: Krankengeld from Arbeitsentgelt as RS Anlage 3 computes it, every step with its source. */
 export function CalculatorScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [form, setForm] = useState<Form>(EXAMPLE);
   const [fileValue, setFileValue] = useState("");
   const [result, setResult] = useState<CalcResult | null>(null);
@@ -84,7 +84,6 @@ export function CalculatorScreen() {
     }
   }
 
-  const lang = i18n.language;
   const compared = result && fileValue.trim() ? Number(num(fileValue)) : null;
   const matches = compared !== null && result ? Math.abs(compared - Number(result.krankengeld)) < 0.005 : null;
 
@@ -174,7 +173,7 @@ export function CalculatorScreen() {
               <div className="calc-headline">
                 <div>
                   <span className="cell-hint">{t("calc.krankengeld")}</span>
-                  <strong className="calc-amount tabular">{eur(result.krankengeld, lang)} €</strong>
+                  <strong className="calc-amount tabular">{eur(result.krankengeld)} €</strong>
                   <span className="cell-hint">{t("calc.perDay")}</span>
                 </div>
                 <div>
@@ -183,7 +182,7 @@ export function CalculatorScreen() {
                 </div>
                 {matches !== null && (
                   <span className={`badge ${matches ? "badge-exact" : "badge-bug"}`}>
-                    {t(matches ? "calc.match" : "calc.mismatch", { value: eur(String(compared), lang) })}
+                    {t(matches ? "calc.match" : "calc.mismatch", { value: eur(String(compared)) })}
                   </span>
                 )}
               </div>
@@ -200,8 +199,8 @@ export function CalculatorScreen() {
                   {result.steps.map((s) => (
                     <tr key={s.key} className={s.key === "krankengeld" ? "calc-final" : undefined}>
                       <td>{t(`calc.step.${s.key}`, { defaultValue: s.key })}</td>
-                      <td className="num tabular">{MONEY.has(s.key) ? `${eur(s.value, lang)} €` : s.value}</td>
-                      <td className="cell-hint tabular">{t(`calc.how.${s.key}`, { defaultValue: s.formula.replace(/(\d)\.(\d)/g, lang === "en" ? "$1.$2" : "$1,$2") })}</td>
+                      <td className="num tabular">{MONEY.has(s.key) ? `${eur(s.value)} €` : s.value}</td>
+                      <td className="cell-hint tabular">{t(`calc.how.${s.key}`, { defaultValue: s.formula.replace(/(\d)\.(\d)/g, "$1,$2") })}</td>
                       <td>
                         {s.passage ? (
                           <span title={s.passage}>

@@ -5,7 +5,6 @@ import type { AdvisorItem, Precedent } from "../data/types";
 import { Badge } from "../components/Badge";
 import { SpecRefText } from "../components/SpecRefText";
 import { useSetTopBar } from "../components/TopBarContext";
-import { pick } from "../format";
 import { InfoTip, Reasoning } from "../components/InfoTip";
 import { signatureLabel } from "../data/labels";
 
@@ -13,7 +12,7 @@ const DECISIONS: Precedent["label"][] = ["variant", "bug", "invalid"];
 const ADVISOR = "SA";
 
 export function AdvisorQueueScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { open, decided, status } = useAdvisorState();
   const [selectedId, setSelectedId] = useState(open[0]?.id ?? "");
   const [lastSaved, setLastSaved] = useState<Precedent | null>(null);
@@ -78,7 +77,7 @@ export function AdvisorQueueScreen() {
                     onClick={() => setSelectedId(item.id)}
                   >
                     <span className="queue-item-head">
-                      <strong>{pick(item.title, i18n.language)}</strong>
+                      <strong>{item.title}</strong>
                       <Badge value="unclear" />
                     </span>
                     <span className="cell-hint">
@@ -97,7 +96,7 @@ export function AdvisorQueueScreen() {
                 {decided.map((p) => (
                   <li key={p.id}>
                     {p.id !== p.signature && <span className="mono">{p.id} </span>}
-                    {pick(p.itemTitle, i18n.language)} <Badge value={p.label} />
+                    {p.itemTitle} <Badge value={p.label} />
                     <div className="cell-hint">
                       {t("advisor.signature")}: <span title={p.signature}>{signatureLabel(t, p.signature)}</span>
                     </div>
@@ -121,8 +120,7 @@ function DeviationDetail({
   item: AdvisorItem;
   onDecide: (item: AdvisorItem, label: Precedent["label"], reason: string) => Promise<void>;
 }) {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language;
+  const { t } = useTranslation();
   const [reason, setReason] = useState("");
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -143,7 +141,7 @@ function DeviationDetail({
 
   return (
     <section className="panel advisor-detail">
-      <h2>{pick(item.title, lang)}</h2>
+      <h2>{item.title}</h2>
       <p className="cell-hint">
         {item.vendor} · {item.testCaseId} · V{item.ruleSet} · {item.record}
         {item.field !== "*" && ` · ${item.field}`}
@@ -152,11 +150,11 @@ function DeviationDetail({
       <div className="compare-tiles">
         <div className="fact-tile">
           <span className="cell-hint">{t("result.col.expected")}</span>
-          <strong>{pick(item.expected, lang)}</strong>
+          <strong>{item.expected}</strong>
         </div>
         <div className="fact-tile">
           <span className="cell-hint">{t("result.col.actual")}</span>
-          <strong>{pick(item.actual, lang)}</strong>
+          <strong>{item.actual}</strong>
         </div>
       </div>
 
@@ -183,7 +181,7 @@ function DeviationDetail({
             {t("advisor.similar")}: {proposal.precedents.length ? proposal.precedents.join(", ") : t("advisor.none")}
           </p>
           <Reasoning>
-            <p>{pick(proposal.reasoning, lang)}</p>
+            <p>{proposal.reasoning}</p>
           </Reasoning>
         </section>
       ) : (

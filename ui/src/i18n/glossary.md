@@ -1,50 +1,48 @@
-# Glossary for the English UI
+# German UI vocabulary
+
+The UI is German only. This list keeps the wording the same on every screen; all texts live in `de.json`.
 
 Rules:
 
-- Legal and procedure terms stay **German** in both languages. English mode shows the meaning below as a tooltip. Source: `src/i18n/terms.ts`.
-- Field and block names (DSLW, DBVO, ABGABEGRUND, AU-AB-AG ...) are never translated.
-- Spec passages are always shown in the original German. An English help text must be marked "Unofficial translation, the German text is binding".
-- Every English UI text uses the words in this list, never a free translation.
+- Legal and procedure terms are written exactly as the law and the specification write them. Source: `src/i18n/terms.ts`.
+- Field and block names (DSLW, DBVO, ABGABEGRUND, AU-AB-AG ...), Abgabegrund codes (41, 61 ...) and spec references (VB V13.3, 3.12) are shown as they are.
+- Spec passages are always quoted in the original wording.
+- Every UI text uses the words in these lists, never a synonym.
 
-| German (always shown) | English meaning (tooltip) |
-|---|---|
-| Systemuntersuchung EEL | system review of payroll software, EEL |
-| Verfahrensbeschreibung | procedure description (the DTA EEL spec) |
-| Vorerkrankung | prior illness |
-| Abgabegrund | message type code |
-| Entgeltfortzahlung (EFZ) | employer-paid sick period |
-| Arbeitsunfähigkeit (AU) | incapacity for work |
-| Vorbewertung | preliminary evaluation (eVpT) |
+## Legal and procedure terms
 
-Field and block names, Abgabegrund codes (41, 61 ...) and spec references (VB V13.3, 3.12) are shown as they are in both languages.
+- Systemuntersuchung EEL
+- Verfahrensbeschreibung
+- Vorerkrankung
+- Abgabegrund
+- Entgeltfortzahlung (EFZ)
+- Arbeitsunfähigkeit (AU)
+- Vorbewertung
 
 ## Fixed UI words
 
-| German UI | English UI |
-|---|---|
-| Übersicht | Overview |
-| Spec-Änderungen | Spec changes |
-| Testkatalog | Test catalogue |
-| Einreichungen | Submissions |
-| Klärungsfälle | Advisor queue |
-| Prüfberichte | Reports |
-| Regelwerk | Rule set |
-| Exakte Übereinstimmung | Exact match |
-| Zulässige Variante | Correct variant |
-| Fehler | Bug |
-| Ungültig | Invalid |
-| Unklar | Unclear |
-| Ignoriert | Ignored |
-| Präzedenzfall | Precedent |
-| Versteckte Variante | Hidden variant |
-| Musterlösung | Model solution |
-| Herstellerdatei | Vendor file |
-| Systemberater | System advisor |
-| Baustein | Block |
-| Regelfeld | Rule field |
-| Gültig | Valid |
-| Identisch | Identical |
-| vergleichen / ignorieren / Regel | compare / ignore / rule |
-| Einreichung | Submission |
-| Runde | Round |
+- Übersicht
+- Spec-Änderungen
+- Testkatalog
+- Einreichungen
+- Klärungsfälle
+- Prüfberichte
+- Regelwerk
+- Exakte Übereinstimmung
+- Zulässige Variante
+- Fehler
+- Ungültig
+- Unklar
+- Ignoriert
+- Präzedenzfall
+- Versteckte Variante
+- Musterlösung
+- Herstellerdatei
+- Systemberater
+- Baustein
+- Regelfeld
+- Gültig
+- Identisch
+- vergleichen / ignorieren / Regel
+- Einreichung
+- Runde

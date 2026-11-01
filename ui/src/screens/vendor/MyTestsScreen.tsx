@@ -5,7 +5,6 @@ import { RUNS } from "../../data/runTexts";
 import { useSavedRun } from "../../data/runStore";
 import { useData } from "../../data/useData";
 import type { RunDef } from "../../data/types";
-import { pick } from "../../format";
 import { InfoTip } from "../../components/InfoTip";
 
 export function MyTestsScreen() {
@@ -47,7 +46,7 @@ export function MyTestsScreen() {
 }
 
 function TestRow({ run }: { run: RunDef }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const state = useSavedRun(run.testCaseId);
   const open = () => navigate(`/vendor/runs/${run.testCaseId}`);
@@ -62,7 +61,7 @@ function TestRow({ run }: { run: RunDef }) {
   return (
     <tr tabIndex={0} className="row-link" onClick={open} onKeyDown={(e) => e.key === "Enter" && open()}>
       <td className="cell-field">{run.testCaseId}</td>
-      <td>{pick(run.title, i18n.language)}</td>
+      <td>{run.title}</td>
       <td>V{run.ruleSet}</td>
       <td>
         <span className={`badge ${run.hidden ? "badge-unclear" : "badge-neutral"}`}>

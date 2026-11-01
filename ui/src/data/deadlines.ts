@@ -10,21 +10,21 @@ export const addDays = (d: Date, n: number) => new Date(d.getTime() + n * DAY);
 
 export const daysBetween = (a: Date, b: Date) => Math.round((b.getTime() - a.getTime()) / DAY);
 
-export function monthLabel(isoMonth: string, lang: string, style: "long" | "short" = "long"): string {
+export function monthLabel(isoMonth: string, style: "long" | "short" = "long"): string {
   const [y, m] = isoMonth.split("-").map(Number);
-  return new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "de-DE", { month: style, year: "numeric" }).format(
+  return new Intl.DateTimeFormat("de-DE", { month: style, year: "numeric" }).format(
     new Date(y, m - 1, 1),
   );
 }
 
 /** "Runde 2 von 4 · peter", "Rezertifizierung V13.4", ... */
-export function deadlineTitle(t: TFunction, d: Deadline, lang: string): string {
+export function deadlineTitle(t: TFunction, d: Deadline): string {
   const p = d.params;
   switch (d.kind) {
     case "round":
       return t("calendar.kind.round", { round: p.round, rounds: p.rounds, testCase: p.test_case });
     case "permanent":
-      return t("calendar.kind.permanent", { month: monthLabel(p.month ?? d.due.slice(0, 7), lang) });
+      return t("calendar.kind.permanent", { month: monthLabel(p.month ?? d.due.slice(0, 7)) });
     default:
       // an unknown kind (older API) shows its name, never a raw translation key
       return t(`calendar.kind.${d.kind}`, { version: p.version, passed: p.passed ?? 0, tests: p.tests ?? 0, defaultValue: d.kind });
