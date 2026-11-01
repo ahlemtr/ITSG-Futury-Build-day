@@ -80,11 +80,11 @@ class Checker:
         issues: list[ParseIssue] = []
         actual: list[Record] = []
         for f in files:
-            pf = parse_file(f, self.kb, version)
+            pf = parse_file(f, self.kb, version, valid_on)
             issues += pf.issues
             actual += pf.messages
         expected = chain.employer()
-        differ = Differ(self.kb, version)
+        differ = Differ(self.kb, version, valid_on)
         devs, pairs = differ.diff(expected, actual)
         self.actual_by_step = {m.step: r for m, r in pairs}
         step_of = {id(r): m.step for m, r in pairs}
@@ -98,7 +98,7 @@ class Checker:
         # format and rule-field checks on the vendor's own messages: shared ones, then the family's
         self.ctx = CheckContext(kb=self.kb, version=version, scenario=sc, chain=chain, rules=self.rules,
                                 actual=actual, params=self.params, step_of=step_of, label=self._label)
-        self.flags = layouts.get(self.kb, "DSLW", version).flags  # block -> MM flag
+        self.flags = layouts.get(self.kb, "DSLW", version, valid_on).flags  # block -> MM flag
         results: list[tuple[Record | None, RuleResult]] = []
         for r in actual:
             results += [(r, x) for x in formats.check_mm_flags(r)]

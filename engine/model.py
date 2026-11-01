@@ -46,6 +46,7 @@ class Layout(BaseModel):
     fixed_length: int
     status: Literal["extracted", "inferred", "partial", "missing"]
     version: str
+    layout_version: str | None = None  # VB Anlage 1 in force, e.g. VB-ANL1@13.1.4 from 01.07.2027
     fields: list[FieldDef]
 
 

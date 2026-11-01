@@ -161,8 +161,8 @@ class GraphBackend:
                        record=record, field=fkey)
         return [dict(r["d"], applicable=r["d"]["document_version"] in active) for r in rows]
 
-    def get_layout(self, record: str, version: str) -> Layout:
-        from kg.field_evidence import resolve_fields
+    def get_layout(self, record: str, version: str, on_date=None) -> Layout:
+        from kg.field_evidence import layout_version, resolve_fields
 
         vb = resolve_vb(version, self.vb_versions)
         row = self._one(
@@ -173,13 +173,14 @@ class GraphBackend:
             f"Record {record!r}", record=record)
         rec = row["rec"]
         fields = []
-        resolved = resolve_fields(row["fields"], self.get_field_definitions(record, version=vb),
-                                  self._document_versions(), vb)
+        resolved = resolve_fields(row["fields"], self.get_field_definitions(record, version=vb, on_date=on_date),
+                                  self._document_versions(), vb, on_date)
         for f in resolved:
             f["values"] = json.loads(f["values"]) if f.get("values") else None
             fields.append(FieldDef(**f))
         return Layout(record=record, title=rec["title"], section=rec["section"], page=rec.get("page"),
-                      fixed_length=rec["fixed_length"], status=rec["status"], version=vb, fields=fields)
+                      fixed_length=rec["fixed_length"], status=rec["status"], version=vb,
+                      layout_version=layout_version(self._document_versions(), vb, on_date), fields=fields)
 
     def get_rules(self, abgabegrund: str, version: str) -> list[Rule]:
         vb = resolve_vb(version, self.vb_versions)

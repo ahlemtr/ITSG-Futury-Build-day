@@ -42,7 +42,10 @@ __all__ = [
 
 
 class KnowledgeBase(Protocol):
-    def get_layout(self, record: str, version: str) -> Layout: ...
+    def get_layout(self, record: str, version: str, on_date=None) -> Layout:
+        """Record layout of a rule set version. `on_date` (the case's validity date) picks the technical
+        field definitions in force that day: VB Anlage 1 changes mid-year (13.1.4 from 01.07.2027)."""
+        ...
 
     def get_field_definitions(self, record: str, field: str | None = None,
                               version: str | None = None, on_date=None) -> list[dict]: ...

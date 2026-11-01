@@ -109,6 +109,12 @@ def applicable_documents(documents: list[dict], version: str | None = None, on_d
     return {f"{d['doc']}@{d['version']}" for d in best.values()}
 
 
+def layout_version(documents: list[dict], version: str | None, on_date=None) -> str | None:
+    """The VB Anlage 1 (record layouts with checks) in force for a rule set version, or on a date."""
+    active = sorted(k for k in applicable_documents(documents, version, on_date) if k.startswith("VB-ANL1@"))
+    return active[-1] if active else None
+
+
 def resolve_fields(fields: list[dict], definitions: list[dict], documents: list[dict], version: str,
                    on_date=None) -> list[dict]:
     """Executable metadata follows an applicable technical definition of the same field span.

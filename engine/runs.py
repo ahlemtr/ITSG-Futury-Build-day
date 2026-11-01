@@ -77,7 +77,7 @@ def submit(kb: KnowledgeBase, st: RunState, files: list[str | bytes]) -> RoundRe
     r = st.round
     texts = [f.decode("utf-8") if isinstance(f, bytes) else f for f in files]
     st.files += texts
-    new_msgs = [m for t in texts for m in parse_file(t, kb, st.version).messages]
+    new_msgs = [m for t in texts for m in parse_file(t, kb, st.version, st.valid_on).messages]
     ch = build_chain(load_scenario(kb, st.test_case), st.version, kb)
     exp_round = [m for m in ch.messages if m.actor == "employer" and m.round == r]
     steps_done = {m.step for m in ch.messages if m.actor == "employer" and m.round <= r}
@@ -105,7 +105,7 @@ def submit(kb: KnowledgeBase, st: RunState, files: list[str | bytes]) -> RoundRe
         for rule in families.of_case(st.test_case).round_one_rules(st.test_case):
             outcomes.setdefault(rule, RuleOutcome(rule=rule, outcome="pass"))
     result = RoundResult(round=r, outcomes=list(outcomes.values()), ended=ended)
-    vendor = [m for t in st.files for m in parse_file(t, kb, st.version).messages]
+    vendor = [m for t in st.files for m in parse_file(t, kb, st.version, st.valid_on).messages]
     replies = [m for m in ch.messages if m.actor == "insurer" and m.round == r]
     if replies and not ended:
         fam = families.of_case(st.test_case)

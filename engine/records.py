@@ -91,12 +91,13 @@ def format_value(f: FieldDef, value: Any) -> str:
 
 
 class Parser:
-    def __init__(self, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION):
+    def __init__(self, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION, on_date=None):
         from engine.rules.params import latest
 
         self.kb = kb
         self.version = version = version or latest(kb)
-        self.dslw = layouts.get(kb, "DSLW", version)
+        self.on_date = on_date
+        self.dslw = layouts.get(kb, "DSLW", version, on_date)
 
     def _cut(self, line: str, f: FieldDef, base: int, rec: str, issues: list[ParseIssue], line_no: int) -> FieldValue:
         a = base + f.start - 1
@@ -140,7 +141,7 @@ class Parser:
         rec.head = {f.name: self._cut(line, f, 0, "DSLW", issues, line_no) for f in self.dslw.fields}
         pos = self.dslw.fixed_length
         for blk in self.dslw.block_order:
-            lay = layouts.get(self.kb, blk, self.version)
+            lay = layouts.get(self.kb, blk, self.version, self.on_date)
             flag_name = self.dslw.flags[blk]
             flag = rec.head.get(flag_name)
             if not flag or flag.value != "J":
@@ -169,11 +170,13 @@ class Parser:
         return rec, issues
 
 
-def parse_file(text: str | bytes, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION) -> ParsedFile:
+def parse_file(text: str | bytes, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION,
+               on_date=None) -> ParsedFile:
+    """`on_date`: the case's validity date (picks the VB Anlage 1 field definitions in force)."""
     encoding = "utf-8"
     if isinstance(text, bytes):
         text, encoding = decode(text)
-    p = Parser(kb, version)
+    p = Parser(kb, version, on_date)
     out = ParsedFile(encoding=encoding)
     for n, (line, nl) in enumerate(_split_lines(text), 1):
         if not line.strip():

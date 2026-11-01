@@ -181,8 +181,8 @@ class YamlBackend:
                 for k, p in self._labelled("FieldDefinition")
                 if p["record"] == record and (fkey is None or p["field"] == fkey)]
 
-    def get_layout(self, record: str, version: str) -> Layout:
-        from kg.field_evidence import resolve_fields
+    def get_layout(self, record: str, version: str, on_date=None) -> Layout:
+        from kg.field_evidence import layout_version, resolve_fields
 
         vb = resolve_vb(version, self.vb_versions)
         p = self._props("Record", record)
@@ -193,10 +193,12 @@ class YamlBackend:
             f = dict(self.nodes[("Field", e["to_key"])])
             f["values"] = json.loads(f["values"]) if f.get("values") else None
             raw_fields.append(dict(f, key=e["to_key"]))
-        fields = [FieldDef(**f) for f in resolve_fields(raw_fields, self.get_field_definitions(record, version=vb),
-                                                       self._document_versions(), vb)]
+        fields = [FieldDef(**f) for f in resolve_fields(raw_fields,
+                                                       self.get_field_definitions(record, version=vb, on_date=on_date),
+                                                       self._document_versions(), vb, on_date)]
         return Layout(record=record, title=p["title"], section=p["section"], page=p.get("page"),
-                      fixed_length=p["fixed_length"], status=p["status"], version=vb, fields=fields)
+                      fixed_length=p["fixed_length"], status=p["status"], version=vb,
+                      layout_version=layout_version(self._document_versions(), vb, on_date), fields=fields)
 
     def get_rules(self, abgabegrund: str, version: str) -> list[Rule]:
         vb = resolve_vb(version, self.vb_versions)
