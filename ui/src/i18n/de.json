@@ -158,6 +158,7 @@
     "col": {
       "vendor": "Hersteller (Demo)",
       "testCase": "Testfall",
+      "family": "Fallgruppe",
       "round": "Runde",
       "ruleSet": "Regelwerk",
       "result": "Ergebnis",

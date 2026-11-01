@@ -572,6 +572,9 @@ export type ApiTestCase = {
   steps: "single" | "chain";
   /** rule-set versions whose expected result differs from the version before */
   result_changes: string[];
+  /** scenario family (Fallgruppe), e.g. vorerkrankung / "Vorerkrankung" */
+  family: string;
+  family_title: string;
 };
 
 export const getTestCases = () => getJson<ApiTestCase[]>("/test-cases");
@@ -580,18 +583,18 @@ export const getTestCases = () => getJson<ApiTestCase[]>("/test-cases");
  * (TA 167, 168) carry inputs only and are not runnable yet (P10). */
 export async function getVendorRuns(curated: RunDef[]): Promise<RunDef[]> {
   const cases = (await getTestCases()).filter((t) => t.status === "approved" && t.origin !== "pta");
-  return cases.map(
-    (t) =>
-      curated.find((r) => r.testCaseId === t.id) ?? {
-        testCaseId: t.id,
-        title: `Testfall ${t.id}`,
-        ruleSet: "13.4",
-        hidden: t.hidden,
-        story: "",
-        facts: [],
-        rounds: [],
-      },
-  );
+  return cases.map((t) => {
+    const def: RunDef = curated.find((r) => r.testCaseId === t.id) ?? {
+      testCaseId: t.id,
+      title: `Testfall ${t.id}`,
+      ruleSet: "13.4",
+      hidden: t.hidden,
+      story: "",
+      facts: [],
+      rounds: [],
+    };
+    return { ...def, familyTitle: t.family_title };
+  });
 }
 
 // ---------- Signed reports (screen 6) ----------
@@ -599,6 +602,7 @@ export async function getVendorRuns(curated: RunDef[]): Promise<RunDef[]> {
 export type ReportListItem = {
   id: string;
   testCaseId: string;
+  familyTitle: string;
   vendor: string;
   ruleSet: string;
   verdict: Label;
@@ -610,11 +614,12 @@ export type ReportListItem = {
 export async function getReports(vendor?: string): Promise<ReportListItem[]> {
   const q = vendor ? `?vendor=${encodeURIComponent(vendor)}` : "";
   const rows = await getJson<
-    { submission_id: string; test_case_id: string; vendor: string | null; rule_set_version: string; label: string; created: string; signed: string | null }[]
+    { submission_id: string; test_case_id: string; family_title: string; vendor: string | null; rule_set_version: string; label: string; created: string; signed: string | null }[]
   >(`/reports${q}`);
   return rows.map((r) => ({
     id: r.submission_id,
     testCaseId: r.test_case_id,
+    familyTitle: r.family_title,
     vendor: r.vendor ?? "–",
     ruleSet: r.rule_set_version,
     verdict: toLabel(r.label),

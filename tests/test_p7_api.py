@@ -30,6 +30,14 @@ def test_seed_counts(client):
     assert [v["version"] for v in client.get("/versions").json()] == ["13.3", "13.4"]
 
 
+def test_families_group_cases_runs_and_reports(client):
+    assert {"id": "vorerkrankung", "title": "Vorerkrankung", "codes": ["01", "41", "61", "62", "88"]} in         client.get("/families").json()
+    assert {(t["family"], t["family_title"]) for t in client.get("/test-cases").json()} ==         {("vorerkrankung", "Vorerkrankung")}
+    run = client.post("/runs", json={"test_case_id": "peter", "valid_on": "2027-01-01"}).json()
+    assert run["family_title"] == "Vorerkrankung"
+    assert all(r["family"] == "vorerkrankung" for r in client.get("/reports").json())
+
+
 def test_parse(client, itsg_bytes):
     r = client.post("/parse", files={"file": ("TEEL0", itsg_bytes)}).json()
     assert r["issues"] == [] and r["records"][2]["fields"]["DBVO.AU-AB-AG"] == "2026-03-11"

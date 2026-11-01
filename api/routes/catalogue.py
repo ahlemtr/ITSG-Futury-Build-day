@@ -7,6 +7,7 @@ from itertools import pairwise
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 
 from api.routes.common import kb, real_versions, repo, test_case
+from engine import families
 from engine.expected import build_chain, get_case, load_scenario
 from engine.records import parse_file
 
@@ -31,7 +32,7 @@ def versions(request: Request, document: str = "VB"):
 @router.get("/rules")
 def rules(request: Request, version: str):
     out: dict[str, dict] = {}
-    for ag in ("41", "61", "62", "01", "88"):
+    for ag in sorted({c for f in families.all_families() for c in f.codes}):
         for r in kb(request).get_rules(ag, version):
             out.setdefault(r.id, r.model_dump())
     params = {}
@@ -55,8 +56,15 @@ def list_test_cases(request: Request, kind: str | None = None, hidden: bool | No
                 if old in t.expected and new in t.expected and t.expected[old] != t.expected[new]]
 
     return [{"id": t.id, "kind": t.kind, "origin": t.origin, "status": t.status, "hidden": t.hidden,
-             "parent": t.parent, "targets": t.targets, "steps": t.steps, "result_changes": result_changes(t)}
-            for t in items]
+             "parent": t.parent, "targets": t.targets, "steps": t.steps, "result_changes": result_changes(t),
+             "family": t.family, "family_title": families.get(t.family).title}
+            for t in sorted(items, key=lambda t: t.family)]
+
+
+@router.get("/families")
+def list_families():
+    """The scenario families the engine knows (engine/families/)."""
+    return [{"id": f.id, "title": f.title, "codes": sorted(f.codes)} for f in families.all_families()]
 
 
 @router.get("/test-cases/{id_}")

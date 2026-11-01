@@ -148,6 +148,14 @@
 }
 
 .diff-table th,
+.list-table .group-row td {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--ink-muted);
+  background: var(--ground);
+  padding: 6px 12px;
+}
+
 .list-table th {
   text-align: left;
   font-weight: 500;

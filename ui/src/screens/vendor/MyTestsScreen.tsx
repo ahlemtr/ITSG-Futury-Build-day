@@ -30,7 +30,15 @@ export function MyTestsScreen() {
             </tr>
           </thead>
           <tbody>
-            {runs.status === "ready" && runs.data.map((run) => <TestRow key={run.testCaseId} run={run} />)}
+            {runs.status === "ready" &&
+              runs.data.map((run, i) => [
+                (i === 0 || runs.data[i - 1].familyTitle !== run.familyTitle) && (
+                  <tr key={`family-${run.familyTitle}`} className="group-row">
+                    <td colSpan={5}>{t("submissions.col.family")}: {run.familyTitle}</td>
+                  </tr>
+                ),
+                <TestRow key={run.testCaseId} run={run} />,
+              ])}
             {runs.status !== "ready" && (
               <tr>
                 <td colSpan={5} className="empty">

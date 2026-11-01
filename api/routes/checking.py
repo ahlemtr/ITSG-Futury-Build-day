@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, Response
 from pydantic import BaseModel
 
 from api.routes.common import ai, kb, real_versions, repo, test_case
-from engine import intake, layouts, report, signing
+from engine import families, intake, layouts, report, signing
 from engine.checker import Checker
 from engine.diff import Differ
 from engine.expected import build_chain, load_scenario
@@ -242,7 +242,12 @@ def list_reports(request: Request, vendor: str | None = None):
         if res is None or (vendor and s.vendor != vendor):
             continue
         signed = repo(request).get_report(s.id)
+        try:
+            fam = families.of_case(test_case(request, s.test_case_id))
+        except Exception:  # noqa: BLE001 - a deleted test case must not break the list
+            fam = families.get(None)
         out.append({"submission_id": s.id, "test_case_id": s.test_case_id, "vendor": s.vendor,
+                    "family": fam.id, "family_title": fam.title,
                     "rule_set_version": res.version, "label": res.label, "created": s.created.isoformat(),
                     "signed": signed["report"]["created"] if signed else None})
     return out

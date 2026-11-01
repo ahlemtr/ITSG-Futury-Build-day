@@ -37,6 +37,7 @@ export function ReportsScreen({ vendor = false }: { vendor?: boolean }) {
                 <tr>
                   {!vendor && <th>{t("submissions.col.vendor")}</th>}
                   <th>{t("submissions.col.testCase")}</th>
+                  <th>{t("submissions.col.family")}</th>
                   <th>{t("submissions.col.ruleSet")}</th>
                   <th>{t("submissions.col.result")}</th>
                   <th>{t("report.col.signed")}</th>
@@ -45,7 +46,7 @@ export function ReportsScreen({ vendor = false }: { vendor?: boolean }) {
               <tbody>
                 {state.data.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="empty">
+                    <td colSpan={6} className="empty">
                       {t("report.none")}
                     </td>
                   </tr>
@@ -59,6 +60,7 @@ export function ReportsScreen({ vendor = false }: { vendor?: boolean }) {
                         {r.testCaseId}
                         {r.hidden && <span className="badge badge-unclear"> {t("run.hidden")}</span>}
                       </td>
+                      <td>{r.familyTitle}</td>
                       <td>V{r.ruleSet}</td>
                       <td>
                         <Badge value={r.verdict} />
