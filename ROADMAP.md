@@ -37,7 +37,7 @@ Done when: every push to `main` and every PR shows a green check.
 
 Why: answers from the ITSG contact unblock several scope goals; the English UI is extra work on every new screen.
 
-- [ ] Send the 10 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for VB Anlage 3 and example cases with solution files for 02, 03 and the other messages
+- [ ] Send the 14 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for VB Anlage 3 and example cases with solution files for 02, 03 and the other messages
 - [ ] Record each answer in `PROJECT_REPORT.md` and in the affected rule or parameter
 - [ ] Remove the English locale and the language switch; keep the i18n key structure so texts stay in one place
 - [ ] Update the i18n check to German only
@@ -59,6 +59,8 @@ Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scen
 - [ ] Define a scenario family interface (inputs, expected chain builder, rules, compare modes) and move the prior-illness logic behind it
 - [ ] Map each Abgabegrund to its required and optional data blocks (VB Anlage 3, or the VB text until it arrives)
 - [ ] Check every layout in `layouts/` against GG Anlage 1 (`tools/compare_anlage1`), fill gaps
+- [ ] Version the record layouts by validity date like the rules (VB Anlage 1 13.1.4 changes them on 01.07.2027, not at a year start)
+- [ ] Fix the Beispielpapier versions: BP 13.2 (`sources/beispielpapier/`, valid 2026) belongs to VB 13.3, BP 13.3 to VB 13.4 (2027); add BP 13.2 to `documents.yaml` and correct the 13 `BP@13.3` citations in `rules.yaml` and `test_cases.yaml` (the five prior-illness examples are identical in both, so the expected results stay)
 - [ ] Test cases name their family; catalogue, runs and reports group by family
 - [ ] Complete the existing rules (`PROJECT_REPORT.md` section 5.2, item 12):
   - [ ] Implement E-3 (an update only in interim flags 3 or 4 does not cancel the earlier 61); today it has a rule card and no code
@@ -82,6 +84,7 @@ Why: 01 appears in Peter's chain, but only the fields that touch the chain are c
 - [ ] Connect the Krankengeld calculator: expected salary values on the 01 are computed, not typed into the test data
 - [ ] Extend the calculator to the cases it lacks (Entgeltumwandlung, flexible working time, Altersteilzeit, output-based pay, the special cases of RS Anl. 3 4.1.1.1.1.2)
 - [ ] Test cases: monthly pay, hourly pay, part time, one-off payment, start of employment mid-month, plus hidden variants
+- [ ] Locked tests from the Beispielpapier examples of this family (ITSG's own situation and result, for 2026 from BP 13.2 and for 2027 from BP 13.3) (chapters 3, 7, 12)
 - [ ] Insurer replies to a 01 (62 benefit end, error replies)
 - [ ] Certificate 04 (Krankengeld for a companion in hospital): same blocks as the 01 plus the hospital stay, with its own test cases
 
@@ -94,6 +97,7 @@ Needs: G2.
 - [ ] Layouts and rules for 02 (child data, care days, limits per child and year)
 - [ ] Expected chain and test cases, including limit boundaries and a hidden variant
 - [ ] Insurer replies and checker labels
+- [ ] Locked tests from the Beispielpapier examples of this family (ITSG's own situation and result, for 2026 from BP 13.2 and for 2027 from BP 13.3)
 
 Done when: a vendor can run a 02 test case end to end and get a signed report.
 
@@ -104,6 +108,7 @@ Needs: G2.
 - [ ] Layouts and rules for 03 (protection periods before and after birth, expected and actual birth date, premature and multiple births)
 - [ ] Expected chain and test cases at the period boundaries, plus a hidden variant
 - [ ] Insurer replies and checker labels
+- [ ] Locked tests from the Beispielpapier examples of this family (ITSG's own situation and result, for 2026 from BP 13.2 and for 2027 from BP 13.3)
 
 Done when: a vendor can run a 03 test case end to end and get a signed report.
 
@@ -112,6 +117,7 @@ Needs: G2.
 ### G6. Other messages: 42, 51, 73, 99 and insurer 66, 67, 71, 72
 
 - [ ] For each Abgabegrund: layout check, rules, when it is due, expected reply
+- [ ] Locked tests from the Beispielpapier examples of this family (ITSG's own situation and result, for 2026 from BP 13.2 and for 2027 from BP 13.3) (chapters 16, 17, 20 for the insurer replies)
 - [ ] Insurer simulator sends 66/67 error replies when the vendor's file is wrong, so the vendor has to react
 - [ ] Expected vendor reactions from the Pflichtenheft (EEL, 01 Allgemeines): after a 66, cancel and resend with the corrected type; after a 67, no cancellation; a 72 is answered with a 73; a 99 only while a benefit is running; a 71 is read in
 - [ ] Cancel (88) and correction paths for every certificate, not only Peter's
@@ -127,6 +133,7 @@ Why: scope for December is all 22 EEL codes. These six are the Pflichtenheft's e
 - [ ] Layouts and rules for the blocks they use (DBLT, DBUN, DBSF ...), with the module's 44 Pflichtenheft items as baseline
 - [ ] Routing: certificates go to the pension or accident insurer instead of the health insurer (Pflichtenheft Anlage 19 lists when, e.g. privately insured people or an occupational disease)
 - [ ] Expected chains, test cases with hidden variants, insurer replies and checker labels for each code
+- [ ] Locked tests from the Beispielpapier examples of this family (ITSG's own situation and result, for 2026 from BP 13.2 and for 2027 from BP 13.3) (chapters 7 to 11)
 - [ ] The extra module is certified separately; the certification flow (G8) shows it as its own module
 
 Done when: every one of the six codes has at least one executable test case and a signed report.
@@ -143,7 +150,13 @@ Why: the demo should show complex situations, not only the happy path.
 - [ ] Test cases with deliberate mistakes in the task itself that good software must catch (the Pflichtenheft says official test tasks may contain them)
 - [ ] Checker labels stay correct under these cases (invalid > bug > unclear > correct variant > exact match)
 
-Done when: a corpus of broken files runs in CI and each gets the expected label.
+- [ ] **Official core check as the first checking step** (`sources/EEL/`, Kernprüfung EEL 13.00.05 by AOK Systems, the same check the insurers run on every file): run it as a small Java sidecar (Java 11+) from the intake step; a form error becomes "invalid" with the official error number and text (657 texts, all data blocks of all 22 codes)
+- [ ] Retire our own format rules (F41, S-1) where the core check covers them; keep only what it does not check
+- [ ] Turn the core check's 247 test files (broken records, each with the error number it must produce) into the broken-files corpus
+- [ ] Store core-check releases with their dates and the Anlage 1 version they check (13.00.05 for 13.1.3); pick the release by the case's validity date
+- [ ] The core check is internal code of AOK Systems: never in Git (`.gitignore`); each machine and the cloud image get it from outside the repo; written permission from ITSG (question 14)
+
+Done when: a corpus of broken files runs in CI and each gets the expected label, and every upload passes through the official core check first.
 
 Needs: G3 (works best after G4–G6).
 
@@ -190,12 +203,13 @@ Why: today 95% of the graph is text (4,452 chunks, 1,935 passages, 1,025 field d
 
 - [ ] Requirement nodes from the Pflichtenheft baseline (G11a import): ID, text, block, message type, sources, checkable yes/no; every rule linked to its item
 - [ ] Decided cases (G9) and all test cases as nodes, with a locked flag
-- [ ] Conflict nodes: two passages that disagree, with status (open, asked, answered by ITSG); expert interpretation nodes tied to a version
+- [ ] Conflict nodes: two passages that disagree, with status (open, asked, answered by ITSG); expert interpretation nodes tied to a version; seeded with the 6 known contradictions (`PROJECT_REPORT.md` section 9)
+- [ ] "Widersprüche" screen for ITSG staff: both passages side by side, topic, status; a deviation that falls on an open contradiction is labelled "unclear: sources contradict each other" instead of "bug"
 - [ ] Link text to structure: each passage to the message types, blocks and fields it mentions; cross-references ("siehe Ziffer ...") as edges; Pflichtenheft sources to passages; passages linked across versions
 - [ ] Context pack query: for one topic (e.g. 41 / DBVO.BEGINN-AU) and one validity date, return the requirements, rules, passages, decided cases and open conflicts; the change, reviewer, check and chat agents use it instead of plain top-k search
 - [ ] Agent memory: change-agent and reviewer runs stored (what changed, outcomes locked, disagreements, who approved)
 - [ ] Retrieval test set (~50 questions, each with the passages it must find), recall reported in CI; fixes the known "Ansprechpartner DBAP" miss
-- [ ] Text chunks stay as the search index; the value is in the typed nodes and links
+- [ ] Storage split (decided 2026-11-01): passage and chunk text, German full-text search and embeddings (pgvector, reused from `kg/build/embeddings.jsonl`) move to Postgres; the graph keeps only keys, metadata and links. Search narrows the area in the graph, then ranks text in Postgres
 
 Done when: the agents' context comes from context packs, the retrieval test runs in CI, and the graph holds requirements, decisions, tests and conflicts.
 
@@ -324,6 +338,7 @@ Needs: G0; G15 for the secrets part.
 ### G17. Reliability
 
 - [ ] PDF reports work in the deployed image (WeasyPrint)
+- [ ] The core check (Java runtime + jar) in the deployed image, copied from outside the repo
 - [ ] Health checks, structured logs, error pages that do not leak internals
 - [ ] Database backups and a tested restore
 - [ ] Demo reset that works in the cloud, admin only
@@ -339,7 +354,7 @@ Needs: G16.
 
 ### G18. Demo for 11 December
 
-- [ ] Reframe the 6-month story: the Pflichtenheft already required "nicht mehr als 6 Monate" while VB 13.3 said "nicht mindestens"; the platform found that ITSG's documents contradicted each other
+- [ ] Two spec stories (decided 2026-11-01): the maternity change (months that cannot be certified: 00000000 in BP 13.2 for 2026, 99999999 in BP 13.3 for 2027, matching the Pflichtenheft) as the real change between versions; the 6-month wording as "the platform found a contradiction in ITSG's documents" (the Pflichtenheft already said "nicht mehr als" while VB 13.3 said "nicht mindestens")
 - [ ] Demo script: vendor run with full EEL coverage, deviations judged, VB 13.4 upload, rules and tests update, signed report, new vendor reaching the certified label
 - [ ] Demo data and accounts, seeded by one command
 - [ ] AI calls run live during the demo; cached answers take over automatically if the network or OpenAI fails; a local run as last resort

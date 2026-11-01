@@ -39,3 +39,6 @@ samples/vendor_uploads/
 
 # Knowledge bundles for teammates (python -m tools.kg_bundle export): contain extracted ITSG text, never commit
 bundles/
+
+# Official EEL core check (AOK Systems): internal code, never in Git. Copy it into sources/EEL/ locally.
+sources/EEL/

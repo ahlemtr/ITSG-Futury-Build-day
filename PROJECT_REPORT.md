@@ -106,7 +106,7 @@ Running it needs Docker (Postgres + Neo4j), Python 3.12 with `uv`, Node, `pdftot
 8. The AI never writes: agents answer in a fixed schema, code validates (citations must be real passage keys, parameter names and types are checked) and writes. Without key and cache every AI call degrades to "no answer". An AI proposal leaves a deviation `unclear` until the advisor decides.
 9. Parameters are versioned with the VB; a Rundschreiben only proposes parameter values.
 10. Advisor decisions are stored as precedents in `DATA_DIR/precedents.yaml` (YAML backend) or Neo4j, never in `kg/seed/precedents.yaml`.
-11. Neo4j holds the knowledge (documents, passages, chunks, rules, parameters, layouts, test definitions, precedents); Postgres holds operations (submissions, checks, runs, reports, catalogue status, upload jobs, growth log, companies, deadlines). Files under `DATA_DIR`.
+11. Neo4j holds the knowledge (documents, passages, chunks, rules, parameters, layouts, test definitions, precedents); *changing with G9b: passage and chunk text and embeddings move to Postgres, the graph keeps keys and links*. Postgres holds operations (submissions, checks, runs, reports, catalogue status, upload jobs, growth log, companies, deadlines). Files under `DATA_DIR`.
 12. The starting point (`SPEC_BASELINE=VB@13.3`) has Peter only and no submissions; the full seed (13.3 + 13.4, 18 test cases, 10 submissions) is what the tests use.
 
 ## 7. How to run
@@ -156,10 +156,26 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 | Expert decisions | A decision applies to its exact signature by default, the expert can widen it to a named pattern; a share of confident verdicts is spot-checked per category; groups of similar decisions become proposed rule definitions; real eVpT decisions are requested from ITSG, synthetic cases until then |
 | Rules as data | Own YAML rule types, readable by domain experts |
 | Checklist | The platform updates the checklist of requirements itself (today ITSG updates the Pflichtenheft by hand). The Pflichtenheft 2026.2 is the baseline; a change agent proposes the next version with a change list, a separate reviewer agent writes the expected outcomes blind, disagreements go to an expert, rules are iterated against locked tests (G11a, G11b). A few sections are held out to grade the AI (G12). Decided 2026-11-01, replaces "hidden answer key" |
+| Core check | The official EEL core check (Kernprüfung EEL 13.00.05, AOK Systems, `sources/EEL/`) is the first checking step for every upload; form errors get the official error number. It is internal code and never goes into Git |
+| Sources in Git | ITSG documents (incl. Pflichtenheft and BP 13.2) are committed like the others; the core check stays local |
+| Storage | Text, full-text search and embeddings in Postgres (pgvector); the graph holds keys and links and narrows the search area (G9b) |
+| Contradictions | Stored as conflict nodes and shown to ITSG staff on their own screen; the agents use the same data |
+| Demo stories | The maternity change (00000000 to 99999999) as the real change between versions, the 6-month wording as a contradiction the platform found |
 | AI quality bar | A derived rule is accepted only with the same results as the known rule on every test table, plus expert approval |
 | Code agent | Allowed after G11b, gated: own branch, rule and calculator modules only, all tests and expert cases must pass, a human merges |
 | AI model | The strongest available OpenAI model for all agents (invalidates the cache once) |
 | Demo AI | Live calls during the demo, cached answers as automatic fallback |
+
+### Known contradictions between ITSG documents
+
+1. 6-month gap, 2026: VB 13.3 says "nicht mindestens 6 Monate", Pflichtenheft items 0cefe80e / aade0289 say "nicht mehr als 6 Monate".
+2. 6-month gap inside VB 13.4: the employer paragraph of 3.12 changed, the insurer paragraph and field text 3.12.7 still have the old wording.
+3. Illness with no end date: Pflichtenheft item ac3b56af "today + 7 days", Beispielpapier 13.5 "report date + 6 days".
+4. Kurz-AU followed by a certified AU: Pflichtenheft item a4770b2b lists only certified periods; ITSG's criteria file implies the Kurz-AU is sent when a certified AU follows.
+5. Address block on a 41: Beispielpapier 13.1 sets MM-ANSCHRIFT = J with a DBAN; ITSG's reference file (Peter) sends N.
+6. Maternity months that cannot be certified, 2026: Pflichtenheft DBMU item 14 requires 99999999; BP 13.2 (2026) shows 00000000; BP 13.3 (2027) shows 99999999.
+
+Contradictions 1 and 6 suggest the Pflichtenheft states a requirement before the VB and Beispielpapier follow (question 13).
 
 ### Questions for the ITSG contact
 
@@ -174,3 +190,6 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 9. Can payroll software clone an employee to start a test branch? What share of eVpT deviations turn out to be allowed variants?
 10. Real past eVpT deviations with the advisor's verdict and reason, as the starting set for expert decisions; example cases with solution files for 02, 03 and the other messages.
 11. Illness with no end date yet: the Pflichtenheft (item ac3b56af) counts until "today + 7 days", Beispielpapier 13.5 (and our engine) until report date + 6 days (02.09 to 08.09). Which one is right?
+12. When two documents disagree, which one wins (law, GG, VB, VB annexes, Beispielpapier, Pflichtenheft, Rundschreiben)? The Pflichtenheft only says the GG are authoritative.
+13. Does the Pflichtenheft announce a requirement before the VB and the Beispielpapier follow (see contradictions 1 and 6)? Can we get Pflichtenheft 2026.1 and earlier versions with their dates?
+14. May the platform run the official EEL core check (Kernprüfung EEL, AOK Systems)? Its source and Javadoc are marked "nur intern".

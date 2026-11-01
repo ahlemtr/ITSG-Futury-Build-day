@@ -19,6 +19,6 @@ Everything the platform reads or is checked against. File names are kept as publ
 
 ## Not yet wired in
 
-`beispielpapier/` BP 13.2 and everything in `pflichtenheft/` are not in `kg/seed/documents.yaml` yet (roadmap G2 and G11a). The seed still cites the 2027 Beispielpapier as `BP@13.3` for 2026 as well; G2 fixes the labels.
+`beispielpapier/` BP 13.2 and everything in `pflichtenheft/` are not in `kg/seed/documents.yaml` yet (roadmap G2 and G11a). `EEL/` (the official core check, internal code of AOK Systems) is kept out of Git: copy it in locally (roadmap G7). The seed still cites the 2027 Beispielpapier as `BP@13.3` for 2026 as well; G2 fixes the labels.
 
 These documents keep their publishers' copyright notices.
