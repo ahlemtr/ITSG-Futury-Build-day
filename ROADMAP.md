@@ -37,7 +37,7 @@ Done when: every push to `main` and every PR shows a green check.
 
 Why: answers from the ITSG contact unblock several scope goals; the English UI is extra work on every new screen.
 
-- [ ] Send the 14 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for VB Anlage 3 and example cases with solution files for 02, 03 and the other messages
+- [ ] Send the 14 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for example cases with solution files for 02, 03 and the other messages
 - [ ] Record each answer in `PROJECT_REPORT.md` and in the affected rule or parameter
 - [ ] Remove the English locale and the language switch; keep the i18n key structure so texts stay in one place
 - [ ] Update the i18n check to German only
@@ -57,7 +57,8 @@ Scope as decided: certificates 01, 02, 03, the other messages and error cases. G
 Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scenario family. New families must plug in without special cases.
 
 - [ ] Define a scenario family interface (inputs, expected chain builder, rules, compare modes) and move the prior-illness logic behind it
-- [ ] Map each Abgabegrund to its required and optional data blocks (VB Anlage 3, or the VB text until it arrives)
+- [ ] Map each Abgabegrund to its required (J), optional (m) and forbidden (N) data blocks from VB Anlage 3 13.3 (`sources/vb/`, table in chapter 2); replace every `mandatory: unknown` in `kg/seed/message_types.yaml`; add VB Anlage 3 to `documents.yaml`
+- [ ] Rules from VB Anlage 3 chapter 3 (continuity of benefits, § 69 SGB IX): which change of benefit needs a new 01/02/03/11-31 and which does not; one gap day always needs a new one
 - [ ] Check every layout in `layouts/` against GG Anlage 1 (`tools/compare_anlage1`), fill gaps
 - [ ] Version the record layouts by validity date like the rules (VB Anlage 1 13.1.4 changes them on 01.07.2027, not at a year start)
 - [ ] Fix the Beispielpapier versions: BP 13.2 (`sources/beispielpapier/`, valid 2026) belongs to VB 13.3, BP 13.3 to VB 13.4 (2027); add BP 13.2 to `documents.yaml` and correct the 13 `BP@13.3` citations in `rules.yaml` and `test_cases.yaml` (the five prior-illness examples are identical in both, so the expected results stay)
