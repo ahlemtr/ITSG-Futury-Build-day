@@ -26,7 +26,7 @@ from engine.model import (
     Version,
 )
 from kg import load
-from kg.common import MAX_SUBGRAPH_DEPTH, norm_field, resolve_passage_key, resolve_vb, to_date
+from kg.common import MAX_SUBGRAPH_DEPTH, keep_source, norm_field, resolve_passage_key, resolve_vb, to_date
 
 PASSAGE_PROPS = "{.key, .doc, .version, .section, .part, .heading, .text, .page, .field}"
 NARROW_BOOST = 1.25  # same re-ranking as the YAML backend: a part or field beats its section
@@ -112,7 +112,7 @@ class GraphBackend:
                      kind=r["r"]["kind"], status=r["r"]["status"], criterion=r["criterion"],
                      family=r["r"].get("family") or "common",
                      applies_to=sorted(r["applies_to"]), fields=sorted(r["fields"]), params=sorted(r["params"]),
-                     sources=sorted(r["sources"])) for r in rows]
+                     sources=sorted(s for s in r["sources"] if keep_source(s, vb))) for r in rows]
 
     def _passages(self, keys: list[str]) -> list[Passage]:
         rows = self._q(f"MATCH (p:Passage) WHERE p.key IN $keys RETURN p {PASSAGE_PROPS} AS p ORDER BY p.key",
@@ -342,7 +342,7 @@ class GraphBackend:
         passage_keys = {s for r in rules for s in r.sources}
         passage_keys |= {r["k"] for r in self._q(
             "MATCH (:Field {key: $field})-[:DESCRIBED_IN]->(p:Passage) WHERE p.doc <> 'VB' OR p.version = $vb "
-            "RETURN p.key AS k", field=fkey, vb=vb)}
+            "RETURN p.key AS k", field=fkey, vb=vb) if keep_source(r["k"], vb)}
         passage_keys = {pk for pk in passage_keys if pk.split("#", 1)[0] in active}
         precedents = [r["k"] for r in self._q(
             "MATCH (p:Precedent)-[:ABOUT]->(:Field {key: $field}) RETURN p.key AS k ORDER BY k", field=fkey)]

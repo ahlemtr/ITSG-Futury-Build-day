@@ -279,7 +279,7 @@ test_cases:
       "13.3": &bp_13_1_expected {send_41: true, periods: [[2026-06-01, 2026-06-25]], total_days: 32}
       "13.4": *bp_13_1_expected
       "sim-13.5": *bp_13_1_expected
-    sources: [BP@13.3#13.1]
+    sources: [BP@13.2#13.1, BP@13.3#13.1]
 
   - id: bp-13-2
     family: vorerkrankung
@@ -301,7 +301,7 @@ test_cases:
       "13.3": &bp_13_2_expected {send_41: true, periods: [[2026-06-01, 2026-06-25], [2026-05-03, 2026-05-06]], total_days: 36}
       "13.4": *bp_13_2_expected
       "sim-13.5": *bp_13_2_expected
-    sources: [BP@13.3#13.2]
+    sources: [BP@13.2#13.2, BP@13.3#13.2]
 
   - id: bp-13-3
     family: vorerkrankung
@@ -321,7 +321,7 @@ test_cases:
       "13.3":     {send_41: false}
       "13.4":     {send_41: false}
       "sim-13.5": {send_41: false}
-    sources: [BP@13.3#13.3]
+    sources: [BP@13.2#13.3, BP@13.3#13.3]
 
   - id: bp-13-4
     family: vorerkrankung
@@ -342,7 +342,7 @@ test_cases:
       "13.3":     {send_41: false, total_days: 23}
       "13.4":     {send_41: false, total_days: 23}
       "sim-13.5": {send_41: false, total_days: 23}
-    sources: [BP@13.3#13.4]
+    sources: [BP@13.2#13.4, BP@13.3#13.4]
 
   - id: bp-13-5
     family: vorerkrankung
@@ -364,7 +364,7 @@ test_cases:
       "13.3":     {send_41: false, total_days: 23}
       "13.4":     {send_41: false, total_days: 23}
       "sim-13.5": {send_41: false, total_days: 23}
-    sources: [BP@13.3#13.5]
+    sources: [BP@13.2#13.5, BP@13.3#13.5]
 
   # Official test tasks: inputs only, no solution available yet, so no targets (allowed for origin pta)
   - id: ta-167

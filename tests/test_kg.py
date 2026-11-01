@@ -321,3 +321,12 @@ def test_backends_agree(yaml_kb, graph_kb):
 
     for call in calls:
         assert dump(call(yaml_kb)) == dump(call(graph_kb))
+
+
+def test_beispielpapier_follows_the_vb_version(kb):
+    """BP 13.2 belongs to VB 13.3 (2026), BP 13.3 to VB 13.4 (2027) (G2)."""
+    r33 = next(r for r in kb.get_rules("41", "13.3") if r.id == "R41-3")
+    r34 = next(r for r in kb.get_rules("41", "13.4") if r.id == "R41-3")
+    assert "BP@13.2#13.2" in r33.sources and "BP@13.3#13.2" not in r33.sources
+    assert "BP@13.3#13.2" in r34.sources and "BP@13.2#13.2" not in r34.sources
+    assert {v.version for v in kb.get_versions("BP")} >= {"13.2", "13.3"}

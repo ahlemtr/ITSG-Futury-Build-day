@@ -35,7 +35,7 @@ parameters:
       - {version: "13.3",     valid_from: 2026-01-01, value: 7}
       - {version: "13.4",     valid_from: 2027-01-01, value: 7}
       - {version: "sim-13.5", valid_from: null,       value: 7, simulated: true}
-    sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions, BP@13.3#13.5]
+    sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions, BP@13.2#13.5, BP@13.3#13.5]
   - name: efz_days
     note: days of continued pay by the employer (EntgFG § 3, 6 weeks)
     values:
