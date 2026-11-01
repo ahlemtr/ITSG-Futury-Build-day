@@ -138,7 +138,7 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 | Event | **11 December 2026**: pitch with live demo to the GKV and other key stakeholders; a pilot discussion with ITSG is likely afterwards. The product must be close to finished, not a scoped demo |
 | People | Ghassen alone, working with Claude Code; teammates help occasionally. The roadmap is a list of independent goals and tasks, no role assignment |
 | Phases | 1) widen EEL scope, 2) real AI rule derivation from the spec text, 3) harden for real use (login, security). Planned in advance, worked in that order |
-| Scope | All of EEL: certificates 01 (Krankengeld), 02 (Kinderkrankengeld), 03 (Mutterschaftsgeld), the other messages (42, 51, 73, 62/71/72, 66/67 errors, 99), including error cases, to show robust and complex situations |
+| Scope | All 22 EEL codes (decided 2026-11-01): employer 01, 02, 03, 04, 41, 42, 51, 73, 88, 99; insurer replies 61, 62, 66, 67, 71, 72; extra module 11, 12, 21, 22, 23, 31 (pension, accident, employment agency). Including error cases, to show robust and complex situations |
 | Demo story | The same arc with full EEL coverage (vendor run, deviations judged, VB 13.4 upload, tests update, signed report), plus automations, e.g. a newly signed vendor completes the whole yearly catalogue, gets the certified label, and that unlocks the permanent test cases |
 | Kept features | Krankengeld calculator, deadline calendar, RAG chat, knowledge graph tab |
 | Language | German only: the English UI will be dropped |

@@ -12,7 +12,7 @@ How to read this file:
 | Phase | Goals |
 |---|---|
 | 0 Foundation | G0, G1 |
-| 1 Full EEL scope | G2–G8 |
+| 1 Full EEL scope | G2–G8 (incl. G6b) |
 | 2 Expert knowledge and AI rule derivation | G9–G13 |
 | 3 Hardening | G14–G17 |
 | 4 Demo | G18 |
@@ -74,7 +74,7 @@ Done when: Peter still passes unchanged, all 37 existing rules have code and a t
 
 Needs: G0.
 
-### G3. Certificate 01 Krankengeld, complete
+### G3. Certificates 01 Krankengeld and 04 hospital companion, complete
 
 Why: 01 appears in Peter's chain, but only the fields that touch the chain are checked.
 
@@ -83,6 +83,7 @@ Why: 01 appears in Peter's chain, but only the fields that touch the chain are c
 - [ ] Extend the calculator to the cases it lacks (Entgeltumwandlung, flexible working time, Altersteilzeit, output-based pay, the special cases of RS Anl. 3 4.1.1.1.1.2)
 - [ ] Test cases: monthly pay, hourly pay, part time, one-off payment, start of employment mid-month, plus hidden variants
 - [ ] Insurer replies to a 01 (62 benefit end, error replies)
+- [ ] Certificate 04 (Krankengeld for a companion in hospital): same blocks as the 01 plus the hospital stay, with its own test cases
 
 Done when: an 01 with every block is checked field by field, each deviation cites a passage.
 
@@ -118,6 +119,19 @@ Needs: G2.
 Done when: every in-scope Abgabegrund has at least one executable test case.
 
 Needs: G2.
+
+### G6b. Extra module: 11, 12, 21, 22, 23, 31
+
+Why: scope for December is all 22 EEL codes. These six are the Pflichtenheft's extra module "EEL-Verfahren ... Verletztengeld, Kinderverletztengeld und Übergangsgeld" (44 items), for benefits paid by pension insurance (11, 12), accident insurance (21, 22, 23) and the employment agency (31).
+
+- [ ] Layouts and rules for the blocks they use (DBLT, DBUN, DBSF ...), with the module's 44 Pflichtenheft items as baseline
+- [ ] Routing: certificates go to the pension or accident insurer instead of the health insurer (Pflichtenheft Anlage 19 lists when, e.g. privately insured people or an occupational disease)
+- [ ] Expected chains, test cases with hidden variants, insurer replies and checker labels for each code
+- [ ] The extra module is certified separately; the certification flow (G8) shows it as its own module
+
+Done when: every one of the six codes has at least one executable test case and a signed report.
+
+Needs: G2; works best after G3.
 
 ### G7. Error cases and robustness
 
