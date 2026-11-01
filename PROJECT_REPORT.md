@@ -161,6 +161,7 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 | Storage | Text, full-text search and embeddings in Postgres (pgvector); the graph holds keys and links and narrows the search area (G9b) |
 | Contradictions | Stored as conflict nodes and shown to ITSG staff on their own screen; the agents use the same data |
 | Demo stories | The maternity change (00000000 to 99999999) as the real change between versions, the 6-month wording as a contradiction the platform found |
+| Held-out items | About 20–25 of the 156 EEL Pflichtenheft items, random with a fixed seed, from 02, 03 and the UV/RV module; never in the knowledge base or agent tools; used only to grade the change agent (G11a, G12) |
 | AI quality bar | A derived rule is accepted only with the same results as the known rule on every test table, plus expert approval |
 | Code agent | Allowed after G11b, gated: own branch, rule and calculator modules only, all tests and expert cases must pass, a human merges |
 | AI model | The strongest available OpenAI model for all agents (invalidates the cache once) |
