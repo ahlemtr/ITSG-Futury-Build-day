@@ -22,7 +22,7 @@ DBVO has a repeating group (`ANZAHL-AU` x 50 chars). All other blocks are fixed 
 | extracted | DSLW, DBAL, DBAE, DBZA, DBEE, DBAW, DBFR, DBUN, DBMU, DBVO, DBHE, DBBE, DBLT, DBSF, DBTK, DBID, DBSD | from the spec tables, no gaps |
 | inferred | DBAP | spec has no table. Boundaries measured from the TEEL0 sample, names tentative |
 | extracted (annex) | DBNA | from Anlage 1 (GG/VB section 5): VORSATZWORT, NAMENSZUSATZ, TITEL, KENNZ-AEND-BER at positions 065-125 |
-| missing | DBAN | no table in the spec, not in the sample |
+| missing | DBAN | no table in the VB, not in the sample; the layout is in Pflichtenheft Anlage 19 (roadmap G2) |
 
 Also derived (marked in the files): DSLW positions 206-224 (MM-* flags, names from the
 Beispielpapier) and DBMU months 2 and 3 (repeat of month 1).

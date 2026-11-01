@@ -31,7 +31,7 @@ Why: every later goal relies on a green, reproducible check.
 - [ ] Neo4j service container in a second CI job with `NEO4J_TESTS=1`
 - [ ] Fix or document `test_search_finds_chaining[graph]` (German full-text ranking)
 
-Done when: every push to `main` and every PR shows a green check.
+Done when: every push and every pull request into upstream `main` shows a green check.
 
 ### G1. ITSG questions and German-only UI
 
@@ -40,7 +40,7 @@ Why: answers from the ITSG contact unblock several scope goals; the English UI i
 - [x] Send the essential questions to the ITSG contact (5 questions, email scheduled for 2026-11-02 08:00; see `PROJECT_REPORT.md` section 9). The other questions run on the team's working assumptions and are asked later only if needed
 - [ ] Look for the published TA 167/168 solution proposals on the ITSG/GKV download page (the PTA says they are published) before waiting for ITSG
 - [ ] Record each answer in `PROJECT_REPORT.md` and in the affected rule or parameter
-- [ ] Remove the English locale and the language switch; keep the i18n key structure so texts stay in one place
+- [ ] Remove the English locale, the language switch and the English part of `ui/src/i18n/glossary.md`; keep the i18n key structure so texts stay in one place
 - [ ] Update the i18n check to German only
 
 Done when: questions sent, UI has one language, i18n check green.
@@ -51,7 +51,7 @@ Needs: nothing.
 
 ## Phase 1: Full EEL scope
 
-Scope as decided: certificates 01, 02, 03, the other messages and error cases. G4 (02) and G5 (03) are built side by side. Test cases are written from the VB and Beispielpapier text, then replaced or validated with ITSG's cases when they arrive. Each certificate goal follows the same pattern: layouts, rules with spec citations, expected chains, test cases (boundary clones and hidden variants), checker labels, insurer replies.
+Scope as decided: all 22 EEL codes (certificates 01–04, the other employer and insurer messages, the extra module 11–31) and error cases. G4 (02) and G5 (03) are built side by side. Test cases are written from the VB and Beispielpapier text, then replaced or validated with ITSG's cases when they arrive. Each certificate goal follows the same pattern: layouts, rules with spec citations, expected chains, test cases (boundary clones and hidden variants), checker labels, insurer replies.
 
 ### G2. Generalise the engine beyond prior illnesses
 
@@ -266,7 +266,7 @@ Needs: G10, G11a, G9b.
 ### G12. Measure the AI
 
 - [ ] Golden set: spec sections paired with the known correct rule definitions (from G10)
-- [ ] Checklist grading on the held-out sections: the change agent regenerates them from the spec text; how many of ITSG's items it found, invented and missed, and whether it named the same source
+- [ ] Checklist grading on the held-out items: the change agent regenerates them from the spec text; how many of ITSG's items it found, invented and missed, and whether it named the same source
 - [ ] Change grading against the Pflichtenheft's own change log (2026.1 to 2026.2: items added, changed, deleted)
 - [ ] Agreement rate between change agent and reviewer agent, and how often the expert sided with each
 - [ ] Items that do not come from the spec text (meeting decisions, laws, items marked "wird im Rahmen der QK 2026 erneut besprochen") are counted separately, since the agent cannot find them in the VB

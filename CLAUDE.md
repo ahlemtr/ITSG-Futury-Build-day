@@ -27,7 +27,7 @@ Known: `tests/test_annex_evidence.py::test_vb_annex_centered_chapters_work_with_
 - Parameters are versioned with the Verfahrensbeschreibung; a Rundschreiben only proposes values.
 - UI is German only (legal terms stay German). OpenAI stays the provider. Only test data goes through the platform.
 - Login goes through Clerk (ITSG staff and vendor roles, invite only). Cloud is Google Cloud in `europe-west3`.
-- `sources/pflichtenheft/Pflichtenheft_EA_2026.2.pdf` (ITSG's checklist of requirements) is the checklist baseline. Sections held out for grading (G12) must never reach the knowledge base or any agent's tools.
+- `sources/pflichtenheft/Pflichtenheft_EA_2026.2.pdf` (ITSG's checklist of requirements) is the checklist baseline. Pflichtenheft items held out for grading (G11a, G12) must never reach the knowledge base or any agent's tools.
 - The agent that drafts a change never reviews it: a separate reviewer agent writes expected outcomes blind; locked tests are never changed by an agent.
 - `sources/EEL/` (official EEL core check by AOK Systems) is internal code: never commit it.
 - Keep `kg/build/` (paid embeddings) and `data/llm_cache/`; changing prompt text invalidates cached answers.

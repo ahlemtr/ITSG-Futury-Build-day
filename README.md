@@ -10,7 +10,7 @@
   <img alt="Neo4j" src="https://img.shields.io/badge/Neo4j-knowledge_graph-4581C3?logo=neo4j&logoColor=white">
   <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-store-4169E1?logo=postgresql&logoColor=white">
   <img alt="Docker" src="https://img.shields.io/badge/Docker-compose-2496ED?logo=docker&logoColor=white">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-174_passed-2EA44F">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-207_passed-2EA44F">
 </p>
 
 <p align="center">
