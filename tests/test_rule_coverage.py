@@ -22,7 +22,7 @@ UNTESTED = {
     "E-3", "C-3", "C-4", "C-5", "C-6", "C-7", "C-8",
 }
 # rules no test case names in its targets
-UNTARGETED = {"S-1"}
+UNTARGETED: set[str] = set()
 
 
 def _rule_ids() -> set[str]:

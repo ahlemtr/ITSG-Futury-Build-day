@@ -11,7 +11,7 @@ from collections import Counter
 from collections.abc import Callable
 from datetime import date
 
-from engine import families
+from engine import families, layouts
 from engine.diff import Differ, _dev_id
 from engine.expected import ChainResult, Scenario, build_chain, load_scenario
 from engine.families.base import CheckContext
@@ -27,7 +27,7 @@ from engine.model import (
     base_field_name,
 )
 from engine.records import parse_file
-from engine.rules import formats
+from engine.rules import blocks, formats
 from engine.rules import params as params_mod
 from engine.variants import Catalogue
 from kg.interface import KnowledgeBase
@@ -98,9 +98,11 @@ class Checker:
         # format and rule-field checks on the vendor's own messages: shared ones, then the family's
         self.ctx = CheckContext(kb=self.kb, version=version, scenario=sc, chain=chain, rules=self.rules,
                                 actual=actual, params=self.params, step_of=step_of, label=self._label)
+        self.flags = layouts.get(self.kb, "DSLW", version).flags  # block -> MM flag
         results: list[tuple[Record | None, RuleResult]] = []
         for r in actual:
             results += [(r, x) for x in formats.check_mm_flags(r)]
+            results += [(r, x) for x in blocks.check_block_presence(r, self.flags)]
             results += [(r, x) for x in formats.check_key_values(r)]
             if r.abgabegrund in self.family.employer_codes:
                 results.append((r, formats.check_uuid(r)))
@@ -115,7 +117,7 @@ class Checker:
             rec_name, _, fld = (x.field or "DSLW.").partition(".")
             d = Deviation(step=step_of.get(id(rec)), abgabegrund=ag, record=rec_name, field=fld or None,
                           kind="value_differs", expected=_s(x.expected), actual=_s(x.actual))
-            self._label(d, "invalid" if x.rule.startswith(("F", "S-")) else "bug", x.rule, x.message)
+            self._label(d, "invalid" if x.rule.startswith(("F", "S-", "A3-")) else "bug", x.rule, x.message)
             devs.append(d)
             covered.add((ag, x.field))
 
@@ -145,6 +147,10 @@ class Checker:
 
     # ------------------------------------------------------------ b. rule re-check
     def recheck(self, d: Deviation) -> bool:
+        """Shared rules first (VB Anlage 3 blocks), then the family's."""
+        hit = blocks.recheck(d, {flag: blk for blk, flag in self.flags.items()})
+        if hit:
+            return self._label(d, hit[0], blocks.RULE, hit[1])
         return self.family.recheck(self.ctx, d)
 
 

@@ -8,7 +8,7 @@ from kg.extract.pdf_text import Line, is_successor, join_text, match_heading, pa
 
 MAX_INDENT = 12  # GG indents sub-sections
 # the GG annexes centre their chapter headings; only there a deeper indent is still a heading
-MAX_INDENT_BY_DOC = {"GG-ANL1": 40, "VB-ANL1": 40, "GG-ANL2": 40, "GG-ANL3": 40}
+MAX_INDENT_BY_DOC = {"GG-ANL1": 40, "VB-ANL1": 40, "GG-ANL2": 40, "GG-ANL3": 40, "VB-ANL3": 50}
 # ... and give one- or two-word chapter titles after a single space ("6 Abrechnungsprogramm", "8 Entgeltart (...)"),
 # which the general bare-heading rule refuses to keep PTA calendar rows out
 ANNEX_HEADING_RE = re.compile(r"^ *(?P<num>\d{1,2})\s+(?P<title>[A-ZÄÖÜ][^=]*)$")

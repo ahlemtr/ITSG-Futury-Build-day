@@ -59,7 +59,7 @@ def test_layout_dbvo(kb):
 
 def test_rules_41_under_13_3(kb):
     rules = kb.get_rules("41", "13.3")
-    expected = [f"R41-{i}" for i in range(1, 7)] + [f"F41-{i}" for i in range(1, 11)] + ["C-1", "C-2", "S-1"]
+    expected = [f"R41-{i}" for i in range(1, 7)] + [f"F41-{i}" for i in range(1, 11)] + ["C-1", "C-2", "A3-1", "S-1"]
     assert [r.id for r in rules] == expected
     sources = [s for r in rules for s in r.sources]
     assert not [s for s in sources if s.startswith("VB@13.4")]
@@ -184,8 +184,8 @@ def test_test_cases_for_rule(kb):
 
 def test_deviation_context_mm_ansprech(kb):
     ctx = kb.get_deviation_context("DSLW", "MM-ANSPRECH", "41", "13.4")
-    assert [r.id for r in ctx.rules] == ["F41-3"]
-    assert [(b.record, b.mandatory) for b in ctx.flagged_blocks] == [("DBAP", "unknown")]
+    assert [r.id for r in ctx.rules] == ["F41-3", "A3-1"]
+    assert [(b.record, b.mandatory, b.presence) for b in ctx.flagged_blocks] == [("DBAP", True, "J")]
     assert "BP@13.3#13.1" in [p.key for p in ctx.passages]
     assert not [p for p in ctx.passages if p.key.startswith("VB@13.3")]
 

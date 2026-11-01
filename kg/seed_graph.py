@@ -218,6 +218,21 @@ def start_from_baseline(seed: Seed, baseline: str, test_cases: list[str]) -> Non
     seed.precedents = []
 
 
+def block_presence(message_types: dict, layouts: dict) -> list[dict]:
+    """VB Anlage 3 table (kg/seed/message_types.yaml `block_table`) as one entry per Abgabegrund and block:
+    {type, record, flag, presence J/m/N}. The MM flag comes from the block's layout (`announced_by`)."""
+    table = message_types.get("block_table") or {}
+    out = []
+    for code, row in (table.get("rows") or {}).items():
+        cells = row.split()
+        if len(cells) != len(table["columns"]):
+            raise ValueError(f"block_table row {code}: {len(cells)} cells for {len(table['columns'])} columns")
+        for block, presence in zip(table["columns"], cells):
+            flag = (layouts.get(block) or {}).get("announced_by", {}).get("field")
+            out.append({"type": str(code), "record": block, "flag": flag, "presence": presence})
+    return out
+
+
 def build(seed_dir: Path = SEED_DIR, layout_dir: Path = LAYOUT_DIR,
           passages_path: Path = BUILD_DIR / "passages.yaml") -> dict:
     return build_from(Seed(seed_dir, layout_dir, passages_path))
@@ -304,8 +319,14 @@ def build_from(seed: Seed) -> dict:
     # --- K4: message types
     for mt in seed.message_types["message_types"]:
         g.node("MessageType", mt["code"], name=mt["name"], sender=mt["sender"], in_scope=mt["in_scope"])
-    for b in seed.message_types["blocks"]:
-        g.edge("USES_BLOCK", "MessageType", b["type"], "Record", b["record"], flag=b["flag"], mandatory=b["mandatory"])
+    for b in block_presence(seed.message_types, seed.layouts):
+        if b["presence"] != "N":  # J and m blocks; N = the block must not be present
+            g.edge("USES_BLOCK", "MessageType", b["type"], "Record", b["record"], flag=b["flag"],
+                   mandatory=b["presence"] == "J", presence=b["presence"])
+    source = (seed.message_types.get("block_table") or {}).get("source")
+    if source:
+        for mt in seed.message_types["message_types"]:
+            passage_edge("DESCRIBED_IN", "MessageType", mt["code"], source)
     for code, keys in (seed.message_types.get("described_in") or {}).items():
         for k in keys:
             passage_edge("DESCRIBED_IN", "MessageType", code, k)

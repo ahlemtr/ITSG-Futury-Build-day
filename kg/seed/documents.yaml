@@ -47,6 +47,17 @@ documents:
         succeeds: "13.1.3"
         file: sources/vb/28.09.2026_VB_EEL_V13.1.4_Anlage_1_Final.pdf
         source_url: https://www.gkv-datenaustausch.de/media/dokumente/arbeitgeber/eel/verfahrensbeschreibung_1/28.09.2026_VB_EEL_V13.1.4_Anlage_1_Final.pdf
+  # VB Anlage 3: which data blocks each Abgabegrund must (J), may (m) or must not (N) carry (chapter 2,
+  # table in kg/seed/message_types.yaml `block_table`) and continuity of benefits, § 69 SGB IX (chapter 3)
+  - code: VB-ANL3
+    title: Anlage 3 (VB) - Übersicht möglicher Kombinationen
+    role: block_combinations
+    parents: [VB]
+    versions:
+      - version: "13.3"
+        published: 2026-01-14
+        valid_from: 2026-01-01
+        file: sources/vb/2026_01_14_Endfassung_EEL_Anlage_3_VB_V13.3.pdf
   - code: GG-ANL2
     title: GG Anlage 2 - Schlüsselzahlen
     role: code_list

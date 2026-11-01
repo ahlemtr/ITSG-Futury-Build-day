@@ -51,6 +51,7 @@ class Demo(Family):
             p = scenario.extras["person"]
             msgs.append(ExpectedMessage(step=1, round=1, actor="employer", abgabegrund="42", head=_head(scenario),
                                         blocks={"DBNA": {"FAMILIENNAME": p["familienname"], "VORNAME": p["vorname"]},
+                                                "DBEE": {},  # mandatory on a 42 (VB Anlage 3)
                                                 "DBAP": dict(scenario.extras["employer"].get("contact", {}))}))
         return ChainResult(version=version, messages=msgs)
 

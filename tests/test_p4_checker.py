@@ -7,7 +7,7 @@ from engine.diff import diff
 from engine.expected import build_chain, load_scenario
 from engine.model import Precedent
 from engine.records import parse_file
-from engine.writer_messages import chain_files
+from engine.writer_messages import chain_files, write_file
 from tools.make_submissions import SEEDS as SEED_TABLE
 
 D = date.fromisoformat
@@ -83,7 +83,11 @@ def test_precedent_resolves_without_ai(fresh_kb, seeds):
     assert res.deviations[0].resolved_by == "catalogue" and res.deviations[0].precedent_key
 
 
-def test_unclear_has_ai_slot(kb, seeds):
-    res = check(kb, "peter", list(seeds["s-no-contact"].files.values()), D("2027-01-01"))
-    [d] = res.deviations
-    assert d.label == "unclear" and d.ai_proposal is None and d.signature == "41|DSLW.MM-ANSPRECH|missing_block"
+def test_unclear_has_ai_slot(kb):
+    """DBID is optional ("m") on a 41: whether this case needs it is not decided by a rule."""
+    ch = build_chain(load_scenario(kb, "peter"), "13.4", kb)
+    m41 = ch.messages[0].model_copy(deep=True)
+    del m41.blocks["DBID"]
+    res = check(kb, "peter", [write_file([m41], kb)], D("2027-01-01"))
+    d = next(d for d in res.deviations if d.kind == "missing_block")
+    assert d.label == "unclear" and d.ai_proposal is None and d.signature == "41|DSLW.MM-ID|missing_block"

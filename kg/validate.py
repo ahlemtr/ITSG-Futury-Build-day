@@ -16,7 +16,7 @@ KEY_FORMATS = {
     "Field": r"[A-Z]{4}\.[A-Z0-9][A-Z0-9-]*",
     "FieldDefinition": r"[A-Z][A-Z0-9-]*@[A-Za-z0-9.-]+#[A-Za-z0-9.-]+",
     "MessageType": r"\d{2}",
-    "Rule": r"(R41|F41|K61|K62)-\d+|[ECS]-\d+|CALC-[A-Z0-9-]+-\d+",
+    "Rule": r"(R41|F41|K61|K62)-\d+|[ECS]-\d+|A3-\d+|CALC-[A-Z0-9-]+-\d+",
     "Criterion": r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
     "Parameter": r"[a-z][a-z0-9_]*",
     "ParamValue": r"[a-z][a-z0-9_]*@(\d+\.\d+|sim-\d+\.\d+)",
@@ -48,7 +48,7 @@ ENUMS = {
     ("Precedent", "verdict"): {"correct_variant", "bug", "invalid"},
     ("Precedent", "kind"): DEVIATION_KINDS,
 }
-EDGE_ENUMS = {("USES_BLOCK", "mandatory"): {True, False, "unknown"}}
+EDGE_ENUMS = {("USES_BLOCK", "mandatory"): {True, False}, ("USES_BLOCK", "presence"): {"J", "m"}}
 
 
 def validate(graph: dict) -> tuple[list[str], list[str]]:

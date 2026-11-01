@@ -1458,7 +1458,7 @@
   },
   "s-no-contact@2027-01-01": {
    "counts": {
-    "unclear": 1
+    "invalid": 1
    },
    "deviations": [
     {
@@ -1466,6 +1466,27 @@
      "actual": "N",
      "expected": "J",
      "field": "MM-ANSPRECH",
+     "kind": "missing_block",
+     "label": "invalid",
+     "record": "DSLW",
+     "resolved_by": "rules",
+     "rule": "A3-1",
+     "step": 1
+    }
+   ],
+   "label": "invalid",
+   "version": "13.4"
+  },
+  "s-no-id@2027-01-01": {
+   "counts": {
+    "unclear": 1
+   },
+   "deviations": [
+    {
+     "abgabegrund": "41",
+     "actual": "N",
+     "expected": "J",
+     "field": "MM-ID",
      "kind": "missing_block",
      "label": "unclear",
      "record": "DSLW",

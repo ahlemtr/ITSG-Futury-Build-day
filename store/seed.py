@@ -26,6 +26,7 @@ VENDORS = {
     "s-stale-efz": "Gehalt 24 Demo",
     "s-insurer-field": "Lohnbüro West Demo",
     "s-no-contact": "Abrechnung Süd Demo",
+    "s-no-id": "Payroll Nord Demo",
     "s-legacy-1": "Altlohn Classic Demo",
     "s-legacy-hidden": "Altlohn Classic Demo",
 }

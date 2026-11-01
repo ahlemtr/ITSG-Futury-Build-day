@@ -166,7 +166,8 @@ class Precedent(BaseModel):
 class FlaggedBlock(BaseModel):
     record: str
     flag: str
-    mandatory: bool | Literal["unknown"]
+    mandatory: bool  # presence J
+    presence: Literal["J", "m"] = "J"  # VB Anlage 3: J must be present, m only when the case calls for it
 
 
 class DeviationContext(BaseModel):

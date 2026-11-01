@@ -347,12 +347,13 @@ class GraphBackend:
             "MATCH (p:Precedent)-[:ABOUT]->(:Field {key: $field}) RETURN p.key AS k ORDER BY k", field=fkey)]
         flag = fkey.split(".", 1)[1]
         blocks = self._q("MATCH (:MessageType {key: $ag})-[u:USES_BLOCK {flag: $flag}]->(b:Record) "
-                         "RETURN b.key AS record, u.mandatory AS mandatory ORDER BY record", ag=ag, flag=flag)
+                         "RETURN b.key AS record, u.mandatory AS mandatory, u.presence AS presence ORDER BY record", ag=ag, flag=flag)
         return DeviationContext(
             record=record, field=fkey, abgabegrund=ag, version=version, rules=rules,
             passages=self._passages(sorted(passage_keys)),
             precedents=[self.find_precedent(k) for k in precedents],
-            flagged_blocks=[FlaggedBlock(record=b["record"], flag=flag, mandatory=b["mandatory"]) for b in blocks],
+            flagged_blocks=[FlaggedBlock(record=b["record"], flag=flag, mandatory=b["mandatory"],
+                                         presence=b["presence"] or "J") for b in blocks],
         )
 
     def _normalize_precedent(self, p: Precedent) -> Precedent:

@@ -26,7 +26,7 @@ def test_health(client):
 def test_seed_counts(client):
     tcs = client.get("/test-cases").json()
     assert len(tcs) == 18 and len([t for t in tcs if not t["hidden"]]) == 16  # incl. ta-167, ta-168
-    assert len(client.get("/submissions").json()) == 10
+    assert len(client.get("/submissions").json()) == 11
     assert [v["version"] for v in client.get("/versions").json()] == ["13.3", "13.4"]
 
 
@@ -86,14 +86,14 @@ def test_diff_view(client):
 
 
 def test_advisor_queue_and_decide(client):
-    client.post("/check", json={"submission_id": "s-no-contact", "valid_on": "2027-01-01"})
+    client.post("/check", json={"submission_id": "s-no-id", "valid_on": "2027-01-01"})
     q = client.get("/advisor/queue").json()
-    assert len(q) == 1 and q[0]["signature"] == "41|DSLW.MM-ANSPRECH|missing_block"
+    assert len(q) == 1 and q[0]["signature"] == "41|DSLW.MM-ID|missing_block"
     r = client.post(f"/deviations/{q[0]['id']}/decide",
-                    json={"label": "bug", "reason": "every 41 in BP 13.1 carries DBAP", "advisor": "ITSG"}).json()
-    assert r["precedent"]["key"] == "41|DSLW.MM-ANSPRECH|missing_block"
+                    json={"label": "bug", "reason": "every 41 in BP 13.1 carries DBID", "advisor": "ITSG"}).json()
+    assert r["precedent"]["key"] == "41|DSLW.MM-ID|missing_block"
     assert client.get("/advisor/queue").json() == []
-    r = client.post("/check", json={"submission_id": "s-no-contact", "valid_on": "2027-01-01"}).json()
+    r = client.post("/check", json={"submission_id": "s-no-id", "valid_on": "2027-01-01"}).json()
     assert r["label"] == "bug" and r["deviations"][0]["precedent_key"]
 
 
@@ -157,7 +157,7 @@ def test_criteria_needs_llm(client):
 def test_overview(client):
     o = client.get("/overview", params={"today": "2026-10-27"}).json()
     assert o["checksNow"]["ruleSet"] == "13.3" and o["checksNow"]["validUntil"] == "2026-12-31"
-    assert o["checksNow"]["submissions"] == 10 and o["checksNow"]["withOpenDeviations"] == 1
+    assert o["checksNow"]["submissions"] == 11 and o["checksNow"]["withOpenDeviations"] == 1
     assert o["nextYear"]["ruleSet"] == "13.4" and o["nextYear"]["specChangesInScope"] > 0
     assert o["nextYear"]["testsToReapprove"] == 2
     assert o["resolution"]["waitingForAdvisor"] == 1

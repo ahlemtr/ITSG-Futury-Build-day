@@ -23,27 +23,36 @@ message_types:
   - {code: "73", name: Rückmeldung Anzahl freigestellter Arbeitstage, sender: employer, in_scope: false}
   - {code: "99", name: Wechsel der meldenden Stelle und Systemwechsel, sender: employer, in_scope: false}
 
-# mandatory: unknown where Anlage 3 of the VB would decide (00 question 11). Do not guess.
-blocks:
-  - {type: "41", record: DBNA, flag: MM-NAME,      mandatory: true}
-  - {type: "41", record: DBAN, flag: MM-ANSCHRIFT, mandatory: unknown}
-  - {type: "41", record: DBVO, flag: MM-VOER,      mandatory: true}
-  - {type: "41", record: DBAP, flag: MM-ANSPRECH,  mandatory: unknown}
-  - {type: "41", record: DBID, flag: MM-ID,        mandatory: unknown}
-  - {type: "61", record: DBNA, flag: MM-NAME,      mandatory: true}
-  - {type: "61", record: DBVO, flag: MM-VOER,      mandatory: true}
-  - {type: "61", record: DBAP, flag: MM-ANSPRECH,  mandatory: unknown}
-  - {type: "61", record: DBID, flag: MM-ID,        mandatory: true}
-  - {type: "01", record: DBNA, flag: MM-NAME,      mandatory: true}
-  - {type: "01", record: DBAL, flag: MM-ALLGEMEIN, mandatory: true}
-  - {type: "01", record: DBAE, flag: MM-ENTGELT,   mandatory: true}
-  - {type: "01", record: DBAP, flag: MM-ANSPRECH,  mandatory: unknown}
-  - {type: "01", record: DBID, flag: MM-ID,        mandatory: unknown}
-  - {type: "88", record: DBSD, flag: MM-SD,        mandatory: true}
-  - {type: "62", record: DBNA, flag: MM-NAME,      mandatory: true}
-  - {type: "62", record: DBEE, flag: MM-EELENDE,   mandatory: true}
-  - {type: "62", record: DBAP, flag: MM-ANSPRECH,  mandatory: unknown}
-  - {type: "62", record: DBID, flag: MM-ID,        mandatory: true}
+# Data blocks per Abgabegrund: VB Anlage 3 13.3, chapter 2 (transcribed 2026-11-01, cell by cell from the PDF).
+# J = the block must be present, m = only when the case calls for it, N = the block must not be present.
+# DSLW is always J. The Anlage shows the regular case; it does not cover the exceptions for cancellations.
+# Each row lists the blocks in the order of `columns`. The MM flag of each block comes from its layout.
+block_table:
+  source: VB-ANL3@13.3#2
+  columns: [DBNA, DBAN, DBAL, DBAE, DBZA, DBEE, DBAW, DBFR, DBUN, DBMU, DBVO, DBHE, DBBE, DBLT, DBSF, DBTK, DBAP, DBID, DBSD]
+  rows:
+    "01": "J m J J m N m N N N N N N N m m J m N"
+    "02": "J m N N N N N J N N N N N N N N J m N"
+    "03": "J m N m m N m N N J N N N N m m J m N"
+    "04": "J m J J m N m N N N N N N N m m J m N"
+    "11": "J m J J m N m N N N m N N J m m J m N"
+    "12": "J m J J m N m N N N m N N J m m J m N"
+    "21": "J m J J m N m N J N N N N N m m J m N"
+    "22": "J m J J m N m N J N N N N J m m J m N"
+    "23": "J m N N N N N J J N N N N N N N J m N"
+    "31": "J m J J m N m N N N N N N J m m J m N"
+    "41": "J m N N N N N N N N J N N N N N J m N"
+    "42": "J m N N N J N N m N N N N N N N J m N"
+    "51": "J m N N N N N N m N N N J N N N J J N"
+    "61": "J m N N N N N N N N J N N N N N J J N"
+    "62": "J m N N N J N N N N N N N N N N J J N"
+    "66": "J m N N N N N N N N N N N N N N J J N"
+    "67": "J m N N N N N N N N N N N N N N J J N"
+    "71": "J m N N N N N N N N N J N N N N J J N"
+    "72": "J m N N N N N J N N N N N N N N J J N"
+    "73": "J m N N N N N J m N N N N N N N J J N"
+    "88": "N N N N N N N N N N N N N N N N N N J"
+    "99": "J m N N N N N N m N N N N N N N J m N"
 
 described_in:
   "01": [GG@13.1#2.1.1]

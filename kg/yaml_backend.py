@@ -323,7 +323,8 @@ class YamlBackend:
         passage_keys |= {pk for pk in self._targets("Field", fkey, "DESCRIBED_IN") if keep_source(pk, vb)}
         passage_keys = {pk for pk in passage_keys if pk.split("#", 1)[0] in active}
         flag = fkey.split(".", 1)[1]
-        blocks = [FlaggedBlock(record=e["to_key"], flag=flag, mandatory=e["props"]["mandatory"])
+        blocks = [FlaggedBlock(record=e["to_key"], flag=flag, mandatory=e["props"]["mandatory"],
+                               presence=e["props"].get("presence", "J"))
                   for e in self.out[("MessageType", ag)]
                   if e["type"] == "USES_BLOCK" and e["props"].get("flag") == flag]
         return DeviationContext(
