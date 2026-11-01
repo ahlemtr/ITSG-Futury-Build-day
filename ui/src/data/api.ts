@@ -8,7 +8,6 @@ import type {
   FieldRow,
   FieldStatus,
   Label,
-  Localized,
   OverviewData,
   Precedent,
   Receipt,
@@ -76,14 +75,6 @@ export function postForm<T>(path: string, fields: Record<string, string | undefi
 }
 
 // ---------- shared mapping helpers ----------
-
-/** A UI text in both languages (the AI overlay keeps it and follows the language switch). */
-export function both(key: string, values?: Record<string, unknown>): Localized {
-  return { de: i18n.getFixedT("de")(key, values), en: i18n.getFixedT("en")(key, values) };
-}
-
-/** Backend explanations are English only; shown as is in both languages. */
-export const same = (text: string): Localized => ({ de: text, en: text });
 
 /** Backend labels to UI labels. */
 export function toLabel(label: string | null | undefined): Label {
@@ -224,22 +215,22 @@ type ApiDiff = {
   steps: { step: number; abgabegrund: string; fields: ApiDiffRow[] }[];
 };
 
-const KIND_TITLE: Record<string, Localized> = {
-  value_differs: { de: "Wert weicht ab", en: "Value differs" },
-  missing_block: { de: "Datenbaustein fehlt", en: "Data block missing" },
-  extra_block: { de: "Zusätzlicher Datenbaustein", en: "Extra data block" },
-  missing_message: { de: "Meldung fehlt", en: "Message missing" },
-  extra_message: { de: "Zusätzliche Meldung", en: "Extra message" },
-  missing_group: { de: "Zeitraum fehlt", en: "Period missing" },
-  extra_group: { de: "Zusätzlicher Zeitraum", en: "Extra period" },
-  order_differs: { de: "Reihenfolge weicht ab", en: "Order differs" },
+const KIND_TITLE: Record<string, string> = {
+  value_differs: "Wert weicht ab",
+  missing_block: "Datenbaustein fehlt",
+  extra_block: "Zusätzlicher Datenbaustein",
+  missing_message: "Meldung fehlt",
+  extra_message: "Zusätzliche Meldung",
+  missing_group: "Zeitraum fehlt",
+  extra_group: "Zusätzlicher Zeitraum",
+  order_differs: "Reihenfolge weicht ab",
 };
 
-export function deviationTitle(d: Pick<ApiDeviation, "kind" | "record" | "field" | "abgabegrund">): Localized {
-  const base = KIND_TITLE[d.kind] ?? same(d.kind);
+export function deviationTitle(d: Pick<ApiDeviation, "kind" | "record" | "field" | "abgabegrund">): string {
+  const base = KIND_TITLE[d.kind] ?? d.kind;
   const field = d.record && d.field ? `${d.record}.${d.field}` : d.record;
   const where = [d.abgabegrund, field].filter(Boolean).join(" · ");
-  return where ? { de: `${base.de}: ${where}`, en: `${base.en}: ${where}` } : base;
+  return where ? `${base}: ${where}` : base;
 }
 
 const show = (v: unknown): string | null => (v === null || v === undefined ? null : String(v));
@@ -261,16 +252,16 @@ function toDeviation(d: ApiDeviation, rules: Map<string, ApiRule>): Deviation {
     // an AI proposal alone settles nothing: the label stays unclear until the advisor decides
     decidedBy: d.label === "unclear" || !d.resolved_by ? "open" : d.resolved_by,
     rule: d.rule
-      ? { id: d.rule, text: same(rule?.title ?? "") }
-      : { id: "–", text: { de: "keine Regel deckt diese Abweichung ab", en: "no rule covers this deviation" } },
+      ? { id: d.rule, text: rule?.title ?? "" }
+      : { id: "–", text: "keine Regel deckt diese Abweichung ab" },
     spec: source ? toSpecRef(source) : undefined,
     criterion: d.criterion
       ? {
           id: d.criterion,
-          text: { de: "ITSG-Kriterium (DTA-EEL-Beispiel Vorerkrankung)", en: "ITSG criterion (DTA-EEL-Beispiel Vorerkrankung)" },
+          text: "ITSG-Kriterium (DTA-EEL-Beispiel Vorerkrankung)",
         }
       : undefined,
-    reasoning: same(d.explanation),
+    reasoning: d.explanation,
   };
 }
 
@@ -333,7 +324,7 @@ export async function getSubmissionResult(id: string): Promise<SubmissionResult 
     .map<FieldRow>((d) => ({
       message: d.step !== null ? messageLabel(d.step, d.abgabegrund ?? "") : undefined,
       block: d.record ?? "–",
-      field: d.field ?? KIND_TITLE[d.kind]?.en ?? d.kind,
+      field: d.field ?? KIND_TITLE[d.kind] ?? d.kind,
       expected: show(d.expected),
       actual: show(d.actual),
       mode: "compare",
@@ -376,13 +367,13 @@ export async function getAdvisorQueue(): Promise<AdvisorItem[]> {
       record: d.record ?? "–",
       field: d.field ?? "*",
       kind: d.kind,
-      expected: same(show(d.expected) ?? "–"),
-      actual: same(show(d.actual) ?? "–"),
+      expected: show(d.expected) ?? "–",
+      actual: show(d.actual) ?? "–",
       proposal: p
         ? {
             label: PROPOSAL_LABEL[p.proposal] ?? "unclear",
             confidence: p.confidence,
-            reasoning: same(p.reasoning),
+            reasoning: p.reasoning,
             citations: p.citations.map(toSpecRef),
             precedents: [],
           }
@@ -449,12 +440,12 @@ type ApiReceipt = {
 };
 
 export const startRun = (testCaseId: string, validOn: string, vendor: string) =>
-  withAi(both("ai.title.story"), postJson<ApiRun>("/runs", { test_case_id: testCaseId, valid_on: validOn, vendor }));
+  withAi(i18n.t("ai.title.story"), postJson<ApiRun>("/runs", { test_case_id: testCaseId, valid_on: validOn, vendor }));
 
 export const getRun = (runId: string) => getJson<ApiRun>(`/runs/${encodeURIComponent(runId)}`);
 
 export const submitRun = (runId: string, files: File[]) =>
-  withAi(both("ai.title.check"), postForm<{ status: string; receipt: ApiReceipt | null; rejected?: boolean }>(
+  withAi(i18n.t("ai.title.check"), postForm<{ status: string; receipt: ApiReceipt | null; rejected?: boolean }>(
     `/runs/${encodeURIComponent(runId)}/submit`,
     {},
     files,
@@ -462,32 +453,23 @@ export const submitRun = (runId: string, files: File[]) =>
 
 const codes = (list: string[]) => list.join(" + ");
 
-function genericInstruction(expects: string[] | undefined, hidden: boolean): Localized {
+function genericInstruction(expects: string[] | undefined, hidden: boolean): string {
   if (hidden || expects === undefined)
-    return {
-      de: "Erfassen Sie den Fall laut Aufgabe. Laden Sie die erzeugte Datei hoch, oder melden Sie, dass Ihre Software keine Meldung erzeugt.",
-      en: "Enter the case as described. Upload the file your software produces, or report that it produces no message.",
-    };
+    return "Erfassen Sie den Fall laut Aufgabe. Laden Sie die erzeugte Datei hoch, oder melden Sie, dass Ihre Software keine Meldung erzeugt.";
   if (expects.length === 0)
-    return {
-      de: "Importieren Sie die Antwort der Krankenkasse. Ihre Software darf keine weitere Meldung erzeugen.",
-      en: "Import the insurer's reply. Your software must not produce another message.",
-    };
-  return {
-    de: `Erfassen Sie den Fall in Ihrer Software und laden Sie die erzeugte Datei hoch (erwartet: ${codes(expects)}).`,
-    en: `Enter the case in your software and upload the file it produces (expected: ${codes(expects)}).`,
-  };
+    return "Importieren Sie die Antwort der Krankenkasse. Ihre Software darf keine weitere Meldung erzeugen.";
+  return `Erfassen Sie den Fall in Ihrer Software und laden Sie die erzeugte Datei hoch (erwartet: ${codes(expects)}).`;
 }
 
 /** The run as the screens know it: curated texts (runTexts.ts) where they exist, backend plan and rules otherwise. */
 export async function runDef(run: ApiRun, curated?: RunDef): Promise<RunDef> {
-  const rules = [...(await getRules(run.version)).values()].map((r) => ({ id: r.id, text: same(r.title) }));
+  const rules = [...(await getRules(run.version)).values()].map((r) => ({ id: r.id, text: r.title }));
   return {
     testCaseId: run.test_case_id,
-    title: curated?.title ?? { de: `Testfall ${run.test_case_id}`, en: `Test case ${run.test_case_id}` },
+    title: curated?.title ?? `Testfall ${run.test_case_id}`,
     ruleSet: run.version,
     hidden: run.hidden,
-    story: curated?.story ?? same(run.story),
+    story: curated?.story ?? run.story,
     facts: curated?.facts ?? [],
     rounds: run.plan.map((p) => {
       const c = curated?.rounds[p.round - 1];
@@ -504,7 +486,7 @@ export async function runDef(run: ApiRun, curated?: RunDef): Promise<RunDef> {
             : (c?.reply ?? {
                 abgabegrund: codes(replies),
                 fileName: `TEEK0-r${p.round}`,
-                title: { de: `Antwort der Krankenkasse (${codes(replies)})`, en: `Insurer reply (${codes(replies)})` },
+                title: `Antwort der Krankenkasse (${codes(replies)})`,
               }),
       };
     }),
@@ -528,8 +510,8 @@ export function toOutcome(r: ApiRoundResult, hidden: boolean): RoundOutcome {
     message: hidden
       ? undefined
       : failedOnes.length
-        ? same(failedOnes.map((o) => `${o.rule}: ${o.message || "failed"}`).join(" · "))
-        : { de: "Alle geprüften Regeln erfüllt.", en: "All checked rules passed." },
+        ? failedOnes.map((o) => `${o.rule}: ${o.message || "failed"}`).join(" · ")
+        : "Alle geprüften Regeln erfüllt.",
   };
 }
 
@@ -553,7 +535,7 @@ export function toReceipt(r: ApiReceipt, local?: Receipt): Receipt {
       record: i.record,
       field: i.field ?? undefined,
       position: i.pos ?? undefined,
-      message: same(i.message),
+      message: i.message,
     })),
   };
 }
@@ -602,10 +584,10 @@ export async function getVendorRuns(curated: RunDef[]): Promise<RunDef[]> {
     (t) =>
       curated.find((r) => r.testCaseId === t.id) ?? {
         testCaseId: t.id,
-        title: { de: `Testfall ${t.id}`, en: `Test case ${t.id}` },
+        title: `Testfall ${t.id}`,
         ruleSet: "13.4",
         hidden: t.hidden,
-        story: { de: "", en: "" },
+        story: "",
         facts: [],
         rounds: [],
       },
@@ -691,7 +673,7 @@ export const reportHtmlUrl = (id: string) => `${BASE}${reportPath(id)}?format=ht
 export async function getReport(id: string): Promise<ReportView | null> {
   let signed: SignedReport;
   try {
-    signed = await shared(`report:${id}`, () => withAi(both("ai.title.report"), getJson<SignedReport>(reportPath(id))));
+    signed = await shared(`report:${id}`, () => withAi(i18n.t("ai.title.report"), getJson<SignedReport>(reportPath(id))));
   } catch (e) {
     if (e instanceof ApiError && e.status === 404) return null;
     throw e;
@@ -718,7 +700,7 @@ export async function getReport(id: string): Promise<ReportView | null> {
   for (const c of r.checks.filter((c) => !c.rule))
     lines.push({
       id: "–",
-      text: deviationTitle(c).en,
+      text: deviationTitle(c),
       result: c.outcome === "bug" || c.outcome === "invalid" ? "fail" : c.outcome === "unclear" ? "open" : "pass",
     });
   return { signed, valid: verify.valid, hidden: tc?.hidden ?? false, rules: lines };
@@ -779,7 +761,7 @@ export type SpecDiff = {
 export async function getSpecDiff(oldVersion = "13.3", newVersion = "13.4"): Promise<SpecDiff> {
   const [d, oldRules, newRules] = await Promise.all([
     shared(`specdiff:${oldVersion}:${newVersion}`, () =>
-      withAi(both("ai.title.specDiff"), postJson<{
+      withAi(i18n.t("ai.title.specDiff"), postJson<{
         changes: SpecChange[];
         recomputed: Recomputed[];
         changed_tests: string[];
@@ -874,7 +856,7 @@ const STAGE_KEYS: Record<string, string> = {
 /** Polls the job and mirrors it in the AI overlay until it is done; resolves with the final job. */
 export async function trackJob(job: ApiJob): Promise<ApiJob> {
   const startedAt = Date.parse(job.created) || Date.now();
-  const title = both("ai.title.specUpload", { doc: job.document, version: job.version });
+  const title = i18n.t("ai.title.specUpload", { doc: job.document, version: job.version });
   for (;;) {
     upsertActivity({
       id: job.id,
@@ -882,7 +864,7 @@ export async function trackJob(job: ApiJob): Promise<ApiJob> {
       startedAt,
       status: job.status,
       error: job.error ?? undefined,
-      stages: job.stages.map((st) => ({ name: st.name, title: both(STAGE_KEYS[st.name] ?? st.title), status: st.status, counts: st.counts })),
+      stages: job.stages.map((st) => ({ name: st.name, title: i18n.t(STAGE_KEYS[st.name] ?? st.title), status: st.status, counts: st.counts })),
     });
     if (job.status !== "running") return job;
     await new Promise((r) => setTimeout(r, 1000));
@@ -996,7 +978,7 @@ export const getResetStatus = () => getJson<{ allowed: boolean; job: ResetJob | 
 export async function resetAll(): Promise<ResetJob> {
   let job = await postJson<ResetJob>("/admin/reset", {});
   const startedAt = Date.parse(job.created) || Date.now();
-  const title = both("admin.reset.job");
+  const title = i18n.t("admin.reset.job");
   for (;;) {
     upsertActivity({
       id: job.id,
@@ -1004,7 +986,7 @@ export async function resetAll(): Promise<ResetJob> {
       startedAt,
       status: job.status,
       error: job.error ?? undefined,
-      stages: job.stages.map((st) => ({ name: st.name, title: both(`admin.reset.stage.${st.name}`), status: st.status, counts: st.counts })),
+      stages: job.stages.map((st) => ({ name: st.name, title: i18n.t(`admin.reset.stage.${st.name}`), status: st.status, counts: st.counts })),
     });
     if (job.status !== "running") return job;
     await new Promise((r) => setTimeout(r, 1000));

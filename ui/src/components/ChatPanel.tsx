@@ -75,7 +75,7 @@ export function ChatPanel() {
 
 /** A drawer on the right: questions about the documents, answered from the knowledge graph with citations. */
 function Panel() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { busy, turns } = useChat();
   const [question, setQuestion] = useState("");
   const input = useRef<HTMLTextAreaElement>(null);
@@ -97,7 +97,7 @@ function Panel() {
     const q = question.trim();
     if (!q || busy) return;
     setQuestion("");
-    void ask(q, i18n.language);
+    void ask(q);
   };
   const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -132,7 +132,7 @@ function Panel() {
             <ul>
               {(["q1", "q2", "q3"] as const).map((k) => (
                 <li key={k}>
-                  <button type="button" className="chat-suggestion" onClick={() => void ask(t(`chat.examples.${k}`), i18n.language)}>
+                  <button type="button" className="chat-suggestion" onClick={() => void ask(t(`chat.examples.${k}`))}>
                     {t(`chat.examples.${k}`)}
                   </button>
                 </li>

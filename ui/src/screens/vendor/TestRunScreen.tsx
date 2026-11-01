@@ -8,12 +8,11 @@ import { PassFail } from "../../components/PassFail";
 import { ReceiptCard } from "../../components/ReceiptCard";
 import { ParsedRecordView } from "../../components/ParsedRecordView";
 import { useSetTopBar } from "../../components/TopBarContext";
-import { pick } from "../../format";
 import { InfoTip } from "../../components/InfoTip";
 
 export function TestRunScreen() {
   const { id = "" } = useParams();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const view = useRun(id);
   const def = view.status === "ready" ? view.def : undefined;
   const state = view.status === "ready" ? view.state : undefined;
@@ -25,13 +24,12 @@ export function TestRunScreen() {
 
   if (view.status === "loading") return <p className="page-subtitle">{t("common.loading")}</p>;
   if (!def || !state) return <div className="placeholder">{t("run.notFound")}</div>;
-  const lang = i18n.language;
 
   return (
     <>
       <div className="page-header page-header-split">
         <div>
-          <h1>{pick(def.title, lang)}</h1>
+          <h1>{def.title}</h1>
           <p className="page-subtitle">
             {def.testCaseId} · V{def.ruleSet} · {t(def.hidden ? "run.hidden" : "run.public")} ·{" "}
             {t("run.roundsCount", { count: def.rounds.length })}
@@ -49,11 +47,11 @@ export function TestRunScreen() {
       <div className="run-layout">
         <aside className="panel story">
           <p className="eyebrow">{t("run.story")}</p>
-          <p>{pick(def.story, lang)}</p>
+          <p>{def.story}</p>
           <div className="fact-tiles">
             {def.facts.map((f) => (
-              <div key={f.value + f.label.de} className="fact-tile">
-                <span className="cell-hint">{pick(f.label, lang)}</span>
+              <div key={f.value + f.label} className="fact-tile">
+                <span className="cell-hint">{f.label}</span>
                 <strong className="tabular">{f.value}</strong>
               </div>
             ))}
@@ -117,8 +115,7 @@ function RoundCard(props: {
   running: boolean;
 }) {
   const { runId, def, round, rs, isCurrent, running } = props;
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language;
+  const { t } = useTranslation();
   const open = isCurrent && running && !rs.outcome;
   const isLast = round.nr === def.rounds.length;
   const expectsNothing = round.expects.length === 0;
@@ -137,7 +134,7 @@ function RoundCard(props: {
           </span>
         )}
       </div>
-      <p>{pick(round.instruction, lang)}</p>
+      <p>{round.instruction}</p>
 
       {open && <UploadZone runId={runId} primaryUpload={!expectsNothing} multiple={round.expects.length > 1} />}
       {rs.noMessage && <p className="hint-box">{t("run.reportedNoMessage")}</p>}
@@ -150,13 +147,13 @@ function RoundCard(props: {
             <h3>{t("run.outcome")}</h3>
             {def.hidden ? <PassFail passed={rs.outcome.passed} /> : <Badge value={rs.outcome.label} />}
           </div>
-          {rs.outcome.message && <p>{pick(rs.outcome.message, lang)}</p>}
+          {rs.outcome.message && <p>{rs.outcome.message}</p>}
           <ul className="rule-list">
             {rs.outcome.rules.map((r) => {
               const rule = round.rules.find((x) => x.id === r.id);
               return (
                 <li key={r.id}>
-                  <PassFail passed={r.passed} /> <strong>{r.id}</strong> {rule && `· ${pick(rule.text, lang)}`}
+                  <PassFail passed={r.passed} /> <strong>{r.id}</strong> {rule && `· ${rule.text}`}
                 </li>
               );
             })}
@@ -168,7 +165,7 @@ function RoundCard(props: {
         <section className="sub-card reply">
           <div className="sub-card-head">
             <h3>
-              {pick(round.reply.title, lang)}
+              {round.reply.title}
               <InfoTip>
                 {t("run.reply.fromYourFile")} {t("run.reply.importHint")}
               </InfoTip>

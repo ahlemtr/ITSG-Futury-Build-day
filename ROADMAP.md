@@ -41,8 +41,8 @@ Why: answers from the ITSG contact unblock several scope goals; the English UI i
 - [x] Send the essential questions to the ITSG contact (5 questions, email scheduled for 2026-11-02 08:00; see `PROJECT_REPORT.md` section 9). The other questions run on the team's working assumptions and are asked later only if needed
 - [ ] Look for the published TA 167/168 solution proposals on the ITSG/GKV download page (the PTA says they are published) before waiting for ITSG
 - [ ] Record each answer in `PROJECT_REPORT.md` and in the affected rule or parameter
-- [ ] Remove the English locale, the language switch and the English part of `ui/src/i18n/glossary.md`; keep the i18n key structure so texts stay in one place
-- [ ] Update the i18n check to German only
+- [x] Remove the English locale, the language switch and the English part of `ui/src/i18n/glossary.md`; keep the i18n key structure so texts stay in one place (`en.json` deleted; the `{de, en}` text pairs in the UI code are plain German strings now; `glossary.md` is the German vocabulary)
+- [x] Update the i18n check to German only (`ui/scripts/check-i18n.mjs`: only `de.json` allowed, no empty texts, every literal key the code uses exists)
 
 Done when: questions sent, UI has one language, i18n check green.
 
@@ -74,6 +74,7 @@ Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scen
   - [ ] New rules for the two prior-illness items with no rule: a 41 only for people with statutory health insurance, addressed to their insurer; never for privately insured people or employee groups 109 and 110
   - [ ] Complete the DBAN layout from Pflichtenheft Anlage 19 (KENNUNG, LAENDERKENNZ, PLZ, WOHNORT, STRASSE, HAUS-NR, ADR-ZUSATZ)
   - [ ] One test per rule ID, so every rule is shown to be covered
+- [ ] Backend texts the UI shows in German: rule titles (`kg/seed/rules.yaml`), check explanations and format messages are English today (found in G1); change them together with the rule cards, not the AI prompts
 
 Done when: Peter still passes unchanged, all 37 existing rules have code and a test, and a second family can be added by adding files, not by editing the checker.
 

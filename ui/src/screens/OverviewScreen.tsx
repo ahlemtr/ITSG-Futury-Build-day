@@ -47,15 +47,15 @@ export function OverviewScreen() {
   );
 }
 
-function monthName(isoMonth: string, lang: string): string {
+function monthName(isoMonth: string): string {
   const [y, m] = isoMonth.split("-").map(Number);
-  return new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "de-DE", { month: "long" }).format(
+  return new Intl.DateTimeFormat("de-DE", { month: "long" }).format(
     new Date(y, m - 1, 1),
   );
 }
 
 function OverviewCards({ data }: { data: OverviewData }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const now = data.checksNow;
   const next = data.nextYear;
   return (
@@ -68,7 +68,7 @@ function OverviewCards({ data }: { data: OverviewData }) {
             : t("overview.now.subtitleOpen", { ruleSet: now.ruleSet })}
         </p>
         <div className="figures">
-          <Figure value={now.submissions} label={t("overview.now.submissions", { month: monthName(now.month, i18n.language) })} />
+          <Figure value={now.submissions} label={t("overview.now.submissions", { month: monthName(now.month) })} />
           <Figure value={now.passedAllRules} label={t("overview.now.passed")} />
           <Figure value={now.withOpenDeviations} label={t("overview.now.open")} attention />
         </div>
@@ -144,11 +144,11 @@ function ResolutionCard({ data }: { data: OverviewData["resolution"] }) {
 }
 
 function NextDeadlines({ data }: { data: CalendarData }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const names = new Map(data.companies.map((c) => [c.id, c.name]));
   const groups = new Map<string, Deadline[]>();
   for (const d of data.deadlines.filter((x) => !x.done))
-    groups.set(`${d.due}|${deadlineTitle(t, d, i18n.language)}`, [...(groups.get(`${d.due}|${deadlineTitle(t, d, i18n.language)}`) ?? []), d]);
+    groups.set(`${d.due}|${deadlineTitle(t, d)}`, [...(groups.get(`${d.due}|${deadlineTitle(t, d)}`) ?? []), d]);
   const next = [...groups.values()].slice(0, DEADLINE_COUNT);
   return (
     <section className="panel panel-flush next-deadlines" aria-labelledby="next-deadlines-title">
@@ -164,7 +164,7 @@ function NextDeadlines({ data }: { data: CalendarData }) {
               <td title={more.length ? [d, ...more].map((x) => names.get(x.company_id ?? "")).join(", ") : undefined}>
                 {more.length ? t("calendar.vendors", { count: more.length + 1 }) : d.company_id ? names.get(d.company_id) : "ITSG"}
               </td>
-              <td>{deadlineTitle(t, d, i18n.language)}</td>
+              <td>{deadlineTitle(t, d)}</td>
               <td>
                 <span className={`badge badge-${d.status === "overdue" ? "bug" : "neutral"}`}>{dueText(t, d)}</span>
               </td>

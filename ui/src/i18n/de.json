@@ -2,7 +2,6 @@
   "app": {
     "product": "EEL Review Assistant",
     "ruleSetContext": "Regelwerk in Kraft <strong>V{{now}}</strong> · nächstes <strong>V{{next}}</strong> ab {{from}}",
-    "languageSwitch": "Sprache wählen",
     "user": "ITSG-Prüfer",
     "viewSwitch": "Ansicht wählen",
     "view": {

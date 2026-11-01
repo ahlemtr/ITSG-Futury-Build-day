@@ -1,13 +1,12 @@
 // Every background AI job the screen is waiting for: spec upload pipelines (with stages from GET /jobs/{id})
 // and single AI calls (triage, explanations, stories, the spec-update agent). The overlay shows them.
 import { useSyncExternalStore } from "react";
-import type { Localized } from "./types";
 
-export type ActivityStage = { name: string; title: Localized; status: "waiting" | "running" | "done" | "failed"; counts: Record<string, unknown> };
+export type ActivityStage = { name: string; title: string; status: "waiting" | "running" | "done" | "failed"; counts: Record<string, unknown> };
 
 export type Activity = {
   id: string;
-  title: Localized;
+  title: string;
   startedAt: number;
   /** null = one AI call without stages */
   stages: ActivityStage[] | null;
@@ -51,7 +50,7 @@ export function upsertActivity(a: Activity) {
 let counter = 0;
 
 /** Shows a stage-less AI activity while `work` runs (calls that may reach the language model). */
-export async function withAi<T>(title: Localized, work: Promise<T>): Promise<T> {
+export async function withAi<T>(title: string, work: Promise<T>): Promise<T> {
   const id = `ai-${++counter}`;
   const startedAt = Date.now();
   upsertActivity({ id, title, startedAt, stages: null, status: "running" });

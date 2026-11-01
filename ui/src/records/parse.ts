@@ -1,7 +1,6 @@
 // Reads DTA EEL files (TEEL0 / TEEK0) in the browser, driven by the record layouts.
 // Port of engine/records.py, display only: the official check is the backend's.
 import layoutsJson from "./layouts.generated.json";
-import type { Localized } from "../data/types";
 
 type LayoutField = { name: string; start: number; end: number; type: string; format?: string };
 type Layout = {
@@ -46,7 +45,7 @@ export type ParseIssue = {
   record: string;
   field?: string;
   position?: number;
-  message: Localized;
+  message: string;
 };
 
 export type ParsedRecord = {
@@ -81,10 +80,7 @@ function readField(line: string, f: LayoutField, base: number, lineNo: number, r
       record,
       field: f.name,
       position: base + f.start,
-      message: {
-        de: `Numerisches Feld enthält "${raw.trim()}"`,
-        en: `Numeric field contains "${raw.trim()}"`,
-      },
+      message: `Numerisches Feld enthält "${raw.trim()}"`,
     });
   }
   return { name: f.name, start: base + f.start, end: base + f.end, raw, value: display(raw, f) };
@@ -135,10 +131,7 @@ function readDslw(line: string, lineNo: number, issues: ParseIssue[]): ParsedRec
         record: "DSLW",
         field: flags[i].name,
         position: pos + 1,
-        message: {
-          de: `${flags[i].name} = J, aber an Position ${pos + 1} steht "${found}" statt ${blockName}`,
-          en: `${flags[i].name} = J, but position ${pos + 1} holds "${found}" instead of ${blockName}`,
-        },
+        message: `${flags[i].name} = J, aber an Position ${pos + 1} steht "${found}" statt ${blockName}`,
       });
       return { line: lineNo, abgabegrund: value("ABGABEGRUND"), datensatzId: value("DATENSATZ-ID"), head, blocks };
     }
@@ -148,10 +141,7 @@ function readDslw(line: string, lineNo: number, issues: ParseIssue[]): ParsedRec
         line: lineNo,
         record: blockName,
         position: pos + 1,
-        message: {
-          de: `Layout von ${blockName} ist unbekannt, Rest der Zeile nicht gelesen`,
-          en: `Layout of ${blockName} is unknown, rest of the line not read`,
-        },
+        message: `Layout von ${blockName} ist unbekannt, Rest der Zeile nicht gelesen`,
       });
       return { line: lineNo, abgabegrund: value("ABGABEGRUND"), datensatzId: value("DATENSATZ-ID"), head, blocks };
     }
@@ -164,10 +154,7 @@ function readDslw(line: string, lineNo: number, issues: ParseIssue[]): ParsedRec
     issues.push({
       line: lineNo,
       record: "DSLW",
-      message: {
-        de: `Zeile hat ${line.length} Zeichen, die Layouts erklären ${pos}`,
-        en: `Line has ${line.length} characters, the layouts account for ${pos}`,
-      },
+      message: `Zeile hat ${line.length} Zeichen, die Layouts erklären ${pos}`,
     });
   }
   return { line: lineNo, abgabegrund: value("ABGABEGRUND"), datensatzId: value("DATENSATZ-ID"), head, blocks };
@@ -186,7 +173,7 @@ export function parseText(text: string): ParsedFile {
       issues.push({
         line: i + 1,
         record: kind,
-        message: { de: `Unbekannter Satz "${kind}"`, en: `Unknown record "${kind}"` },
+        message: `Unbekannter Satz "${kind}"`,
       });
     }
   });
@@ -194,7 +181,7 @@ export function parseText(text: string): ParsedFile {
     issues.push({
       line: 0,
       record: "DSLW",
-      message: { de: "Keine DSLW-Datensätze gefunden", en: "No DSLW records found" },
+      message: "Keine DSLW-Datensätze gefunden",
     });
   }
   return { lineKinds, records, issues };

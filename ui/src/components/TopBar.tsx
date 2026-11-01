@@ -3,7 +3,6 @@ import { Trans, useTranslation } from "react-i18next";
 import { getOverview } from "../data/api";
 import { useData } from "../data/useData";
 import { formatDate } from "../format";
-import { LANGUAGES, setLanguage } from "../i18n";
 import { useTopBarContent } from "./TopBarContext";
 import { UserMenu } from "./UserMenu";
 import { ChatButton } from "./ChatPanel";
@@ -15,7 +14,7 @@ const VIEWS: { view: View; home: string }[] = [
 ];
 
 export function TopBar() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const view = useView();
   const screenContext = useTopBarContent();
@@ -45,18 +44,6 @@ export function TopBar() {
         {screenContext ?? (sets || view === "vendor" ? <Trans i18nKey={defaultContext} values={contextValues} components={{ strong: <strong /> }} /> : null)}
       </span>
       <ChatButton />
-      <div className="segmented" role="group" aria-label={t("app.languageSwitch")}>
-        {LANGUAGES.map((lang) => (
-          <button
-            key={lang}
-            type="button"
-            aria-pressed={i18n.language === lang}
-            onClick={() => setLanguage(lang)}
-          >
-            {lang.toUpperCase()}
-          </button>
-        ))}
-      </div>
       {view === "vendor" ? (
         <span className="avatar" title={t("app.vendorUser")}>
           HS

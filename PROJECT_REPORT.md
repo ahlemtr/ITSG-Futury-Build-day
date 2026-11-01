@@ -1,6 +1,6 @@
 # EEL Review Assistant: project report
 
-State on 2026-10-31, branch `main` at `0f48295` ("final changes"); sections 4, 5.2 and 9 updated on 2026-11-01 (decisions, sources, ITSG questions). Written after reading every plan, handout and README in the repository, the challenge deck, the code layout, the API and the UI routes, and after running the checks. This file replaces the hackathon plans (`plan/`, `HANDOUT.md`, `INTEGRATION_PLAN.md`, `SPEC_UPDATE_WORKFLOW.md`, `BACKEND_IMPLEMENTATION_PLAN.md`, `ui/UI_PLAN.md`), which were deleted in the same cleanup. Everything worth keeping from them is summarised here. They remain readable in Git history (`git show 0f48295:plan/03_DOMAIN_RULES_VORERKRANKUNG.md`, etc.).
+State on 2026-10-31, branch `main` at `0f48295` ("final changes"); sections 4, 5.2 and 9 updated on 2026-11-01 (decisions, sources, ITSG questions); sections 4, 5.1, 5.2 and 8 updated again on 2026-11-01 after G0 (CI, merged into upstream `main` as `09dacc2`, PR #5); sections 4, 5.1, 5.2 and 9 updated on 2026-11-01 after the code part of G1 (German-only UI). Written after reading every plan, handout and README in the repository, the challenge deck, the code layout, the API and the UI routes, and after running the checks. This file replaces the hackathon plans (`plan/`, `HANDOUT.md`, `INTEGRATION_PLAN.md`, `SPEC_UPDATE_WORKFLOW.md`, `BACKEND_IMPLEMENTATION_PLAN.md`, `ui/UI_PLAN.md`), which were deleted in the same cleanup. Everything worth keeping from them is summarised here. They remain readable in Git history (`git show 0f48295:plan/03_DOMAIN_RULES_VORERKRANKUNG.md`, etc.).
 
 ## 1. The challenge
 
@@ -42,10 +42,10 @@ Pitch lines used: "One platform for EEL testing: it receives the files, answers 
 | LLM | `llm/` | OpenAI Structured Outputs client with a disk cache (`client.py`), read-only tools (`tools.py`), agents: `change_analysis`, `spec_update`, `calculation_analysis`, `check` (triage), `chat` (RAG), `document_metadata`; plus `explain`, `story`, `extract` (criteria) |
 | Store | `store/` | `PgRepo` (Postgres) and `MemoryRepo` with the same methods; `schema.sql`; seed |
 | API | `api/main.py`, `api/routes/*` | FastAPI, 46 endpoints (health, parse, submissions/check/diff/report, advisor queue + decide, runs, test cases + approve, builder, specdiff, spec upload + jobs, criteria, rules/versions/passages, kg stats/events/ask/subgraph/field definitions, calendar, chat, calc, admin reset) |
-| UI | `ui/` | React 18 + Vite + TypeScript, German default and English on a button. ITSG view: Overview, Fristen (calendar), Prüfrechner (calculator), Spec-Änderungen, Testkatalog, Wissensgraph, Einreichungen, Klärungsfälle, Prüfberichte. Vendor view ("Hersteller"): my tests, test run per round, calendar, results, reports. AI activity overlay, chat drawer |
+| UI | `ui/` | React 18 + Vite + TypeScript, German only (texts in `ui/src/i18n/de.json`, English removed in G1). ITSG view: Overview, Fristen (calendar), Prüfrechner (calculator), Spec-Änderungen, Testkatalog, Wissensgraph, Einreichungen, Klärungsfälle, Prüfberichte. Vendor view ("Hersteller"): my tests, test run per round, calendar, results, reports. AI activity overlay, chat drawer |
 | Tools | `tools/` | `reset_baseline` (demo reset), `make_submissions`, `make_vendor_uploads`, `extract_key_values` (GG Anlage 2 code tables), `compare_anlage1`, `kg_bundle` (export/import passages, embeddings, AI cache) |
-| Deployment | `Dockerfile` (API image), `docker-compose.yml` (local Postgres + Neo4j + API), `dev.ps1` (one-command local start on Windows). The TU VM setup was removed on 2026-10-31; Google Cloud deployment is still to be written |
-| Sources | `sources/` | Pflichtenheft EA 2026.2 with Anlagen (ITSG's checklist of requirements for certification; the baseline for the checklist, with about 20–25 items held out for grading), VB 13.3, GG 13.1 + Anlagen 1–3, VB Anlagen 1 (layouts) and 2 (error catalogue) in 13.1.3 and 13.1.4, VB Anlage 3 13.3 (data blocks per Abgabegrund), Beispielpapier 13.2 and 13.3 (= VB Anlage 4), Pool-Testaufgaben, Rundschreiben Anl. 1–3, the two ITSG DOCX files, the challenge deck. VB 13.4 is kept local only (gitignored) because it is uploaded live in the demo |
+| Deployment | `Dockerfile` (API image), `docker-compose.yml` (local Postgres + Neo4j + API), `dev.ps1` (one-command local start on Windows), `.github/workflows/ci.yml` (GitHub Actions on every push and every PR into `main`: jobs `python` with ruff + pytest, `ui` with build + i18n check, `graph` with a Neo4j service, `kg.build --skip-embed` and the graph tests). The TU VM setup was removed on 2026-10-31; Google Cloud deployment is still to be written |
+| Sources | `sources/` | Pflichtenheft EA 2026.2 with Anlagen (ITSG's checklist of requirements for certification; the baseline for the checklist, with about 20–25 items held out for grading), VB 13.3, GG 13.1 + Anlagen 1–3, VB Anlagen 1 (layouts) and 2 (error catalogue) in 13.1.3 and 13.1.4, VB Anlage 3 13.3 (data blocks per Abgabegrund), Beispielpapier 13.2 and 13.3 (= VB Anlage 4), Pool-Testaufgaben, Rundschreiben Anl. 1–3, the two ITSG DOCX files, the challenge deck. VB 13.4 is in Git since 2026-11-01 (G0: a fresh checkout and CI need the full seed) but kept out of the Docker image; the demo still starts at 13.3 through `SPEC_BASELINE=VB@13.3` and uploads 13.4 live |
 
 Hackathon team (from the commit history): Ahlem Trabelsi (backend engine), Mohamed Hizem (knowledge graph), Slim Frikha (UI shell, vendor view, advisor queue, README showcase), Ghassen Zaara (plans, integration, spec update workflow, calendar, reset, chat, deployment). 56 commits, 26–27.10.2026. From here on Ghassen carries the project, with occasional help.
 
@@ -69,7 +69,11 @@ Hackathon team (from the commit history): Ahlem Trabelsi (backend engine), Moham
 | GG annexes as cited evidence; S-1 checks every code field against Anlage 2 | done |
 | Deadline calendar per vendor company, demo reset from the user menu, "less text" UI pass | done (deadline rules are assumptions, see 5.3) |
 
-Checks run on 2026-10-31 on this machine: `pytest` 207 passed, **1 failed**, 27 skipped (graph tests need `NEO4J_TESTS=1`); `ruff check .` clean; `tsc -b` clean; i18n check: 564 keys, both languages complete.
+Checks run on 2026-11-01 after G0: `pytest` 208 passed, 0 failed, 27 skipped (the skipped ones are the graph tests, which need `NEO4J_TESTS=1`); with Neo4j and the full graph, `tests/test_kg.py` 58 passed; `ruff check .` clean; `npm run build` (incl. `tsc -b`) clean; i18n check: 564 keys, both languages complete. GitHub Actions runs the same checks on every push and PR; all three jobs green on PR #5.
+
+After the code part of G1 (German only, 2026-11-01, local, not yet run in CI): `pytest` 208 passed, 27 skipped; `ruff check .` clean; `npm run build` clean; i18n check (now German only) 563 texts, 380 literal key uses all found.
+
+Before G0 (2026-10-31): 207 passed, **1 failed**, 27 skipped.
 
 The failure: `tests/test_annex_evidence.py::test_vb_annex_centered_chapters_work_with_linux_poppler_indentation` expected sections `{"1","2","3"}`, got `{"intro","2","3"}`. Update 2026-11-01 (G0): this was not a Windows/poppler issue. The test feeds synthetic lines; the TOC filter in `kg/extract/generic.py` read the "1" at the end of "1 Änderungsprotokoll zur Anlage 1" as a page number and dropped the heading, on every platform. Fixed (a number after "Anlage" is part of the title); re-extracting all sources gives identical passages, so no embeddings change. The test is now `test_vb_annex_centered_chapters_are_headings`.
 
@@ -91,6 +95,7 @@ These are the honest gaps. They matter for December because a jury that read the
 10. **Search quality** has a known miss: for "Ansprechpartner DBAP" both backends rank annex field rows (VB-ANL1 4.f222, 21.*) above VB 3.18. `test_search_finds_chaining[graph]` is fixed (2026-11-01, G0): the Neo4j search added up the scores of every chunk of a passage instead of using its best chunk, so RS-ANL2 chapter 6 (many chunks headed "6. Mutterschaftsgeld.") came first for "Vorerkrankung 6 Monate".
 11. **Data protection.** ITSG documents and vendor files go to OpenAI. Decided for December: only test data goes through the platform, so OpenAI stays; expect the question from the GKV audience anyway.
 12. **Incomplete rules inside the covered topic.** E-3 has a rule card but no code. K61-4 and K61-5 are not computed: the insurer flags are typed into the test data. The checks for K61-1..3 and K62-1 (`check_61`, `check_62`) are never called. Many rule IDs are not named by any test, so coverage per rule is unknown. Planned in roadmap goal G2.
+13. **Backend texts are English in a German UI.** Since G1 the UI is German only, but texts that come from the backend are shown as they are: rule titles (`kg/seed/rules.yaml`, e.g. "41 only if the current AU and at least one prior AU are certified"), check explanations and format messages. Planned in roadmap goal G2.
 
 ### 5.3 Operational weight
 
@@ -131,7 +136,7 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 - **Comments:** dead references to the deleted plans (`plan/02`, `(08 section 5.2)`, `Step K9.1`, `HANDOUT agenda`, milestone tags like `P8.5`) were removed from comments and docstrings only; no code or prompt text changed.
 - **README:** Slim's showcase README (from `origin/main`) is kept; only its links to deleted files were fixed.
 - **Kept on purpose:** `kg/build/` (156 MB, includes 142 MB of paid embeddings), `data/llm_cache/` (AI answers, offline demo), `data/keys/` (report signing key), `.venv/`, `ui/node_modules/`, `.env`, the challenge deck.
-- **Checked:** every tracked file is referenced by the code or read by convention (config files, entry points, CLI tools). After the cleanup: `pytest` 207 passed, 1 failed (the Windows/Linux `pdftotext` annex test), 27 skipped; `ruff` and `tsc` clean.
+- **Checked:** every tracked file is referenced by the code or read by convention (config files, entry points, CLI tools). After the cleanup: `pytest` 207 passed, 1 failed (the annex test, then thought to be a Windows/Linux `pdftotext` issue; G0 found a splitter bug and fixed it, see 5.1), 27 skipped; `ruff` and `tsc` clean.
 
 ## 9. Decisions for December (2026-10-31)
 
@@ -143,7 +148,7 @@ The repo was reduced to what is needed to continue (commits `fbf69c7` and the on
 | Scope | All 22 EEL codes (decided 2026-11-01): employer 01, 02, 03, 04, 41, 42, 51, 73, 88, 99; insurer replies 61, 62, 66, 67, 71, 72; extra module 11, 12, 21, 22, 23, 31 (pension, accident, employment agency). Including error cases, to show robust and complex situations |
 | Demo story | The same arc with full EEL coverage (vendor run, deviations judged, VB 13.4 upload, tests update, signed report), plus automations, e.g. a newly signed vendor completes the whole yearly catalogue, gets the certified label, and that unlocks the permanent test cases |
 | Kept features | Krankengeld calculator, deadline calendar, RAG chat, knowledge graph tab |
-| Language | German only: the English UI will be dropped |
+| Language | German only: the English UI was removed in G1 (2026-11-01); backend texts shown in the UI are still English (5.2 item 13) |
 | Login | Two roles, ITSG staff and vendor accounts, through **Clerk** (decided 2026-11-01, replaces the own user table); sign-up restricted, ITSG invites the vendor accounts; where Clerk stores account data must be checked and documented |
 | Data | Only test data goes through the platform (test employees like Peter); OpenAI stays the AI provider |
 | Architecture | Keep Neo4j + Postgres |

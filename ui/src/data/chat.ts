@@ -66,13 +66,13 @@ function isReply(x: unknown): x is ChatReply {
   return typeof r === "object" && r !== null && (r.answer === null || typeof r.answer === "string") && Array.isArray(r.context) && Array.isArray(r.citations);
 }
 
-export async function ask(question: string, language: string) {
+export async function ask(question: string) {
   const history = state.turns.flatMap((t) =>
     t.role === "user" ? [{ role: "user", text: t.text }] : t.role === "assistant" && t.reply.answer ? [{ role: "assistant", text: t.reply.answer }] : [],
   );
   set({ busy: true, turns: [...state.turns, { role: "user", text: question }] });
   try {
-    const reply = await postJson<unknown>("/chat", { question, history, language: language === "en" ? "en" : "de" });
+    const reply = await postJson<unknown>("/chat", { question, history, language: "de" });
     if (!isReply(reply)) throw new Error("unexpected answer from the server");
     set({ turns: [...state.turns, { role: "assistant", reply, typing: true }] });
   } catch (e) {

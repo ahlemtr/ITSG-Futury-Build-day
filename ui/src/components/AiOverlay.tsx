@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { dismissActivity, useActivities, type Activity, type ActivityStage } from "../data/aiActivity";
-import { pick } from "../format";
 
 /** Pinned to the top of every screen while the AI works in the background; the screen stays usable. */
 export function AiOverlay() {
@@ -28,7 +27,7 @@ function useElapsed(startedAt: number, running: boolean): string {
 }
 
 function ActivityCard({ activity }: { activity: Activity }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const running = activity.status === "running";
   const elapsed = useElapsed(activity.startedAt, running);
   const current = activity.stages?.find((s) => s.status === "running");
@@ -37,11 +36,11 @@ function ActivityCard({ activity }: { activity: Activity }) {
       <div className="ai-head">
         <NeuralMark running={running} />
         <div className="ai-title">
-          <strong>{pick(activity.title, i18n.language)}</strong>
+          <strong>{activity.title}</strong>
           <span className="cell-hint">
             {running
               ? current
-                ? pick(current.title, i18n.language)
+                ? current.title
                 : t("ai.thinking")
               : t(activity.status === "done" ? "ai.done" : "ai.failed")}
           </span>
@@ -73,12 +72,12 @@ const SHOWN_COUNTS = [
 ];
 
 function StageRow({ stage }: { stage: ActivityStage }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const counts = SHOWN_COUNTS.filter((k) => stage.counts[k] !== undefined && stage.counts[k] !== 0);
   return (
     <li className={`ai-stage ai-stage-${stage.status}`}>
       <span className="ai-dot" aria-hidden="true" />
-      <span>{pick(stage.title, i18n.language)}</span>
+      <span>{stage.title}</span>
       <span className="cell-hint">
         {counts.map((k) => `${t(`ai.count.${k}`)} ${String(stage.counts[k])}`).join(" · ")}
       </span>

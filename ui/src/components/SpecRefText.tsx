@@ -6,7 +6,7 @@ const DOCUMENT_NAMES: Record<SpecRef["document"], string> = {
   BP: "Beispielpapier",
 };
 
-/** "VB V13.3, 3.12 · DBVO Vorerkrankungen". German in both languages; full document name on hover. */
+/** "VB V13.3, 3.12 · DBVO Vorerkrankungen". Full document name on hover. */
 export function SpecRefText({ spec }: { spec: SpecRef }) {
   return (
     <span lang="de">

@@ -8,7 +8,7 @@ import { Badge } from "../components/Badge";
 import { SpecRefText } from "../components/SpecRefText";
 import { useSetTopBar } from "../components/TopBarContext";
 import { useView, viewBase } from "../components/useView";
-import { formatDate, pick } from "../format";
+import { formatDate } from "../format";
 import { InfoTip, Reasoning } from "../components/InfoTip";
 
 const CHIP_ORDER: FieldStatus[] = ["identical", "variant", "bug", "invalid", "unclear", "ignored", "valid"];
@@ -39,7 +39,7 @@ export function SubmissionResultScreen() {
 }
 
 function ResultView({ result }: { result: SubmissionResult }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const view = useView();
   const [filter, setFilter] = useState<FieldStatus | "all">("all");
   const [onlyDeviations, setOnlyDeviations] = useState(result.deviations.length > 0);
@@ -221,9 +221,9 @@ function ResultView({ result }: { result: SubmissionResult }) {
 
         <aside className="panel explain" aria-live="polite">
           {deviation ? (
-            <DeviationPanel deviation={deviation} lang={i18n.language} />
+            <DeviationPanel deviation={deviation} />
           ) : selected ? (
-            <FieldPanel row={selected} lang={i18n.language} />
+            <FieldPanel row={selected} />
           ) : null}
         </aside>
       </div>
@@ -243,11 +243,11 @@ function Value({ value }: { value: string | null }) {
   return <span title={value}>{value}</span>;
 }
 
-function DeviationPanel({ deviation, lang }: { deviation: Deviation; lang: string }) {
+function DeviationPanel({ deviation }: { deviation: Deviation }) {
   const { t } = useTranslation();
   return (
     <>
-      <h2>{pick(deviation.title, lang)}</h2>
+      <h2>{deviation.title}</h2>
       <Badge value={deviation.label} />
       <dl className="facts">
         <div>
@@ -257,7 +257,7 @@ function DeviationPanel({ deviation, lang }: { deviation: Deviation; lang: strin
         <div>
           <dt>{t("result.rule")}</dt>
           <dd>
-            <strong>{deviation.rule.id}</strong> · {pick(deviation.rule.text, lang)}
+            <strong>{deviation.rule.id}</strong> · {deviation.rule.text}
           </dd>
         </div>
         {deviation.spec && (
@@ -272,18 +272,18 @@ function DeviationPanel({ deviation, lang }: { deviation: Deviation; lang: strin
           <div>
             <dt>{t("result.criterion")}</dt>
             <dd>
-              {pick(deviation.criterion.text, lang)}
+              {deviation.criterion.text}
               <div className="cell-hint">{deviation.criterion.id}</div>
             </dd>
           </div>
         )}
       </dl>
-      <Reasoning>{pick(deviation.reasoning, lang)}</Reasoning>
+      <Reasoning>{deviation.reasoning}</Reasoning>
     </>
   );
 }
 
-function FieldPanel({ row, lang }: { row: FieldRow; lang: string }) {
+function FieldPanel({ row }: { row: FieldRow }) {
   const { t } = useTranslation();
   return (
     <>
@@ -301,7 +301,7 @@ function FieldPanel({ row, lang }: { row: FieldRow; lang: string }) {
         </div>
         <div>
           <dt>{t("result.explanation")}</dt>
-          <dd>{row.note ? pick(row.note, lang) : t("result.identicalNote")}</dd>
+          <dd>{row.note ? row.note : t("result.identicalNote")}</dd>
         </div>
         {row.source && (
           <div>
