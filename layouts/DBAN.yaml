@@ -10,11 +10,14 @@ announced_by:
   record: DSLW
   field: MM-ANSCHRIFT
   value_if_present: J
-status: missing
-fixed_length: 4
+status: extracted
+fixed_length: 133
 notes:
-- Not commented in the Verfahrensbeschreibung and not present in the TEEL0 sample. Only sent when the insurance
-  number is unknown. Needs the record description from the GG annexes.
+- Not commented in the Verfahrensbeschreibung and not present in the TEEL0 sample. Positions, lengths, types and
+  M/m from GG Anlage 1 (13.1.1); field names from Pflichtenheft Anlage 19 (2026.1, DBAN), which refers to Anlage 9.4
+  of the joint circular "Meldeverfahren zur Sozialversicherung". Both sources agree on every position.
+- VB Anlage 3 marks DBAN "m" on every code except 88 (sent only when the case calls for it).
+- Address changes are only allowed through the DEÜV procedure (Pflichtenheft Anlage 19).
 fields:
 - name: KENNUNG
   start: 1
@@ -24,3 +27,45 @@ fields:
   required: M
   constant: DBAN
   source: structure
+- name: LAENDERKENNZ
+  start: 5
+  end: 7
+  length: 3
+  type: an
+  required: m
+  source: GG Anlage 1 + Pflichtenheft Anlage 19 (only for foreign addresses)
+- name: PLZ
+  start: 8
+  end: 17
+  length: 10
+  type: an
+  required: m
+  source: GG Anlage 1 + Pflichtenheft Anlage 19 (German addresses 5 digits, left-aligned, then spaces)
+- name: WOHNORT
+  start: 18
+  end: 51
+  length: 34
+  type: an
+  required: M
+  source: GG Anlage 1 + Pflichtenheft Anlage 19
+- name: STRASSE
+  start: 52
+  end: 84
+  length: 33
+  type: an
+  required: m
+  source: GG Anlage 1 + Pflichtenheft Anlage 19 (if the address has a street)
+- name: HAUS-NR
+  start: 85
+  end: 93
+  length: 9
+  type: an
+  required: m
+  source: GG Anlage 1 + Pflichtenheft Anlage 19 (if the address has a house number)
+- name: ADR-ZUSATZ
+  start: 94
+  end: 133
+  length: 40
+  type: an
+  required: m
+  source: GG Anlage 1 + Pflichtenheft Anlage 19 (e.g. "Hinterhaus")

@@ -52,6 +52,20 @@ def test_encodings(kb, itsg_bytes):
 def test_unknown_block_is_an_issue(kb, itsg_bytes):
     text = itsg_bytes.decode("utf-8")
     i = text.index("N41001J") + 7
-    bad = text[:i] + "J" + text[i + 1:]  # MM-ANSCHRIFT = J, no DBAN layout
+    bad = text[:i] + "J" + text[i + 1:]  # MM-ANSCHRIFT = J, but no DBAN block follows
     pf = parse_file(bad, kb)
     assert any("DBAN" in x.message for x in pf.issues)
+
+
+def test_dban_round_trip(kb):
+    """DBAN layout from GG Anlage 1 + Pflichtenheft Anlage 19 (G2)."""
+    from engine.expected import build_chain, load_scenario
+    from engine.records import write_dslw
+
+    m41 = build_chain(load_scenario(kb, "peter"), "13.4", kb).messages[0]
+    blocks = {**m41.blocks, "DBAN": {"PLZ": "63067", "WOHNORT": "Offenbach", "STRASSE": "Kaiserleistrasse",
+                                     "HAUS-NR": "10-16"}}
+    line = write_dslw(m41.head, blocks, kb)
+    [rec] = parse_file(line + "\r\n", kb).messages
+    assert rec.get("DSLW.MM-ANSCHRIFT") == "J" and rec.get("DBAN.WOHNORT") == "Offenbach"
+    assert rec.blocks["DBAN"].length == 133 and rec.get("DBVO.AU-AB-AG") == m41.blocks["DBVO"]["AU-AB-AG"]
