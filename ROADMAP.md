@@ -153,7 +153,7 @@ Why: the demo should show complex situations, not only the happy path.
 
 - [ ] **Official core check as the first checking step** (`sources/EEL/`, Kernprüfung EEL 13.00.05 by AOK Systems, the same check the insurers run on every file): run it as a small Java sidecar (Java 11+) from the intake step; a form error becomes "invalid" with the official error number and text (657 texts, all data blocks of all 22 codes)
 - [ ] Retire our own format rules (F41, S-1) where the core check covers them; keep only what it does not check
-- [ ] Check the file envelope ourselves: VB Anlage 2 says the checks of VOSZ, DSKO and NCSZ (about 50 error numbers) are not in the core check and every receiver implements them itself
+- [ ] Build the checks the core check does not run: the 42 letter-coded checks of VB Anlage 2 ("v"/"e"/"H": 11 VOSZ, 10 NCSZ, 10 DSKO, 10 DSLW, 1 DBUN, e.g. creation date not older than 6 months, file numbers without gaps, sender number admitted), which every receiver implements itself. All 639 numbered checks of Anlage 2 13.1.3 are in core check 13.00.05 (verified 2026-11-01)
 - [ ] Error texts and severity from VB Anlage 2 (`sources/vb/`, 13.1.3 and 13.1.4, picked by validity date): a numeric 5th character is a core-check error, "v" a binding check, "e" only recommended (a warning, not "invalid"), "H" a hint, A/D/E/I/K/L a check of one insurer association; checking stops after more than 8 errors
 - [ ] Turn the core check's 247 test files (broken records, each with the error number it must produce) into the broken-files corpus
 - [ ] Store core-check releases with their dates and the Anlage 1 version they check (13.00.05 for 13.1.3); pick the release by the case's validity date
