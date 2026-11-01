@@ -14,9 +14,9 @@ from pydantic import BaseModel
 
 from engine.builder import outcome
 from engine.expected import build_chain, get_case, load_scenario
+from engine.families.vorerkrankung.rules import add_months, days, must_send_41
 from engine.model import AuPeriod
 from engine.rules import params as params_mod
-from engine.rules.vorerkrankung import add_months, days, must_send_41
 from kg.interface import KnowledgeBase
 
 S, I, B = {"type": "string"}, {"type": "integer"}, {"type": "boolean"}
