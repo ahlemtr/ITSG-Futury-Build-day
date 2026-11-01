@@ -55,7 +55,7 @@ def check(request: Request, body: CheckBody):
         repo(request).save_check(s.id, res)
         return {"submission_id": s.id, **res.model_dump(mode="json")}
     if not body.test_case_id:
-        raise HTTPException(422, "test_case_id or submission_id required")
+        raise HTTPException(422, "test_case_id oder submission_id erforderlich")
     return run_check(request, body.test_case_id, body.files, body.valid_on).model_dump(mode="json")
 
 
@@ -186,9 +186,9 @@ def _justifications(k, refs: list[str]) -> list[str]:
 def decide(request: Request, dev_id: str, body: DecideBody):
     found = repo(request).find_deviation(dev_id)
     if not found:
-        raise HTTPException(404, "deviation not found")
+        raise HTTPException(404, "Abweichung nicht gefunden")
     if body.label not in ("correct_variant", "bug", "invalid"):
-        raise HTTPException(422, "label must be correct_variant, bug or invalid")
+        raise HTTPException(422, "Bewertung muss correct_variant, bug oder invalid sein")
     sid, d = found
     cites = body.citations or (d.ai_proposal.citations if d.ai_proposal else []) or d.sources
     p = Precedent(abgabegrund=d.abgabegrund or "", field=d.field_key, kind=d.kind, verdict=body.label,

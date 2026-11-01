@@ -34,10 +34,10 @@ def check_block_presence(rec: Record, flags: dict[str, str]) -> list[RuleResult]
         field = f"DSLW.{flag}" if flag else f"{block}"
         if p == "J" and block not in rec.blocks:
             out.append(RuleResult(rule=RULE, ok=False, field=field, expected=block, actual=None,
-                                  message=f"block {block} is mandatory on a {rec.abgabegrund} (VB Anlage 3) but missing"))
+                                  message=f"Datenbaustein {block} ist bei Abgabegrund {rec.abgabegrund} Pflicht (VB Anlage 3), fehlt aber"))
         if p == "N" and block in rec.blocks:
             out.append(RuleResult(rule=RULE, ok=False, field=field, expected=None, actual=block,
-                                  message=f"block {block} must not be sent on a {rec.abgabegrund} (VB Anlage 3)"))
+                                  message=f"Datenbaustein {block} darf bei Abgabegrund {rec.abgabegrund} nicht übermittelt werden (VB Anlage 3)"))
     return out
 
 
@@ -49,7 +49,7 @@ def recheck(d: Deviation, block_of_flag: dict[str, str]) -> tuple[str, str] | No
     block = block_of_flag.get(d.field or "") or d.record
     p = presence(d.abgabegrund, block)
     if d.kind == "missing_block" and p == "J":
-        return "invalid", f"block {block} is mandatory on a {d.abgabegrund} (VB Anlage 3) but missing"
+        return "invalid", f"Datenbaustein {block} ist bei Abgabegrund {d.abgabegrund} Pflicht (VB Anlage 3), fehlt aber"
     if d.kind == "extra_block" and p == "N":
-        return "invalid", f"block {block} must not be sent on a {d.abgabegrund} (VB Anlage 3)"
+        return "invalid", f"Datenbaustein {block} darf bei Abgabegrund {d.abgabegrund} nicht übermittelt werden (VB Anlage 3)"
     return None

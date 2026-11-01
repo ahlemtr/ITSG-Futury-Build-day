@@ -53,8 +53,9 @@ def select_chain(current: AuPeriod, certified: list[AuPeriod], p: Params, trace:
         far = too_far(next_start, a.end, p)
         if trace:
             op = ">" if p.gap_inclusive else ">="
-            trace.add(rule, f"prior {a.start}..{a.end}: next start {next_start} {op} {limit} is {far}"
-                            f" -> {'stop' if far else 'chain'}", ok=not far or bool(chain))
+            trace.add(rule, f"Vorerkrankung {a.start}..{a.end}: nächster Beginn {next_start} {op} {limit} ist "
+                            f"{'wahr' if far else 'falsch'} -> {'Ende der Kette' if far else 'verkettet'}",
+                      ok=not far or bool(chain))
         if far:
             break
         chain.append(a)
@@ -77,26 +78,26 @@ def must_send_41(current: AuPeriod, priors: list[AuPeriod], report_date: date | 
                       "report_date": str(report_date) if report_date else None, "params": p.__dict__,
                       "insurance": insurance, "person_group": person_group})
     if insurance != "statutory":
-        t.add("R41-7", f"insurance {insurance}: a 41 only for people with statutory health insurance", ok=False)
+        t.add("R41-7", f"Versicherung {insurance}: eine 41 nur für gesetzlich Krankenversicherte", ok=False)
         return Decision41(send=False, trace=t)
-    t.add("R41-7", "statutory health insurance: the 41 goes to the person's health insurer")
+    t.add("R41-7", "gesetzlich krankenversichert: die 41 geht an die Krankenkasse der versicherten Person")
     if person_group in NO_41_PERSON_GROUPS:
-        t.add("R41-8", f"person group {person_group}: no 41 for marginal employment", ok=False)
+        t.add("R41-8", f"Personengruppe {person_group}: keine 41 bei geringfügiger Beschäftigung", ok=False)
         return Decision41(send=False, trace=t)
     certified = [a for a in priors if a.certified]
     dropped = [a for a in priors if not a.certified]
-    t.add("R41-5", f"{len(dropped)} uncertified prior(s) dropped")
+    t.add("R41-5", f"{len(dropped)} nicht attestierte Vorerkrankungszeit(en) nicht berücksichtigt")
     if not current.certified or not certified:
-        t.add("R41-1", f"current certified={current.certified}, certified priors={len(certified)}", ok=False)
+        t.add("R41-1", f"aktuelle AU attestiert={current.certified}, attestierte Vorerkrankungszeiten={len(certified)}", ok=False)
         return Decision41(send=False, trace=t)
-    t.add("R41-1", f"current certified, {len(certified)} certified prior(s)")
+    t.add("R41-1", f"aktuelle AU attestiert, {len(certified)} attestierte Vorerkrankungszeit(en)")
     chain = select_chain(current, certified, p, t)
     if not chain:
         t.values["chain"] = []
         return Decision41(send=False, trace=t)
     cur_end = current_end(current, report_date, p)
     if not current.end:
-        t.add("R41-6", f"open end counted until {cur_end}")
+        t.add("R41-6", f"offenes Ende gezählt bis {cur_end}")
     window_start = add_months(current.start, -p.sum_window_months)
     cur_days = days(current.start, cur_end)
     prior_days = sum(days_in_window(a, window_start, current.start) for a in chain)
@@ -104,7 +105,7 @@ def must_send_41(current: AuPeriod, priors: list[AuPeriod], report_date: date | 
     t.values.update(chain=[[str(a.start), str(a.end)] for a in chain], window_start=str(window_start),
                     current_days=cur_days, prior_days=prior_days, total=total)
     ok = total >= p.min_total_days
-    t.add("R41-4", f"total {total} = {cur_days} current + {prior_days} prior; minimum {p.min_total_days}", ok=ok)
+    t.add("R41-4", f"insgesamt {total} = {cur_days} aktuelle + {prior_days} Vorerkrankungstage; Minimum {p.min_total_days}", ok=ok)
     return Decision41(send=ok, chain=chain, total_days=total, trace=t)
 
 
@@ -203,7 +204,7 @@ def efz_end(current_start: date, groups_61: list[Mapping[str, Any]], p: Params) 
         elif kz_au == 5 and _g(g, "TEIL-ANR-AU-BEGINN"):
             n = days(_g(g, "TEIL-ANR-AU-BEGINN"), _g(g, "TEIL-ANR-AU-ENDE"))
         used += n
-        t.steps.append(f"E-1: {s}..{e} KZ-AU {kz_au} KZ-NACHWEIS {kz_nw} -> {n} days")
+        t.steps.append(f"E-1: {s}..{e} KZ-AU {kz_au} KZ-NACHWEIS {kz_nw} -> {n} Tage")
     remaining = p.efz_days - used
     end = current_start + timedelta(days=remaining - 1) if remaining > 0 else current_start - timedelta(days=1)
     t.rules.append("E-1")

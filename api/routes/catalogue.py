@@ -84,7 +84,7 @@ def get_test_case(request: Request, id_: str):
 def expected(request: Request, id_: str, version: str):
     tc = test_case(request, id_)
     if tc.hidden:
-        raise HTTPException(403, "expected results of hidden tests are not shown")
+        raise HTTPException(403, "erwartete Ergebnisse versteckter Testfälle werden nicht angezeigt")
     ch = build_chain(load_scenario(kb(request), tc), version, kb(request))
     return ch.model_dump(mode="json")
 
@@ -99,7 +99,7 @@ def passage(request: Request, doc: str, version: str, section: str):
     try:
         return kb(request).get_passage(f"{doc}@{version}#{section}").model_dump()
     except KeyError:
-        raise HTTPException(404, "passage not found")
+        raise HTTPException(404, "Textstelle nicht gefunden")
 
 
 @router.get("/graph/subgraph")

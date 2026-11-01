@@ -32,12 +32,12 @@ def status(request: Request):
 @router.post("/admin/reset", status_code=202)
 def start(request: Request):
     if not allowed(request):
-        raise HTTPException(403, "reset is only allowed on a local setup (or with ALLOW_RESET=1)")
+        raise HTTPException(403, "Zurücksetzen ist nur lokal erlaubt (oder mit ALLOW_RESET=1)")
     app = request.app
     with _lock:
         job = getattr(app.state, "reset_job", None)
         if job and job["status"] == "running":
-            raise HTTPException(409, "a reset is already running")
+            raise HTTPException(409, "ein Zurücksetzen läuft bereits")
         # kept in memory: the reset empties the job tables of the store
         job = {"id": f"reset-{uuid.uuid4().hex[:8]}", "status": "running", "created": datetime.now(UTC).isoformat(),
                "stages": [{"name": n, "status": "waiting", "counts": {}} for n in STAGES], "error": None}

@@ -92,7 +92,7 @@ class Checker:
         # parse issues -> invalid
         for i in issues:
             d = Deviation(record=i.record, field=i.field, kind="value_differs", actual=i.message)
-            self._label(d, "invalid", None, f"format: {i.message} (line {i.line}, position {i.pos})")
+            self._label(d, "invalid", None, f"Format: {i.message} (Zeile {i.line}, Stelle {i.pos})")
             devs.append(d)
 
         # format and rule-field checks on the vendor's own messages: shared ones, then the family's
@@ -130,7 +130,7 @@ class Checker:
             if self.recheck(d):
                 continue
             d.label, d.resolved_by = "unclear", None
-            d.explanation = "no rule, catalogue entry or precedent covers this deviation"
+            d.explanation = "keine Regel, kein Katalogeintrag und kein Präzedenzfall deckt diese Abweichung ab"
             if triage:
                 triage(d, version)
 

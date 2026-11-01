@@ -26,9 +26,9 @@ def check_mm_flags(rec: Record) -> list[RuleResult]:
     for blk, flag in BLOCK_FLAGS.items():
         v = rec.get(f"DSLW.{flag}")
         if v == "J" and blk not in rec.blocks:
-            out.append(_r("F41-3", False, f"{flag} = J but block {blk} missing", blk, None, f"DSLW.{flag}"))
+            out.append(_r("F41-3", False, f"{flag} = J, aber Datenbaustein {blk} fehlt", blk, None, f"DSLW.{flag}"))
         if blk in rec.blocks and v != "J":
-            out.append(_r("F41-3", False, f"block {blk} present but {flag} = {v}", "J", v, f"DSLW.{flag}"))
+            out.append(_r("F41-3", False, f"Datenbaustein {blk} vorhanden, aber {flag} = {v}", "J", v, f"DSLW.{flag}"))
     return out
 
 
@@ -61,7 +61,7 @@ def check_key_values(rec: Record) -> list[RuleResult]:
             continue
         code = fv.raw.strip()
         if code not in t["codes"]:
-            out.append(_r("S-1", False, f"{fv.name} = {code} is not a Schlüsselzahl of GG Anlage 2 "
+            out.append(_r("S-1", False, f"{fv.name} = {code} ist keine Schlüsselzahl nach GG Anlage 2 "
                                          f"({', '.join(t['codes'])})", sorted(t["codes"]), code,
                           f"{record}.{base_field_name(fv.name)}"))
     return out
@@ -69,4 +69,4 @@ def check_key_values(rec: Record) -> list[RuleResult]:
 
 def check_uuid(rec: Record) -> RuleResult:
     dsid = rec.dsid or ""
-    return _r("F41-10", bool(UUID_RE.match(dsid)), "DATENSATZ-ID 8-4-4-4-12 hex", "uuid", dsid, "DSLW.DATENSATZ-ID")
+    return _r("F41-10", bool(UUID_RE.match(dsid)), "DATENSATZ-ID im Format 8-4-4-4-12 (hexadezimal)", "uuid", dsid, "DSLW.DATENSATZ-ID")

@@ -4,10 +4,10 @@
 rules:
   # --- when must the employer send a 41?
   - id: R41-1
-    title: 41 only if the current AU and at least one prior AU are certified
+    title: "41 nur, wenn die aktuelle AU und mindestens eine Vorerkrankung attestiert sind"
     description: >-
-      A 41 may only be sent if the current AU and at least one prior AU are certified (sick note:
-      eAU or paper at the employer).
+      Eine 41 darf nur erzeugt werden, wenn sowohl die aktuelle Arbeitsunfähigkeit als auch mindestens eine
+      vorherige Arbeitsunfähigkeit attestiert sind (AU-Bescheinigung: eAU oder Papier beim Arbeitgeber).
     kind: domain
     family: vorerkrankung
     status: approved
@@ -17,11 +17,11 @@ rules:
     params: []
     sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions, BVORERK@1#f41c7278]
   - id: R41-2
-    title: gap between current AU start and last prior AU end at most gap_months
+    title: "Abstand zwischen Beginn der aktuellen AU und Ende der letzten Vorerkrankung höchstens gap_months"
     description: >-
-      Start of the current AU minus the end of the last prior AU is at most gap_months. With
-      gap_inclusive = true (13.4) a gap of exactly 6 months (next_start == prior_end + 6 months) still
-      chains; with false (13.3) it does not.
+      Beginn der aktuellen AU minus Ende der letzten Vorerkrankung ist höchstens gap_months. Mit gap_inclusive =
+      true (13.4) wird ein Abstand von genau 6 Monaten (nächster Beginn = Ende + 6 Monate) noch verkettet, mit
+      false (13.3) nicht.
     kind: domain
     family: vorerkrankung
     status: approved
@@ -31,10 +31,11 @@ rules:
     params: [gap_months, gap_inclusive]
     sources: [VB@13.3#3.12/chaining, VB@13.4#3.12/chaining, BVORERK@1#0cefe80e]
   - id: R41-3
-    title: chain back while the gap to the next AU is at most gap_months (Daumenkriterium)
+    title: "Kette zurück, solange der Abstand zur nächsten AU höchstens gap_months beträgt (Daumenkriterium)"
     description: >-
-      Chain back: include a prior AU only while the gap to the next one is at most gap_months
-      (Daumenkriterium), no time limit. Newest first; stop at the first gap larger than gap_months.
+      Kette zurück: eine Vorerkrankung wird nur aufgenommen, solange der Abstand zur nächsten AU höchstens
+      gap_months beträgt (Daumenkriterium), ohne zeitliche Grenze. Jüngste zuerst; Ende beim ersten Abstand über
+      gap_months.
     kind: domain
     family: vorerkrankung
     status: approved
@@ -44,10 +45,10 @@ rules:
     params: [gap_months, gap_inclusive]
     sources: [VB@13.3#3.12/chaining, VB@13.4#3.12/chaining, VB@13.3#3.12.7, VB@13.4#3.12.7, BP@13.2#13.2, BP@13.3#13.2, BVORERK@1#aade0289]
   - id: R41-4
-    title: prior days in the last sum_window_months + current AU days at least min_total_days
+    title: "Vorerkrankungstage der letzten sum_window_months plus Tage der aktuellen AU mindestens min_total_days"
     description: >-
-      Prior days in the last sum_window_months plus the current AU days must be at least
-      min_total_days.
+      Die Vorerkrankungstage der letzten sum_window_months zusammen mit den Tagen der aktuellen AU umfassen
+      mindestens min_total_days.
     kind: domain
     family: vorerkrankung
     status: approved
@@ -57,10 +58,11 @@ rules:
     params: [min_total_days, sum_window_months]
     sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions, BP@13.2#13.4, BP@13.3#13.4, BVORERK@1#9c8c9b58]
   - id: R41-5
-    title: uncertified short absences (Kurz-AU) are never listed
+    title: "nicht attestierte Kurzerkrankungen (Kurz-AU) werden nie angegeben"
     description: >-
-      Uncertified short absences (Kurz-AU) are never listed, unless a certified AU follows seamlessly
-      (then they belong to it; listing format: ask ITSG, 00 question 12).
+      Nicht attestierte Kurzerkrankungen (Kurz-AU) werden nie angegeben, außer eine attestierte AU schließt
+      nahtlos an (dann gehören sie zu ihr; Angabe offen, ITSG-Frage 5). Nur attestierte AU-Zeiten gehören in die
+      41 (Pflichtenheft-Kriterium a4770b2b).
     kind: domain
     family: vorerkrankung
     status: approved
@@ -70,11 +72,11 @@ rules:
     params: []
     sources: [VB@13.3#3.12/chaining, VB@13.4#3.12/chaining]
   - id: R41-6
-    title: open-ended current AU counts until report date + open_end_days - 1
+    title: "offenes Ende der aktuellen AU zählt bis Tagesdatum der Meldung + open_end_days - 1"
     description: >-
-      An open-ended current AU counts until report date + open_end_days - 1 (one week including the
-      report date, BP 13.5: 02.09 -> 08.09). The Pflichtenheft item says "today + 7 days" (contradiction 3,
-      ITSG question 11).
+      Eine aktuelle AU mit offenem Ende zählt bis Tagesdatum der Meldung + open_end_days - 1 (eine Woche
+      einschließlich des Meldedatums, Beispielpapier 13.5: 02.09. bis 08.09.). Das Pflichtenheft-Kriterium nennt
+      "Tagesdatum zzgl. 7 Tage" (Widerspruch 3, ITSG-Frage 11).
     kind: domain
     family: vorerkrankung
     status: approved
@@ -85,10 +87,10 @@ rules:
     sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions, BP@13.2#13.5, BP@13.3#13.5]
 
   - id: R41-7
-    title: 41 only for people with statutory health insurance, addressed to their health insurer
+    title: "41 nur für gesetzlich Krankenversicherte, an deren Krankenkasse"
     description: >-
-      A 41 is only created for people insured in the statutory health insurance; the receiver is the
-      Betriebsnummer of the health insurer the person is insured with (Pflichtenheft 2026.2, DBVO item 1).
+      Eine 41 wird nur für gesetzlich Krankenversicherte erzeugt; Empfänger ist die Betriebsnummer der
+      Krankenkasse, bei der die beschäftigte Person versichert ist (Pflichtenheft 2026.2, DBVO Kriterium 1).
     kind: domain
     family: vorerkrankung
     status: approved
@@ -98,10 +100,10 @@ rules:
     params: []
     sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions]
   - id: R41-8
-    title: no 41 for privately insured people or marginal employment (person groups 109, 110)
+    title: "keine 41 für privat Krankenversicherte und geringfügig Beschäftigte (Personengruppe 109, 110)"
     description: >-
-      A 41 cannot be created for privately insured people or for marginally employed people with person group
-      109 or 110 (Pflichtenheft 2026.2, DBVO item 2).
+      Für privat Krankenversicherte und geringfügig Beschäftigte mit Personengruppenschlüssel 109 oder 110 kann
+      keine 41 erstellt werden (Pflichtenheft 2026.2, DBVO Kriterium 2).
     kind: domain
     family: vorerkrankung
     status: approved
@@ -113,8 +115,9 @@ rules:
 
   # --- format rules for an employer 41 record
   - id: F41-1
-    title: ABGABEGRUND = 41
-    description: DSLW.ABGABEGRUND = 41.
+    title: "ABGABEGRUND = 41"
+    description: >-
+      DSLW.ABGABEGRUND = 41.
     kind: format
     family: vorerkrankung
     status: approved
@@ -124,8 +127,9 @@ rules:
     params: []
     sources: [VB@13.3#3.1.18, VB@13.4#3.1.18]
   - id: F41-2
-    title: KORR-ABGABEGRUND = 00
-    description: DSLW.KORR-ABGABEGRUND = 00.
+    title: "KORR-ABGABEGRUND = 00"
+    description: >-
+      DSLW.KORR-ABGABEGRUND = 00.
     kind: format
     family: vorerkrankung
     status: approved
@@ -135,8 +139,9 @@ rules:
     params: []
     sources: [VB@13.3#3.1.19, VB@13.4#3.1.19]
   - id: F41-3
-    title: MM-VOER = J, and every MM flag matches the blocks present
-    description: DSLW.MM-VOER = J, and every MM flag matches the blocks present.
+    title: "MM-VOER = J, und jedes MM-Kennzeichen passt zu den vorhandenen Datenbausteinen"
+    description: >-
+      DSLW.MM-VOER = J, und jedes MM-Kennzeichen passt zu den vorhandenen Datenbausteinen.
     kind: format
     family: vorerkrankung
     status: approved
@@ -146,8 +151,9 @@ rules:
     params: []
     sources: [VB@13.3#3.1, VB@13.4#3.1, BP@13.2#13.1, BP@13.3#13.1]
   - id: F41-4
-    title: GRUNDAV = 1 (sickness)
-    description: DBVO.GRUNDAV = 1 (sickness).
+    title: "GRUNDAV = 1 (Krankheit)"
+    description: >-
+      DBVO.GRUNDAV = 1 (Arbeitsunfähigkeit wegen Krankheit).
     kind: format
     family: vorerkrankung
     status: approved
@@ -157,8 +163,9 @@ rules:
     params: []
     sources: [VB@13.3#3.12.1, VB@13.4#3.12.1]
   - id: F41-5
-    title: AU-AB-AG = current AU start
-    description: DBVO.AU-AB-AG = start of the current AU.
+    title: "AU-AB-AG = Beginn der aktuellen AU"
+    description: >-
+      DBVO.AU-AB-AG = Beginn der aktuellen Arbeitsunfähigkeit.
     kind: format
     family: vorerkrankung
     status: approved
@@ -168,8 +175,9 @@ rules:
     params: []
     sources: [VB@13.3#3.12.2, VB@13.4#3.12.2]
   - id: F41-6
-    title: AU-AB-SV, KZ-AK-AU, 12-MONATSFRIST-AB zero (insurer-only fields)
-    description: DBVO.AU-AB-SV, KZ-AK-AU and 12-MONATSFRIST-AB are zero (insurer-only fields).
+    title: "AU-AB-SV, KZ-AK-AU, 12-MONATSFRIST-AB leer (füllt nur die Krankenkasse)"
+    description: >-
+      DBVO.AU-AB-SV, KZ-AK-AU und 12-MONATSFRIST-AB sind Grundstellung (Felder der Krankenkasse).
     kind: format
     family: vorerkrankung
     status: approved
@@ -179,8 +187,9 @@ rules:
     params: []
     sources: [VB@13.3#3.12.3, VB@13.4#3.12.3, VB@13.3#3.12.4, VB@13.4#3.12.4, VB@13.3#3.12.5, VB@13.4#3.12.5]
   - id: F41-7
-    title: ANZAHL-AU = number of groups, at least 1
-    description: DBVO.ANZAHL-AU = number of groups, at least 1.
+    title: "ANZAHL-AU = Anzahl der AU-Zeiten, mindestens 1"
+    description: >-
+      DBVO.ANZAHL-AU = Anzahl der AU-Zeiten, mindestens 1.
     kind: format
     family: vorerkrankung
     status: approved
@@ -190,8 +199,9 @@ rules:
     params: []
     sources: [VB@13.3#3.12.6, VB@13.4#3.12.6]
   - id: F41-8
-    title: groups newest first
-    description: The DBVO groups are listed newest first (VB 3.12.7).
+    title: "AU-Zeiten absteigend, jüngste zuerst"
+    description: >-
+      Die AU-Zeiten im DBVO stehen absteigend, die jüngste zuerst (VB 3.12.7).
     kind: format
     family: vorerkrankung
     status: approved
@@ -201,8 +211,9 @@ rules:
     params: []
     sources: [VB@13.3#3.12.7, VB@13.4#3.12.7]
   - id: F41-9
-    title: per group KZ-NACHWEIS, TEIL-*, KZ-AU zero (insurer-only fields)
-    description: Per group KZ-NACHWEIS, TEIL-NACHWEIS-*, KZ-AU and TEIL-ANR-* are zero (insurer-only fields).
+    title: "je AU-Zeit KZ-NACHWEIS, TEIL-*, KZ-AU leer (füllt nur die Krankenkasse)"
+    description: >-
+      Je AU-Zeit sind KZ-NACHWEIS, TEIL-NACHWEIS-*, KZ-AU und TEIL-ANR-* Grundstellung (Felder der Krankenkasse).
     kind: format
     family: vorerkrankung
     status: approved
@@ -212,10 +223,10 @@ rules:
     params: []
     sources: [VB@13.3#3.12.9, VB@13.4#3.12.9, VB@13.3#3.12.12, VB@13.4#3.12.12]
   - id: F41-10
-    title: DATENSATZ-ID unique, 8-4-4-4-12 hex format
+    title: "DATENSATZ-ID eindeutig, Format 8-4-4-4-12 hexadezimal"
     description: >-
-      DSLW.DATENSATZ-ID is unique and in 8-4-4-4-12 hex format (no RFC 4122 version check: ITSG's own
-      IDs like 11111111-2222-AAAA-EEEE-111111111111 would fail it).
+      DSLW.DATENSATZ-ID ist eindeutig und im Format 8-4-4-4-12 hexadezimal (ohne Prüfung der RFC-4122-Version:
+      ITSG-eigene IDs wie 11111111-2222-AAAA-EEEE-111111111111 würden sonst abgelehnt).
     kind: format
     family: vorerkrankung
     status: approved
@@ -227,8 +238,9 @@ rules:
 
   # --- insurer reply 61 and 62
   - id: K61-1
-    title: REFERENZ-ID = DATENSATZ-ID of the employer's 41
-    description: DBID.REFERENZ-ID = DATENSATZ-ID of the employer's 41.
+    title: "REFERENZ-ID = DATENSATZ-ID der 41 des Arbeitgebers"
+    description: >-
+      DBID.REFERENZ-ID = DATENSATZ-ID der 41 des Arbeitgebers.
     kind: reply
     family: vorerkrankung
     status: approved
@@ -238,8 +250,9 @@ rules:
     params: []
     sources: [VB@13.3#3.19.3, VB@13.4#3.19.3]
   - id: K61-2
-    title: BBNR-VU = the employer's BBNR-VU
-    description: DSLW.BBNR-VU = the employer's BBNR-VU (clarified in V13.4, VB 3.1.10).
+    title: "BBNR-VU = BBNR-VU des Arbeitgebers"
+    description: >-
+      DSLW.BBNR-VU = BBNR-VU des Arbeitgebers (in V13.4 klargestellt, VB 3.1.10).
     kind: reply
     family: vorerkrankung
     status: approved
@@ -249,8 +262,10 @@ rules:
     params: []
     sources: [VB@13.3#3.1.10, VB@13.4#3.1.10]
   - id: K61-3
-    title: DBVO groups = same periods, same order as the 41; extra periods appended
-    description: DBVO groups carry the same periods in the same order as the 41; extra periods are appended after.
+    title: "DBVO: dieselben AU-Zeiten in derselben Reihenfolge wie in der 41, weitere angehängt"
+    description: >-
+      Der DBVO enthält dieselben AU-Zeiten in derselben Reihenfolge wie die 41; weitere AU-Zeiten werden
+      angehängt.
     kind: reply
     family: vorerkrankung
     status: approved
@@ -260,8 +275,10 @@ rules:
     params: []
     sources: [VB@13.3#3.12/insurer, VB@13.4#3.12/insurer]
   - id: K61-4
-    title: KZ-NACHWEIS 1 present, 2 partly, 4 missing
-    description: KZ-NACHWEIS-nn is 1 present, 2 partly, 4 missing.
+    title: "KZ-NACHWEIS 1 vorhanden, 2 teilweise, 4 fehlt"
+    description: >-
+      KZ-NACHWEIS-nn ist 1 (Nachweis vorhanden), 2 (teilweise) oder 4 (fehlt). Berechnet aus den Fakten des
+      Testfalls (Art der AU-Bescheinigung, wann die Krankenkasse sie erhält).
     kind: reply
     family: vorerkrankung
     status: approved
@@ -271,10 +288,11 @@ rules:
     params: []
     sources: [VB@13.3#3.12.9, VB@13.4#3.12.9]
   - id: K61-5
-    title: KZ-AU 1 counts, 2 does not, 5 partly, 3 further check, 0 not checked
+    title: "KZ-AU 1 anrechenbar, 2 nicht, 5 teilweise, 3 weitere Prüfung, 0 nicht geprüft"
     description: >-
-      KZ-AU-nn is 1 counts, 2 does not count, 5 partly counts (TEIL-ANR range), 3 further check
-      (interim), 0 not checked (e.g. current sick note missing, BP 16.7).
+      KZ-AU-nn ist 1 (anrechenbar), 2 (nicht anrechenbar), 5 (teilweise anrechenbar, Zeitraum in TEIL-ANR), 3
+      (weitere Prüfung, vorläufig) oder 0 (nicht geprüft, z. B. aktuelle AU-Bescheinigung fehlt, Beispielpapier
+      16.7). Berechnet aus den Fakten des Testfalls.
     kind: reply
     family: vorerkrankung
     status: approved
@@ -284,10 +302,10 @@ rules:
     params: []
     sources: [VB@13.3#3.12.12, VB@13.4#3.12.12, VB@13.3#3.12.13, VB@13.4#3.12.13, VB@13.3#3.12.14, VB@13.4#3.12.14, BP@13.2#16.7, BP@13.3#16.7]
   - id: K61-6
-    title: 12-MONATSFRIST-AB = start of the earliest counted period
+    title: "12-MONATSFRIST-AB = Beginn der frühesten anrechenbaren AU-Zeit"
     description: >-
-      12-MONATSFRIST-AB = start of the 12-month period = start of the earliest counted period
-      (Peter: 14.07.2025, Hinweise; BP 16.1).
+      12-MONATSFRIST-AB = Beginn der 12-Monatsfrist = Beginn der frühesten anrechenbaren AU-Zeit (Peter:
+      14.07.2025, Hinweise; Beispielpapier 16.1).
     kind: reply
     family: vorerkrankung
     status: approved
@@ -297,8 +315,9 @@ rules:
     params: []
     sources: [VB@13.3#3.12.5, VB@13.4#3.12.5, BP@13.2#16.1, BP@13.3#16.1, HINWEISE@1#chain]
   - id: K61-7
-    title: KZ-AK-AU = 4 if the current sick note is missing, else 0
-    description: KZ-AK-AU = 4 if the current sick note is missing, else 0.
+    title: "KZ-AK-AU = 4, wenn die aktuelle AU-Bescheinigung fehlt, sonst 0"
+    description: >-
+      KZ-AK-AU = 4, wenn die aktuelle AU-Bescheinigung fehlt, sonst 0.
     kind: reply
     family: vorerkrankung
     status: approved
@@ -308,8 +327,10 @@ rules:
     params: []
     sources: [VB@13.3#3.12.4, VB@13.4#3.12.4]
   - id: K62-1
-    title: REFERENZ-ID = DATENSATZ-ID of the latest valid 01
-    description: "DBID.REFERENZ-ID = DATENSATZ-ID of the latest valid 01 (Peter: the new 01 of step 6, Hinweise table)."
+    title: "REFERENZ-ID = DATENSATZ-ID der letzten gültigen 01"
+    description: >-
+      DBID.REFERENZ-ID = DATENSATZ-ID der letzten gültigen 01 (Peter: die neue 01 aus Schritt 6,
+      Hinweise-Tabelle).
     kind: reply
     family: vorerkrankung
     status: approved
@@ -319,10 +340,10 @@ rules:
     params: []
     sources: [VB@13.3#3.19.3, VB@13.4#3.19.3, HINWEISE@1#chain]
   - id: K62-2
-    title: EEL-ENDE and EEL-ENDE-GRUND, never after the end of employment
+    title: "EEL-ENDE und EEL-ENDE-GRUND, nie nach dem Ende der Beschäftigung"
     description: >-
-      DBEE.EEL-ENDE and DBEE.EEL-ENDE-GRUND: 31.03.2026 and 99 for Peter (Hinweise table), never after
-      the end of employment (C-6).
+      DBEE.EEL-ENDE und DBEE.EEL-ENDE-GRUND: 31.03.2026 und 99 für Peter (Hinweise-Tabelle), nie nach dem Ende der
+      Beschäftigung (C-6).
     kind: reply
     family: vorerkrankung
     status: approved
@@ -334,10 +355,11 @@ rules:
 
   # --- EFZ end after a 61
   - id: E-1
-    title: the 01 carries DBAL.DATUM-EGZBIS = efz_end
+    title: "die 01 enthält DBAL.DATUM-EGZBIS = Ende der EFZ"
     description: >-
-      The 01 certificate carries DBAL.DATUM-EGZBIS = efz_end, where efz_end = current start +
-      (efz_days - used - 1) days and used counts the periods the 61 marks as counting.
+      Die Entgeltbescheinigung 01 enthält DBAL.DATUM-EGZBIS = Ende der EFZ; Ende der EFZ = Beginn der aktuellen AU
+      + (efz_days - angerechnete Tage - 1) Tage, angerechnet werden die Zeiten, die die 61 als anrechenbar
+      kennzeichnet.
     kind: efz
     family: vorerkrankung
     status: approved
@@ -347,8 +369,10 @@ rules:
     params: [efz_days]
     sources: [VB@13.3#3.4.3, VB@13.4#3.4.3, HINWEISE@1#chain]
   - id: E-2
-    title: a corrected 61 that changes efz_end requires 88 + new 01
-    description: A corrected 61 that changes efz_end requires an 88 (cancel the old 01) and a new 01.
+    title: "ändert eine korrigierte 61 das Ende der EFZ, folgen 88 und neue 01"
+    description: >-
+      Ändert eine korrigierte 61 das Ende der EFZ, wird die alte 01 mit einer 88 storniert und eine neue 01
+      gesendet.
     kind: efz
     family: vorerkrankung
     status: approved
@@ -358,10 +382,10 @@ rules:
     params: [efz_days]
     sources: [GG@13.1#2.5, BP@13.2#23, BP@13.3#23]
   - id: E-3
-    title: an update only in interim flags 3 or 4 does not cancel the earlier 61
+    title: "eine Aktualisierung nur in vorläufigen Kennzeichen 3 oder 4 ersetzt die frühere 61 nicht"
     description: >-
-      An updated 61 whose only change is in interim flags 3 or 4 (KZ-AK-AU, KZ-AU-nn) does not cancel
-      the earlier 61.
+      Ändert eine aktualisierte 61 nur vorläufige Kennzeichen (KZ-AU 3, KZ-AK-AU 4), ersetzt sie die frühere 61
+      nicht: die 01 bleibt, keine 88 und keine neue 01.
     kind: efz
     family: vorerkrankung
     status: approved
@@ -373,8 +397,9 @@ rules:
 
   # --- chain rules
   - id: C-1
-    title: every employer message has a unique DATENSATZ-ID
-    description: Every employer message has a unique DATENSATZ-ID.
+    title: "jede Meldung des Arbeitgebers hat eine eindeutige DATENSATZ-ID"
+    description: >-
+      Jede Meldung des Arbeitgebers hat eine eindeutige DATENSATZ-ID.
     kind: chain
     family: vorerkrankung
     status: approved
@@ -384,10 +409,10 @@ rules:
     params: []
     sources: [VB@13.3#3.1.11, VB@13.4#3.1.11]
   - id: C-2
-    title: AKTENZEICHEN-VERURSACHER identical across all employer messages of the case
+    title: "AKTENZEICHEN-VERURSACHER in allen Meldungen des Arbeitgebers zum Fall gleich"
     description: >-
-      AKTENZEICHEN-VERURSACHER is identical across all employer messages of the case (DBID on 41 and
-      01, DBSD on the 88).
+      Das AKTENZEICHEN-VERURSACHER ist in allen Meldungen des Arbeitgebers zum Fall gleich (DBID in 41 und 01,
+      DBSD in der 88).
     kind: chain
     family: vorerkrankung
     status: approved
@@ -397,8 +422,9 @@ rules:
     params: []
     sources: [VB@13.3#3.19.2, VB@13.4#3.19.2, VB@13.3#3.20, VB@13.4#3.20]
   - id: C-3
-    title: the 88 points to the DATENSATZ-ID of the cancelled 01
-    description: The 88's DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG = DATENSATZ-ID of the 01 being cancelled.
+    title: "die 88 verweist auf die DATENSATZ-ID der stornierten 01"
+    description: >-
+      DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG der 88 = DATENSATZ-ID der stornierten 01.
     kind: chain
     family: vorerkrankung
     status: approved
@@ -408,8 +434,9 @@ rules:
     params: []
     sources: [VB@13.3#3.20, VB@13.4#3.20, GG@13.1#2.5]
   - id: C-4
-    title: the 88's VORNAME / FAMILIENNAME = names in the cancelled record
-    description: The 88's DBSD.VORNAME / FAMILIENNAME = names in the cancelled record (clarified in V13.4, VB 3.20).
+    title: "VORNAME / FAMILIENNAME der 88 = Namen im stornierten Datensatz"
+    description: >-
+      DBSD.VORNAME und DBSD.FAMILIENNAME der 88 = Namen im stornierten Datensatz (in V13.4 klargestellt, VB 3.20).
     kind: chain
     family: vorerkrankung
     status: approved
@@ -419,8 +446,9 @@ rules:
     params: []
     sources: [VB@13.3#3.20, VB@13.4#3.20]
   - id: C-5
-    title: the new 01 comes after the 88
-    description: The new 01 comes after the 88.
+    title: "die neue 01 folgt auf die 88"
+    description: >-
+      Die neue 01 folgt auf die 88.
     kind: chain
     family: vorerkrankung
     status: approved
@@ -430,8 +458,10 @@ rules:
     params: []
     sources: [GG@13.1#2.5]
   - id: C-6
-    title: the insurer's 62 end date is not after the end of employment
-    description: The insurer's 62 end date is not after the end of employment (clarified in V13.4, VB 3.7.3).
+    title: "das Ende in der 62 der Krankenkasse liegt nicht nach dem Ende der Beschäftigung"
+    description: >-
+      Das Ende in der 62 der Krankenkasse liegt nicht nach dem Ende der Beschäftigung (in V13.4 klargestellt, VB
+      3.7.3).
     kind: chain
     family: vorerkrankung
     status: approved
@@ -441,10 +471,10 @@ rules:
     params: []
     sources: [VB@13.3#3.7.3, VB@13.4#3.7.3]
   - id: C-7
-    title: the 61 repeats AKTENZEICHEN-VERURSACHER unchanged, or blank if none was sent
+    title: "die 61 wiederholt das AKTENZEICHEN-VERURSACHER unverändert oder lässt es leer"
     description: >-
-      The insurer's 61 repeats DBID.AKTENZEICHEN-VERURSACHER unchanged, or leaves it blank if the
-      employer sent none (clarified in V13.4, VB 3.19).
+      Die 61 der Krankenkasse wiederholt DBID.AKTENZEICHEN-VERURSACHER unverändert oder lässt es leer, wenn der
+      Arbeitgeber keines gesendet hat (in V13.4 klargestellt, VB 3.19).
     kind: chain
     family: vorerkrankung
     status: approved
@@ -454,8 +484,9 @@ rules:
     params: []
     sources: [VB@13.3#3.19.2, VB@13.4#3.19.2]
   - id: C-8
-    title: the 88 carries only DBSD (MM-SD = J, every other MM flag N)
-    description: "The 88 carries only DBSD: MM-SD = J, every other MM flag N (Beispielpapier 23)."
+    title: "die 88 enthält nur den DBSD (MM-SD = J, alle anderen MM-Kennzeichen N)"
+    description: >-
+      Die 88 enthält nur den Datenbaustein DBSD: MM-SD = J, alle anderen MM-Kennzeichen N (Beispielpapier 23).
     kind: chain
     family: vorerkrankung
     status: approved
@@ -467,11 +498,11 @@ rules:
 
   # --- VB Anlage 3: data blocks per Abgabegrund (kg/seed/message_types.yaml block_table), all message types
   - id: A3-1
-    title: every mandatory block present, no forbidden block (VB Anlage 3)
+    title: "jeder Pflicht-Datenbaustein vorhanden, kein unzulässiger Datenbaustein (VB Anlage 3)"
     description: >-
-      Each Abgabegrund carries the data blocks marked J in VB Anlage 3 chapter 2 and none marked N. Blocks
-      marked m are sent only when the case calls for it; whether the case calls for it is judged by the
-      family's rules or an expert.
+      Jeder Abgabegrund enthält die Datenbausteine, die VB Anlage 3 Kapitel 2 mit J kennzeichnet, und keinen mit
+      N. Datenbausteine mit m werden nur bei entsprechendem Sachverhalt übermittelt; ob der Sachverhalt vorliegt,
+      entscheiden die Regeln der Fallgruppe oder ein Systemberater.
     kind: format
     family: common
     status: approved
@@ -485,10 +516,10 @@ rules:
 
   # --- VB Anlage 3 chapter 3: continuity of benefits, § 69 SGB IX (kg/seed/continuity.yaml)
   - id: A3-2
-    title: a gap of at least one calendar day between two benefits always needs a new certificate
+    title: "liegt mindestens ein Kalendertag zwischen zwei Leistungen, folgt immer eine neue Entgeltbescheinigung"
     description: >-
-      If at least one calendar day (non-working days included) lies between two benefit periods, the employer
-      always sends a new certificate for the second one.
+      Liegt mindestens ein Kalendertag (auch arbeitsfreie Tage) zwischen zwei Leistungszeiträumen, erstattet der
+      Arbeitgeber für den zweiten stets eine neue Meldung (VB Anlage 3 Kapitel 3).
     kind: chain
     family: common
     status: approved
@@ -498,11 +529,11 @@ rules:
     params: []
     sources: [VB-ANL3@13.3#3]
   - id: A3-3
-    title: directly following benefits need a new certificate only where VB Anlage 3 says so
+    title: "direkt aufeinanderfolgende Leistungen: neue Entgeltbescheinigung nur, wo VB Anlage 3 es vorsieht"
     description: >-
-      When a second benefit directly follows the first, the table of VB Anlage 3 chapter 3 decides whether the
-      employer sends a new certificate (e.g. Krankengeld followed by Mutterschaftsgeld: yes; Übergangsgeld
-      followed by Krankengeld: no; Kinderkrankengeld for the same child: no, for another child: yes).
+      Folgt eine zweite Leistung direkt auf die erste, entscheidet die Tabelle in VB Anlage 3 Kapitel 3 (§ 69 SGB
+      IX), ob der Arbeitgeber eine neue Meldung erstattet (z. B. Krankengeld, dann Mutterschaftsgeld: ja;
+      Übergangsgeld, dann Krankengeld: nein; Kinderkrankengeld für dasselbe Kind: nein, für ein anderes Kind: ja).
     kind: chain
     family: common
     status: approved
@@ -514,11 +545,12 @@ rules:
 
   # --- GG Anlage 2: Schlüsselzahlen (kg/seed/key_values.yaml), all message types
   - id: S-1
-    title: Codes are Schlüsselzahlen of GG Anlage 2
+    title: "Schlüsselzahlen nach GG Anlage 2"
     description: >-
-      A filled code field (ABGABEGRUND, KORR-ABGABEGRUND, GRUNDBEEND, FEHLZEIT, EEL-ENDE-GRUND,
-      ABRECHNUNGSPROGRAMM, MM-KUG, ENTGART, KEINEFREIST, GRUNDAV, KZ-NACHWEIS, KZ-AU) carries one of the codes
-      of GG Anlage 2. Whether a field must be filled is checked elsewhere; Grundstellung is not judged here.
+      Ein gefülltes Schlüsselfeld (ABGABEGRUND, KORR-ABGABEGRUND, GRUNDBEEND, FEHLZEIT, EEL-ENDE-GRUND,
+      ABRECHNUNGSPROGRAMM, MM-KUG, ENTGART, KEINEFREIST, GRUNDAV, KZ-NACHWEIS, KZ-AU) enthält eine Schlüsselzahl
+      aus GG Anlage 2. Ob ein Feld gefüllt sein muss, prüfen andere Regeln; Grundstellung wird hier nicht
+      bewertet.
     kind: format
     family: common
     status: approved

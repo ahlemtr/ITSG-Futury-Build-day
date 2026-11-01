@@ -48,21 +48,21 @@ def new_certificate(first: str, first_end: date, following: str, following_start
         raise ValueError("the following benefit starts before the first one ends")
     if gap >= 1:
         return ContinuityDecision(new_certificate=True, rule="A3-2", verdict="gap",
-                                  reason=f"{gap} calendar day(s) between the two benefits: always a new certificate")
+                                  reason=f"{gap} Kalendertag(e) zwischen den beiden Leistungen: immer eine neue Entgeltbescheinigung")
     if organ_donation:
         return ContinuityDecision(new_certificate=True, rule="A3-3", verdict="required",
-                                  reason="Krankengeld nach § 44a SGB V has no data exchange: the following benefit "
-                                         "needs its own certificate")
+                                  reason="für Krankengeld nach § 44a SGB V gibt es keinen Datenaustausch: die folgende "
+                                         "Leistung braucht eine eigene Entgeltbescheinigung")
     v = verdict(first, following)
     if v == "same_child":
         if same_child is None:
             raise ValueError("whether it is the same child decides here: pass same_child")
         new: bool | None = not same_child
-        why = "same child: one continuous case" if same_child else "another child: a new case"
+        why = "dasselbe Kind: ein durchgängiger Fall" if same_child else "ein anderes Kind: ein neuer Fall"
     else:
         new = {"none": False, "required": True, "impossible": None}[v]
-        why = {"none": "§ 69 SGB IX: the first certificate carries on",
-               "required": "a new certificate with the code of the following benefit",
-               "impossible": "this combination cannot occur"}[v]
+        why = {"none": "§ 69 SGB IX: die erste Entgeltbescheinigung gilt weiter",
+               "required": "eine neue Entgeltbescheinigung mit dem Abgabegrund der folgenden Leistung",
+               "impossible": "diese Kombination kommt nicht vor (keine Fallgestaltung)"}[v]
     return ContinuityDecision(new_certificate=new, rule="A3-3", verdict=v,
-                              reason=f"{benefit_of(first)} followed directly by {benefit_of(following)}: {why}")
+                              reason=f"{benefit_of(first)}, direkt gefolgt von {benefit_of(following)}: {why}")

@@ -27,7 +27,7 @@ class RunBody(BaseModel):
 def _load(request: Request, run_id: str) -> tuple[runs.RunState, dict]:
     doc = repo(request).get_run(run_id)
     if doc is None:
-        raise HTTPException(404, "run not found")
+        raise HTTPException(404, "Testlauf nicht gefunden")
     return runs.RunState.model_validate(doc), doc
 
 

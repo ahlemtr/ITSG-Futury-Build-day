@@ -101,7 +101,7 @@ def submit(kb: KnowledgeBase, st: RunState, files: list[str | bytes]) -> RoundRe
             ended = True
     if r > max((m.round for m in ch.messages if m.actor == "employer"), default=0) and new_msgs:
         outcomes["import-only"] = RuleOutcome(rule="import-only", outcome="fail",
-                                              message="no new message may be sent in this round")
+                                              message="in dieser Runde darf keine neue Meldung gesendet werden")
     if r == 1:
         for rule in families.of_case(st.test_case).round_one_rules(st.test_case):
             outcomes.setdefault(rule, RuleOutcome(rule=rule, outcome="pass"))
