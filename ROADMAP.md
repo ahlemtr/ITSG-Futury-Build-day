@@ -60,8 +60,14 @@ Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scen
 - [ ] Map each Abgabegrund to its required and optional data blocks (VB Anlage 3, or the VB text until it arrives)
 - [ ] Check every layout in `layouts/` against GG Anlage 1 (`tools/compare_anlage1`), fill gaps
 - [ ] Test cases name their family; catalogue, runs and reports group by family
+- [ ] Complete the existing rules (`PROJECT_REPORT.md` section 5.2, item 12):
+  - [ ] Implement E-3 (an update only in interim flags 3 or 4 does not cancel the earlier 61); today it has a rule card and no code
+  - [ ] Compute K61-4 (KZ-NACHWEIS) and K61-5 (KZ-AU) from the case facts; today they are typed into the test data
+  - [ ] Call `check_61` and `check_62` (K61-1..3, K62-1) as a self-check of the insurer simulator, or delete them; today they are never called
+  - [ ] Complete the DBAN layout (today only KENNUNG)
+  - [ ] One test per rule ID, so every rule is shown to be covered
 
-Done when: Peter still passes unchanged and a second family can be added by adding files, not by editing the checker.
+Done when: Peter still passes unchanged, all 37 existing rules have code and a test, and a second family can be added by adding files, not by editing the checker.
 
 Needs: G0.
 
