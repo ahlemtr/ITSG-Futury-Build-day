@@ -18,8 +18,8 @@ ID = re.compile(r"[\"']([^\"']+)[\"']")
 # rules no test proves yet
 UNTESTED = {
     "F41-1", "F41-2", "F41-3", "F41-4", "F41-5", "F41-7", "F41-9", "F41-10",
-    "K61-2", "K61-3", "K61-4", "K61-5", "K61-6", "K61-7",
-    "E-3", "C-3", "C-4", "C-5", "C-6", "C-7", "C-8",
+    "K61-6", "K61-7",
+    "C-3", "C-4", "C-5", "C-8",
 }
 # rules no test case names in its targets
 UNTARGETED = {"A3-2", "A3-3"}  # continuity of benefits: no family chains two benefits yet (G3-G6)

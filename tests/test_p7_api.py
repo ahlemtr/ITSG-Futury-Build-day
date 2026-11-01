@@ -25,7 +25,7 @@ def test_health(client):
 
 def test_seed_counts(client):
     tcs = client.get("/test-cases").json()
-    assert len(tcs) == 18 and len([t for t in tcs if not t["hidden"]]) == 16  # incl. ta-167, ta-168
+    assert len(tcs) == 21 and len([t for t in tcs if not t["hidden"]]) == 19  # incl. ta-167, ta-168
     assert len(client.get("/submissions").json()) == 11
     assert [v["version"] for v in client.get("/versions").json()] == ["13.3", "13.4"]
 

@@ -10,7 +10,8 @@ from decimal import Decimal
 from typing import Any
 
 from engine.families.base import ChainResult, Scenario
-from engine.families.vorerkrankung.rules import efz_end, must_send_41
+from engine.families.vorerkrankung import rules
+from engine.families.vorerkrankung.rules import efz_end
 from engine.model import AuPeriod, Decision41, ExpectedMessage
 from engine.rules import params as params_mod
 from kg.interface import KnowledgeBase
@@ -43,9 +44,10 @@ def _dbid(sc: Scenario, ref: str = "") -> dict[str, Any]:
     return {"AKTENZEICHEN-SV": "", "AKTENZEICHEN-VERURSACHER": sc.extras.get("azvu", ""), "REFERENZ-ID": ref}
 
 
-def _group(a: AuPeriod, nw: int = 0, au: int = 0) -> dict[str, Any]:
-    return {"BEGINN-AU": a.start, "ENDE-AU": a.end, "KZ-NACHWEIS": nw, "TEIL-NACHWEIS-AU-BEGINN": None,
-            "TEIL-NACHWEIS-AU-ENDE": None, "KZ-AU": au, "TEIL-ANR-AU-BEGINN": None, "TEIL-ANR-AU-ENDE": None}
+def _group(a: AuPeriod, flags: dict[str, Any] | None = None) -> dict[str, Any]:
+    g = {"BEGINN-AU": a.start, "ENDE-AU": a.end, "KZ-NACHWEIS": 0, "TEIL-NACHWEIS-AU-BEGINN": None,
+         "TEIL-NACHWEIS-AU-ENDE": None, "KZ-AU": 0, "TEIL-ANR-AU-BEGINN": None, "TEIL-ANR-AU-ENDE": None}
+    return {**g, **(flags or {})}
 
 
 def msg_41(sc: Scenario, chain: list[AuPeriod], step: int = 1) -> ExpectedMessage:
@@ -61,24 +63,28 @@ def msg_41(sc: Scenario, chain: list[AuPeriod], step: int = 1) -> ExpectedMessag
                            blocks=blocks)
 
 
-def insurer_flags(sc: Scenario, which: str, a: AuPeriod) -> tuple[int, int]:
-    ins = sc.extras["insurer"]
-    f = {**ins["default_flags"], **ins.get(which, {}).get(str(a.start), {})}
-    return f["kz_nachweis"], f["kz_au"]
+def _insurer_contact(sc: Scenario) -> dict[str, Any] | None:
+    """DBAP of the insurer's replies (VB Anlage 3: J on 61 and 62)."""
+    contact = sc.extras.get("insurer", {}).get("contact")
+    return dict(contact) if contact else None
 
 
 def msg_61(sc: Scenario, chain: list[AuPeriod], which: str, step: int, round_: int, ref: str,
            azvu: str | None = None) -> ExpectedMessage:
     cur = sc.test_case.inputs.current
-    groups = [_group(a, *insurer_flags(sc, which, a)) for a in chain]
+    reply = "first" if which == "first_61" else "corrected"
+    groups = [_group(a, rules.insurer_flags(a, reply)) for a in chain]  # K61-4, K61-5 from the case facts
     counted = [a for a, g in zip(chain, groups) if g["KZ-AU"] in (1, 5)]
     frist = min((a.start for a in counted), default=None)  # K61-6
     blocks = {
         "DBNA": _dbna(sc),
-        "DBVO": {"GRUNDAV": 1, "AU-AB-AG": cur.start, "AU-AB-SV": cur.start, "KZ-AK-AU": 0 if cur.certified else 4,
+        "DBVO": {"GRUNDAV": 1, "AU-AB-AG": cur.start, "AU-AB-SV": cur.start,
+                 "KZ-AK-AU": 0 if cur.certified else rules.INTERIM_KZ_AK_AU,  # K61-7
                  "12-MONATSFRIST-AB": frist, "groups": groups},
         "DBID": {**_dbid(sc, ref), **({"AKTENZEICHEN-VERURSACHER": azvu} if azvu is not None else {})},
     }
+    if (contact := _insurer_contact(sc)) is not None:
+        blocks["DBAP"] = contact
     return ExpectedMessage(step=step, round=round_, actor="insurer", abgabegrund="61",
                            head=_head(sc, step, "61", insurer=True), blocks=blocks,
                            note=f"{which.replace('_', ' ')} (TEEK0)")
@@ -112,6 +118,8 @@ def msg_62(sc: Scenario, step: int, round_: int, ref: str, benefit_start: date) 
               "DBEE": {"EEL-ABAG": benefit_start, "EEL-ABSV": benefit_start, "EEL-ENDE": end,
                        "EEL-ENDE-GRUND": sc.extras["insurer"].get("eel_ende_grund", 99)},
               "DBID": _dbid(sc, ref)}
+    if (contact := _insurer_contact(sc)) is not None:
+        blocks["DBAP"] = contact
     return ExpectedMessage(step=step, round=round_, actor="insurer", abgabegrund="62",
                            head=_head(sc, step, "62", insurer=True), blocks=blocks, note="end of benefit (TEEK0)")
 
@@ -120,8 +128,7 @@ def msg_62(sc: Scenario, step: int, round_: int, ref: str, benefit_start: date) 
 
 
 def decide(kb: KnowledgeBase, sc: Scenario, version: str) -> Decision41:
-    i = sc.test_case.inputs
-    return must_send_41(i.current, i.priors, i.report_date, params_mod.load(kb, version=version))
+    return rules.decide(sc.test_case.inputs, params_mod.load(kb, version=version))
 
 
 def build_chain(kb: KnowledgeBase, sc: Scenario, version: str) -> ChainResult:
@@ -142,14 +149,18 @@ def build_chain(kb: KnowledgeBase, sc: Scenario, version: str) -> ChainResult:
     efz2, t2 = efz_end(cur.start, corrected.blocks["DBVO"]["groups"], p)
     res.messages += [first, m01, corrected]
     res.values["efz"] = {"after_first_61": efz1, "after_corrected_61": efz2}
+    # E-3: an update that only sets interim flags (KZ-AU 3, KZ-AK-AU 4) does not replace the first 61
+    replaces = rules.supersedes(first.blocks["DBVO"], corrected.blocks["DBVO"])
+    res.values["corrected_61_replaces_first"] = replaces
     res.traces.update(efz_first=t1, efz_corrected=t2)
+    efz = efz2 if replaces else efz1
     latest_01, step = m01, 5
-    if efz2 != efz1:  # E-2: corrected 61 changes the EFZ end -> 88 + new 01
+    if efz != efz1:  # E-2: corrected 61 changes the EFZ end -> 88 + new 01
         m88 = msg_88(sc, 5, 3, m01)
-        new01 = msg_01(sc, 6, 3, efz2)
+        new01 = msg_01(sc, 6, 3, efz)
         res.messages += [m88, new01]
         latest_01, step = new01, 7
-    benefit_start = efz2 + timedelta(days=1)
+    benefit_start = efz + timedelta(days=1)
     res.messages.append(msg_62(sc, step, 3, latest_01.head["DATENSATZ-ID"], benefit_start))
     return res
 

@@ -116,6 +116,29 @@ def check_62(rec: Record, latest_01: Record, employment_end: date | None) -> lis
     return out
 
 
+# ---------------------------------------------------------------- self-check of the insurer simulator
+
+
+def self_check(kb, scenario, replies: list[Record], employer: list[Record]) -> list[RuleResult]:
+    """K61-1..3, C-7 on every 61 against the employer's 41; K62-1, C-6 on every 62 against the latest 01 before
+    it; A3-1 (VB Anlage 3 blocks) on every reply. Returns the failed results."""
+    from engine import layouts
+    from engine.rules import blocks
+
+    flags = layouts.get(kb, "DSLW", None).flags
+    m41 = next((r for r in employer if r.abgabegrund == "41"), None)
+    out: list[RuleResult] = []
+    for rec in replies:
+        out += blocks.check_block_presence(rec, flags)
+        if rec.abgabegrund == "61" and m41 is not None:
+            out += check_61(rec, m41)
+        if rec.abgabegrund == "62":
+            v01 = [r for r in employer if r.abgabegrund == "01"]
+            if v01:
+                out += check_62(rec, v01[-1], scenario.test_case.inputs.employment_end)
+    return [r for r in out if not r.ok]
+
+
 # ---------------------------------------------------------------- checks on the vendor's messages
 
 EMPLOYER_TYPES = {"01", "41", "88"}
@@ -175,12 +198,22 @@ def _recheck_groups(ctx: CheckContext, d: Deviation) -> bool:
     return False
 
 
+def _no_new_01(ctx: CheckContext, d: Deviation) -> bool:
+    """An 88 or a further 01 the chain does not have: E-3 if the corrected 61 only set interim flags, else E-2."""
+    if ctx.chain.values.get("corrected_61_replaces_first") is False:
+        return ctx.label(d, "bug", "E-3", "the corrected 61 only sets interim flags (KZ-AU 3 / KZ-AK-AU 4): the "
+                                          "earlier 61 stands, the 01 is neither cancelled nor sent again")
+    if "efz" in ctx.chain.values:
+        return ctx.label(d, "bug", "E-2", "the corrected 61 does not change the EFZ end: no 88 and no new 01")
+    return False
+
+
 def recheck(ctx: CheckContext, d: Deviation) -> bool:
     ag, f = d.abgabegrund, f"{d.record}.{base_field_name(d.field or '')}"
     i = ctx.scenario.test_case.inputs
     if ag == "41":
         if d.kind == "missing_message":
-            rule = deciding_rule(i.current, i.priors, i.report_date, ctx.params)
+            rule = deciding_rule(i.current, i.priors, i.report_date, ctx.params, i.insurance, i.person_group)
             return ctx.label(d, "bug", rule, f"a 41 is required under {ctx.version} ({_why41(ctx)}) "
                                              f"but none was sent")
         if d.kind == "extra_message":
@@ -197,6 +230,8 @@ def recheck(ctx: CheckContext, d: Deviation) -> bool:
             return ctx.label(d, "invalid", "F41-5", "AU-AB-AG must be the start of the current AU")
         if f == "DBVO.GRUNDAV":
             return ctx.label(d, "invalid", "F41-4", "GRUNDAV must be 1 (sickness)")
+        if f in ("DSLW.EMPFAENGERNUMMER", "DSLW.BBNR-KK"):
+            return ctx.label(d, "bug", "R41-7", "the 41 goes to the health insurer of the person (its Betriebsnummer)")
     if ag == "01":
         if f == "DBAL.DATUM-EGZBIS":
             return ctx.label(d, "bug", "E-1", f"pay end must be the EFZ end {d.expected} computed from the "
@@ -204,10 +239,14 @@ def recheck(ctx: CheckContext, d: Deviation) -> bool:
         if d.kind == "missing_message":
             rule = "E-2" if (d.step or 0) > 3 else "E-1"
             return ctx.label(d, "bug", rule, "the 01 certificate is missing")
+        if d.kind == "extra_message":
+            return _no_new_01(ctx, d)
     if ag == "88":
         if d.kind == "missing_message":
             return ctx.label(d, "bug", "E-2", "the corrected 61 changed the EFZ end: the first 01 must be "
                                               "cancelled with an 88 before the new 01")
+        if d.kind == "extra_message":
+            return _no_new_01(ctx, d)
         if f == "DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG":
             return ctx.label(d, "bug", "C-3", "the 88 must point to the 01 being cancelled")
         if f in ("DBSD.VORNAME", "DBSD.FAMILIENNAME"):

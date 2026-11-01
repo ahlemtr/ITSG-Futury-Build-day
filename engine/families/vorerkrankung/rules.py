@@ -11,8 +11,12 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 
-from engine.model import AuPeriod, Decision41, Trace
+from engine.model import AuPeriod, Decision41, TestInputs, Trace
 from engine.rules.params import Params
+
+NO_41_PERSON_GROUPS = {109, 110}  # marginal employment (Pflichtenheft item bcec54ad)
+INTERIM_KZ_AU = 3  # "further check": an interim answer of the insurer (K61-5, E-3)
+INTERIM_KZ_AK_AU = 4  # current sick note missing (K61-7, E-3)
 
 
 def days(start: date, end: date) -> int:
@@ -67,9 +71,18 @@ def current_end(current: AuPeriod, report_date: date | None, p: Params) -> date:
     return report_date + timedelta(days=p.open_end_days - 1)
 
 
-def must_send_41(current: AuPeriod, priors: list[AuPeriod], report_date: date | None, p: Params) -> Decision41:
+def must_send_41(current: AuPeriod, priors: list[AuPeriod], report_date: date | None, p: Params,
+                 insurance: str = "statutory", person_group: int | None = None) -> Decision41:
     t = Trace(inputs={"current": current.model_dump(mode="json"), "priors": [a.model_dump(mode="json") for a in priors],
-                      "report_date": str(report_date) if report_date else None, "params": p.__dict__})
+                      "report_date": str(report_date) if report_date else None, "params": p.__dict__,
+                      "insurance": insurance, "person_group": person_group})
+    if insurance != "statutory":
+        t.add("R41-7", f"insurance {insurance}: a 41 only for people with statutory health insurance", ok=False)
+        return Decision41(send=False, trace=t)
+    t.add("R41-7", "statutory health insurance: the 41 goes to the person's health insurer")
+    if person_group in NO_41_PERSON_GROUPS:
+        t.add("R41-8", f"person group {person_group}: no 41 for marginal employment", ok=False)
+        return Decision41(send=False, trace=t)
     certified = [a for a in priors if a.certified]
     dropped = [a for a in priors if not a.certified]
     t.add("R41-5", f"{len(dropped)} uncertified prior(s) dropped")
@@ -95,15 +108,77 @@ def must_send_41(current: AuPeriod, priors: list[AuPeriod], report_date: date | 
     return Decision41(send=ok, chain=chain, total_days=total, trace=t)
 
 
-def deciding_rule(current: AuPeriod, priors: list[AuPeriod], report_date: date | None, p: Params) -> str:
+def decide(i: TestInputs, p: Params) -> Decision41:
+    """must_send_41 on a test case's inputs."""
+    return must_send_41(i.current, i.priors, i.report_date, p, insurance=i.insurance, person_group=i.person_group)
+
+
+def deciding_rule(current: AuPeriod, priors: list[AuPeriod], report_date: date | None, p: Params,
+                  insurance: str = "statutory", person_group: int | None = None) -> str:
     """For a 41 that must be sent: the condition closest to its boundary (smallest margin).
     Used to name the rule a vendor broke when it sent no 41. Ties go to R41-2."""
-    d = must_send_41(current, priors, report_date, p)
+    d = must_send_41(current, priors, report_date, p, insurance=insurance, person_group=person_group)
     if not d.send:
         return d.trace.failed[-1] if d.trace.failed else "R41-1"
     gap_margin = (gap_limit(d.chain[0].end, p) - current.start).days
     total_margin = (d.total_days or 0) - p.min_total_days
     return "R41-2" if gap_margin <= total_margin else "R41-4"
+
+
+# ---------------------------------------------------------------- insurer flags on the 61 (K61-4, K61-5)
+
+
+def note_kind(a: AuPeriod) -> str:
+    return a.sick_note or ("eau" if a.certified else "none")
+
+
+def insurer_has_note(a: AuPeriod, reply: str) -> bool:
+    """Does the insurer have the sick note when it writes this reply ("first" or "corrected" 61)?
+    An eAU reaches it at once; a paper note when the case says (default: never)."""
+    kind = note_kind(a)
+    if kind == "eau":
+        return True
+    if kind == "paper":
+        gets = a.insurer_gets_note or "never"
+        return gets == "first" or (gets == "corrected" and reply == "corrected")
+    return False
+
+
+def insurer_flags(a: AuPeriod, reply: str) -> dict[str, Any]:
+    """The DBVO group flags the insurer sets for one prior period in its first or corrected 61.
+
+    K61-4 KZ-NACHWEIS: 1 sick note present, 4 missing. K61-5 KZ-AU: 1 counts, 2 does not count, 5 partly counts
+    (TEIL-ANR-AU range), 3 further check (interim). A missing note is an interim answer in the first 61 (4 / 3);
+    in the corrected 61 the insurer has decided: still missing = does not count (4 / 2). A period the insurer
+    rechecks is set back to 3 in the corrected 61 (E-3)."""
+    out: dict[str, Any] = {"KZ-NACHWEIS": 1, "KZ-AU": 1, "TEIL-ANR-AU-BEGINN": None, "TEIL-ANR-AU-ENDE": None}
+    if not insurer_has_note(a, reply):
+        out.update({"KZ-NACHWEIS": 4, "KZ-AU": INTERIM_KZ_AU if reply == "first" else 2})
+        return out
+    if reply == "corrected" and a.insurer_rechecks:
+        out["KZ-AU"] = INTERIM_KZ_AU
+    elif a.counts == "no":
+        out["KZ-AU"] = 2
+    elif a.counts == "partly":
+        out.update({"KZ-AU": 5, "TEIL-ANR-AU-BEGINN": a.counts_from, "TEIL-ANR-AU-ENDE": a.counts_to})
+    return out
+
+
+def supersedes(old: Mapping[str, Any], new: Mapping[str, Any]) -> bool:
+    """E-3: does an updated 61 replace the earlier one? Not if every change only sets an interim flag
+    (KZ-AU 3 or KZ-AK-AU 4): the earlier answer stands. `old` / `new`: the DBVO blocks of both 61s."""
+    if _g(old, "KZ-AK-AU") != _g(new, "KZ-AK-AU") and _g(new, "KZ-AK-AU") != INTERIM_KZ_AK_AU:
+        return True
+    og, ng = old.get("groups", []), new.get("groups", [])
+    if [(_g(g, "BEGINN-AU"), _g(g, "ENDE-AU")) for g in og] != [(_g(g, "BEGINN-AU"), _g(g, "ENDE-AU")) for g in ng]:
+        return True
+    for a, b in zip(og, ng):
+        changed = {k for k in set(a) | set(b) if _g(a, k) != _g(b, k)}
+        if changed - {"KZ-AU", "KZ-NACHWEIS"} or ("KZ-AU" in changed and _g(b, "KZ-AU") != INTERIM_KZ_AU):
+            return True
+        if "KZ-NACHWEIS" in changed and _g(b, "KZ-AU") != INTERIM_KZ_AU:
+            return True
+    return False
 
 
 # ---------------------------------------------------------------- EFZ end

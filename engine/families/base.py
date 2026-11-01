@@ -111,9 +111,10 @@ class Family(ABC):
         """Rules a clean first round already proves (vorerkrankung: the R41 targets)."""
         return []
 
-    def self_check(self, kb: KnowledgeBase, chain: ChainResult) -> list[RuleResult]:
-        """Checks on the replies our insurer simulator writes (vorerkrankung: K61, K62). A failure is our
-        bug, never the vendor's."""
+    def self_check(self, kb: KnowledgeBase, scenario: Scenario, replies: list[Record],
+                   employer: list[Record]) -> list[RuleResult]:
+        """Checks on the replies our insurer simulator writes (vorerkrankung: K61, K62), against the employer
+        messages they answer. Returns the failed checks; a failure is our bug, never the vendor's."""
         return []
 
     # ---- test builder

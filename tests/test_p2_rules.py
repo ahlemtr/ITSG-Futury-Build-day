@@ -6,7 +6,7 @@ import yaml
 
 from engine.expected import get_case
 from engine.families.vorerkrankung import checks as vk_checks
-from engine.families.vorerkrankung.rules import add_months, deciding_rule, efz_end, must_send_41
+from engine.families.vorerkrankung.rules import add_months, decide, deciding_rule, efz_end, must_send_41
 from engine.records import parse_file
 from engine.rules import formats, params
 
@@ -32,7 +32,7 @@ def test_rules_table(kb, case, version):
     """Every Beispielpapier and Peter row under 13.3, 13.4 and sim-13.5."""
     tc = get_case(kb, case)
     exp = tc.expected[version]
-    d = must_send_41(tc.inputs.current, tc.inputs.priors, tc.inputs.report_date, params.load(kb, version=version))
+    d = decide(tc.inputs, params.load(kb, version=version))
     assert d.send == exp.send_41
     if exp.send_41:
         assert [(a.start, a.end) for a in d.chain] == exp.periods

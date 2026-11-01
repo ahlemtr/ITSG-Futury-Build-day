@@ -7,15 +7,14 @@ import random
 from datetime import date, timedelta
 
 from engine import builder as core
-from engine.families.vorerkrankung.rules import add_months, days, days_in_window, must_send_41
+from engine.families.vorerkrankung.rules import add_months, days, days_in_window, decide
 from engine.model import AuPeriod, Case, ExpectedOutcome
 from engine.rules import params as params_mod
 from kg.interface import KnowledgeBase
 
 
 def outcome(kb: KnowledgeBase, tc: Case, version: str) -> ExpectedOutcome:
-    i = tc.inputs
-    d = must_send_41(i.current, i.priors, i.report_date, params_mod.load(kb, version=version))
+    d = decide(tc.inputs, params_mod.load(kb, version=version))
     return ExpectedOutcome(send_41=d.send, periods=[(a.start, a.end) for a in d.chain] if d.send else [],
                            total_days=d.total_days if d.send else None)
 

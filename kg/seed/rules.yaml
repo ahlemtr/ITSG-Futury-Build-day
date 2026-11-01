@@ -64,7 +64,7 @@ rules:
     kind: domain
     family: vorerkrankung
     status: approved
-    criterion: null
+    criterion: a4770b2b-0da5-46bc-baf1-a86472054ca2
     applies_to: ["41"]
     fields: [DBVO.BEGINN-AU, DBVO.ENDE-AU]
     params: []
@@ -73,15 +73,43 @@ rules:
     title: open-ended current AU counts until report date + open_end_days - 1
     description: >-
       An open-ended current AU counts until report date + open_end_days - 1 (one week including the
-      report date, BP 13.5: 02.09 -> 08.09).
+      report date, BP 13.5: 02.09 -> 08.09). The Pflichtenheft item says "today + 7 days" (contradiction 3,
+      ITSG question 11).
     kind: domain
     family: vorerkrankung
     status: approved
-    criterion: null
+    criterion: ac3b56af-98ca-4fe4-88cf-88ee685e52c9
     applies_to: ["41"]
     fields: [DBVO.AU-AB-AG]
     params: [open_end_days]
     sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions, BP@13.2#13.5, BP@13.3#13.5]
+
+  - id: R41-7
+    title: 41 only for people with statutory health insurance, addressed to their health insurer
+    description: >-
+      A 41 is only created for people insured in the statutory health insurance; the receiver is the
+      Betriebsnummer of the health insurer the person is insured with (Pflichtenheft 2026.2, DBVO item 1).
+    kind: domain
+    family: vorerkrankung
+    status: approved
+    criterion: 91e32e04-a608-4a04-82ef-83f021be4505
+    applies_to: ["41"]
+    fields: [DSLW.EMPFAENGERNUMMER, DSLW.BBNR-KK]
+    params: []
+    sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions]
+  - id: R41-8
+    title: no 41 for privately insured people or marginal employment (person groups 109, 110)
+    description: >-
+      A 41 cannot be created for privately insured people or for marginally employed people with person group
+      109 or 110 (Pflichtenheft 2026.2, DBVO item 2).
+    kind: domain
+    family: vorerkrankung
+    status: approved
+    criterion: bcec54ad-235c-4ad1-9058-9d5460cf9f88
+    applies_to: ["41"]
+    fields: []
+    params: []
+    sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions]
 
   # --- format rules for an employer 41 record
   - id: F41-1

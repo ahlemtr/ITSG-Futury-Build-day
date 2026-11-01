@@ -62,6 +62,10 @@ class Vorerkrankung(Family):
             m.blocks["DBVO"]["groups"] = ordered
         return m
 
+    def self_check(self, kb: KnowledgeBase, scenario: Scenario, replies: list[Record],
+                   employer: list[Record]) -> list[RuleResult]:
+        return checks.self_check(kb, scenario, replies, employer)
+
     def round_one_rules(self, case: Case) -> list[str]:
         return [r for r in case.targets if r.startswith("R41")]
 

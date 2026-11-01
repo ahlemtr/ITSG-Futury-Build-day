@@ -14,7 +14,7 @@ test_cases:
     targets: [R41-1, R41-2, R41-3, R41-4, R41-5, R41-6,
               F41-1, F41-2, F41-3, F41-4, F41-5, F41-6, F41-7, F41-8, F41-9, F41-10,
               K61-1, K61-2, K61-3, K61-4, K61-5, K61-6, K61-7, K62-1, K62-2,
-              E-1, E-2, E-3, C-1, C-2, C-3, C-4, C-5, C-6, C-7, C-8, A3-1, S-1]
+              E-1, E-2, C-1, C-2, C-3, C-4, C-5, C-6, C-7, C-8, A3-1, S-1, R41-7, R41-8]
     steps: chain
     inputs:
       report_date: 2026-03-11
@@ -24,7 +24,9 @@ test_cases:
         - {start: 2025-07-14, end: 2025-07-15, certified: true}
         - {start: 2025-10-01, end: 2025-10-17, certified: true}
         - {start: 2025-12-01, end: 2025-12-03, certified: true}
-        - {start: 2026-03-01, end: 2026-03-03, certified: true, note: paper at the employer only, no eAU}
+        # paper note at the employer only, no eAU (Hinweise); the insurer gets it with the correction:
+        # first 61 KZ-NACHWEIS 4 / KZ-AU 3, corrected 61 1 / 1 (computed, K61-4, K61-5)
+        - {start: 2026-03-01, end: 2026-03-03, certified: true, sick_note: paper, insurer_gets_note: corrected}
     expected:
       "13.3": &peter_expected
         send_41: true
@@ -116,7 +118,9 @@ test_cases:
         - {start: 2025-07-14, end: 2025-07-15, certified: true}
         - {start: 2025-10-01, end: 2025-10-17, certified: true}
         - {start: 2025-12-01, end: 2025-12-03, certified: true}
-        - {start: 2026-03-01, end: 2026-03-03, certified: true, note: paper at the employer only, no eAU}
+        # paper note at the employer only, no eAU (Hinweise); the insurer gets it with the correction:
+        # first 61 KZ-NACHWEIS 4 / KZ-AU 3, corrected 61 1 / 1 (computed, K61-4, K61-5)
+        - {start: 2026-03-01, end: 2026-03-03, certified: true, sick_note: paper, insurer_gets_note: corrected}
     expected:
       "13.3":     {send_41: false, total_days: 27}
       "13.4":     {send_41: false, total_days: 27}
@@ -203,7 +207,9 @@ test_cases:
         - {start: 2025-07-14, end: 2025-07-15, certified: true}
         - {start: 2025-10-01, end: 2025-10-17, certified: false, note: no sick note (Kurz-AU)}
         - {start: 2025-12-01, end: 2025-12-03, certified: true}
-        - {start: 2026-03-01, end: 2026-03-03, certified: true, note: paper at the employer only, no eAU}
+        # paper note at the employer only, no eAU (Hinweise); the insurer gets it with the correction:
+        # first 61 KZ-NACHWEIS 4 / KZ-AU 3, corrected 61 1 / 1 (computed, K61-4, K61-5)
+        - {start: 2026-03-01, end: 2026-03-03, certified: true, sick_note: paper, insurer_gets_note: corrected}
     expected:
       "13.3":     {send_41: false, total_days: 18}
       "13.4":     {send_41: false, total_days: 18}
@@ -365,6 +371,80 @@ test_cases:
       "13.4":     {send_41: false, total_days: 23}
       "sim-13.5": {send_41: false, total_days: 23}
     sources: [BP@13.2#13.5, BP@13.3#13.5]
+
+  # --- G2: rules that had no test case
+  - id: peter-private
+    family: vorerkrankung
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [R41-7]
+    steps: single
+    inputs:
+      report_date: 2026-03-11
+      employment_end: 2026-03-31
+      insurance: private
+      current: {start: 2026-03-11, end: 2026-03-20, certified: true}
+      priors:
+        - {start: 2025-12-01, end: 2025-12-30, certified: true}
+    expected:
+      "13.3":     {send_41: false}
+      "13.4":     {send_41: false}
+      "sim-13.5": {send_41: false}
+    sources: []
+
+  - id: peter-minijob
+    family: vorerkrankung
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [R41-8]
+    steps: single
+    inputs:
+      report_date: 2026-03-11
+      employment_end: 2026-03-31
+      person_group: 109
+      current: {start: 2026-03-11, end: 2026-03-20, certified: true}
+      priors:
+        - {start: 2025-12-01, end: 2025-12-30, certified: true}
+    expected:
+      "13.3":     {send_41: false}
+      "13.4":     {send_41: false}
+      "sim-13.5": {send_41: false}
+    sources: []
+
+  # The insurer rechecks the December period in its corrected 61 (KZ-AU 3, interim): the update does not replace
+  # the first 61 (E-3), so the 01 stays and no 88 follows, although the EFZ end computed from the update would move.
+  - id: peter-interim-update
+    family: vorerkrankung
+    kind: clone
+    origin: builder
+    status: approved
+    hidden: false
+    parent: peter
+    targets: [E-3, K61-5]
+    steps: chain
+    inputs:
+      report_date: 2026-03-11
+      employment_end: 2026-03-31
+      current: {start: 2026-03-11, end: 2026-03-20, certified: true}
+      priors:
+        - {start: 2025-07-14, end: 2025-07-15, certified: true}
+        - {start: 2025-10-01, end: 2025-10-17, certified: true}
+        - {start: 2025-12-01, end: 2025-12-03, certified: true, insurer_rechecks: true}
+        - {start: 2026-03-01, end: 2026-03-03, certified: true}
+    expected:
+      "13.3": &interim_expected
+        send_41: true
+        periods: [[2026-03-01, 2026-03-03], [2025-12-01, 2025-12-03], [2025-10-01, 2025-10-17], [2025-07-14, 2025-07-15]]
+        total_days: 35
+      "13.4": *interim_expected
+      "sim-13.5": *interim_expected
+    sources: [VB@13.3#3.12.12, VB@13.4#3.12.12]
 
   # Official test tasks: inputs only, no solution available yet, so no targets (allowed for origin pta)
   - id: ta-167

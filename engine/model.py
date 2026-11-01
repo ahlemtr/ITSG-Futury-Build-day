@@ -228,6 +228,15 @@ class AuPeriod(BaseModel):
     start: dt.date
     end: dt.date | None = None  # None = open end (current AU only)
     certified: bool = True
+    # Facts the insurer's 61 flags are computed from (K61-4, K61-5), instead of typing the flags in:
+    # the kind of sick note (None: eAU if certified, else none) and, for a paper note, which 61 the insurer
+    # has it for (first reply, only the corrected reply, never)
+    sick_note: Literal["eau", "paper", "none"] | None = None
+    insurer_gets_note: Literal["first", "corrected", "never"] | None = None
+    counts: Literal["yes", "no", "partly"] = "yes"  # does the period count for the EFZ (KZ-AU 1 / 2 / 5)
+    counts_from: dt.date | None = None  # partly: the part that counts (TEIL-ANR-AU)
+    counts_to: dt.date | None = None
+    insurer_rechecks: bool = False  # the corrected 61 sets this period back to "further check" (KZ-AU 3, E-3)
 
 
 class TestInputs(BaseModel):
@@ -238,6 +247,8 @@ class TestInputs(BaseModel):
     current: AuPeriod | None = None
     priors: list[AuPeriod] = Field(default_factory=list)
     summary: str | None = None
+    insurance: Literal["statutory", "private"] = "statutory"  # R41-7: a 41 only for statutory insured people
+    person_group: int | None = None  # Personengruppenschlüssel; 109, 110 (marginal employment): no 41 (R41-8)
 
 
 class ExpectedOutcome(BaseModel):

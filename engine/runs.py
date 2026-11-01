@@ -40,6 +40,7 @@ class RoundResult(BaseModel):
     reply_name: str | None = None
     reply: str | None = None  # TEEK0 text
     ended: bool = False
+    simulator_issues: list[str] = []  # failed self-checks of our insurer reply (K61, K62, A3-1): our bug
 
 
 class RunState(BaseModel):
@@ -112,6 +113,9 @@ def submit(kb: KnowledgeBase, st: RunState, files: list[str | bytes]) -> RoundRe
         adapted = [fam.adapt_reply(m, vendor) for m in replies]
         result.reply_name = f"TEEK0-{st.test_case.id}-r{r}"
         result.reply = write_file(adapted, kb)
+        written = parse_file(result.reply, kb, st.version, st.valid_on).messages
+        scenario = load_scenario(kb, st.test_case)
+        result.simulator_issues = [f"{x.rule}: {x.message}" for x in fam.self_check(kb, scenario, written, vendor)]
     st.rounds.append(result)
     failed = any(o.outcome == "fail" for o in result.outcomes)
     if ended or failed and r >= st.last_round:
@@ -119,6 +123,16 @@ def submit(kb: KnowledgeBase, st: RunState, files: list[str | bytes]) -> RoundRe
     elif r >= st.last_round:
         st.status = "failed" if any(o.outcome == "fail" for rr in st.rounds for o in rr.outcomes) else "passed"
     return result
+
+
+def self_check_chain(kb: KnowledgeBase, test_case: str | Case, version: str) -> list[str]:
+    """The insurer replies of a case's expected chain checked against its expected employer messages."""
+    sc = load_scenario(kb, test_case)
+    ch = build_chain(sc, version, kb)
+    parse = lambda msgs: parse_file(write_file(msgs, kb), kb, version).messages if msgs else []
+    replies = parse([m for m in ch.messages if m.actor == "insurer"])
+    employer = parse(ch.employer())
+    return [f"{x.rule}: {x.message}" for x in families.of_case(sc.test_case).self_check(kb, sc, replies, employer)]
 
 
 def check_so_far(kb: KnowledgeBase, st: RunState, triage=None) -> CheckResult:
