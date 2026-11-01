@@ -15,7 +15,7 @@ Everything the platform reads or is checked against. File names are kept as publ
 
 ## Demo document
 
-`vb/2026_03_10_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.4_ab_01.01.2027.pdf` is kept out of Git and the Docker image: it is uploaded live in the demo. Start the application with `SPEC_BASELINE=VB@13.3`; the upload stores the original under `uploads/VB@13.4.pdf`.
+`vb/2026_03_10_Endfassung_Verfahrensbeschreibung_DTA_EEL_Version_13.4_ab_01.01.2027.pdf` is in Git (since 2026-11-01, so a fresh checkout and CI have the full seed) but kept out of the Docker image: it is uploaded live in the demo. Start the application with `SPEC_BASELINE=VB@13.3`; the upload stores the original under `uploads/VB@13.4.pdf`.
 
 ## Not yet wired in
 

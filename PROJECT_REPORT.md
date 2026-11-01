@@ -71,7 +71,9 @@ Hackathon team (from the commit history): Ahlem Trabelsi (backend engine), Moham
 
 Checks run on 2026-10-31 on this machine: `pytest` 207 passed, **1 failed**, 27 skipped (graph tests need `NEO4J_TESTS=1`); `ruff check .` clean; `tsc -b` clean; i18n check: 564 keys, both languages complete.
 
-The failure: `tests/test_annex_evidence.py::test_vb_annex_centered_chapters_work_with_linux_poppler_indentation` expects sections `{"1","2","3"}`, gets `{"intro","2","3"}`. The heading detection for centred annex chapters depends on the indentation `pdftotext` produces; the test encodes Linux poppler indentation and fails on this Windows setup.
+The failure: `tests/test_annex_evidence.py::test_vb_annex_centered_chapters_work_with_linux_poppler_indentation` expected sections `{"1","2","3"}`, got `{"intro","2","3"}`. Update 2026-11-01 (G0): this was not a Windows/poppler issue. The test feeds synthetic lines; the TOC filter in `kg/extract/generic.py` read the "1" at the end of "1 Änderungsprotokoll zur Anlage 1" as a page number and dropped the heading, on every platform. Fixed (a number after "Anlage" is part of the title); re-extracting all sources gives identical passages, so no embeddings change. The test is now `test_vb_annex_centered_chapters_are_headings`.
+
+A fresh checkout also failed 21 more tests, because the VB 13.4 PDF was gitignored and those tests need its passages. Decided 2026-11-01: the VB 13.4 PDF is committed. The demo's 13.3 starting point comes from `SPEC_BASELINE=VB@13.3`, not from the file being absent.
 
 ### 5.2 Where the pitch is bigger than the product
 

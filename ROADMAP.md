@@ -27,7 +27,8 @@ Why: every later goal relies on a green, reproducible check.
 
 - [ ] GitHub Actions workflow on Linux: `uv run pytest -q`, `uv run ruff check .`, `npm run build` (includes `tsc`), `npm run check:i18n`
 - [ ] Install `poppler-utils` in CI so the annex tests run as intended
-- [ ] Make `test_vb_annex_centered_chapters_work_with_linux_poppler_indentation` pass on Windows too, or mark it Linux-only with a clear reason
+- [x] Make `test_vb_annex_centered_chapters_work_with_linux_poppler_indentation` pass on Windows too, or mark it Linux-only with a clear reason (it was a splitter bug on every platform, not poppler: fixed in `kg/extract/generic.py`, test renamed `test_vb_annex_centered_chapters_are_headings`)
+- [ ] Commit the VB 13.4 PDF so a fresh checkout (and CI) has the full seed; 21 tests need its passages
 - [ ] Neo4j service container in a second CI job with `NEO4J_TESTS=1`
 - [ ] Fix or document `test_search_finds_chaining[graph]` (German full-text ranking)
 

@@ -18,7 +18,8 @@ cd ui && npm run build && npm run check:i18n
 ```
 
 Without Docker: `DATABASE_URL= uv run uvicorn api.main:app --port 8000` (in-memory store, YAML knowledge base).
-Known: `tests/test_annex_evidence.py::test_vb_annex_centered_chapters_work_with_linux_poppler_indentation` fails on Windows (`pdftotext` indentation); `uvicorn --reload` hangs on Windows.
+CI: `.github/workflows/ci.yml` (jobs `python`, `ui`, `graph` with a Neo4j service and `kg.build --skip-embed`).
+Known: `uvicorn --reload` hangs on Windows; a Windows clone needs `git config core.longpaths true` (long Rundschreiben file names).
 
 ## Rules of the codebase
 
