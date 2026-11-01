@@ -71,7 +71,9 @@ Hackathon team (from the commit history): Ahlem Trabelsi (backend engine), Moham
 
 Checks run on 2026-10-31 on this machine: `pytest` 207 passed, **1 failed**, 27 skipped (graph tests need `NEO4J_TESTS=1`); `ruff check .` clean; `tsc -b` clean; i18n check: 564 keys, both languages complete.
 
-The failure: `tests/test_annex_evidence.py::test_vb_annex_centered_chapters_work_with_linux_poppler_indentation` expects sections `{"1","2","3"}`, gets `{"intro","2","3"}`. The heading detection for centred annex chapters depends on the indentation `pdftotext` produces; the test encodes Linux poppler indentation and fails on this Windows setup.
+The failure: `tests/test_annex_evidence.py::test_vb_annex_centered_chapters_work_with_linux_poppler_indentation` expected sections `{"1","2","3"}`, got `{"intro","2","3"}`. Update 2026-11-01 (G0): this was not a Windows/poppler issue. The test feeds synthetic lines; the TOC filter in `kg/extract/generic.py` read the "1" at the end of "1 Änderungsprotokoll zur Anlage 1" as a page number and dropped the heading, on every platform. Fixed (a number after "Anlage" is part of the title); re-extracting all sources gives identical passages, so no embeddings change. The test is now `test_vb_annex_centered_chapters_are_headings`.
+
+A fresh checkout also failed 21 more tests, because the VB 13.4 PDF was gitignored and those tests need its passages. Decided 2026-11-01: the VB 13.4 PDF is committed. The demo's 13.3 starting point comes from `SPEC_BASELINE=VB@13.3`, not from the file being absent.
 
 ### 5.2 Where the pitch is bigger than the product
 
@@ -86,7 +88,7 @@ These are the honest gaps. They matter for December because a jury that read the
 7. **Calendar rules are invented** until ITSG confirms them: round N due 14 days after round N-1, update tests due the day before the new version takes effect, permanent test cases due each month end, catalogue approval 60 days before the switch.
 8. **No login.** The ITSG/vendor switch is a demo toggle, all endpoints are open. Hidden tests are protected only by the UI not calling `GET /test-cases/{id}`. The reset endpoint is allowed from loopback or with `ALLOW_RESET=1`.
 9. **Not a vendor-side tool.** The optional "run locally at the vendor" idea from the deck is not built (same engine, packaging only).
-10. **Search quality** has a known miss: "Ansprechpartner DBAP" ranks VB 2.2.3.1 above 3.18; `test_search_finds_chaining[graph]` fails on Neo4j's German full-text ranking.
+10. **Search quality** has a known miss: for "Ansprechpartner DBAP" both backends rank annex field rows (VB-ANL1 4.f222, 21.*) above VB 3.18. `test_search_finds_chaining[graph]` is fixed (2026-11-01, G0): the Neo4j search added up the scores of every chunk of a passage instead of using its best chunk, so RS-ANL2 chapter 6 (many chunks headed "6. Mutterschaftsgeld.") came first for "Vorerkrankung 6 Monate".
 11. **Data protection.** ITSG documents and vendor files go to OpenAI. Decided for December: only test data goes through the platform, so OpenAI stays; expect the question from the GKV audience anyway.
 12. **Incomplete rules inside the covered topic.** E-3 has a rule card but no code. K61-4 and K61-5 are not computed: the insurer flags are typed into the test data. The checks for K61-1..3 and K62-1 (`check_61`, `check_62`) are never called. Many rule IDs are not named by any test, so coverage per rule is unknown. Planned in roadmap goal G2.
 

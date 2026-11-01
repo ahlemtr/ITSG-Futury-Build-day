@@ -250,9 +250,15 @@ class GraphBackend:
         fused: dict[str, float] = {}
         best_text: dict[str, tuple[float, str]] = {}
         for weight, ranked in lists:
-            for rank, row in enumerate(ranked):
-                score = weight / (RRF_K + rank + 1)
-                fused[row["passage"]] = max(fused.get(row["passage"], 0.0), 0.0) + score
+            # a passage counts once per list, at the rank of its best chunk: many weak chunks of one long passage
+            # (each repeating a heading such as "6. Mutterschaftsgeld.") must not add up past one strong chunk
+            seen: set[str] = set()
+            for row in ranked:
+                if row["passage"] in seen:
+                    continue
+                seen.add(row["passage"])
+                score = weight / (RRF_K + len(seen))
+                fused[row["passage"]] = fused.get(row["passage"], 0.0) + score
                 if score > best_text.get(row["passage"], (0.0, ""))[0] and len(row["text"] or "") <= 4000:
                     best_text[row["passage"]] = (score, row["text"])
         if not fused:

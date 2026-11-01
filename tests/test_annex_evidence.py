@@ -6,7 +6,8 @@ from engine.records import format_value, parse_file, to_value, write_file
 from kg.field_evidence import classify
 
 
-def test_vb_annex_centered_chapters_work_with_linux_poppler_indentation():
+def test_vb_annex_centered_chapters_are_headings():
+    """Chapter 1 ends in "Anlage 1": that number is part of the title, not a TOC page number."""
     from kg.extract import generic
     from kg.extract.pdf_text import Line
 

@@ -12,8 +12,9 @@ MAX_INDENT_BY_DOC = {"GG-ANL1": 40, "VB-ANL1": 40, "GG-ANL2": 40, "GG-ANL3": 40}
 # ... and give one- or two-word chapter titles after a single space ("6 Abrechnungsprogramm", "8 Entgeltart (...)"),
 # which the general bare-heading rule refuses to keep PTA calendar rows out
 ANNEX_HEADING_RE = re.compile(r"^ *(?P<num>\d{1,2})\s+(?P<title>[A-ZÄÖÜ][^=]*)$")
-# A heading-shaped line ending in a page number is a TOC entry (RS-ANL3 has one per chapter, without dots)
-TOC_ENTRY_RE = re.compile(r"\s\d{1,3}\s*$")
+# A heading-shaped line ending in a page number is a TOC entry (RS-ANL3 has one per chapter, without dots).
+# A number after "Anlage" is part of the title ("1 Änderungsprotokoll zur Anlage 1"), not a page number.
+TOC_ENTRY_RE = re.compile(r"(?<!Anlage)\s\d{1,3}\s*$")
 
 # Sections that must exist per document
 REQUIRED = {
