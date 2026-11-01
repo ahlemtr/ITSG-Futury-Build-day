@@ -37,7 +37,8 @@ Done when: every push to `main` and every PR shows a green check.
 
 Why: answers from the ITSG contact unblock several scope goals; the English UI is extra work on every new screen.
 
-- [ ] Send the 14 questions of `PROJECT_REPORT.md` section 9 to the ITSG contact; add the request for example cases with solution files for 02, 03 and the other messages
+- [x] Send the essential questions to the ITSG contact (5 questions, email scheduled for 2026-11-02 08:00; see `PROJECT_REPORT.md` section 9). The other questions run on the team's working assumptions and are asked later only if needed
+- [ ] Look for the published TA 167/168 solution proposals on the ITSG/GKV download page (the PTA says they are published) before waiting for ITSG
 - [ ] Record each answer in `PROJECT_REPORT.md` and in the affected rule or parameter
 - [ ] Remove the English locale and the language switch; keep the i18n key structure so texts stay in one place
 - [ ] Update the i18n check to German only

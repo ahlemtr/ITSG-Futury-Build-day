@@ -179,6 +179,10 @@ Contradictions 1 and 6 suggest the Pflichtenheft states a requirement before the
 
 ### Questions for the ITSG contact
 
+*Sent 2026-11-02 (one email, 5 questions): 1 (TA 167/168 solutions), 10 (Peter-like cases for 02 and 03, past eVpT deviations), 12 (which document wins), 11 (open end: today + 7 or report date + 6) and 14 (core check). The rest run on working assumptions and are asked only if they block work.*
+
+*Note on TA 167/168:* they are the only Pool-Testaufgaben with EEL certificates, and passing them is part of the system check for the certificate. ITSG publishes solution proposals but calls them non-binding ("unverbindliche Vorschläge"); justified alternatives are allowed. A TA solution therefore becomes a locked test that allows variants, unlike a Beispielpapier example.
+
 1. TA 167 and TA 168: solutions and TEEK0 reply files, and a sample eVpT deviation report.
 2. *Answered by VB Anlage 3 13.3:* DBAP is mandatory (J) on every code except 88; DBID is mandatory on 51, 61, 62, 66, 67, 71, 72, 73 and optional elsewhere; DBAN is optional ("m"). Still open: when exactly an address must be sent, and the layout of DBAN (Pflichtenheft Anlage 19 has it).
 3. "6 months" in VB 3.12: counted from the end date or from the day after? Month ends: is 31.08 + 6 months = 28.02? *Ghassen (2026-11-01): from the end date, 28.02, as implemented. Confirm.*
