@@ -41,3 +41,9 @@ bundles/
 
 # Official EEL core check (AOK Systems): internal code, never in Git. Copy it into sources/EEL/ locally.
 sources/EEL/
+
+# ITSG's solutions to TA 167 / TA 168 (received 2026-11-02, G2b): not published, they name ITSG staff.
+# Kept local until ITSG clears publication; tests that read them skip when they are missing.
+fixtures/itsg/ta-167/
+fixtures/itsg/ta-168/
+sources/testaufgaben/loesungen/
