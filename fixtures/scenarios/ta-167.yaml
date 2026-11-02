@@ -1,0 +1,49 @@
+# Chain-only extras for TA 167 (Pool-Testaufgaben 2025/2026, Hoffmann, Marc). The rounds ta-167-r1 .. r3 inherit
+# this file through their parent. Person and employer from the published task (PTA, Aufgabe sheet); employer contact
+# (DBAP) is ITSG's test persona of the TA workbooks; insurer numbers and the insurer's DBAP from ITSG's TEEK0 replies
+# (generic test data). DATENSATZ-IDs are ours (ITSG's are not compared).
+person:
+  vsnr: 26111095H493
+  geburtsdat: 1995-10-11
+  familienname: Hoffmann
+  vorname: Marc
+employer:
+  verfahren: LEIST
+  absendernummer: "99301347"    # Testfirma Systemprüfung ITSG GmbH
+  empfaengernummer: "99300660"  # DAK-G
+  version_nr: 13
+  bbnr_vu: "99301347"
+  bbnr_kk: "99300660"
+  produkt_identifier: "7654321"
+  modifikations_identifier: 66666XXX
+  abrechnungsprogramm: 1
+  contact:
+    NAME: Mia Testfrau
+    TELEFON: +49 69 87003580
+    FAX: +49 69 8700358300
+    EMAIL: systemuntersuchung@itsg.de
+    FIRMA-1: Testfirma Systemprüfung
+    FIRMA-2: ITSG GmbH
+    PLZ: "63067"
+    ORT: Offenbach
+    STRASSE: Kaiserleistraße
+    HAUSNUMMER: 10-16
+azvu: "167"
+created: "20260102161616000000"
+ids:
+  "1": 16700000-0001-4000-8000-000000000001
+  "2": 16700000-0002-4000-8000-000000000002
+  "3": 16700000-0003-4000-8000-000000000003
+  "4": 16700000-0004-4000-8000-000000000004
+  "5": 16700000-0005-4000-8000-000000000005
+insurer:
+  eel_ende_grund: 99
+  contact:
+    NAME: DAK-G EEL-Sachbearbeiter
+    TELEFON: +49 1234 56789
+    EMAIL: DAK@TestMail.de
+    FIRMA-1: DAK-G / Test ITSG
+    PLZ: "63067"
+    ORT: Offenbach
+    STRASSE: Kaiserleistraße
+    HAUSNUMMER: 10-16

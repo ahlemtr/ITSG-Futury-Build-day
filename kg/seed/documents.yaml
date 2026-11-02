@@ -83,6 +83,17 @@ documents:
         published: 2026-09-22
         valid_from: 2026-01-01
         file: sources/testaufgaben/PTA_Gemeinsame-Testaufgaben-2025-2026_Version-3.pdf
+  # ITSG's solutions to TA 167 / TA 168 (workbooks + TEEK0 replies), received 2026-11-02. Not published: the files are
+  # git-ignored and only local; no passages are extracted. Locked test values cite sheet and cell of this delivery.
+  - code: PTA-LSG
+    title: Musterlösungen zu den Gemeinsamen Testaufgaben 2025/2026 (TA 167, TA 168)
+    role: solution
+    parents: [PTA]
+    versions:
+      - version: "2026-11-02"
+        published: null
+        valid_from: 2026-01-01
+        file: sources/testaufgaben/loesungen/TA_167-EEL_2025-2026.xlsx
   - code: BP
     title: Beispielpapier DTA EEL
     versions:

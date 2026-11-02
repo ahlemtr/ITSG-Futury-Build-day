@@ -305,7 +305,8 @@ rules:
     title: "12-MONATSFRIST-AB = Beginn der frühesten anrechenbaren AU-Zeit"
     description: >-
       12-MONATSFRIST-AB = Beginn der 12-Monatsfrist = Beginn der frühesten anrechenbaren AU-Zeit (Peter:
-      14.07.2025, Hinweise; Beispielpapier 16.1).
+      14.07.2025, Hinweise; Beispielpapier 16.1). TA 167 (ITSG-Musterlösung, unverbindlich) setzt dagegen 12 Monate vor die früheste anrechenbare AU bzw. vor
+      die aktuelle AU, wenn keine anrechenbar ist (Widerspruch, ITSG gefragt; als erwarteter Fehler gesperrt).
     kind: reply
     family: vorerkrankung
     status: approved
@@ -326,6 +327,19 @@ rules:
     fields: [DBVO.KZ-AK-AU]
     params: []
     sources: [VB@13.3#3.12.4, VB@13.4#3.12.4]
+  - id: K61-8
+    title: "AU-AB-SV nur, wenn der AU-Beginn der Krankenkasse vom AU-Beginn des Arbeitgebers abweicht"
+    description: >-
+      Die Krankenkasse füllt DBVO.AU-AB-SV nur, wenn ihr Beginn der aktuellen Arbeitsunfähigkeit von AU-AB-AG
+      abweicht; sonst Grundstellung (VB 3.12.3; Beispielpapier 16.1 und die Rückmeldungen zu TA 167 zeigen 00000000).
+    kind: reply
+    family: vorerkrankung
+    status: approved
+    criterion: null
+    applies_to: ["61"]
+    fields: [DBVO.AU-AB-SV]
+    params: []
+    sources: [VB@13.3#3.12.3, VB@13.4#3.12.3, BP@13.2#16.1, BP@13.3#16.1]
   - id: K62-1
     title: "REFERENZ-ID = DATENSATZ-ID der letzten gültigen 01"
     description: >-
@@ -394,6 +408,34 @@ rules:
     fields: [DBVO.KZ-AK-AU, DBVO.KZ-AU]
     params: []
     sources: [VB@13.3#3.12.4, VB@13.4#3.12.4, VB@13.3#3.12.12, VB@13.4#3.12.12]
+
+  - id: E-4
+    title: "gibt der Arbeitnehmer dieselbe Krankheit an, zählt der Arbeitgeber seine eigenen EFZ-Tage"
+    description: >-
+      Teilt der Arbeitnehmer mit, dass es sich um dieselbe Krankheit wie bei früheren Arbeitsunfähigkeiten handelt,
+      zählt der Arbeitgeber die attestierten Tage dieser Zeiten innerhalb von 12 Monaten vor der aktuellen AU selbst
+      (§ 3 EFZG). Sind die sechs Wochen verbraucht, gibt es keine Entgeltfortzahlung (DATUM-EGZBIS = Tag vor
+      DATUM-AB), auch wenn die 61 keine Zeit als anrechenbar kennzeichnet (TA 167, dritte Runde: 11.06.2026).
+    kind: efz
+    family: vorerkrankung
+    status: approved
+    criterion: null
+    applies_to: ["01"]
+    fields: [DBAL.DATUM-EGZBIS]
+    params: [efz_days]
+    sources: [VB@13.3#3.12.5, VB@13.4#3.12.5]
+  - id: E-5
+    title: "die Entgeltfortzahlung endet spätestens mit dem Ende der Beschäftigung"
+    description: >-
+      DATUM-EGZBIS liegt nie nach dem Ende der Beschäftigung.
+    kind: efz
+    family: vorerkrankung
+    status: approved
+    criterion: null
+    applies_to: ["01"]
+    fields: [DBAL.DATUM-EGZBIS, DBAL.ENDE-BV-ZUM]
+    params: []
+    sources: [VB@13.3#3.4.3, VB@13.4#3.4.3]
 
   # --- chain rules
   - id: C-1

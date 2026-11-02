@@ -125,6 +125,8 @@ class Checker:
         for d in devs:
             if d.resolved_by:
                 continue
+            if self._case_variant(d):
+                continue
             if self.catalogue.resolve(d, self.kb):
                 continue
             if self.recheck(d):
@@ -144,6 +146,22 @@ class Checker:
             resolved_by=dict(Counter(d.resolved_by or "open" for d in devs)),
             expected_messages=len(expected), actual_messages=len(actual),
         )
+
+    def _case_variant(self, d: Deviation) -> bool:
+        """A justified variant of this test case only (e.g. an official task allows an alternative date). Matched by
+        signature, and by expected / actual value where the entry names them; read before the global catalogue."""
+        for v in self.sc.test_case.allowed_variants:
+            if v.get("signature") != d.signature:
+                continue
+            if "expected" in v and str(v["expected"]) != str(d.expected):
+                continue
+            if "actual" in v and str(v["actual"]) != str(d.actual):
+                continue
+            d.label, d.resolved_by = v.get("verdict", "correct_variant"), "catalogue"
+            d.explanation = f"zulässige Variante dieses Testfalls: {v.get('reason', '')}"
+            d.sources = [v["source"]] if v.get("source") else []
+            return True
+        return False
 
     # ------------------------------------------------------------ b. rule re-check
     def recheck(self, d: Deviation) -> bool:

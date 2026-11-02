@@ -352,7 +352,7 @@ class Pipeline:
         old = self.previous.version if self.previous and self.doc == "VB" else None
         flipped, expected, drafts = [], {}, []
         for tc in self.repo.list_test_cases():
-            if old is None:
+            if old is None or tc.locked:  # a locked case keeps the values typed in from its source document
                 continue
             r = builder.recompute(self.kb, [tc], old, self.version)[0]
             tc.expected[self.version] = r.new
@@ -373,7 +373,8 @@ class Pipeline:
                 continue  # no boundary builder for this rule
         for tid in list(dict.fromkeys(drafts)):
             tc = self.repo.get_test_case(tid)
-            if tc and not tc.hidden and builder.recompute(self.kb, [tc], old, self.version)[0].differs:
+            rec = builder.recompute(self.kb, [tc], old, self.version) if tc and not tc.hidden else []
+            if rec and rec[0].differs:
                 h = builder.hidden(self.kb, tc)
                 self.repo.upsert_test_case(h)
                 drafts.append(h.id)

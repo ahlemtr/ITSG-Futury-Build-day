@@ -1,4 +1,7 @@
 # Test cases: facts and expected values
+# Locked cases (locked: true) carry values typed in from their source document, each compared field with
+# its source in expected_sources; the engine never recomputes them (tests/test_locked.py checks them).
+# Other cases are recomputed with the rules engine.
 # (recomputed with the rules engine). Years in the BP examples: XX = 2026, YY = 2025.
 # steps: single = only the 41 decision is graded; chain = full message chain.
 # Periods are listed newest first (F41-8). Hidden cases are in the graph like the others;
@@ -6,6 +9,7 @@
 test_cases:
   - id: peter
     family: vorerkrankung
+    locked: true
     kind: reference
     origin: itsg
     status: approved
@@ -37,6 +41,11 @@ test_cases:
       "13.4": *peter_expected
       "sim-13.5": *peter_expected
     sources: [HINWEISE@1#facts, HINWEISE@1#chain]
+    expected_sources:
+      send_41: HINWEISE@1#chain
+      periods: HINWEISE@1#chain
+      efz_end: HINWEISE@1#chain
+      chain: HINWEISE@1#chain
 
   - id: peter-gap-exact
     family: vorerkrankung
@@ -268,6 +277,7 @@ test_cases:
 
   - id: bp-13-1
     family: vorerkrankung
+    locked: true
     kind: reference
     origin: beispielpapier
     status: approved
@@ -286,9 +296,13 @@ test_cases:
       "13.4": *bp_13_1_expected
       "sim-13.5": *bp_13_1_expected
     sources: [BP@13.2#13.1, BP@13.3#13.1]
+    expected_sources:
+      send_41: BP@13.2#13.1, BP@13.3#13.1
+      periods: BP@13.2#13.1, BP@13.3#13.1
 
   - id: bp-13-2
     family: vorerkrankung
+    locked: true
     kind: reference
     origin: beispielpapier
     status: approved
@@ -308,9 +322,13 @@ test_cases:
       "13.4": *bp_13_2_expected
       "sim-13.5": *bp_13_2_expected
     sources: [BP@13.2#13.2, BP@13.3#13.2]
+    expected_sources:
+      send_41: BP@13.2#13.2, BP@13.3#13.2
+      periods: BP@13.2#13.2, BP@13.3#13.2
 
   - id: bp-13-3
     family: vorerkrankung
+    locked: true
     kind: reference
     origin: beispielpapier
     status: approved
@@ -328,9 +346,13 @@ test_cases:
       "13.4":     {send_41: false}
       "sim-13.5": {send_41: false}
     sources: [BP@13.2#13.3, BP@13.3#13.3]
+    expected_sources:
+      send_41: BP@13.2#13.3, BP@13.3#13.3
+      periods: BP@13.2#13.3, BP@13.3#13.3
 
   - id: bp-13-4
     family: vorerkrankung
+    locked: true
     kind: reference
     origin: beispielpapier
     status: approved
@@ -349,9 +371,13 @@ test_cases:
       "13.4":     {send_41: false, total_days: 23}
       "sim-13.5": {send_41: false, total_days: 23}
     sources: [BP@13.2#13.4, BP@13.3#13.4]
+    expected_sources:
+      send_41: BP@13.2#13.4, BP@13.3#13.4
+      periods: BP@13.2#13.4, BP@13.3#13.4
 
   - id: bp-13-5
     family: vorerkrankung
+    locked: true
     kind: reference
     origin: beispielpapier
     status: approved
@@ -371,6 +397,9 @@ test_cases:
       "13.4":     {send_41: false, total_days: 23}
       "sim-13.5": {send_41: false, total_days: 23}
     sources: [BP@13.2#13.5, BP@13.3#13.5]
+    expected_sources:
+      send_41: BP@13.2#13.5, BP@13.3#13.5
+      periods: BP@13.2#13.5, BP@13.3#13.5
 
   # --- G2: rules that had no test case
   - id: peter-private
@@ -449,19 +478,170 @@ test_cases:
   # Official test tasks: inputs only, no solution available yet, so no targets (allowed for origin pta)
   - id: ta-167
     family: vorerkrankung
+    locked: true
     kind: reference
     origin: pta
-    status: draft
+    status: approved
     hidden: false
     parent: null
     targets: []
     steps: chain
     inputs:
-      summary: Testaufgabe 167, EEL-Bescheinigungen sind zu erstellen (PTA 5.14)
+      summary: >-
+        Testaufgabe 167 (Hoffmann, Marc; Maurer, DAK-G): drei Vorerkrankungsanfragen mit den Rückmeldungen
+        TEEK0521, TEEK0523, TEEK0524 und je einer Entgeltbescheinigung 01. Die Runden sind ta-167-r1 bis -r3.
+        Musterlösung von ITSG (unverbindlich), erhalten 2026-11-02, nicht veröffentlicht.
     expected: {}
     sources: [PTA@2025-2026-v3#5.14]
-  - id: ta-168
+
+  # TA 167 round 1: AU from 05.12.2025 (worked that day), one earlier AU 13.08.-12.09.2025 that does not count.
+  # The task text gives the earlier AU as 01.09.-12.09.2025; ITSG's TEEK0521 and workbook use 13.08. (contradiction).
+  - id: ta-167-r1
     family: vorerkrankung
+    locked: true
+    kind: reference
+    origin: pta
+    status: approved
+    hidden: false
+    parent: ta-167
+    targets: [R41-1, R41-2, R41-4, K61-4, K61-5, K61-8, E-1]
+    steps: chain
+    inputs:
+      report_date: 2025-12-05
+      insurer_corrects: false
+      current: {start: 2025-12-05, end: 2026-01-01, certified: true}
+      priors:
+        - {start: 2025-08-13, end: 2025-09-12, certified: true, counts: "no"}
+    expected:
+      "13.3":
+        send_41: true
+        periods: [[2025-08-13, 2025-09-12]]
+        chain: ["41", "61", "01"]
+        egzbis: 2026-01-15
+        frist_12m: 2024-12-05
+        xfail:
+          frist_12m: >-
+            ITSG's TEEK0521 sets 12-MONATSFRIST-AB 12 months before the current AU when no earlier AU counts;
+            VB 3.12.5 and BP 16.1 give the start of the first AU of the same illness (Grundstellung when none
+            counts). Asked ITSG (follow-up to question 1).
+    expected_sources:
+      send_41: PTA-LSG@2026-11-02#TA167/TEEK0521
+      periods: PTA-LSG@2026-11-02#TA167/TEEK0521 (DBVO)
+      chain: PTA-LSG@2026-11-02#TA167/Aufgabe!I29,I32
+      egzbis: PTA-LSG@2026-11-02#TA167/EEL!H21
+      frist_12m: PTA-LSG@2026-11-02#TA167/TEEK0521 (12-MONATSFRIST-AB)
+    allowed_variants:
+      - {signature: "41|DBVO.BEGINN-AU|missing_group", expected: "2025-12-05..2026-01-01", verdict: correct_variant,
+         reason: "AU-Beginn 06.12.2025 statt 05.12.2025 (am 05.12. noch gearbeitet), laut Musterlösung zulässig",
+         source: "PTA-LSG@2026-11-02#TA167/EEL!K26"}
+    sources: [PTA@2025-2026-v3#5.14]
+
+  # TA 167 round 2: AU 02.02.-20.02.2026 (TEEK0523/0524; the task text says 26.02.-06.03.2026, contradiction).
+  - id: ta-167-r2
+    family: vorerkrankung
+    locked: true
+    kind: reference
+    origin: pta
+    status: approved
+    hidden: false
+    parent: ta-167
+    targets: [R41-2, R41-3, R41-4, K61-4, K61-5, K61-6, E-1]
+    steps: chain
+    inputs:
+      report_date: 2026-02-02
+      insurer_corrects: false
+      current: {start: 2026-02-02, end: 2026-02-20, certified: true}
+      priors:
+        - {start: 2025-12-05, end: 2026-01-23, certified: true}
+        - {start: 2025-08-13, end: 2025-09-12, certified: true, counts: "no"}
+    expected:
+      "13.3":
+        send_41: true
+        periods: [[2025-12-05, 2026-01-23], [2025-08-13, 2025-09-12]]
+        chain: ["41", "61", "01"]
+        egzbis: 2026-02-20
+        frist_12m: 2024-12-05
+        xfail:
+          egzbis: >-
+            ITSG's 01 says DATUM-EGZBIS 20.02.2026, but ITSG's own 61 (TEEK0523) counts 05.12.2025-23.01.2026 for the
+            same illness (50 days), so the six weeks are used up and the engine gives 01.02.2026; the task text also
+            asks to correct the EFZ into Krankengeld. No rule reproduces it; asked ITSG.
+          frist_12m: >-
+            ITSG's TEEK0523 sets 12-MONATSFRIST-AB 12 months before the earliest counting AU (05.12.2024); VB 3.12.5
+            and BP 16.1 give its start (05.12.2025). Asked ITSG.
+    expected_sources:
+      send_41: PTA-LSG@2026-11-02#TA167/EEL!H65
+      periods: PTA-LSG@2026-11-02#TA167/EEL!H72:H76
+      chain: PTA-LSG@2026-11-02#TA167/Aufgabe!I34,I35
+      egzbis: PTA-LSG@2026-11-02#TA167/EEL!H96
+      frist_12m: PTA-LSG@2026-11-02#TA167/TEEK0523 (12-MONATSFRIST-AB)
+    allowed_variants:
+      - {signature: "41|DBVO.BEGINN-AU|missing_group", expected: "2025-08-13..2025-09-12", verdict: correct_variant,
+         reason: "die von der Krankenkasse nicht angerechnete AU 13.08.-12.09.2025 ist optional (ANZAHL-AU 01)",
+         source: "PTA-LSG@2026-11-02#TA167/EEL!K79"}
+      - {signature: "41|DBVO.BEGINN-AU|missing_group", expected: "2025-12-05..2026-01-23", verdict: correct_variant,
+         reason: "AU-Beginn 06.12.2025 statt 05.12.2025 ist laut Musterlösung zulässig",
+         source: "PTA-LSG@2026-11-02#TA167/EEL!K78"}
+      - {signature: "41|DBVO.BEGINN-AU|extra_group", actual: "2025-12-06..2026-01-23", verdict: correct_variant,
+         reason: "AU-Beginn 06.12.2025 statt 05.12.2025 ist laut Musterlösung zulässig",
+         source: "PTA-LSG@2026-11-02#TA167/EEL!K78"}
+    sources: [PTA@2025-2026-v3#5.14]
+
+  # TA 167 round 3: AU from 12.06.2026; the employee says it is the same illness, so the employer pays no EFZ
+  # (E-4), although the insurer counts none of the earlier AUs (TEEK0524). Leaves on 30.06.2026.
+  - id: ta-167-r3
+    family: vorerkrankung
+    locked: true
+    kind: reference
+    origin: pta
+    status: approved
+    hidden: false
+    parent: ta-167
+    targets: [R41-2, R41-3, R41-4, K61-4, K61-5, K61-6, E-4, E-5]
+    steps: chain
+    inputs:
+      report_date: 2026-06-12
+      employment_end: 2026-06-30
+      insurer_corrects: false
+      current: {start: 2026-06-12, end: 2026-06-30, certified: true, same_illness_stated: true}
+      priors:
+        - {start: 2026-02-02, end: 2026-02-20, certified: true, counts: "no"}
+        - {start: 2025-12-05, end: 2026-01-23, certified: true, counts: "no"}
+        - {start: 2025-08-13, end: 2025-09-12, certified: true, counts: "no"}
+    expected:
+      "13.3":
+        send_41: true
+        periods: [[2026-02-02, 2026-02-20], [2025-12-05, 2026-01-23], [2025-08-13, 2025-09-12]]
+        chain: ["41", "61", "01"]
+        egzbis: 2026-06-11
+        frist_12m: 2025-06-12
+        xfail:
+          frist_12m: >-
+            ITSG's TEEK0524 sets 12-MONATSFRIST-AB 12 months before the current AU when no earlier AU counts;
+            VB 3.12.5 and BP 16.1 give the start of the first AU of the same illness (Grundstellung when none
+            counts). Asked ITSG.
+    expected_sources:
+      send_41: PTA-LSG@2026-11-02#TA167/EEL!H142
+      periods: PTA-LSG@2026-11-02#TA167/EEL!H149:H156
+      chain: PTA-LSG@2026-11-02#TA167/Aufgabe!I39,H40
+      egzbis: PTA-LSG@2026-11-02#TA167/EEL!H176
+      frist_12m: PTA-LSG@2026-11-02#TA167/TEEK0524 (12-MONATSFRIST-AB)
+    allowed_variants:
+      - {signature: "41|DBVO.BEGINN-AU|missing_group", expected: "2025-12-05..2026-01-23", verdict: correct_variant,
+         reason: "AU 05.12.2025-23.01.2026 ist in dieser Anfrage optional",
+         source: "PTA-LSG@2026-11-02#TA167/EEL!K157"}
+      - {signature: "41|DBVO.BEGINN-AU|missing_group", expected: "2025-08-13..2025-09-12", verdict: correct_variant,
+         reason: "die von der Krankenkasse nicht angerechnete AU 13.08.-12.09.2025 ist optional",
+         source: "PTA-LSG@2026-11-02#TA167/EEL!K157"}
+      - {signature: "41|DBVO.BEGINN-AU|extra_group", actual: "2025-12-06..2026-01-23", verdict: correct_variant,
+         reason: "AU-Beginn 06.12.2025 statt 05.12.2025 ist laut Musterlösung zulässig",
+         source: "PTA-LSG@2026-11-02#TA167/EEL!K156"}
+    sources: [PTA@2025-2026-v3#5.14]
+
+  # TA 168 is not prior illness: a 02 Kinderkrankengeld (09.2025), a 03 Mutterschaftsgeld (from 10.12.2025) and the
+  # insurer's 71 (TEEK0527). It stays a draft until the families exist (G4, G5, G6).
+  - id: ta-168
+    family: kinderkrankengeld
     kind: reference
     origin: pta
     status: draft
@@ -470,6 +650,13 @@ test_cases:
     targets: []
     steps: chain
     inputs:
-      summary: Testaufgabe 168, EEL-Bescheinigungen sind zu erstellen (PTA 5.14)
+      summary: >-
+        Testaufgabe 168 (Sortiererin, DAK-G, befristet bis 31.01.2026, Monatsgehalt 2.687,70 EUR, eine weitere
+        geringfügige Beschäftigung): Kind A geboren 16.09.2020, Betreuung bei Erkrankung des Kindes 11.09.-12.09.2025
+        und 15.09.-19.09.2025 (1 Tag bezahlte Freistellung) -> EEL-Bescheinigung 02; Schwangerschaft, voraussichtliche
+        Entbindung 21.01.2026, individuelles Beschäftigungsverbot 01.11.-09.12.2025, Mutterschutzfrist ab
+        10.12.2025, tatsächliche Entbindung 25.01.2026 -> EEL-Bescheinigung 03; Rückmeldung 71 (TEEK0527:
+        ZAHL-BEGINN 10.12.2025, EEL-NETTO 10,42 EUR).
+      families: [kinderkrankengeld, mutterschaftsgeld]
     expected: {}
     sources: [PTA@2025-2026-v3#5.14]

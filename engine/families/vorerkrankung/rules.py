@@ -190,8 +190,23 @@ def _g(g: Mapping[str, Any], name: str) -> Any:
     return getattr(v, "value", v)
 
 
-def efz_end(current_start: date, groups_61: list[Mapping[str, Any]], p: Params) -> tuple[date, Trace]:
-    t = Trace(inputs={"current_start": str(current_start), "efz_days": p.efz_days})
+def employer_efz_days(current: AuPeriod, priors: list[AuPeriod], p: Params) -> int:
+    """E-4: the EFZ days the employer itself already paid for the same illness, when the employee says it is
+    the same illness: certified earlier AU days within the 12 months before the current AU (§ 3 EFZG), at most
+    efz_days. 0 when the employee says nothing."""
+    if not current.same_illness_stated:
+        return 0
+    window = add_months(current.start, -12)
+    paid = sum(days_in_window(a, window, current.start) for a in priors if a.certified and a.end)
+    return min(paid, p.efz_days)
+
+
+def efz_end(current_start: date, groups_61: list[Mapping[str, Any]], p: Params, own_used: int = 0,
+            employment_end: date | None = None) -> tuple[date, Trace]:
+    """E-1: the EFZ end after a 61. E-4: the employer's own count of the same illness (`own_used`) wins when it is
+    higher. E-5: never past the end of employment."""
+    t = Trace(inputs={"current_start": str(current_start), "efz_days": p.efz_days, "own_used": own_used,
+                      "employment_end": str(employment_end) if employment_end else None})
     used = 0
     for g in groups_61:
         s, e = _g(g, "BEGINN-AU"), _g(g, "ENDE-AU")
@@ -205,8 +220,16 @@ def efz_end(current_start: date, groups_61: list[Mapping[str, Any]], p: Params) 
             n = days(_g(g, "TEIL-ANR-AU-BEGINN"), _g(g, "TEIL-ANR-AU-ENDE"))
         used += n
         t.steps.append(f"E-1: {s}..{e} KZ-AU {kz_au} KZ-NACHWEIS {kz_nw} -> {n} Tage")
+    t.rules.append("E-1")
+    if own_used > used:
+        t.steps.append(f"E-4: Arbeitnehmer gibt dieselbe Krankheit an, Arbeitgeber zählt {own_used} eigene EFZ-Tage")
+        t.rules.append("E-4")
+        used = own_used
     remaining = p.efz_days - used
     end = current_start + timedelta(days=remaining - 1) if remaining > 0 else current_start - timedelta(days=1)
-    t.rules.append("E-1")
+    if employment_end is not None and end > employment_end:
+        t.steps.append(f"E-5: EFZ endet spätestens mit dem Ende der Beschäftigung {employment_end}")
+        t.rules.append("E-5")
+        end = employment_end
     t.values.update(used=used, remaining=remaining, efz_end=str(end))
     return end, t

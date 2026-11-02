@@ -78,7 +78,9 @@ def msg_61(sc: Scenario, chain: list[AuPeriod], which: str, step: int, round_: i
     frist = min((a.start for a in counted), default=None)  # K61-6
     blocks = {
         "DBNA": _dbna(sc),
-        "DBVO": {"GRUNDAV": 1, "AU-AB-AG": cur.start, "AU-AB-SV": cur.start,
+        # K61-8: AU-AB-SV only when the insurer's start differs from the employer's (VB 3.12.3, BP 16.1)
+        "DBVO": {"GRUNDAV": 1, "AU-AB-AG": cur.start,
+                 "AU-AB-SV": cur.insurer_start if cur.insurer_start and cur.insurer_start != cur.start else None,
                  "KZ-AK-AU": 0 if cur.certified else rules.INTERIM_KZ_AK_AU,  # K61-7
                  "12-MONATSFRIST-AB": frist, "groups": groups},
         "DBID": {**_dbid(sc, ref), **({"AKTENZEICHEN-VERURSACHER": azvu} if azvu is not None else {})},
@@ -141,12 +143,19 @@ def build_chain(kb: KnowledgeBase, sc: Scenario, version: str) -> ChainResult:
     res.messages.append(m41)
     if sc.test_case.steps != "chain":
         return res
-    cur = sc.test_case.inputs.current
+    i = sc.test_case.inputs
+    cur = i.current
+    own = rules.employer_efz_days(cur, i.priors, p)  # E-4
     first = msg_61(sc, d.chain, "first_61", 2, 1, m41.head["DATENSATZ-ID"])
-    efz1, t1 = efz_end(cur.start, first.blocks["DBVO"]["groups"], p)
+    efz1, t1 = efz_end(cur.start, first.blocks["DBVO"]["groups"], p, own, i.employment_end)
     m01 = msg_01(sc, 3, 2, efz1)
+    if not i.insurer_corrects:  # one round: 41, the insurer's 61, the 01 (TA 167)
+        res.messages += [first, m01]
+        res.values["efz"] = {"after_first_61": efz1}
+        res.traces.update(efz_first=t1)
+        return res
     corrected = msg_61(sc, d.chain, "corrected_61", 4, 2, m41.head["DATENSATZ-ID"])
-    efz2, t2 = efz_end(cur.start, corrected.blocks["DBVO"]["groups"], p)
+    efz2, t2 = efz_end(cur.start, corrected.blocks["DBVO"]["groups"], p, own, i.employment_end)
     res.messages += [first, m01, corrected]
     res.values["efz"] = {"after_first_61": efz1, "after_corrected_61": efz2}
     # E-3: an update that only sets interim flags (KZ-AU 3, KZ-AK-AU 4) does not replace the first 61

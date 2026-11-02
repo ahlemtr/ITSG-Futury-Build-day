@@ -370,7 +370,9 @@ def build_from(seed: Seed) -> dict:
     for order, tc in enumerate(seed.test_cases, start=1):
         g.node("TestCase", tc["id"], kind=tc["kind"], origin=tc["origin"], status=tc["status"],
                hidden=bool(tc.get("hidden", False)), steps=tc["steps"], parent=tc.get("parent"), order=order,
-               family=tc.get("family") or "vorerkrankung",
+               family=tc.get("family") or "vorerkrankung", locked=bool(tc.get("locked", False)),
+               expected_sources=to_json(tc.get("expected_sources") or {}),
+               allowed_variants=to_json(tc.get("allowed_variants") or []),
                inputs=to_json(tc.get("inputs") or {}), expected=to_json(tc.get("expected") or {}))
         for rid in tc.get("targets", []):
             g.edge("TARGETS", "TestCase", tc["id"], "Rule", rid)

@@ -35,7 +35,7 @@ def test_specdiff(vb_changes):
 
 def test_impact(kb):
     imp = specdiff.impact(["VB-13.3-13.4-DBVO-chaining"], kb)
-    assert {r.id for r in imp.recompute} == {"R41-2", "R41-3"} and len(imp.tests) == 8
+    assert {r.id for r in imp.recompute} == {"R41-2", "R41-3"} and len(imp.tests) == 11  # incl. ta-167-r1..r3
 
 
 def test_recompute(kb):

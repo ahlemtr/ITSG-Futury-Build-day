@@ -31,7 +31,8 @@ def test_prior_illness_is_found_without_registration():
 
 
 def test_seed_cases_and_rules_name_their_family(kb):
-    assert {t.family for t in kb.get_test_cases(include_hidden=True)} == {"vorerkrankung"}
+    assert {t.family for t in kb.get_test_cases(include_hidden=True)} == {"vorerkrankung", "kinderkrankengeld"}
+    assert get_case(kb, "ta-168").inputs.families == ["kinderkrankengeld", "mutterschaftsgeld"]  # not built yet
     assert get_case(kb, "peter").family == "vorerkrankung"
     assert {r.id: r.family for r in kb.get_rules("41", "13.4")}["S-1"] == "common"
     assert {r.id: r.family for r in kb.get_rules("41", "13.4")}["R41-2"] == "vorerkrankung"

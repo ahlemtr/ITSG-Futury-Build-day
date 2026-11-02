@@ -27,6 +27,7 @@ __all__ = [
     "load_from",
     "of_case",
     "register",
+    "title_of",
 ]
 
 
@@ -73,6 +74,15 @@ def get(family_id: str | None) -> Family:
 def all_families() -> list[Family]:
     _discover()
     return [_REGISTRY[k] for k in sorted(_REGISTRY)]
+
+
+def title_of(family_id: str | None) -> str:
+    """German title for the UI; a family that is not built yet (e.g. kinderkrankengeld before G4) gets a readable
+    name from its id."""
+    try:
+        return get(family_id).title
+    except KeyError:
+        return (family_id or DEFAULT).capitalize()
 
 
 def of_case(case) -> Family:

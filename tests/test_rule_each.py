@@ -149,3 +149,31 @@ def test_c8_cancel_carries_only_dbsd(kb):
     m88 = next(m for m in msgs if m.abgabegrund == "88")
     m88.blocks["DBNA"] = dict(msgs[0].blocks["DBNA"])
     assert _fails(vk.check_chain(_parsed(kb, msgs)), "C-8")
+
+
+# ---------------------------------------------------------------- G2b: K61-8, E-4, E-5
+
+
+@pytest.mark.rules("K61-8")
+def test_k61_8_au_ab_sv_only_when_the_insurer_start_differs(kb):
+    assert _peter(kb).messages[1].blocks["DBVO"]["AU-AB-SV"] is None
+    tc = get_case(kb, "peter").model_copy(deep=True)
+    tc.inputs.current.insurer_start = D("2026-03-10")
+    ch = build_chain(load_scenario(kb, tc), "13.4", kb)
+    assert ch.messages[1].blocks["DBVO"]["AU-AB-SV"] == D("2026-03-10")
+
+
+@pytest.mark.rules("E-4", "E-5")
+def test_e4_and_e5_employer_count_and_end_of_employment(kb):
+    from engine.families.vorerkrankung.rules import efz_end
+    from engine.rules import params
+
+    p = params.load(kb, version="13.3")
+    # E-4: no group counts in the 61, but the employer already paid 42 days for the same illness: no EFZ
+    end, t = efz_end(D("2026-06-12"), [], p, own_used=42)
+    assert end == D("2026-06-11") and "E-4" in t.rules
+    # E-5: the EFZ would run to 23.07., the employment ends on 30.06.
+    end, t = efz_end(D("2026-06-12"), [], p, employment_end=D("2026-06-30"))
+    assert end == D("2026-06-30") and "E-5" in t.rules
+    tc = get_case(kb, "ta-167-r3")
+    assert build_chain(load_scenario(kb, tc), "13.3", kb).messages[-1].blocks["DBAL"]["DATUM-EGZBIS"] == D("2026-06-11")

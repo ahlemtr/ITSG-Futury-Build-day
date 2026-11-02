@@ -57,7 +57,7 @@ def list_test_cases(request: Request, kind: str | None = None, hidden: bool | No
 
     return [{"id": t.id, "kind": t.kind, "origin": t.origin, "status": t.status, "hidden": t.hidden,
              "parent": t.parent, "targets": t.targets, "steps": t.steps, "result_changes": result_changes(t),
-             "family": t.family, "family_title": families.get(t.family).title}
+             "family": t.family, "family_title": families.title_of(t.family)}
             for t in sorted(items, key=lambda t: t.family)]
 
 

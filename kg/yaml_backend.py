@@ -149,7 +149,7 @@ class YamlBackend:
         targets = sorted(self._targets("TestCase", key, "TARGETS"), key=self._rule_order)
         return cls(key=key, kind=p["kind"], origin=p["origin"], status=p["status"], hidden=p["hidden"],
                    steps=p["steps"], parent=p.get("parent"), targets=targets,
-                   family=p.get("family") or "vorerkrankung", **extra)
+                   family=p.get("family") or "vorerkrankung", locked=bool(p.get("locked", False)), **extra)
 
     def _precedent(self, key: str) -> Precedent:
         p = self._props("Precedent", key)
@@ -309,6 +309,8 @@ class YamlBackend:
     def get_test_case(self, key: str) -> TestCase:
         p = self._props("TestCase", key)
         return self._test_ref(key, TestCase, inputs=json.loads(p["inputs"]), expected=json.loads(p["expected"]),
+                              expected_sources=json.loads(p.get("expected_sources") or "{}"),
+                              allowed_variants=json.loads(p.get("allowed_variants") or "[]"),
                               sources=sorted(self._targets("TestCase", key, "DESCRIBED_IN")))
 
     def get_deviation_context(self, record: str, field: str, abgabegrund: str, version: str) -> DeviationContext:
