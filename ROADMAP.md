@@ -78,7 +78,7 @@ Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scen
 
 Done when: Peter still passes unchanged, all 37 existing rules have code and a test, and a second family can be added by adding files, not by editing the checker.
 
-State 2026-11-02 (branch `g2-generalise`, not merged yet): the done-when line holds. Peter's employer files and check results are byte-identical (golden snapshot `tests/golden/engine.json`); the insurer's 61 and 62 now carry a DBAP, as VB Anlage 3 requires. All 42 rule cards have code and a test; a test-only family under `tests/fakes/families/demo/` runs through the core without any core change. Open: the R41-5 wording (ITSG question 5) and two paid steps: embeddings for the new passages (VB Anlage 3, BP 13.2) and one AI re-run, because rule cards and engine texts changed the prompts.
+State 2026-11-02 (branch `g2-generalise`, not merged yet): the done-when line holds. Peter's employer files and check results are byte-identical (golden snapshot `tests/golden/engine.json`); the insurer's 61 and 62 now carry a DBAP, as VB Anlage 3 requires. All 42 rule cards have code and a test; a test-only family under `tests/fakes/families/demo/` runs through the core without any core change. Open: the R41-5 wording (ITSG question 5). The two paid steps are done (2026-11-02, G2b session): embeddings for the new chunks and one re-run of the VB 13.4 analysis, together about $0.27.
 
 Needs: G0.
 
@@ -93,38 +93,40 @@ Decisions of 2026-11-02:
 - PTA 2025/2026 tasks are checked under VB 13.3 (validity date 01.01.2026 for parts dated 2025), because our knowledge base has no rule set valid in 2025.
 
 Files and sources
-- [ ] Move the TEEK0 files to `fixtures/itsg/ta-167/` and `fixtures/itsg/ta-168/`, the workbooks to `sources/testaufgaben/loesungen/`; add both paths to `.gitignore`
-- [ ] `kg/seed/documents.yaml`: entry `PTA-LSG` (solutions to the Pool-Testaufgaben 2025/2026, ITSG, received 2026-11-02, not published, file local only) so test values can cite sheet and cell
+- [x] Move the TEEK0 files to `fixtures/itsg/ta-167/` and `fixtures/itsg/ta-168/`, the workbooks to `sources/testaufgaben/loesungen/`; add both paths to `.gitignore`
+- [x] `kg/seed/documents.yaml`: entry `PTA-LSG` (solutions to the Pool-Testaufgaben 2025/2026, ITSG, received 2026-11-02, not published, file local only) so test values can cite sheet and cell
 - [ ] Ask ITSG whether the solutions may be published in our repository; commit them only after a yes
 
 Engine fixes found by the TEEK0 files
-- [ ] AU-AB-SV on the insurer's 61 stays empty unless the insurer's start date differs from the employer's (VB 3.12.3); today the simulator always fills it. New rule K61-8
-- [ ] Rewrite K61-6 to TA 167's reading (code, rule card, sources); read BP 16.1 in full first and stop if it clearly shows the other reading. Peter's expected 61 moves from 14.07.2025 to 14.07.2024: review the golden snapshot diff (`tests/golden/`) before regenerating it
-- [ ] Rule E-4: the employer counts its own EFZ days of the same illness within 12 months from the first AU (§ 3 EFZG); when the employee states it is the same illness and the six weeks are used up, no EFZ (DATUM-EGZBIS = day before DATUM-AB), whatever the 61 says (TA 167 round 3: 11.06.2026). New input fact on the current AU
-- [ ] Rule E-5: EFZ never runs past the end of employment
-- [ ] Round 2 of TA 167 (DATUM-EGZBIS 20.02.2026): no rule reproduces it consistently with ITSG's own 61 (05.12.2025–23.01.2026 counts, 50 days, so EFZ is used up) and task text ("Korrektur ... in Krankengeldbezug"). Lock ITSG's value as a strict expected failure with the reason, ask ITSG, and turn it green only when the engine or ITSG's answer explains it
-- [ ] Rule texts change the agents' prompts: the cached answers for K61-6 go stale; re-run only with an explicit go (paid)
+- [x] AU-AB-SV on the insurer's 61 stays empty unless the insurer's start date differs from the employer's (VB 3.12.3); today the simulator always fills it. New rule K61-8
+- [x] Rewrite K61-6 to TA 167's reading (code, rule card, sources); read BP 16.1 in full first and stop if it clearly shows the other reading. Peter's expected 61 moves from 14.07.2025 to 14.07.2024: review the golden snapshot diff (`tests/golden/`) before regenerating it. *Stopped (2026-11-02): BP 16.1 sets 12-MONATSFRIST-AB to the start of the counting AU (01.06.20XX) and VB 3.12.5 says the same; K61-6 keeps that reading, Peter stays at 14.07.2025, TA 167's three values are strict expected failures and the question goes to ITSG (contradiction 7)*
+- [x] Rule E-4: the employer counts its own EFZ days of the same illness within 12 months from the first AU (§ 3 EFZG); when the employee states it is the same illness and the six weeks are used up, no EFZ (DATUM-EGZBIS = day before DATUM-AB), whatever the 61 says (TA 167 round 3: 11.06.2026). New input fact on the current AU
+- [x] Rule E-5: EFZ never runs past the end of employment
+- [x] Round 2 of TA 167 (DATUM-EGZBIS 20.02.2026): no rule reproduces it consistently with ITSG's own 61 (05.12.2025–23.01.2026 counts, 50 days, so EFZ is used up) and task text ("Korrektur ... in Krankengeldbezug"). Lock ITSG's value as a strict expected failure with the reason, ask ITSG, and turn it green only when the engine or ITSG's answer explains it
+- [x] Rule texts change the agents' prompts: the cached answers for K61-6 go stale; re-run only with an explicit go (paid) (done with the go of 2026-11-02, budget cap $10, spent at most $0.27)
 
 Test catalogue
-- [ ] Locked-test runner (`tests/test_locked.py`): for every locked case and every rule set version it has an expected value for, build the chain from its inputs and compare with the stored expected values; any difference fails, except an allowed variant of that case. Today no test does this for all cases: some have hand-written asserts, and the golden snapshot only freezes the engine's last output (it catches change, not correctness)
-- [ ] Expected values of a locked case are typed in from the source document, each with its source, and never recomputed by the engine (`engine/builder.py` `recompute`, `with_expected` and the spec-change pipeline skip locked cases; a test proves it). Applies to Peter, the Beispielpapier rows and TA 167
-- [ ] `ta-167` becomes the parent (approved, locked) with children `ta-167-r1`, `-r2`, `-r3`, one per prior-illness round (41 + the insurer's 61 + EFZ end): inputs from the TEEK0 files, validity 01.01.2026 / 02.02.2026 / 12.06.2026, expected values with a source per value (sheet and cell)
-- [ ] `fixtures/scenarios/ta-167.yaml`: person (Hoffmann, Marc), employer 99301347, insurer DAK-G 99300660, insurer DBAP from the TEEK0 files
-- [ ] Locked marker on test cases; a locked case can never be changed by an agent (G11b relies on it)
-- [ ] Allowed variants per case, read by the checker before the global catalogue: in a later 41, a period the insurer already rejected (KZ-AU 2) may be left out; BEGINN-AU 06.12.2025 with AE-ERSTTAG N instead of 05.12.2025 with J (both marked optional by ITSG)
-- [ ] `ta-168`: correct the family (it is 02 Kinderkrankengeld, 03 Mutterschaftsgeld and the insurer's 71, not prior illness) and write down its inputs; it stays a draft until G4, G5 and G6 exist
+- [x] Locked-test runner (`tests/test_locked.py`): for every locked case and every rule set version it has an expected value for, build the chain from its inputs and compare with the stored expected values; any difference fails, except an allowed variant of that case. Today no test does this for all cases: some have hand-written asserts, and the golden snapshot only freezes the engine's last output (it catches change, not correctness)
+- [x] Expected values of a locked case are typed in from the source document, each with its source, and never recomputed by the engine (`engine/builder.py` `recompute`, `with_expected` and the spec-change pipeline skip locked cases; a test proves it). Applies to Peter, the Beispielpapier rows and TA 167
+- [x] `ta-167` becomes the parent (approved, locked) with children `ta-167-r1`, `-r2`, `-r3`, one per prior-illness round (41 + the insurer's 61 + EFZ end): inputs from the TEEK0 files, validity 01.01.2026 / 02.02.2026 / 12.06.2026, expected values with a source per value (sheet and cell)
+- [x] `fixtures/scenarios/ta-167.yaml`: person (Hoffmann, Marc), employer 99301347, insurer DAK-G 99300660, insurer DBAP from the TEEK0 files
+- [x] Locked marker on test cases; a locked case can never be changed by an agent (G11b relies on it)
+- [x] Allowed variants per case, read by the checker before the global catalogue: in a later 41, a period the insurer already rejected (KZ-AU 2) may be left out; BEGINN-AU 06.12.2025 with AE-ERSTTAG N instead of 05.12.2025 with J (both marked optional by ITSG)
+- [x] `ta-168`: correct the family (it is 02 Kinderkrankengeld, 03 Mutterschaftsgeld and the insurer's 71, not prior illness) and write down its inputs; it stays a draft until G4, G5 and G6 exist
 
 Tests (`tests/test_ta_167.py`)
-- [ ] Every TEEK0 file parses with no issue
-- [ ] Our simulated 61 in each round equals ITSG's TEEK0 except DATUM-ERSTELLUNG, DATENSATZ-ID, AKTENZEICHEN-SV and REFERENZ-ID (ITSG leaves it blank, its own note says so; K61-1 stays)
-- [ ] 41 decision and periods per round; the allowed variants are labelled as variants, not bugs
-- [ ] DATUM-EGZBIS per round (round 2 as the strict expected failure)
-- [ ] Checker run on a TEEL0 written from the workbook cells (the 41s; the 01s follow in G3) gives no bug
+- [x] Every TEEK0 file parses with no issue
+- [x] Our simulated 61 in each round equals ITSG's TEEK0 except DATUM-ERSTELLUNG, DATENSATZ-ID, AKTENZEICHEN-SV and REFERENZ-ID (ITSG leaves it blank, its own note says so; K61-1 stays)
+- [x] 41 decision and periods per round; the allowed variants are labelled as variants, not bugs
+- [x] DATUM-EGZBIS per round (round 2 as the strict expected failure)
+- [x] Checker run on a TEEL0 written from the workbook cells (the 41s; the 01s follow in G3) gives no bug
 
 Records
-- [ ] `PROJECT_REPORT.md` section 9: question 1 answered (what came, what did not: no TEEL0 files, no eVpT deviation report); new contradictions (K61-6, the two date sets in TA 167, round 2 EFZ end, the Info sheet against the real TEEK0524, REFERENZ-ID blank); follow-up questions (round 2, publication, eVpT report). Section 6: VB 13.3 for PTA 2025/2026. Section 3: catalogue line for ta-167 and ta-168
+- [x] `PROJECT_REPORT.md` section 9: question 1 answered (what came, what did not: no TEEL0 files, no eVpT deviation report); new contradictions (K61-6, the two date sets in TA 167, round 2 EFZ end, the Info sheet against the real TEEK0524, REFERENZ-ID blank); follow-up questions (round 2, publication, eVpT report). Section 6: VB 13.3 for PTA 2025/2026. Section 3: catalogue line for ta-167 and ta-168
 
 Done when: one runner checks every locked case against its document values, `ta-167-r1` to `-r3` are locked and pass (round 2 as a documented expected failure), our simulated 61s equal ITSG's TEEK0 files except the listed fields, Peter passes with its reviewed new 12-month date, and nothing from the delivery is in Git.
+
+State 2026-11-02 (branch `g2b-ta-solutions` on top of `g2-generalise`, not merged): done except asking ITSG about publication (the follow-up questions are drafted in `PROJECT_REPORT.md` section 9, question 1). The done-when line holds with one change: Peter keeps its 12-month date, because K61-6 kept the reading of BP 16.1 (see the K61-6 box).
 
 Needs: G2 (merged). The 01 content of TA 167 needs G3; TA 168 needs G4, G5 and G6.
 
