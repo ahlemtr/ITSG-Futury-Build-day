@@ -33,8 +33,14 @@ def chains(kb) -> dict[str, Any]:
     from engine.rules import params as params_mod
     from engine.writer_messages import chain_files
 
+    from engine import families
+
+    known = {f.id for f in families.all_families()}
     out: dict[str, Any] = {}
     for ref in sorted(kb.get_test_cases(include_hidden=True), key=lambda t: t.key):
+        if (ref.family or families.DEFAULT) not in known:  # not built yet (ta-168 before G4)
+            out[ref.key] = {"family_not_built": ref.family}
+            continue
         per_version: dict[str, Any] = {}
         for v in params_mod.all_versions(kb):
             try:
