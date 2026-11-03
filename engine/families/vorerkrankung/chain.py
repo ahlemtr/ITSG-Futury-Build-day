@@ -19,7 +19,7 @@ from kg.interface import KnowledgeBase
 # ---------------------------------------------------------------- message builders
 
 
-def _head(sc: Scenario, step: int, abgabegrund: str, insurer: bool = False, korr: int = 0) -> dict[str, Any]:
+def _head(sc: Scenario, step: int, abgabegrund: str, insurer: bool = False) -> dict[str, Any]:
     e, p = sc.extras["employer"], sc.extras["person"]
     snd, rcv = (e["empfaengernummer"], e["absendernummer"]) if insurer else (e["absendernummer"], e["empfaengernummer"])
     return {
@@ -29,7 +29,7 @@ def _head(sc: Scenario, step: int, abgabegrund: str, insurer: bool = False, korr
         "PRODUKT-IDENTIFIER": "" if insurer else e["produkt_identifier"],
         "MODIFIKATIONS-IDENTIFIER": "" if insurer else e["modifikations_identifier"],
         "DATUM-VERARBEITUNG": "0" * 20, "BBNR-KK": e["bbnr_kk"], "BBNR-ABRECHNUNGSSTELLE": "",
-        "RUECKMELDUNG-ENTGELTERSATZLEISTUNG": "N", "ABGABEGRUND": int(abgabegrund), "KORR-ABGABEGRUND": korr,
+        "RUECKMELDUNG-ENTGELTERSATZLEISTUNG": "N", "ABGABEGRUND": int(abgabegrund), "KORR-ABGABEGRUND": 0,  # S-2: 00 except on a 66
         "ABRECHNUNGSPROGRAMM": 0 if insurer else e["abrechnungsprogramm"],
     }
 
@@ -111,7 +111,7 @@ def msg_88(sc: Scenario, step: int, round_: int, cancelled: ExpectedMessage) -> 
                        "FAMILIENNAME": cancelled.blocks["DBNA"]["FAMILIENNAME"],
                        "AKTENZEICHEN-VERURSACHER": sc.extras.get("azvu", "")}}
     return ExpectedMessage(step=step, round=round_, actor="employer", abgabegrund="88",
-                           head=_head(sc, step, "88", korr=1), blocks=blocks, note="cancels the first 01")
+                           head=_head(sc, step, "88"), blocks=blocks, note="cancels the first 01")
 
 
 def msg_62(sc: Scenario, step: int, round_: int, ref: str, benefit_start: date) -> ExpectedMessage:
