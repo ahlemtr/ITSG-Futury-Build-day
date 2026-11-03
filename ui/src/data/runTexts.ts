@@ -55,8 +55,7 @@ export const RUNS: RunDef[] = [
         expects: ["88", "01"],
         rules: [
           { id: "E-2", text: "geändertes EFZ-Ende: 88 + neue 01 (bis 27.03.2026)" },
-          { id: "C-3", text: "88 storniert die alte 01" },
-          { id: "C-5", text: "neue 01 nach der 88" },
+          { id: "C-3", text: "88 nennt die stornierte 01" },
         ],
         reply: {
           abgabegrund: "62",
@@ -68,7 +67,7 @@ export const RUNS: RunDef[] = [
         nr: 4,
         instruction: "Importieren Sie die 62. Ihre Software darf keine weitere Meldung erzeugen.",
         expects: [],
-        rules: [{ id: "C-6", text: "nach der 62 keine weitere Meldung" }],
+        rules: [{ id: "import-only", text: "nach der 62 keine weitere Meldung" }],
       },
     ],
   },

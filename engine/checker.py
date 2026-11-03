@@ -1,8 +1,10 @@
 """Rule checker: exact match first, then each deviation gets one label.
 
 Flow per submission: parse (issues -> invalid) -> expected chain under the rule set valid on
-`valid_on` -> 3-level diff -> rule-field and format checks -> per deviation: a. catalogue and
-precedents, b. rule re-check, c. left `unclear` with an empty AI slot (filled by llm/).
+`valid_on` -> 3-level diff -> rule checks on the vendor's messages (common, then the family's) -> per
+deviation: a. allowed variant of the case, catalogue and precedents, b. the failed rule check on the same
+field, else the family's re-check, c. left `unclear` with an empty AI slot (filled by llm/).
+A broken rule is labelled by its card's kind: format -> invalid, every other kind -> bug.
 """
 
 from __future__ import annotations
@@ -27,7 +29,7 @@ from engine.model import (
     base_field_name,
 )
 from engine.records import parse_file
-from engine.rules import blocks, formats
+from engine.rules import common
 from engine.rules import params as params_mod
 from engine.variants import Catalogue
 from kg.interface import KnowledgeBase
@@ -54,6 +56,10 @@ class Checker:
             for r in self.kb.get_rules(ag, version):
                 out.setdefault(r.id, r)
         return out
+
+    def _label_of(self, rule: str) -> str:
+        r = self.rules.get(rule)
+        return "invalid" if r is not None and r.kind == "format" else "bug"
 
     def _label(self, d: Deviation, label: str, rule: str | None, why: str, resolved_by: str = "rules") -> bool:
         d.label, d.resolved_by, d.explanation = label, resolved_by, why
@@ -99,27 +105,25 @@ class Checker:
         self.ctx = CheckContext(kb=self.kb, version=version, scenario=sc, chain=chain, rules=self.rules,
                                 actual=actual, params=self.params, step_of=step_of, label=self._label)
         self.flags = layouts.get(self.kb, "DSLW", version, valid_on).flags  # block -> MM flag
-        results: list[tuple[Record | None, RuleResult]] = []
-        for r in actual:
-            results += [(r, x) for x in formats.check_mm_flags(r)]
-            results += [(r, x) for x in blocks.check_block_presence(r, self.flags)]
-            results += [(r, x) for x in formats.check_key_values(r)]
-            if r.abgabegrund in self.family.employer_codes:
-                results.append((r, formats.check_uuid(r)))
+        results = [(r, x) for r in actual for x in common.check_message(r, self.flags)]
+        results += common.check_case(actual)
         results += self.family.check_records(self.ctx)
-        covered = {(d.abgabegrund, f"{d.record}.{base_field_name(d.field or '')}") for d in devs}
+        # one failed check per message type and field; a field the diff already shows keeps the diff's deviation
+        # and is labelled from this check in the analysis below
+        self.failed: dict[tuple[str | None, str | None], RuleResult] = {}
+        covered = {_key(d) for d in devs}
         for rec, x in results:
-            if x.ok:
-                continue
             ag = rec.abgabegrund if rec else None
+            if x.ok or (ag, x.field) in self.failed:
+                continue
+            self.failed[(ag, x.field)] = x
             if (ag, x.field) in covered:
                 continue
             rec_name, _, fld = (x.field or "DSLW.").partition(".")
             d = Deviation(step=step_of.get(id(rec)), abgabegrund=ag, record=rec_name, field=fld or None,
                           kind="value_differs", expected=_s(x.expected), actual=_s(x.actual))
-            self._label(d, "invalid" if x.rule.startswith(("F", "S-", "A3-")) else "bug", x.rule, x.message)
+            self._label(d, self._label_of(x.rule), x.rule, x.message)
             devs.append(d)
-            covered.add((ag, x.field))
 
         # analysis of the diff deviations
         for d in devs:
@@ -165,11 +169,15 @@ class Checker:
 
     # ------------------------------------------------------------ b. rule re-check
     def recheck(self, d: Deviation) -> bool:
-        """Shared rules first (VB Anlage 3 blocks), then the family's."""
-        hit = blocks.recheck(d, {flag: blk for blk, flag in self.flags.items()})
-        if hit:
-            return self._label(d, hit[0], blocks.RULE, hit[1])
+        """The failed rule check on the deviation's field, else the family's re-check."""
+        x = self.failed.get(_key(d))
+        if x is not None:
+            return self._label(d, self._label_of(x.rule), x.rule, x.message)
         return self.family.recheck(self.ctx, d)
+
+
+def _key(d: Deviation) -> tuple[str | None, str]:
+    return d.abgabegrund, f"{d.record}.{base_field_name(d.field or '')}"
 
 
 def _s(v):

@@ -19,7 +19,7 @@ ID = re.compile(r"[\"']([^\"']+)[\"']")
 # rules no test proves yet: none since G2; a new rule card needs its test in the same change
 UNTESTED: set[str] = set()
 # rules no test case names in its targets
-UNTARGETED = {"A3-2", "A3-3"}  # continuity of benefits: no family chains two benefits yet (G3-G6)
+UNTARGETED = {"A3-2"}  # continuity of benefits: no family chains two benefits yet (G3-G6)
 
 
 def _rule_ids() -> set[str]:

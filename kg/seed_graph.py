@@ -99,7 +99,7 @@ def _expand(sources: list[str], vb_versions: list[str]) -> list[str]:
 def _key_values(record: str, field: str) -> str | None:
     """The Schlüsselzahlen of GG Anlage 2 for a field (kg/seed/key_values.yaml), as the Field's allowed values."""
     from engine.model import base_field_name
-    from engine.rules.formats import key_values
+    from engine.rules.common import key_values
 
     t = key_values().get(base_field_name(field))
     return to_json(t["codes"]) if t and record in t["records"] else None

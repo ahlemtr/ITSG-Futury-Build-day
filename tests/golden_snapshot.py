@@ -29,11 +29,10 @@ def _s(v: Any) -> Any:
 
 
 def chains(kb) -> dict[str, Any]:
+    from engine import families
     from engine.expected import build_chain, load_scenario
     from engine.rules import params as params_mod
     from engine.writer_messages import chain_files
-
-    from engine import families
 
     known = {f.id for f in families.all_families()}
     out: dict[str, Any] = {}

@@ -6,7 +6,7 @@ import pytest
 
 from engine.checker import Checker
 from engine.records import parse_file
-from engine.rules import formats
+from engine.rules import common as formats
 from tests.conftest import ITSG_FILE
 
 

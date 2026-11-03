@@ -59,7 +59,7 @@ def test_reused_dsid_and_azvu(kb):
     _, files = _peter(kb)
     r2 = files["TEEL0-peter-r2"].replace("AAAAAAAA-EEEE-2222-4444-BBBBBBBBBBBB", "11111111-2222-AAAA-EEEE-111111111111")
     res = check(kb, "peter", [files["TEEL0-peter-r1"], r2], D("2027-01-01"))
-    assert "C-1" in {d.rule for d in res.deviations if d.label == "bug"}
+    assert "C-1" in {d.rule for d in res.deviations if d.label == "invalid"}
     r3 = files["TEEL0-peter-r3"].replace("1234-5678-007", "1234-5678-999")
     res = check(kb, "peter", [files["TEEL0-peter-r1"], files["TEEL0-peter-r2"], r3], D("2027-01-01"))
     assert "C-2" in {d.rule for d in res.deviations}

@@ -78,12 +78,12 @@ def must_send_41(current: AuPeriod, priors: list[AuPeriod], report_date: date | 
                       "report_date": str(report_date) if report_date else None, "params": p.__dict__,
                       "insurance": insurance, "person_group": person_group})
     if insurance != "statutory":
-        t.add("R41-7", f"Versicherung {insurance}: eine 41 nur für gesetzlich Krankenversicherte", ok=False)
+        t.add("R41-8", f"Versicherung {insurance}: keine 41 für privat Krankenversicherte", ok=False)
         return Decision41(send=False, trace=t)
-    t.add("R41-7", "gesetzlich krankenversichert: die 41 geht an die Krankenkasse der versicherten Person")
     if person_group in NO_41_PERSON_GROUPS:
         t.add("R41-8", f"Personengruppe {person_group}: keine 41 bei geringfügiger Beschäftigung", ok=False)
         return Decision41(send=False, trace=t)
+    t.add("R41-7", "gesetzlich krankenversichert: die 41 geht an die Krankenkasse der versicherten Person")
     certified = [a for a in priors if a.certified]
     dropped = [a for a in priors if not a.certified]
     t.add("R41-5", f"{len(dropped)} nicht attestierte Vorerkrankungszeit(en) nicht berücksichtigt")
@@ -166,20 +166,16 @@ def insurer_flags(a: AuPeriod, reply: str) -> dict[str, Any]:
 
 
 def supersedes(old: Mapping[str, Any], new: Mapping[str, Any]) -> bool:
-    """E-3: does an updated 61 replace the earlier one? Not if every change only sets an interim flag
-    (KZ-AU 3 or KZ-AK-AU 4): the earlier answer stands. `old` / `new`: the DBVO blocks of both 61s."""
+    """E-3: does an updated 61 replace the earlier one? Not if every change only sets an interim flag: a changed
+    period now says KZ-AU 3, a changed KZ-AK-AU now says 4. `old` / `new`: the DBVO blocks of both 61s."""
+    og, ng = old.get("groups", []), new.get("groups", [])
+    span = lambda g: (_g(g, "BEGINN-AU"), _g(g, "ENDE-AU"))
+    if [span(g) for g in og] != [span(g) for g in ng]:
+        return True
     if _g(old, "KZ-AK-AU") != _g(new, "KZ-AK-AU") and _g(new, "KZ-AK-AU") != INTERIM_KZ_AK_AU:
         return True
-    og, ng = old.get("groups", []), new.get("groups", [])
-    if [(_g(g, "BEGINN-AU"), _g(g, "ENDE-AU")) for g in og] != [(_g(g, "BEGINN-AU"), _g(g, "ENDE-AU")) for g in ng]:
-        return True
-    for a, b in zip(og, ng):
-        changed = {k for k in set(a) | set(b) if _g(a, k) != _g(b, k)}
-        if changed - {"KZ-AU", "KZ-NACHWEIS"} or ("KZ-AU" in changed and _g(b, "KZ-AU") != INTERIM_KZ_AU):
-            return True
-        if "KZ-NACHWEIS" in changed and _g(b, "KZ-AU") != INTERIM_KZ_AU:
-            return True
-    return False
+    values = lambda g: {k: _g(g, k) for k in g}
+    return any(values(a) != values(b) and _g(b, "KZ-AU") != INTERIM_KZ_AU for a, b in zip(og, ng))
 
 
 # ---------------------------------------------------------------- EFZ end

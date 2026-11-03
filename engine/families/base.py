@@ -4,8 +4,8 @@ A family is one kind of test story: its own case facts, its own expected message
 rules. `vorerkrankung` (Peter: 41, 61, 01, 61, 88, 01, 62) is the first. Later: 02 Kinderkrankengeld,
 03 Mutterschaftsgeld, ...
 
-The core (parser, diff, labels, catalogue and precedents, MM flags, S-1 code values, Anlage 3 block
-check, DATENSATZ-ID format, reports) works the same for every family. It asks the family only for what
+The core (parser, diff, labels, catalogue and precedents, the common rules of engine/rules/, reports)
+works the same for every family. It asks the family only for what
 differs. A new family = a new folder `engine/families/<id>/` with a `FAMILY` object; nothing in the core
 changes.
 """
@@ -91,7 +91,7 @@ class Family(ABC):
 
     # ---- checking the vendor's files
     def check_records(self, ctx: CheckContext) -> list[tuple[Record | None, RuleResult]]:
-        """Family format and chain rules on the vendor's messages (vorerkrankung: F41, C-1..8)."""
+        """Family rules on the vendor's messages (vorerkrankung: F41 on the 41, E-2 on the 88)."""
         return []
 
     def recheck(self, ctx: CheckContext, d: Deviation) -> bool:

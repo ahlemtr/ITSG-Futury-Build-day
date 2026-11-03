@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
+from typing import get_args
 
+from engine.model import RuleKind
 from kg.extract import check_3_12
 
 KEY_FORMATS = {
@@ -30,7 +32,7 @@ DEVIATION_KINDS = {"value_differs", "missing_block", "extra_block", "missing_mes
 
 # (label, property) -> allowed values
 ENUMS = {
-    ("Rule", "kind"): {"domain", "format", "reply", "chain", "efz", "calculation"},
+    ("Rule", "kind"): set(get_args(RuleKind)),
     ("Rule", "status"): {"approved", "draft"},
     ("MessageType", "sender"): {"employer", "insurer", "both"},
     ("Field", "type"): {"an", "n"},

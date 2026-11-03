@@ -60,7 +60,7 @@ Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scen
 
 - [x] Define a scenario family interface (inputs, expected chain builder, rules, compare modes) and move the prior-illness logic behind it (`engine/families/base.py`; prior illness in `engine/families/vorerkrankung/`; a family is found by its folder)
 - [x] Map each Abgabegrund to its required (J), optional (m) and forbidden (N) data blocks from VB Anlage 3 13.3 (`sources/vb/`, table in chapter 2); replace every `mandatory: unknown` in `kg/seed/message_types.yaml`; add VB Anlage 3 to `documents.yaml` (`block_table`, new common rule A3-1)
-- [x] Rules from VB Anlage 3 chapter 3 (continuity of benefits, § 69 SGB IX): which change of benefit needs a new 01/02/03/11-31 and which does not; one gap day always needs a new one (`kg/seed/continuity.yaml`, `engine/rules/continuity.py`, rules A3-2, A3-3)
+- [x] Rules from VB Anlage 3 chapter 3 (continuity of benefits, § 69 SGB IX): which change of benefit needs a new 01/02/03/11-31 and which does not; one gap day always needs a new one (`kg/seed/continuity.yaml`, `engine/rules/continuity.py`, rule A3-2)
 - [x] Check every layout in `layouts/` against GG Anlage 1 (`tools/compare_anlage1`), fill gaps (247 fields, no structural difference; DBAP confirmed; 24 M/m-only findings documented)
 - [x] Version the record layouts by validity date like the rules (VB Anlage 1 13.1.4 changes them on 01.07.2027, not at a year start) (`get_layout(..., on_date)`; same structure in 13.1.3 and 13.1.4, 15 check texts differ)
 - [x] Fix the Beispielpapier versions: BP 13.2 (`sources/beispielpapier/`, valid 2026) belongs to VB 13.3, BP 13.3 to VB 13.4 (2027); add BP 13.2 to `documents.yaml` and correct the 13 `BP@13.3` citations in `rules.yaml` and `test_cases.yaml` (the five prior-illness examples are identical in both, so the expected results stay)
@@ -74,11 +74,12 @@ Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scen
   - [x] New rules for the two prior-illness items with no rule: a 41 only for people with statutory health insurance, addressed to their insurer; never for privately insured people or employee groups 109 and 110 (R41-7, R41-8; 109 and 110 are marginal employment)
   - [x] Complete the DBAN layout from Pflichtenheft Anlage 19 (KENNUNG, LAENDERKENNZ, PLZ, WOHNORT, STRASSE, HAUS-NR, ADR-ZUSATZ)
   - [x] One test per rule ID, so every rule is shown to be covered (`tests/test_rule_coverage.py` is strict)
+  - [x] Review every rule against its sources: no rule twice, each card's scope where the documents say it holds, one place for its code (2026-11-03: 45 cards became 36; the 88 sends KORR-ABGABEGRUND 00, VB 3.1.19, BP 23; private insurance is R41-8)
 - [x] Backend texts the UI shows in German: rule titles (`kg/seed/rules.yaml`), check explanations and format messages are English today (found in G1); change them together with the rule cards, not the AI prompts
 
 Done when: Peter still passes unchanged, all 37 existing rules have code and a test, and a second family can be added by adding files, not by editing the checker.
 
-State 2026-11-02 (branch `g2-generalise`, not merged yet): the done-when line holds. Peter's employer files and check results are byte-identical (golden snapshot `tests/golden/engine.json`); the insurer's 61 and 62 now carry a DBAP, as VB Anlage 3 requires. All 42 rule cards have code and a test; a test-only family under `tests/fakes/families/demo/` runs through the core without any core change. Open: the R41-5 wording (ITSG question 5). The two paid steps are done (2026-11-02, G2b session): embeddings for the new chunks and one re-run of the VB 13.4 analysis, together about $0.27.
+State 2026-11-02 (branch `g2-generalise`, not merged yet): the done-when line holds. Peter's employer files and check results are byte-identical (golden snapshot `tests/golden/engine.json`); the insurer's 61 and 62 now carry a DBAP, as VB Anlage 3 requires. All rule cards have code and a test (36 after the rule review of 2026-11-03, branch `g2c-rules-clean`); a test-only family under `tests/fakes/families/demo/` runs through the core without any core change. Open: the R41-5 wording (ITSG question 5). The two paid steps are done (2026-11-02, G2b session): embeddings for the new chunks and one re-run of the VB 13.4 analysis, together about $0.27.
 
 Needs: G0.
 

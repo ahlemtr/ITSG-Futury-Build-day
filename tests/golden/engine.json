@@ -1576,7 +1576,7 @@
     "chain": [],
     "efz": {},
     "failed": [
-     "R41-7"
+     "R41-8"
     ],
     "files": {},
     "messages": [],
@@ -1587,7 +1587,7 @@
     "chain": [],
     "efz": {},
     "failed": [
-     "R41-7"
+     "R41-8"
     ],
     "files": {},
     "messages": [],
@@ -1598,7 +1598,7 @@
     "chain": [],
     "efz": {},
     "failed": [
-     "R41-7"
+     "R41-8"
     ],
     "files": {},
     "messages": [],
@@ -2215,7 +2215,7 @@
   },
   "s-wrong-order@2027-01-01": {
    "counts": {
-    "bug": 1
+    "invalid": 1
    },
    "deviations": [
     {
@@ -2224,14 +2224,14 @@
      "expected": "['2026-03-01..2026-03-03', '2025-12-01..2025-12-03', '2025-10-01..2025-10-17', '2025-07-14..2025-07-15']",
      "field": "BEGINN-AU",
      "kind": "order_differs",
-     "label": "bug",
+     "label": "invalid",
      "record": "DBVO",
      "resolved_by": "rules",
      "rule": "F41-8",
      "step": 1
     }
    ],
-   "label": "bug",
+   "label": "invalid",
    "version": "13.4"
   }
  },

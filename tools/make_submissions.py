@@ -110,7 +110,7 @@ SEEDS = [
      {"2027-01-01": "exact_match"}, []),
     ("s-three-periods", "peter", "41 lists 3 of 4 periods", m_three_periods, {"2027-01-01": "correct_variant"}, []),
     ("s-missing-july", "peter", "July period dropped", m_missing_july, {"2027-01-01": "bug"}, ["R41-3"]),
-    ("s-wrong-order", "peter", "periods oldest first", m_wrong_order, {"2027-01-01": "bug"}, ["F41-8"]),
+    ("s-wrong-order", "peter", "periods oldest first", m_wrong_order, {"2027-01-01": "invalid"}, ["F41-8"]),
     ("s-stale-efz", "peter", "second 01 still says 30.03, no 88", m_stale_efz, {"2027-01-01": "bug"}, ["E-1", "E-2"]),
     ("s-insurer-field", "peter", "AU-AB-SV filled by the employer", m_insurer_field, {"2027-01-01": "invalid"},
      ["F41-6"]),

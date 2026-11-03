@@ -1,11 +1,12 @@
-"""VB Anlage 3 chapter 2: which data blocks each Abgabegrund must (J), may (m) or must not (N) carry.
-Rule A3-1, the same for every family. The table is kg/seed/message_types.yaml `block_table`."""
+"""Rule A3-1, the same for every family: which data blocks each Abgabegrund must (J), may (m) or must not (N)
+carry (VB Anlage 3 chapter 2, table in kg/seed/message_types.yaml `block_table`), and each MM flag in the DSLW
+is J exactly when its block is present (VB 3.1)."""
 
 from __future__ import annotations
 
 from functools import cache
 
-from engine.model import Deviation, Record, RuleResult
+from engine.model import Record, RuleResult
 
 RULE = "A3-1"
 
@@ -19,37 +20,22 @@ def block_table() -> dict[str, dict[str, str]]:
     return {str(code): dict(zip(table["columns"], row.split())) for code, row in (table.get("rows") or {}).items()}
 
 
-def presence(abgabegrund: str | None, block: str) -> str | None:
-    return block_table().get(abgabegrund or "", {}).get(block)
-
-
-def check_block_presence(rec: Record, flags: dict[str, str]) -> list[RuleResult]:
-    """Every J block present, no N block present. `flags`: block -> MM flag (from the DSLW layout)."""
-    row = block_table().get(rec.abgabegrund or "")
-    if row is None:
-        return []
+def check_blocks(rec: Record, flags: dict[str, str]) -> list[RuleResult]:
+    """At most one failed result per block. `flags`: block -> MM flag (from the DSLW layout)."""
+    row = block_table().get(rec.abgabegrund or "", {})
     out = []
-    for block, p in row.items():
-        flag = flags.get(block)
-        field = f"DSLW.{flag}" if flag else f"{block}"
-        if p == "J" and block not in rec.blocks:
-            out.append(RuleResult(rule=RULE, ok=False, field=field, expected=block, actual=None,
-                                  message=f"Datenbaustein {block} ist bei Abgabegrund {rec.abgabegrund} Pflicht (VB Anlage 3), fehlt aber"))
-        if p == "N" and block in rec.blocks:
-            out.append(RuleResult(rule=RULE, ok=False, field=field, expected=None, actual=block,
-                                  message=f"Datenbaustein {block} darf bei Abgabegrund {rec.abgabegrund} nicht übermittelt werden (VB Anlage 3)"))
+    for block in dict.fromkeys([*row, *flags]):
+        flag, present, p = flags.get(block), block in rec.blocks, row.get(block)
+        v = rec.get(f"DSLW.{flag}") if flag else None
+        if p == "J" and not present:
+            msg, exp, act = f"Datenbaustein {block} ist bei Abgabegrund {rec.abgabegrund} Pflicht (VB Anlage 3), fehlt aber", block, None
+        elif p == "N" and present:
+            msg, exp, act = f"Datenbaustein {block} darf bei Abgabegrund {rec.abgabegrund} nicht übermittelt werden (VB Anlage 3)", None, block
+        elif flag and (v == "J") != present:
+            msg = f"{flag} = {v}, aber Datenbaustein {block} {'vorhanden' if present else 'fehlt'}"
+            exp, act = "J" if present else "N", v
+        else:
+            continue
+        out.append(RuleResult(rule=RULE, ok=False, message=msg, expected=exp, actual=act,
+                              field=f"DSLW.{flag}" if flag else block))
     return out
-
-
-def recheck(d: Deviation, block_of_flag: dict[str, str]) -> tuple[str, str] | None:
-    """A diff deviation for a missing or extra block: (label, explanation) if Anlage 3 decides it, else None
-    (m blocks depend on the case: the family or an expert decides)."""
-    if d.kind not in ("missing_block", "extra_block"):
-        return None
-    block = block_of_flag.get(d.field or "") or d.record
-    p = presence(d.abgabegrund, block)
-    if d.kind == "missing_block" and p == "J":
-        return "invalid", f"Datenbaustein {block} ist bei Abgabegrund {d.abgabegrund} Pflicht (VB Anlage 3), fehlt aber"
-    if d.kind == "extra_block" and p == "N":
-        return "invalid", f"Datenbaustein {block} darf bei Abgabegrund {d.abgabegrund} nicht übermittelt werden (VB Anlage 3)"
-    return None

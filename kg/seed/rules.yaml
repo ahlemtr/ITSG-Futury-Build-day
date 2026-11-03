@@ -1,8 +1,134 @@
-# Rules of the engine.
+# Rules of the engine. One card per rule; the code that checks it:
+#   family common        -> engine/rules/ (common.py, blocks.py, continuity.py): every message, every family
+#   family vorerkrankung -> engine/families/vorerkrankung/ (rules.py decides and computes, chain.py builds the
+#                           expected messages, checks.py checks the vendor's messages and names the rule)
+# `kind` sets the label of a broken rule: format -> invalid, every other kind -> bug.
 # Sources cite the narrowest passage, in both VB versions where the text exists in both.
 # BP, HINWEISE and BVORERK sources are optional: dropped with a warning if the file is missing.
+# IDs are permanent: a retired ID is never reused. Retired 2026-11-03 (meaning moved to):
+#   F41-1 (could never fail), F41-2 -> S-2, F41-3 -> A3-1, F41-9 -> F41-6, F41-10 -> C-1, C-4 -> C-3,
+#   C-5 -> E-2, C-6 -> K62-2, C-7 -> K61-9, C-8 -> A3-1, A3-3 -> A3-2.
+all_messages: &all ["01", "02", "03", "04", "11", "12", "21", "22", "23", "31", "41", "42", "51", "61", "62", "66",
+                    "67", "71", "72", "73", "88", "99"]
+benefit_certificates: &certificates ["01", "02", "03", "04", "11", "12", "21", "22", "23", "31"]
 rules:
-  # --- when must the employer send a 41?
+  # ======================================================== common: every message, every family
+
+  # --- GG Anlage 2: Schlüsselzahlen (kg/seed/key_values.yaml)
+  - id: S-1
+    title: "Schlüsselzahlen nach GG Anlage 2"
+    description: >-
+      Ein gefülltes Schlüsselfeld (ABGABEGRUND, KORR-ABGABEGRUND, GRUNDBEEND, FEHLZEIT, EEL-ENDE-GRUND,
+      ABRECHNUNGSPROGRAMM, MM-KUG, ENTGART, KEINEFREIST, GRUNDAV, KZ-NACHWEIS, KZ-AU) enthält eine Schlüsselzahl
+      aus GG Anlage 2. Ob ein Feld gefüllt sein muss, prüfen andere Regeln; Grundstellung wird hier nicht
+      bewertet.
+    kind: format
+    family: common
+    status: approved
+    criterion: null
+    applies_to: *all
+    fields: [DSLW.ABGABEGRUND, DSLW.KORR-ABGABEGRUND, DSLW.ABRECHNUNGSPROGRAMM, DBAL.GRUNDBEEND, DBAL.MM-KUG,
+             DBAE.ENTGART, DBEE.EEL-ENDE-GRUND, DBVO.GRUNDAV, DBVO.KZ-NACHWEIS, DBVO.KZ-AU]
+    params: []
+    sources: [GG-ANL2@13.0#2, GG-ANL2@13.0#3, GG-ANL2@13.0#5, GG-ANL2@13.0#6, GG-ANL2@13.0#7, GG-ANL2@13.0#8,
+              GG-ANL2@13.0#10, GG-ANL2@13.0#11, GG-ANL2@13.0#12]
+  - id: S-2
+    title: "KORR-ABGABEGRUND = 00, außer bei Abgabegrund 66"
+    description: >-
+      DSLW.KORR-ABGABEGRUND nennt nur in der Rückmeldung 66 (falscher Abgabegrund) den korrekten Abgabegrund; in
+      jeder Meldung des Arbeitgebers und jeder anderen Rückmeldung ist nur Grundstellung 00 zulässig, auch in
+      der Stornierung 88 (VB 3.1.19, Beispielpapier 23).
+    kind: format
+    family: common
+    status: approved
+    criterion: null
+    applies_to: *all
+    fields: [DSLW.KORR-ABGABEGRUND]
+    params: []
+    sources: [VB@13.3#3.1.19, VB@13.4#3.1.19, BP@13.2#23, BP@13.3#23]
+
+  # --- VB Anlage 3 chapter 2: data blocks per Abgabegrund (kg/seed/message_types.yaml block_table)
+  - id: A3-1
+    title: "Datenbausteine nach VB Anlage 3, MM-Kennzeichen passend"
+    description: >-
+      Jeder Abgabegrund enthält die Datenbausteine, die VB Anlage 3 Kapitel 2 mit J kennzeichnet, und keinen mit
+      N (die 88 zum Beispiel nur den DBSD). Datenbausteine mit m werden nur bei entsprechendem Sachverhalt
+      übermittelt; ob der Sachverhalt vorliegt, entscheiden die Regeln der Fallgruppe oder ein Systemberater.
+      Jedes MM-Kennzeichen im DSLW ist genau dann J, wenn sein Datenbaustein vorhanden ist (VB 3.1).
+    kind: format
+    family: common
+    status: approved
+    criterion: null
+    applies_to: *all
+    fields: [DSLW.MM-NAME, DSLW.MM-ANSCHRIFT, DSLW.MM-ALLGEMEIN, DSLW.MM-ENTGELT, DSLW.MM-VOER, DSLW.MM-EELENDE,
+             DSLW.MM-ANSPRECH, DSLW.MM-ID, DSLW.MM-SD]
+    params: []
+    sources: [VB-ANL3@13.3#2, VB-ANL3@13.3#2.2, VB@13.3#3.1, VB@13.4#3.1, BP@13.2#13.1, BP@13.3#13.1, BP@13.2#23,
+              BP@13.3#23]
+
+  # --- the employer's messages of one case, taken together
+  - id: C-1
+    title: "DATENSATZ-ID im Format 8-4-4-4-12, in jeder Meldung eine andere"
+    description: >-
+      DSLW.DATENSATZ-ID ist hexadezimal im Format 8-4-4-4-12 (ohne Prüfung der RFC-4122-Version: ITSG-eigene IDs
+      wie 11111111-2222-AAAA-EEEE-111111111111 würden sonst abgelehnt) und in jeder Meldung des Arbeitgebers eine
+      andere.
+    kind: format
+    family: common
+    status: approved
+    criterion: null
+    applies_to: *all
+    fields: [DSLW.DATENSATZ-ID]
+    params: []
+    sources: [VB@13.3#3.1.11, VB@13.4#3.1.11]
+  - id: C-2
+    title: "AKTENZEICHEN-VERURSACHER in allen Meldungen des Arbeitgebers zum Fall gleich"
+    description: >-
+      Das AKTENZEICHEN-VERURSACHER ist in allen Meldungen des Arbeitgebers zum Fall gleich (DBID, in der 88 der
+      DBSD).
+    kind: chain
+    family: common
+    status: approved
+    criterion: null
+    applies_to: *all
+    fields: [DBID.AKTENZEICHEN-VERURSACHER, DBSD.AKTENZEICHEN-VERURSACHER]
+    params: []
+    sources: [VB@13.3#3.19.2, VB@13.4#3.19.2, VB@13.3#3.20, VB@13.4#3.20]
+  - id: C-3
+    title: "die 88 nennt die stornierte Meldung: DATENSATZ-ID und Namen wie dort"
+    description: >-
+      DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG der 88 ist die DATENSATZ-ID einer früheren Meldung des Falls;
+      DBSD.VORNAME und DBSD.FAMILIENNAME sind die Namen in dieser Meldung (GG 2.5, VB 3.20). Welche Meldung zu
+      stornieren ist, sagen die Regeln der Fallgruppe (Vorerkrankung: E-2).
+    kind: chain
+    family: common
+    status: approved
+    criterion: null
+    applies_to: ["88"]
+    fields: [DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG, DBSD.VORNAME, DBSD.FAMILIENNAME]
+    params: []
+    sources: [VB@13.3#3.20, VB@13.4#3.20, GG@13.1#2.5]
+
+  # --- VB Anlage 3 chapter 3: continuity of benefits, § 69 SGB IX (kg/seed/continuity.yaml); used from G4 on
+  - id: A3-2
+    title: "Leistungswechsel: neue Entgeltbescheinigung nach VB Anlage 3 Kapitel 3"
+    description: >-
+      Liegt mindestens ein Kalendertag (auch arbeitsfreie Tage) zwischen zwei Leistungen, erstattet der
+      Arbeitgeber für die zweite stets eine neue Meldung. Folgt die zweite direkt auf die erste, entscheidet die
+      Tabelle in VB Anlage 3 Kapitel 3 (§ 69 SGB IX), z. B. Krankengeld, dann Mutterschaftsgeld: ja;
+      Übergangsgeld, dann Krankengeld: nein; Kinderkrankengeld für dasselbe Kind: nein, für ein anderes Kind: ja.
+    kind: continuity
+    family: common
+    status: approved
+    criterion: null
+    applies_to: *certificates
+    fields: []
+    params: []
+    sources: [VB-ANL3@13.3#3]
+
+  # ======================================================== vorerkrankung (VB 3.12)
+
+  # --- when must the employer send a 41, and with which periods?
   - id: R41-1
     title: "41 nur, wenn die aktuelle AU und mindestens eine Vorerkrankung attestiert sind"
     description: >-
@@ -85,12 +211,11 @@ rules:
     fields: [DBVO.AU-AB-AG]
     params: [open_end_days]
     sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions, BP@13.2#13.5, BP@13.3#13.5]
-
   - id: R41-7
-    title: "41 nur für gesetzlich Krankenversicherte, an deren Krankenkasse"
+    title: "die 41 geht an die Krankenkasse der versicherten Person"
     description: >-
-      Eine 41 wird nur für gesetzlich Krankenversicherte erzeugt; Empfänger ist die Betriebsnummer der
-      Krankenkasse, bei der die beschäftigte Person versichert ist (Pflichtenheft 2026.2, DBVO Kriterium 1).
+      Empfänger der 41 ist die Betriebsnummer der Krankenkasse, bei der die beschäftigte Person gesetzlich
+      versichert ist (Pflichtenheft 2026.2, DBVO Kriterium 1). Wer keine 41 erhält: R41-8.
     kind: domain
     family: vorerkrankung
     status: approved
@@ -113,47 +238,12 @@ rules:
     params: []
     sources: [VB@13.3#3.12/conditions, VB@13.4#3.12/conditions]
 
-  # --- format rules for an employer 41 record
-  - id: F41-1
-    title: "ABGABEGRUND = 41"
-    description: >-
-      DSLW.ABGABEGRUND = 41.
-    kind: format
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["41"]
-    fields: [DSLW.ABGABEGRUND]
-    params: []
-    sources: [VB@13.3#3.1.18, VB@13.4#3.1.18]
-  - id: F41-2
-    title: "KORR-ABGABEGRUND = 00"
-    description: >-
-      DSLW.KORR-ABGABEGRUND = 00.
-    kind: format
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["41"]
-    fields: [DSLW.KORR-ABGABEGRUND]
-    params: []
-    sources: [VB@13.3#3.1.19, VB@13.4#3.1.19]
-  - id: F41-3
-    title: "MM-VOER = J, und jedes MM-Kennzeichen passt zu den vorhandenen Datenbausteinen"
-    description: >-
-      DSLW.MM-VOER = J, und jedes MM-Kennzeichen passt zu den vorhandenen Datenbausteinen.
-    kind: format
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["41"]
-    fields: [DSLW.MM-VOER, DSLW.MM-ANSPRECH, DSLW.MM-ID, DSLW.MM-NAME, DSLW.MM-ANSCHRIFT]
-    params: []
-    sources: [VB@13.3#3.1, VB@13.4#3.1, BP@13.2#13.1, BP@13.3#13.1]
+  # --- format of the employer's 41
   - id: F41-4
     title: "GRUNDAV = 1 (Krankheit)"
     description: >-
-      DBVO.GRUNDAV = 1 (Arbeitsunfähigkeit wegen Krankheit).
+      DBVO.GRUNDAV = 1 (Arbeitsunfähigkeit wegen Krankheit); 2 (Vorsorge/Reha) und 3 (Übergangsgeld) gehören zu
+      anderen Fallgruppen.
     kind: format
     family: vorerkrankung
     status: approved
@@ -175,17 +265,20 @@ rules:
     params: []
     sources: [VB@13.3#3.12.2, VB@13.4#3.12.2]
   - id: F41-6
-    title: "AU-AB-SV, KZ-AK-AU, 12-MONATSFRIST-AB leer (füllt nur die Krankenkasse)"
+    title: "Felder der Krankenkasse bleiben in der 41 leer"
     description: >-
-      DBVO.AU-AB-SV, KZ-AK-AU und 12-MONATSFRIST-AB sind Grundstellung (Felder der Krankenkasse).
+      Felder, die nur die Krankenkasse füllt, sind in der 41 Grundstellung: AU-AB-SV, KZ-AK-AU,
+      12-MONATSFRIST-AB und je AU-Zeit KZ-NACHWEIS, TEIL-NACHWEIS-*, KZ-AU, TEIL-ANR-*.
     kind: format
     family: vorerkrankung
     status: approved
     criterion: null
     applies_to: ["41"]
-    fields: [DBVO.AU-AB-SV, DBVO.KZ-AK-AU, DBVO.12-MONATSFRIST-AB]
+    fields: [DBVO.AU-AB-SV, DBVO.KZ-AK-AU, DBVO.12-MONATSFRIST-AB, DBVO.KZ-NACHWEIS, DBVO.TEIL-NACHWEIS-AU-BEGINN,
+             DBVO.TEIL-NACHWEIS-AU-ENDE, DBVO.KZ-AU, DBVO.TEIL-ANR-AU-BEGINN, DBVO.TEIL-ANR-AU-ENDE]
     params: []
-    sources: [VB@13.3#3.12.3, VB@13.4#3.12.3, VB@13.3#3.12.4, VB@13.4#3.12.4, VB@13.3#3.12.5, VB@13.4#3.12.5]
+    sources: [VB@13.3#3.12.3, VB@13.4#3.12.3, VB@13.3#3.12.4, VB@13.4#3.12.4, VB@13.3#3.12.5, VB@13.4#3.12.5,
+              VB@13.3#3.12.9, VB@13.4#3.12.9, VB@13.3#3.12.12, VB@13.4#3.12.12]
   - id: F41-7
     title: "ANZAHL-AU = Anzahl der AU-Zeiten, mindestens 1"
     description: >-
@@ -210,33 +303,8 @@ rules:
     fields: [DBVO.BEGINN-AU, DBVO.ENDE-AU]
     params: []
     sources: [VB@13.3#3.12.7, VB@13.4#3.12.7]
-  - id: F41-9
-    title: "je AU-Zeit KZ-NACHWEIS, TEIL-*, KZ-AU leer (füllt nur die Krankenkasse)"
-    description: >-
-      Je AU-Zeit sind KZ-NACHWEIS, TEIL-NACHWEIS-*, KZ-AU und TEIL-ANR-* Grundstellung (Felder der Krankenkasse).
-    kind: format
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["41"]
-    fields: [DBVO.KZ-NACHWEIS, DBVO.TEIL-NACHWEIS-AU-BEGINN, DBVO.TEIL-NACHWEIS-AU-ENDE, DBVO.KZ-AU, DBVO.TEIL-ANR-AU-BEGINN, DBVO.TEIL-ANR-AU-ENDE]
-    params: []
-    sources: [VB@13.3#3.12.9, VB@13.4#3.12.9, VB@13.3#3.12.12, VB@13.4#3.12.12]
-  - id: F41-10
-    title: "DATENSATZ-ID eindeutig, Format 8-4-4-4-12 hexadezimal"
-    description: >-
-      DSLW.DATENSATZ-ID ist eindeutig und im Format 8-4-4-4-12 hexadezimal (ohne Prüfung der RFC-4122-Version:
-      ITSG-eigene IDs wie 11111111-2222-AAAA-EEEE-111111111111 würden sonst abgelehnt).
-    kind: format
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["41"]
-    fields: [DSLW.DATENSATZ-ID]
-    params: []
-    sources: [VB@13.3#3.1.11, VB@13.4#3.1.11]
 
-  # --- insurer reply 61 and 62
+  # --- the insurer's replies 61 and 62 (our insurer simulator writes them; checked on itself, never a vendor label)
   - id: K61-1
     title: "REFERENZ-ID = DATENSATZ-ID der 41 des Arbeitgebers"
     description: >-
@@ -340,6 +408,19 @@ rules:
     fields: [DBVO.AU-AB-SV]
     params: []
     sources: [VB@13.3#3.12.3, VB@13.4#3.12.3, BP@13.2#16.1, BP@13.3#16.1]
+  - id: K61-9
+    title: "die 61 wiederholt das AKTENZEICHEN-VERURSACHER der 41 unverändert oder lässt es leer"
+    description: >-
+      Die 61 der Krankenkasse wiederholt DBID.AKTENZEICHEN-VERURSACHER der 41 unverändert oder lässt es leer,
+      wenn der Arbeitgeber keines gesendet hat (in V13.4 klargestellt, VB 3.19).
+    kind: reply
+    family: vorerkrankung
+    status: approved
+    criterion: null
+    applies_to: ["61"]
+    fields: [DBID.AKTENZEICHEN-VERURSACHER]
+    params: []
+    sources: [VB@13.3#3.19.2, VB@13.4#3.19.2]
   - id: K62-1
     title: "REFERENZ-ID = DATENSATZ-ID der letzten gültigen 01"
     description: >-
@@ -354,10 +435,10 @@ rules:
     params: []
     sources: [VB@13.3#3.19.3, VB@13.4#3.19.3, HINWEISE@1#chain]
   - id: K62-2
-    title: "EEL-ENDE und EEL-ENDE-GRUND, nie nach dem Ende der Beschäftigung"
+    title: "EEL-ENDE nie nach dem Ende der Beschäftigung, mit EEL-ENDE-GRUND"
     description: >-
-      DBEE.EEL-ENDE und DBEE.EEL-ENDE-GRUND: 31.03.2026 und 99 für Peter (Hinweise-Tabelle), nie nach dem Ende der
-      Beschäftigung (C-6).
+      DBEE.EEL-ENDE ist das Ende der Leistung, nie nach dem Ende der Beschäftigung (in V13.4 klargestellt, VB
+      3.7.3); EEL-ENDE-GRUND nennt den Grund (Peter: 31.03.2026 und 99, Hinweise-Tabelle).
     kind: reply
     family: vorerkrankung
     status: approved
@@ -367,7 +448,7 @@ rules:
     params: []
     sources: [VB@13.3#3.7.3, VB@13.4#3.7.3, VB@13.3#3.7.4, VB@13.4#3.7.4]
 
-  # --- EFZ end after a 61
+  # --- EFZ end after a 61, and what the employer sends when it changes
   - id: E-1
     title: "die 01 enthält DBAL.DATUM-EGZBIS = Ende der EFZ"
     description: >-
@@ -383,10 +464,10 @@ rules:
     params: [efz_days]
     sources: [VB@13.3#3.4.3, VB@13.4#3.4.3, HINWEISE@1#chain]
   - id: E-2
-    title: "ändert eine korrigierte 61 das Ende der EFZ, folgen 88 und neue 01"
+    title: "ändert eine korrigierte 61 das Ende der EFZ, storniert eine 88 die alte 01, danach folgt eine neue 01"
     description: >-
-      Ändert eine korrigierte 61 das Ende der EFZ, wird die alte 01 mit einer 88 storniert und eine neue 01
-      gesendet.
+      Ändert eine korrigierte 61 das Ende der EFZ, wird die alte 01 mit einer 88 storniert und danach eine neue 01
+      gesendet; ändert sie es nicht, folgt weder 88 noch neue 01.
     kind: efz
     family: vorerkrankung
     status: approved
@@ -408,7 +489,6 @@ rules:
     fields: [DBVO.KZ-AK-AU, DBVO.KZ-AU]
     params: []
     sources: [VB@13.3#3.12.4, VB@13.4#3.12.4, VB@13.3#3.12.12, VB@13.4#3.12.12]
-
   - id: E-4
     title: "gibt der Arbeitnehmer dieselbe Krankheit an, zählt der Arbeitgeber seine eigenen EFZ-Tage"
     description: >-
@@ -436,170 +516,3 @@ rules:
     fields: [DBAL.DATUM-EGZBIS, DBAL.ENDE-BV-ZUM]
     params: []
     sources: [VB@13.3#3.4.3, VB@13.4#3.4.3]
-
-  # --- chain rules
-  - id: C-1
-    title: "jede Meldung des Arbeitgebers hat eine eindeutige DATENSATZ-ID"
-    description: >-
-      Jede Meldung des Arbeitgebers hat eine eindeutige DATENSATZ-ID.
-    kind: chain
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["01", "41", "88"]
-    fields: [DSLW.DATENSATZ-ID]
-    params: []
-    sources: [VB@13.3#3.1.11, VB@13.4#3.1.11]
-  - id: C-2
-    title: "AKTENZEICHEN-VERURSACHER in allen Meldungen des Arbeitgebers zum Fall gleich"
-    description: >-
-      Das AKTENZEICHEN-VERURSACHER ist in allen Meldungen des Arbeitgebers zum Fall gleich (DBID in 41 und 01,
-      DBSD in der 88).
-    kind: chain
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["01", "41", "88"]
-    fields: [DBID.AKTENZEICHEN-VERURSACHER, DBSD.AKTENZEICHEN-VERURSACHER]
-    params: []
-    sources: [VB@13.3#3.19.2, VB@13.4#3.19.2, VB@13.3#3.20, VB@13.4#3.20]
-  - id: C-3
-    title: "die 88 verweist auf die DATENSATZ-ID der stornierten 01"
-    description: >-
-      DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG der 88 = DATENSATZ-ID der stornierten 01.
-    kind: chain
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["88"]
-    fields: [DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG]
-    params: []
-    sources: [VB@13.3#3.20, VB@13.4#3.20, GG@13.1#2.5]
-  - id: C-4
-    title: "VORNAME / FAMILIENNAME der 88 = Namen im stornierten Datensatz"
-    description: >-
-      DBSD.VORNAME und DBSD.FAMILIENNAME der 88 = Namen im stornierten Datensatz (in V13.4 klargestellt, VB 3.20).
-    kind: chain
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["88"]
-    fields: [DBSD.VORNAME, DBSD.FAMILIENNAME]
-    params: []
-    sources: [VB@13.3#3.20, VB@13.4#3.20]
-  - id: C-5
-    title: "die neue 01 folgt auf die 88"
-    description: >-
-      Die neue 01 folgt auf die 88.
-    kind: chain
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["01", "88"]
-    fields: [DSLW.ABGABEGRUND]
-    params: []
-    sources: [GG@13.1#2.5]
-  - id: C-6
-    title: "das Ende in der 62 der Krankenkasse liegt nicht nach dem Ende der Beschäftigung"
-    description: >-
-      Das Ende in der 62 der Krankenkasse liegt nicht nach dem Ende der Beschäftigung (in V13.4 klargestellt, VB
-      3.7.3).
-    kind: chain
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["62"]
-    fields: [DBEE.EEL-ENDE]
-    params: []
-    sources: [VB@13.3#3.7.3, VB@13.4#3.7.3]
-  - id: C-7
-    title: "die 61 wiederholt das AKTENZEICHEN-VERURSACHER unverändert oder lässt es leer"
-    description: >-
-      Die 61 der Krankenkasse wiederholt DBID.AKTENZEICHEN-VERURSACHER unverändert oder lässt es leer, wenn der
-      Arbeitgeber keines gesendet hat (in V13.4 klargestellt, VB 3.19).
-    kind: chain
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["61"]
-    fields: [DBID.AKTENZEICHEN-VERURSACHER]
-    params: []
-    sources: [VB@13.3#3.19.2, VB@13.4#3.19.2]
-  - id: C-8
-    title: "die 88 enthält nur den DBSD (MM-SD = J, alle anderen MM-Kennzeichen N)"
-    description: >-
-      Die 88 enthält nur den Datenbaustein DBSD: MM-SD = J, alle anderen MM-Kennzeichen N (Beispielpapier 23).
-    kind: chain
-    family: vorerkrankung
-    status: approved
-    criterion: null
-    applies_to: ["88"]
-    fields: [DSLW.MM-SD]
-    params: []
-    sources: [VB@13.3#3.20, VB@13.4#3.20, BP@13.2#23, BP@13.3#23]
-
-  # --- VB Anlage 3: data blocks per Abgabegrund (kg/seed/message_types.yaml block_table), all message types
-  - id: A3-1
-    title: "jeder Pflicht-Datenbaustein vorhanden, kein unzulässiger Datenbaustein (VB Anlage 3)"
-    description: >-
-      Jeder Abgabegrund enthält die Datenbausteine, die VB Anlage 3 Kapitel 2 mit J kennzeichnet, und keinen mit
-      N. Datenbausteine mit m werden nur bei entsprechendem Sachverhalt übermittelt; ob der Sachverhalt vorliegt,
-      entscheiden die Regeln der Fallgruppe oder ein Systemberater.
-    kind: format
-    family: common
-    status: approved
-    criterion: null
-    applies_to: ["01", "02", "03", "04", "11", "12", "21", "22", "23", "31", "41", "42", "51", "61", "62", "66",
-                 "67", "71", "72", "73", "88", "99"]
-    fields: [DSLW.MM-NAME, DSLW.MM-ANSCHRIFT, DSLW.MM-ALLGEMEIN, DSLW.MM-ENTGELT, DSLW.MM-VOER, DSLW.MM-EELENDE,
-             DSLW.MM-ANSPRECH, DSLW.MM-ID, DSLW.MM-SD]
-    params: []
-    sources: [VB-ANL3@13.3#2, VB-ANL3@13.3#2.2]
-
-  # --- VB Anlage 3 chapter 3: continuity of benefits, § 69 SGB IX (kg/seed/continuity.yaml)
-  - id: A3-2
-    title: "liegt mindestens ein Kalendertag zwischen zwei Leistungen, folgt immer eine neue Entgeltbescheinigung"
-    description: >-
-      Liegt mindestens ein Kalendertag (auch arbeitsfreie Tage) zwischen zwei Leistungszeiträumen, erstattet der
-      Arbeitgeber für den zweiten stets eine neue Meldung (VB Anlage 3 Kapitel 3).
-    kind: chain
-    family: common
-    status: approved
-    criterion: null
-    applies_to: ["01", "02", "03", "04", "11", "12", "21", "22", "23", "31"]
-    fields: []
-    params: []
-    sources: [VB-ANL3@13.3#3]
-  - id: A3-3
-    title: "direkt aufeinanderfolgende Leistungen: neue Entgeltbescheinigung nur, wo VB Anlage 3 es vorsieht"
-    description: >-
-      Folgt eine zweite Leistung direkt auf die erste, entscheidet die Tabelle in VB Anlage 3 Kapitel 3 (§ 69 SGB
-      IX), ob der Arbeitgeber eine neue Meldung erstattet (z. B. Krankengeld, dann Mutterschaftsgeld: ja;
-      Übergangsgeld, dann Krankengeld: nein; Kinderkrankengeld für dasselbe Kind: nein, für ein anderes Kind: ja).
-    kind: chain
-    family: common
-    status: approved
-    criterion: null
-    applies_to: ["01", "02", "03", "04", "11", "12", "21", "22", "23", "31"]
-    fields: []
-    params: []
-    sources: [VB-ANL3@13.3#3]
-
-  # --- GG Anlage 2: Schlüsselzahlen (kg/seed/key_values.yaml), all message types
-  - id: S-1
-    title: "Schlüsselzahlen nach GG Anlage 2"
-    description: >-
-      Ein gefülltes Schlüsselfeld (ABGABEGRUND, KORR-ABGABEGRUND, GRUNDBEEND, FEHLZEIT, EEL-ENDE-GRUND,
-      ABRECHNUNGSPROGRAMM, MM-KUG, ENTGART, KEINEFREIST, GRUNDAV, KZ-NACHWEIS, KZ-AU) enthält eine Schlüsselzahl
-      aus GG Anlage 2. Ob ein Feld gefüllt sein muss, prüfen andere Regeln; Grundstellung wird hier nicht
-      bewertet.
-    kind: format
-    family: common
-    status: approved
-    criterion: null
-    applies_to: ["01", "41", "61", "62", "88"]
-    fields: [DSLW.ABGABEGRUND, DSLW.KORR-ABGABEGRUND, DSLW.ABRECHNUNGSPROGRAMM, DBAL.GRUNDBEEND, DBAL.MM-KUG,
-             DBAE.ENTGART, DBEE.EEL-ENDE-GRUND, DBVO.GRUNDAV, DBVO.KZ-NACHWEIS, DBVO.KZ-AU]
-    params: []
-    sources: [GG-ANL2@13.0#2, GG-ANL2@13.0#3, GG-ANL2@13.0#5, GG-ANL2@13.0#6, GG-ANL2@13.0#7, GG-ANL2@13.0#8,
-              GG-ANL2@13.0#10, GG-ANL2@13.0#11, GG-ANL2@13.0#12]
