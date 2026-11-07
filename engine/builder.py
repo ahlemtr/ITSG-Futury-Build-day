@@ -28,6 +28,9 @@ def outcome(kb: KnowledgeBase, tc: Case, version: str) -> BaseModel:
 
 
 def with_expected(kb: KnowledgeBase, tc: Case, versions: list[str] | None = None) -> Case:
+    """Fill the expected results from the engine. A locked case keeps the values typed in from its source."""
+    if tc.locked:
+        return tc
     tc.expected = {v: outcome(kb, tc, v) for v in (versions or params_mod.all_versions(kb))}
     return tc
 
@@ -44,6 +47,8 @@ def recompute(kb: KnowledgeBase, test_cases: list[str | Case], old: str, new: st
     out = []
     for t in test_cases:
         tc = get_case(kb, t) if isinstance(t, str) else t
+        if tc.locked:  # its values come from its source document, never from the engine
+            continue
         o, n = outcome(kb, tc, old), outcome(kb, tc, new)
         out.append(Recomputed(id=tc.id, old=o, new=n, differs=o != n))
     return out
@@ -62,6 +67,7 @@ def clone(kb: KnowledgeBase, base: str | Case, branch_point: date | None, change
     tc.inputs = type(tc.inputs).model_validate(inputs)
     tc.id = new_id or f"{b.id}-clone"
     tc.parent, tc.kind, tc.origin, tc.status, tc.hidden = b.id, "clone", "builder", "draft", False
+    tc.locked, tc.expected_sources, tc.allowed_variants = False, {}, []  # a clone is computed, not typed in
     tc.steps = "single"
     tc.branch_point = branch_point
     tc.targets = targets or b.targets

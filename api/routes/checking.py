@@ -243,11 +243,11 @@ def list_reports(request: Request, vendor: str | None = None):
             continue
         signed = repo(request).get_report(s.id)
         try:
-            fam = families.of_case(test_case(request, s.test_case_id))
+            fam_id = test_case(request, s.test_case_id).family
         except Exception:  # noqa: BLE001 - a deleted test case must not break the list
-            fam = families.get(None)
+            fam_id = families.DEFAULT
         out.append({"submission_id": s.id, "test_case_id": s.test_case_id, "vendor": s.vendor,
-                    "family": fam.id, "family_title": fam.title,
+                    "family": fam_id, "family_title": families.title_of(fam_id),
                     "rule_set_version": res.version, "label": res.label, "created": s.created.isoformat(),
                     "signed": signed["report"]["created"] if signed else None})
     return out

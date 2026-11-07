@@ -73,7 +73,7 @@ def test_affected_rules_chaining(kb):
     assert {r.id for r in impact.recompute} == {"R41-2", "R41-3"}
     assert {t.key for t in impact.tests} == {
         "peter", "peter-gap-exact", "peter-gap-in", "peter-gap-out", "peter-hidden", "peter-gap-exact-hidden",
-        "bp-13-2", "bp-13-3",
+        "bp-13-2", "bp-13-3", "ta-167-r1", "ta-167-r2", "ta-167-r3",
     }
     review = {r.id for r in impact.review}
     assert not review & {"R41-2", "R41-3"}
@@ -178,7 +178,8 @@ def test_raw_change_links_to_narrowest_passage(kb):
 
 def test_test_cases_for_rule(kb):
     public = [t.key for t in kb.get_test_cases("R41-2")]
-    assert public == ["peter", "peter-gap-exact", "peter-gap-in", "peter-gap-out", "bp-13-3"]
+    assert public == ["peter", "peter-gap-exact", "peter-gap-in", "peter-gap-out", "bp-13-3", "ta-167-r1",
+                      "ta-167-r2", "ta-167-r3"]
     with_hidden = {t.key for t in kb.get_test_cases("R41-2", include_hidden=True)}
     assert with_hidden == set(public) | {"peter-hidden", "peter-gap-exact-hidden"}
 

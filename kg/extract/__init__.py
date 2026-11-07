@@ -63,6 +63,8 @@ def run(seed_dir: Path = SEED_DIR, layout_dir: Path = LAYOUT_DIR, build_dir: Pat
 
     passages: list[dict] = []
     for dv in load_documents(seed_dir):
+        if dv.get("role") == "solution":  # TA solutions: local workbooks, cited by sheet and cell, no passages
+            continue
         if not dv["present"]:
             warn(f"{dv['doc']}@{dv['version']}: file {dv['file']} missing, skipped")
             continue

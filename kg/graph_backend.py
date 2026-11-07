@@ -125,9 +125,11 @@ class GraphBackend:
             t = r["t"]
             ref = {"key": t["key"], "kind": t["kind"], "origin": t["origin"], "status": t["status"], "hidden": t["hidden"],
                        "steps": t["steps"], "parent": t.get("parent"), "targets": r["targets"],
-                   "family": t.get("family") or "vorerkrankung"}
+                   "family": t.get("family") or "vorerkrankung", "locked": bool(t.get("locked"))}
             if full:
                 out.append(TestCase(**ref, inputs=json.loads(t["inputs"]), expected=json.loads(t["expected"]),
+                                    expected_sources=json.loads(t.get("expected_sources") or "{}"),
+                                    allowed_variants=json.loads(t.get("allowed_variants") or "[]"),
                                     sources=sorted(r["sources"])))
             else:
                 out.append(TestCaseRef(**ref))

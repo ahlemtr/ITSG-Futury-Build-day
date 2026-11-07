@@ -2,7 +2,7 @@
 
 Test platform for ITSG's system review of payroll software, scoped to income replacement benefits (Entgeltersatzleistungen, EEL). Won the Futury Hackathon 2026 × ITSG. Next milestone: live demo to the GKV and ITSG on **11 December 2026**, pilot likely after.
 
-Read `PROJECT_REPORT.md` first: what exists, promised vs. delivered (section 5), decisions in force (6), decisions for December (9), open questions for ITSG. The plan is `ROADMAP.md` (goals G0–G18).
+Read `PROJECT_REPORT.md` first: what exists, promised vs. delivered (section 5), decisions in force (6), decisions for December (9), open questions for ITSG. The plan is `ROADMAP.md` (goals G0–G18, plus G2b and G6b). Each goal has the same shape: "Why", boxes grouped by topic, "Done when", "Needs"; new work goes in as a goal or as boxes of an existing goal in that shape.
 
 ## Layout
 
@@ -31,5 +31,9 @@ Known: `uvicorn --reload` hangs on Windows; a Windows clone needs `git config co
 - `sources/pflichtenheft/Pflichtenheft_EA_2026.2.pdf` (ITSG's checklist of requirements) is the checklist baseline. Pflichtenheft items held out for grading (G11a, G12) must never reach the knowledge base or any agent's tools.
 - The agent that drafts a change never reviews it: a separate reviewer agent writes expected outcomes blind; locked tests are never changed by an agent.
 - `sources/EEL/` (official EEL core check by AOK Systems) is internal code: never commit it.
+- ITSG's solutions to TA 167 / TA 168 (workbooks and TEEK0 replies, received 2026-11-02, G2b) are not committed until ITSG clears publication: they name ITSG staff and upstream is public. They are git-ignored; tests that read them skip when they are missing.
+- A locked test's expected values are typed in from its source document (ITSG Hinweise, Beispielpapier, TA solution, expert decision) with a source per value, and never recomputed by the engine. A rule change is accepted only when every locked test still passes under every version it has values for.
+- Official test task solutions are non-binding: they become locked tests that allow justified variants (allowed variants per case), unlike Beispielpapier examples. Where an ITSG value cannot be reproduced by a rule, lock it as a strict expected failure with the reason and ask ITSG; never write logic just to hit the value.
+- Pool-Testaufgaben 2025/2026 are checked under VB 13.3 (there is no rule set valid in 2025 in the knowledge base).
 - Keep `kg/build/` (paid embeddings) and `data/llm_cache/`; changing prompt text invalidates cached answers.
 - Git: work in a fork; `upstream` is `ahlemtr/ITSG-Futury-Build-day`. One branch per feature, PR into upstream `main`; sync the fork from upstream before branching. Tick `ROADMAP.md` boxes as work lands.

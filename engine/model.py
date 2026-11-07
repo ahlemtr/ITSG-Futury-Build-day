@@ -129,12 +129,15 @@ class TestCaseRef(BaseModel):
     parent: str | None = None
     targets: list[str] = Field(default_factory=list)
     family: str = "vorerkrankung"  # scenario family (engine/families/)
+    locked: bool = False  # expected values typed in from a source document: never recomputed, never changed by an agent
 
 
 class TestCase(TestCaseRef):
     inputs: dict[str, Any] = Field(default_factory=dict)
     expected: dict[str, Any] = Field(default_factory=dict)  # per version: "13.3", "13.4", "sim-13.5"
     sources: list[str] = Field(default_factory=list)
+    expected_sources: dict[str, str] = Field(default_factory=dict)  # expected field -> source (sheet / cell / passage)
+    allowed_variants: list[dict[str, Any]] = Field(default_factory=list)  # justified variants of this case only
 
 
 class Impact(BaseModel):
@@ -237,6 +240,9 @@ class AuPeriod(BaseModel):
     counts_from: dt.date | None = None  # partly: the part that counts (TEIL-ANR-AU)
     counts_to: dt.date | None = None
     insurer_rechecks: bool = False  # the corrected 61 sets this period back to "further check" (KZ-AU 3, E-3)
+    # current AU only:
+    insurer_start: dt.date | None = None  # the insurer's own start date, if it differs (AU-AB-SV, K61-8)
+    same_illness_stated: bool = False  # the employee says it is the same illness as the earlier ones (E-4)
 
 
 class TestInputs(BaseModel):
@@ -249,12 +255,19 @@ class TestInputs(BaseModel):
     summary: str | None = None
     insurance: Literal["statutory", "private"] = "statutory"  # R41-7: a 41 only for statutory insured people
     person_group: int | None = None  # Personengruppenschlüssel; 109, 110 (marginal employment): no 41 (R41-8)
+    insurer_corrects: bool = True  # Peter: the insurer sends a corrected 61 (then 88 + new 01, 62); False: 41, 61, 01
 
 
 class ExpectedOutcome(BaseModel):
     send_41: bool
     periods: list[tuple[dt.date, dt.date]] = Field(default_factory=list)
     total_days: int | None = None
+
+
+class RawFacts(BaseModel):
+    """Inputs or expected values of a case whose family is not built yet: kept as written."""
+
+    model_config = {"extra": "allow"}
 
 
 class Case(BaseModel):
@@ -270,6 +283,9 @@ class Case(BaseModel):
     targets: list[str] = Field(default_factory=list)
     steps: Literal["single", "chain"] = "single"
     family: str = "vorerkrankung"  # scenario family (engine/families/): types inputs and expected
+    locked: bool = False
+    expected_sources: dict[str, str] = Field(default_factory=dict)
+    allowed_variants: list[dict[str, Any]] = Field(default_factory=list)
     inputs: SerializeAsAny[BaseModel]  # the family's Inputs (vorerkrankung: TestInputs)
     expected: dict[str, SerializeAsAny[BaseModel]] = Field(default_factory=dict)  # family Outcome per version
     sources: list[str] = Field(default_factory=list)
@@ -283,12 +299,16 @@ class Case(BaseModel):
             return data
         from engine import families
 
-        fam = families.get(data.get("family"))
         data = dict(data)
+        try:
+            fam = families.get(data.get("family"))
+            inputs_model, outcome_model = fam.Inputs, fam.Outcome
+        except KeyError:  # a family that is not built yet (ta-168: 02, 03): keep the facts as they are
+            inputs_model = outcome_model = RawFacts
         if isinstance(data.get("inputs"), dict):
-            data["inputs"] = fam.Inputs.model_validate(data["inputs"])
+            data["inputs"] = inputs_model.model_validate(data["inputs"])
         if isinstance(data.get("expected"), dict):
-            data["expected"] = {v: fam.Outcome.model_validate(e) if isinstance(e, dict) else e
+            data["expected"] = {v: outcome_model.model_validate(e) if isinstance(e, dict) else e
                                 for v, e in data["expected"].items()}
         return data
 
@@ -296,11 +316,14 @@ class Case(BaseModel):
     def from_kb(cls, tc: TestCase) -> Case:
         return cls(id=tc.key, kind=tc.kind, origin=tc.origin, status=tc.status, hidden=tc.hidden, parent=tc.parent,
                    targets=tc.targets, steps=tc.steps, family=tc.family, inputs=dict(tc.inputs),
-                   expected={v: dict(e) for v, e in tc.expected.items()}, sources=tc.sources)
+                   expected={v: dict(e) for v, e in tc.expected.items()}, sources=tc.sources, locked=tc.locked,
+                   expected_sources=tc.expected_sources, allowed_variants=tc.allowed_variants)
 
     def to_kb(self) -> TestCase:
         return TestCase(key=self.id, kind=self.kind, origin=self.origin, status=self.status, hidden=self.hidden,
                         steps=self.steps, parent=self.parent, targets=self.targets, family=self.family,
+                        locked=self.locked, expected_sources=self.expected_sources,
+                        allowed_variants=self.allowed_variants,
                         inputs=self.inputs.model_dump(mode="json"),
                         expected={v: e.model_dump(mode="json") for v, e in self.expected.items()},
                         sources=self.sources)
