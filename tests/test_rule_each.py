@@ -8,7 +8,7 @@ from engine.checker import check
 from engine.expected import build_chain, get_case, load_scenario
 from engine.families.vorerkrankung import chain as vk_chain
 from engine.families.vorerkrankung import checks as vk
-from engine.rules import formats
+from engine.rules import blocks, common
 from engine.writer_messages import write_file
 
 D = date.fromisoformat
@@ -37,23 +37,29 @@ def _41(kb, **dbvo):
 # ---------------------------------------------------------------- F41: format of the employer's 41
 
 
-@pytest.mark.rules("F41-1", "F41-2")
-def test_f41_1_and_2_abgabegrund_and_korr(kb):
-    m01 = _parsed(kb, [_peter(kb).messages[2]])[0]
-    assert _fails(vk.check_41_format(m01), "F41-1")
+@pytest.mark.rules("S-2")
+def test_s2_korr_abgabegrund_only_on_a_66(kb):
+    """VB 3.1.19: only the insurer's 66 names a corrected Abgabegrund; every other message, the 88 too, sends 00."""
+    msgs = _parsed(kb, _peter(kb).messages)
+    assert not [x for m in msgs for x in common.check_korr(m)]  # Peter's whole chain, 88 included (BP 23)
     m = _41(kb)
     m.head["KORR-ABGABEGRUND"] = 1
     [rec] = _parsed(kb, [m])
-    assert _fails(vk.check_41_format(rec), "F41-2") and not _fails(vk.check_41_format(rec), "F41-1")
+    assert _fails(common.check_korr(rec), "S-2")
+    res = check(kb, "peter", [write_file([m], kb)], D("2027-01-01"))
+    assert {(d.rule, d.label) for d in res.deviations if d.field == "KORR-ABGABEGRUND"} == {("S-2", "invalid")}
 
 
-@pytest.mark.rules("F41-3")
-def test_f41_3_mm_flags_match_blocks(kb):
+@pytest.mark.rules("A3-1")
+def test_a3_1_mm_flags_match_blocks(kb):
+    flags = {"DBAP": "MM-ANSPRECH", "DBVO": "MM-VOER"}
     [rec] = _parsed(kb, [_peter(kb).messages[0]])
-    rec.head["MM-ANSPRECH"].value = "N"  # flag says no DBAP, block is there
-    assert _fails(formats.check_mm_flags(rec), "F41-3")
-    del rec.blocks["DBVO"]
-    assert _fails(vk.check_41_format(rec), "F41-3")
+    rec.head["MM-ANSPRECH"].value = "N"  # flag says no DBAP, but the block is there
+    assert [x.field for x in blocks.check_blocks(rec, flags)] == ["DSLW.MM-ANSPRECH"]
+    rec.head["MM-ANSPRECH"].value = "J"
+    del rec.blocks["DBVO"]  # DBVO is J on a 41
+    [x] = blocks.check_blocks(rec, flags)
+    assert x.rule == "A3-1" and x.field == "DSLW.MM-VOER" and "Pflicht" in x.message
 
 
 @pytest.mark.rules("F41-4", "F41-5")
@@ -71,23 +77,23 @@ def test_f41_7_count_of_groups(kb):
     assert _fails(vk.check_41_format(rec, D("2026-03-11")), "F41-7")
 
 
-@pytest.mark.rules("F41-9")
-def test_f41_9_insurer_only_group_fields(kb):
+@pytest.mark.rules("F41-6")
+def test_f41_6_insurer_only_group_fields(kb):
     m = _41(kb)
     m.blocks["DBVO"]["groups"][0]["KZ-AU"] = 1
     [rec] = _parsed(kb, [m])
-    assert _fails(vk.check_41_format(rec, D("2026-03-11")), "F41-9")
+    assert _fails(vk.check_41_format(rec, D("2026-03-11")), "F41-6")
     res = check(kb, "peter", [write_file([m], kb)], D("2027-01-01"))
-    assert "F41-9" in {d.rule for d in res.deviations if d.label == "invalid"}
+    assert {(d.rule, d.label) for d in res.deviations if (d.field or "").startswith("KZ-AU")} == {("F41-6", "invalid")}
 
 
-@pytest.mark.rules("F41-10")
-def test_f41_10_datensatz_id_format(kb):
+@pytest.mark.rules("S-3")
+def test_s3_datensatz_id_format(kb):
     m = _41(kb)
     m.head["DATENSATZ-ID"] = "not-a-uuid"
     [rec] = _parsed(kb, [m])
-    assert not formats.check_uuid(rec).ok
-    assert formats.check_uuid(_parsed(kb, [_41(kb)])[0]).ok  # ITSG's own style of ID is accepted
+    assert _fails(common.check_dsid_format(rec), "S-3")
+    assert not common.check_dsid_format(_parsed(kb, [_41(kb)])[0])  # ITSG's own style of ID is accepted
 
 
 # ---------------------------------------------------------------- K61: what the insurer's 61 carries
@@ -120,35 +126,43 @@ def _employer(kb):
     return [m.model_copy(deep=True) for m in _peter(kb).employer()]
 
 
-@pytest.mark.rules("C-3")
-def test_c3_cancel_points_to_the_01(kb):
+def _case_results(kb, msgs):
+    return [x for _, x in common.check_case(_parsed(kb, msgs))]
+
+
+@pytest.mark.rules("C-3", "E-2")
+def test_c3_cancel_names_an_earlier_message(kb):
     msgs = _employer(kb)
     m88 = next(m for m in msgs if m.abgabegrund == "88")
-    m88.blocks["DBSD"]["DATENSATZ-ID-URSPRUNGSMELDUNG"] = msgs[0].head["DATENSATZ-ID"]  # the 41, not the 01
-    assert _fails(vk.check_chain(_parsed(kb, msgs)), "C-3")
+    assert not _case_results(kb, msgs)  # Peter's 88 names his first 01
+    m88.blocks["DBSD"]["DATENSATZ-ID-URSPRUNGSMELDUNG"] = "00000000-0000-4000-8000-000000000000"  # no such message
+    assert _fails(_case_results(kb, msgs), "C-3")
+    # an earlier message, but the wrong one: C-3 holds, E-2 (cancel the first 01) is broken
+    m88.blocks["DBSD"]["DATENSATZ-ID-URSPRUNGSMELDUNG"] = msgs[0].head["DATENSATZ-ID"]  # the 41
+    assert not _case_results(kb, msgs)
     res = check(kb, "peter", [write_file(msgs, kb)], D("2027-01-01"))
-    assert "C-3" in {d.rule for d in res.deviations if d.label == "bug"}
+    assert {(d.rule, d.label) for d in res.deviations if d.field == "DATENSATZ-ID-URSPRUNGSMELDUNG"} == {("E-2", "bug")}
 
 
-@pytest.mark.rules("C-4")
-def test_c4_cancel_names(kb):
+@pytest.mark.rules("C-3")
+def test_c3_cancel_names(kb):
     msgs = _employer(kb)
     next(m for m in msgs if m.abgabegrund == "88").blocks["DBSD"]["VORNAME"] = "Paul"
-    assert _fails(vk.check_chain(_parsed(kb, msgs)), "C-4")
+    assert _fails(_case_results(kb, msgs), "C-3")
+    res = check(kb, "peter", [write_file(msgs, kb)], D("2027-01-01"))
+    assert {(d.rule, d.label) for d in res.deviations if d.field == "VORNAME"} == {("C-3", "bug")}
 
 
-@pytest.mark.rules("C-5")
-def test_c5_new_01_after_the_cancel(kb):
+@pytest.mark.rules("E-2", "A3-1")
+def test_cancel_without_new_01_or_with_extra_block(kb):
+    """After the 88 the new 01 follows (E-2); the 88 carries only the DBSD (Anlage 3 row 88)."""
     msgs = [m for m in _employer(kb) if m.step != 6]  # 88 without the new 01
-    assert _fails(vk.check_chain(_parsed(kb, msgs)), "C-5")
-
-
-@pytest.mark.rules("C-8")
-def test_c8_cancel_carries_only_dbsd(kb):
-    msgs = _employer(kb)
-    m88 = next(m for m in msgs if m.abgabegrund == "88")
-    m88.blocks["DBNA"] = dict(msgs[0].blocks["DBNA"])
-    assert _fails(vk.check_chain(_parsed(kb, msgs)), "C-8")
+    res = check(kb, "peter", [write_file(msgs, kb)], D("2027-01-01"))
+    assert {(d.rule, d.kind) for d in res.deviations} == {("E-2", "missing_message")}
+    m88 = next(m for m in _employer(kb) if m.abgabegrund == "88")
+    m88.blocks["DBNA"] = dict(_employer(kb)[0].blocks["DBNA"])
+    [x] = blocks.check_blocks(_parsed(kb, [m88])[0], {"DBNA": "MM-NAME", "DBSD": "MM-SD"})
+    assert x.rule == "A3-1" and x.actual == "DBNA"
 
 
 # ---------------------------------------------------------------- G2b: K61-8, E-4, E-5

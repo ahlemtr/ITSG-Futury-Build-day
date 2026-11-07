@@ -4,8 +4,8 @@ A family is one kind of test story: its own case facts, its own expected message
 rules. `vorerkrankung` (Peter: 41, 61, 01, 61, 88, 01, 62) is the first. Later: 02 Kinderkrankengeld,
 03 Mutterschaftsgeld, ...
 
-The core (parser, diff, labels, catalogue and precedents, MM flags, S-1 code values, Anlage 3 block
-check, DATENSATZ-ID format, reports) works the same for every family. It asks the family only for what
+The core (parser, diff, labels, catalogue and precedents, the common rules of engine/rules/, reports)
+works the same for every family. It asks the family only for what
 differs. A new family = a new folder `engine/families/<id>/` with a `FAMILY` object; nothing in the core
 changes.
 """
@@ -65,14 +65,14 @@ class CheckContext:
     actual: list[Record]  # the vendor's messages
     params: Any = None  # the family's parameters of this version
     step_of: dict[int, int] = field(default_factory=dict)  # id(record) -> chain step
-    label: Callable[[Deviation, str, str | None, str], bool] = lambda *a: True  # set by the checker
+    # set by the checker: label(deviation, label, rule, why); label None = the rule is broken, its card's kind decides
+    label: Callable[[Deviation, str | None, str | None, str], bool] = lambda *a: True
 
 
 class Family(ABC):
     id: ClassVar[str]  # "vorerkrankung"
     title: ClassVar[str]  # German, shown in the UI: "Vorerkrankung"
     codes: ClassVar[frozenset[str]]  # Abgabegründe of the chain: 41, 61, 01, 88, 62
-    employer_codes: ClassVar[frozenset[str]]  # the ones the vendor sends: 41, 01, 88
     Inputs: ClassVar[type[BaseModel]]  # typed case facts (vorerkrankung: AU periods, report date ...)
     Outcome: ClassVar[type[BaseModel]]  # expected result per version (vorerkrankung: send 41?, periods, days)
 
@@ -91,7 +91,7 @@ class Family(ABC):
 
     # ---- checking the vendor's files
     def check_records(self, ctx: CheckContext) -> list[tuple[Record | None, RuleResult]]:
-        """Family format and chain rules on the vendor's messages (vorerkrankung: F41, C-1..8)."""
+        """Family rules on the vendor's messages (vorerkrankung: F41 on the 41, E-2 on the 88)."""
         return []
 
     def recheck(self, ctx: CheckContext, d: Deviation) -> bool:

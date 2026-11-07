@@ -8,7 +8,7 @@ from engine.expected import get_case
 from engine.families.vorerkrankung import checks as vk_checks
 from engine.families.vorerkrankung.rules import add_months, decide, deciding_rule, efz_end, must_send_41
 from engine.records import parse_file
-from engine.rules import formats, params
+from engine.rules import common, params
 
 VERSIONS = ["13.3", "13.4", "sim-13.5"]
 ROOT = Path(__file__).resolve().parents[1]
@@ -84,9 +84,10 @@ def test_format_checks(kb, itsg_bytes):
     m = parse_file(itsg_bytes, kb).messages[0]
     res = vk_checks.check_41_format(m, D("2026-03-11"))
     assert all(r.ok for r in res), [r for r in res if not r.ok]
-    assert formats.check_uuid(m).ok and formats.check_mm_flags(m) == []
+    assert common.check_message(m, {"DBVO": "MM-VOER", "DBAP": "MM-ANSPRECH", "DBNA": "MM-NAME"}) == []
     text = itsg_bytes.decode()
     i = text.index("DBVO1") + 13  # AU-AB-SV
     bad = parse_file(text[:i] + "20260311" + text[i + 8:], kb).messages[0]
     assert any(r.rule == "F41-6" and not r.ok for r in vk_checks.check_41_format(bad))
-    assert not vk_checks.check_chain([m, m])[0].ok  # reused DSID -> C-1
+    [(_, x)] = common.check_case([m, m])  # reused DSID
+    assert x.rule == "C-1"

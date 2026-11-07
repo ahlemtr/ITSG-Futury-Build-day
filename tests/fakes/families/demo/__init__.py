@@ -35,7 +35,6 @@ class Demo(Family):
     id = "demo"
     title = "Demo"
     codes = frozenset({"42"})
-    employer_codes = frozenset({"42"})
     Inputs = DemoInputs
     Outcome = DemoOutcome
 

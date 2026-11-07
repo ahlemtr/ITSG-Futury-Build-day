@@ -1,4 +1,4 @@
-"""VB Anlage 3 chapter 3: continuity of benefits (rules A3-2, A3-3)."""
+"""VB Anlage 3 chapter 3: continuity of benefits (rule A3-2)."""
 
 from datetime import date
 
@@ -23,14 +23,14 @@ def test_table_rows_as_printed():
 @pytest.mark.rules("A3-2")
 def test_one_gap_day_always_needs_a_new_certificate():
     seamless = new_certificate("01", D("2026-03-31"), "01", D("2026-04-01"))
-    assert seamless.new_certificate is False and seamless.rule == "A3-3"
+    assert seamless.new_certificate is False and seamless.verdict == "none"
     gap = new_certificate("01", D("2026-03-31"), "01", D("2026-04-02"))  # 01.04 in between
-    assert gap.new_certificate is True and gap.rule == "A3-2"
+    assert gap.new_certificate is True and gap.verdict == "gap"
     with pytest.raises(ValueError):
         new_certificate("01", D("2026-03-31"), "01", D("2026-03-31"))
 
 
-@pytest.mark.rules("A3-3")
+@pytest.mark.rules("A3-2")
 def test_directly_following_benefits():
     assert new_certificate("01", D("2026-03-31"), "21", D("2026-04-01")).new_certificate is False
     assert new_certificate("21", D("2026-03-31"), "01", D("2026-04-01")).new_certificate is False

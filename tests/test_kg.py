@@ -59,8 +59,8 @@ def test_layout_dbvo(kb):
 
 def test_rules_41_under_13_3(kb):
     rules = kb.get_rules("41", "13.3")
-    expected = ([f"R41-{i}" for i in range(1, 9)] + [f"F41-{i}" for i in range(1, 11)]
-                + ["C-1", "C-2", "A3-1", "S-1"])
+    expected = (["S-1", "S-2", "S-3", "A3-1", "C-1", "C-2"] + [f"R41-{i}" for i in range(1, 9)]
+                + [f"F41-{i}" for i in range(4, 9)])  # card order of rules.yaml
     assert [r.id for r in rules] == expected
     sources = [s for r in rules for s in r.sources]
     assert not [s for s in sources if s.startswith("VB@13.4")]
@@ -101,7 +101,7 @@ def test_precedent_round_trip(kb):
         pytest.skip(f"a real precedent {signature} exists, not overwriting it")
     p = Precedent(abgabegrund="41", field="DBVO.KZ-AU", kind="order_differs", verdict="correct_variant",
                   reason="test precedent", advisor="pytest", decided=dt.date(2026, 10, 26),
-                  justified_by=["F41-9", "VB@13.4#3.12.12"])
+                  justified_by=["F41-6", "VB@13.4#3.12.12"])
     try:
         kb.add_precedent(p)
         found = kb.find_precedent(signature)
@@ -186,7 +186,7 @@ def test_test_cases_for_rule(kb):
 
 def test_deviation_context_mm_ansprech(kb):
     ctx = kb.get_deviation_context("DSLW", "MM-ANSPRECH", "41", "13.4")
-    assert [r.id for r in ctx.rules] == ["F41-3", "A3-1"]
+    assert [r.id for r in ctx.rules] == ["A3-1"]
     assert [(b.record, b.mandatory, b.presence) for b in ctx.flagged_blocks] == [("DBAP", True, "J")]
     assert "BP@13.3#13.1" in [p.key for p in ctx.passages]
     assert not [p for p in ctx.passages if p.key.startswith("VB@13.3")]
@@ -236,11 +236,11 @@ def test_precedent_resave_replaces_justifications(kb):
     signature = "41|DBVO.KZ-NACHWEIS|value_differs"
     _free_signature(kb, signature)
     p = Precedent(abgabegrund="41", field="DBVO.KZ-NACHWEIS", kind="value_differs", verdict="invalid",
-                  justified_by=["F41-9", "VB@13.4#3.12.9"])
+                  justified_by=["F41-6", "VB@13.4#3.12.9"])
     try:
         kb.add_precedent(p)
-        kb.add_precedent(p.model_copy(update={"justified_by": ["F41-9"]}))
-        assert kb.find_precedent(signature).justified_by == ["F41-9"]
+        kb.add_precedent(p.model_copy(update={"justified_by": ["F41-6"]}))
+        assert kb.find_precedent(signature).justified_by == ["F41-6"]
     finally:
         kb.remove_precedent(signature)
 

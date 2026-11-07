@@ -17,7 +17,6 @@ class Vorerkrankung(Family):
     id = "vorerkrankung"
     title = "Vorerkrankung"
     codes = frozenset({"41", "61", "01", "88", "62"})
-    employer_codes = frozenset({"41", "01", "88"})
     Inputs = TestInputs
     Outcome = ExpectedOutcome
 

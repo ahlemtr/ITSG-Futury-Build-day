@@ -53,6 +53,8 @@ def test_interim_update_does_not_replace_the_first_61(kb):
     dbvo = lambda au, ak=0: {"KZ-AK-AU": ak, "groups": [g(au)]}
     assert not supersedes(dbvo(1), dbvo(3)) and not supersedes(dbvo(1), dbvo(1, ak=4))
     assert supersedes(dbvo(3), dbvo(1)) and supersedes(dbvo(1), dbvo(2))
+    partly = {**g(5), "TEIL-ANR-AU-BEGINN": D("2025-12-01"), "TEIL-ANR-AU-ENDE": D("2025-12-02")}
+    assert supersedes({"groups": [partly]}, dbvo(3))  # more than an interim flag changed: the earlier 61 is replaced
     ch = build_chain(load_scenario(kb, "peter-interim-update"), "13.4", kb)
     assert [m.abgabegrund for m in ch.messages] == ["41", "61", "01", "61", "62"]
     assert ch.values["corrected_61_replaces_first"] is False
@@ -70,9 +72,9 @@ def test_cancel_after_an_interim_update_is_a_bug(kb):
     assert res.label == "bug" and "E-3" in {d.rule for d in res.deviations}
 
 
-@pytest.mark.rules("R41-7", "R41-8")
+@pytest.mark.rules("R41-8")
 def test_no_41_without_statutory_insurance(kb, itsg_bytes):
-    for case, rule in (("peter-private", "R41-7"), ("peter-minijob", "R41-8")):
+    for case, rule in (("peter-private", "R41-8"), ("peter-minijob", "R41-8")):
         ch = build_chain(load_scenario(kb, case), "13.4", kb)
         assert ch.messages == [] and ch.decision.trace.failed == [rule]
         res = check(kb, case, [itsg_bytes], D("2027-01-01"))  # the vendor sends a 41 anyway
@@ -89,7 +91,7 @@ def test_41_goes_to_the_persons_insurer(kb):
     assert d.label == "bug" and d.rule == "R41-7"
 
 
-@pytest.mark.rules("K61-1", "K61-2", "K61-3", "K62-1", "C-6", "C-7")
+@pytest.mark.rules("K61-1", "K61-2", "K61-3", "K61-9", "K62-1", "K62-2")
 def test_simulator_self_check(kb):
     for case in ("peter", "peter-interim-update"):
         assert runs.self_check_chain(kb, case, "13.4") == []
