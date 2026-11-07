@@ -70,6 +70,11 @@ def m_no_contact(msgs):
     return msgs
 
 
+def m_no_id(msgs):
+    del msgs[0].blocks["DBID"]
+    return msgs
+
+
 def m_variant(msgs):
     """Other DSIDs, timestamps, product id, sender data: rule and ignore fields only."""
     new_ids = {}
@@ -109,7 +114,10 @@ SEEDS = [
     ("s-stale-efz", "peter", "second 01 still says 30.03, no 88", m_stale_efz, {"2027-01-01": "bug"}, ["E-1", "E-2"]),
     ("s-insurer-field", "peter", "AU-AB-SV filled by the employer", m_insurer_field, {"2027-01-01": "invalid"},
      ["F41-6"]),
-    ("s-no-contact", "peter", "41 without DBAP (MM-ANSPRECH = N)", m_no_contact, {"2027-01-01": "unclear"}, []),
+    ("s-no-contact", "peter", "41 without DBAP (MM-ANSPRECH = N)", m_no_contact, {"2027-01-01": "invalid"},
+     ["A3-1"]),
+    ("s-no-id", "peter", "41 without DBID (MM-ID = N); DBID is optional on a 41", m_no_id, {"2027-01-01": "unclear"},
+     []),
     ("s-legacy-1", "peter-gap-exact", "vendor still on 13.3 logic: no 41 sent", m_legacy,
      {"2026-11-01": "exact_match", "2027-01-01": "bug"}, ["R41-2"]),
     ("s-legacy-hidden", "peter-gap-exact-hidden", "same vendor, dates 31.08.2025 / 28.02.2026", m_legacy,

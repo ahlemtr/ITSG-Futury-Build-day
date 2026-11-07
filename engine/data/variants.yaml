@@ -4,6 +4,6 @@
 variants:
   - signature: "41|DSLW.MM-ANSCHRIFT|extra_block"
     verdict: correct_variant
-    reason: Beispielpapier 13.1 sets MM-ANSCHRIFT = J with a DBAN block on a 41; the ITSG file sends N.
+    reason: "Beispielpapier 13.1 setzt in der 41 MM-ANSCHRIFT = J mit DBAN; die ITSG-Datei sendet N."
     source: BP@13.3#13.1
     active: false   # candidate only: activate once ITSG confirms

@@ -42,14 +42,16 @@ ids:                            # DATENSATZ-IDs per chain step (Hinweise table);
   "6": 11112222-FFFF-3333-5555-CCCCCCCCCCCC
   "7": 62626262-0001-4000-8000-000000000001
 insurer:
-  # first 61: the paper note 01.03-03.03 is not known to the insurer (Hinweise): KZ-NACHWEIS 4.
-  # KZ-AU 3 (further check, interim) for that period is derived.
-  first_61:
-    "2026-03-01": {kz_nachweis: 4, kz_au: 3}
-  # corrected 61: the employee hands in the note, every period counts (Hinweise)
-  corrected_61: {}
-  default_flags: {kz_nachweis: 1, kz_au: 1}
+  # The 61 flags (KZ-NACHWEIS, KZ-AU) are computed from the facts of each period in the test case
+  # (sick_note, insurer_gets_note, counts; engine/families/vorerkrankung/rules.py insurer_flags), no longer typed here.
   eel_ende_grund: 99            # Hinweise
+  contact:                      # DBAP on the insurer's 61 and 62 (VB Anlage 3: J); derived, not given by ITSG
+    NAME: Leistungsabteilung
+    TELEFON: 0800-1234567
+    EMAIL: eel@testkasse.example
+    FIRMA-1: Testkasse (Demo)
+    PLZ: "10115"
+    ORT: Berlin
 salary:                         # 01 certificate (DBAE): vendor payroll data, ignored by the diff (derived)
   eaz_beginn: 2026-02-01
   eaz_ende: 2026-02-28

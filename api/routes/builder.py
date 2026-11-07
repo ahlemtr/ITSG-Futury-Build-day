@@ -94,7 +94,7 @@ def hidden(request: Request, body: HiddenBody):
 @router.post("/test-cases/{id_}/approve")
 def approve(request: Request, id_: str, body: ApproveBody):
     if body.decision not in ("approved", "rejected"):
-        raise HTTPException(422, "decision must be approved or rejected")
+        raise HTTPException(422, "Entscheidung muss approved oder rejected sein")
     tc = test_case(request, id_)
     repo(request).upsert_test_case(tc)
     tc = repo(request).approve(id_, body.approver, body.decision)
@@ -105,7 +105,7 @@ def approve(request: Request, id_: str, body: ApproveBody):
 def package(request: Request, id_: str, version: str | None = None):
     tc = test_case(request, id_)
     if tc.hidden:
-        raise HTTPException(403, "hidden test cases are never exported")
+        raise HTTPException(403, "versteckte Testfälle werden nie exportiert")
     version = version or real_versions(request)[-1]
     story = ai(request).story(tc) if ai(request) else None
     files = builder.package(kb(request), tc, version, story)

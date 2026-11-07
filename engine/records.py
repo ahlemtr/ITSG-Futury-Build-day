@@ -48,14 +48,14 @@ def to_value(f: FieldDef, raw: str) -> tuple[Any, str | None]:
     if f.type == "an":
         return raw.rstrip(" "), None
     if not raw.isdigit():
-        return None, f"non-numeric value {raw!r} in numeric field"
+        return None, f"nicht numerischer Wert {raw!r} in einem numerischen Feld"
     if f.format == "date_yyyymmdd" and f.length == 8:
         if raw == "0" * 8:
             return None, None
         try:
             return date(int(raw[:4]), int(raw[4:6]), int(raw[6:])), None
         except ValueError:
-            return None, f"invalid date {raw!r}"
+            return None, f"ungültiges Datum {raw!r}"
     if f.format in ("amount_2dp", "hours_2dp"):
         return Decimal(int(raw)) / 100, None
     if f.length > 8 and f.format == "date_yyyymmdd":
@@ -91,17 +91,18 @@ def format_value(f: FieldDef, value: Any) -> str:
 
 
 class Parser:
-    def __init__(self, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION):
+    def __init__(self, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION, on_date=None):
         from engine.rules.params import latest
 
         self.kb = kb
         self.version = version = version or latest(kb)
-        self.dslw = layouts.get(kb, "DSLW", version)
+        self.on_date = on_date
+        self.dslw = layouts.get(kb, "DSLW", version, on_date)
 
     def _cut(self, line: str, f: FieldDef, base: int, rec: str, issues: list[ParseIssue], line_no: int) -> FieldValue:
         a = base + f.start - 1
         raw = line[a: a + f.length]
-        value, problem = to_value(f, raw) if len(raw) == f.length else (None, "line too short")
+        value, problem = to_value(f, raw) if len(raw) == f.length else (None, "Zeile zu kurz")
         if problem:
             issues.append(ParseIssue(record=rec, field=f.name, pos=a + 1, message=problem, line=line_no))
         return FieldValue(name=f.name, raw=raw, value=value, pos=a + 1)
@@ -131,16 +132,16 @@ class Parser:
         if kind in ENVELOPE:
             return rec, issues
         if kind != "DSLW":
-            issues.append(ParseIssue(record=kind, message=f"unknown record {kind!r}", line=line_no, pos=1))
+            issues.append(ParseIssue(record=kind, message=f"unbekannter Datensatz {kind!r}", line=line_no, pos=1))
             return rec, issues
         if len(line) < self.dslw.fixed_length:
-            issues.append(ParseIssue(record="DSLW", message=f"record length {len(line)} shorter than the fixed part "
+            issues.append(ParseIssue(record="DSLW", message=f"Satzlänge {len(line)} kürzer als der feste Teil "
                                                             f"({self.dslw.fixed_length})", line=line_no))
             return rec, issues
         rec.head = {f.name: self._cut(line, f, 0, "DSLW", issues, line_no) for f in self.dslw.fields}
         pos = self.dslw.fixed_length
         for blk in self.dslw.block_order:
-            lay = layouts.get(self.kb, blk, self.version)
+            lay = layouts.get(self.kb, blk, self.version, self.on_date)
             flag_name = self.dslw.flags[blk]
             flag = rec.head.get(flag_name)
             if not flag or flag.value != "J":
@@ -148,12 +149,12 @@ class Parser:
             found = line[pos: pos + 4]
             if found != blk:
                 issues.append(ParseIssue(record="DSLW", field=flag_name, pos=pos + 1, line=line_no,
-                                         message=f"{flag_name}=J but found {found!r} instead of {blk}"))
+                                         message=f"{flag_name}=J, aber {found!r} statt {blk} gefunden"))
                 rec.tail = line[pos:]
                 return rec, issues
             if lay.status == "missing":
                 issues.append(ParseIssue(record=blk, pos=pos + 1, line=line_no,
-                                         message=f"unknown block {blk}: layout not available (status missing)"))
+                                         message=f"unbekannter Datenbaustein {blk}: Satzbeschreibung nicht vorhanden"))
                 rec.tail = line[pos:]
                 return rec, issues
             block = self._block(line, pos, lay, issues, line_no)
@@ -161,19 +162,21 @@ class Parser:
             pos += block.length
         if pos != len(line):
             rest = line[pos:]
-            msg = f"record length {len(line)}, layouts account for {pos}"
+            msg = f"Satzlänge {len(line)}, laut Satzbeschreibungen {pos}"
             if rest[:4].isalpha() and rest[:2] == "DB":
-                msg += f"; unannounced block {rest[:4]!r} at {pos + 1}"
+                msg += f"; nicht angekündigter Datenbaustein {rest[:4]!r} an Stelle {pos + 1}"
             issues.append(ParseIssue(record="DSLW", pos=pos + 1, line=line_no, message=msg))
             rec.tail = rest
         return rec, issues
 
 
-def parse_file(text: str | bytes, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION) -> ParsedFile:
+def parse_file(text: str | bytes, kb: KnowledgeBase, version: str | None = DEFAULT_VERSION,
+               on_date=None) -> ParsedFile:
+    """`on_date`: the case's validity date (picks the VB Anlage 1 field definitions in force)."""
     encoding = "utf-8"
     if isinstance(text, bytes):
         text, encoding = decode(text)
-    p = Parser(kb, version)
+    p = Parser(kb, version, on_date)
     out = ParsedFile(encoding=encoding)
     for n, (line, nl) in enumerate(_split_lines(text), 1):
         if not line.strip():

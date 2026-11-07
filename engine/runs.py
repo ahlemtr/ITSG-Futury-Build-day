@@ -15,10 +15,11 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+from engine import families
 from engine.builder import story_text
 from engine.checker import Checker, worst
 from engine.expected import build_chain, get_case, load_scenario
-from engine.model import Case, CheckResult, ExpectedMessage, Record
+from engine.model import Case, CheckResult, ExpectedMessage
 from engine.records import parse_file
 from engine.rules import params as params_mod
 from engine.writer_messages import write_file
@@ -39,6 +40,7 @@ class RoundResult(BaseModel):
     reply_name: str | None = None
     reply: str | None = None  # TEEK0 text
     ended: bool = False
+    simulator_issues: list[str] = []  # failed self-checks of our insurer reply (K61, K62, A3-1): our bug
 
 
 class RunState(BaseModel):
@@ -69,28 +71,6 @@ def start(kb: KnowledgeBase, test_case: str | Case, valid_on: date) -> tuple[Run
     return st, story_text(tc)
 
 
-def _vendor_reply(kb: KnowledgeBase, st: RunState, m: ExpectedMessage, vendor: list[Record]) -> ExpectedMessage:
-    """Adapt the expected insurer reply to the vendor's own messages."""
-    m = m.model_copy(deep=True)
-    v41 = next((r for r in vendor if r.abgabegrund == "41"), None)
-    v01 = [r for r in vendor if r.abgabegrund == "01"]
-    ref = v41 if m.abgabegrund == "61" else (v01[-1] if v01 else None)
-    if ref is not None:
-        m.blocks["DBID"]["REFERENZ-ID"] = ref.dsid or ""
-        m.blocks["DBID"]["AKTENZEICHEN-VERURSACHER"] = ref.get("DBID.AKTENZEICHEN-VERURSACHER") or ""
-        m.head["BBNR-VU"] = ref.get("DSLW.BBNR-VU") or m.head["BBNR-VU"]
-    if m.abgabegrund == "61" and v41 is not None:
-        exp_groups = {(g["BEGINN-AU"], g["ENDE-AU"]): g for g in m.blocks["DBVO"]["groups"]}
-        ordered = []
-        for s, e in v41.periods:  # K61-3: the vendor's periods in the vendor's order
-            g = exp_groups.pop((s, e), None)
-            ordered.append(g or {**next(iter(m.blocks["DBVO"]["groups"])), "BEGINN-AU": s, "ENDE-AU": e,
-                                 "KZ-NACHWEIS": 4, "KZ-AU": 2})
-        ordered += list(exp_groups.values())  # periods the insurer knows on top, appended
-        m.blocks["DBVO"]["groups"] = ordered
-    return m
-
-
 def submit(kb: KnowledgeBase, st: RunState, files: list[str | bytes]) -> RoundResult:
     if st.status != "open":
         raise ValueError(f"run is {st.status}")
@@ -98,7 +78,7 @@ def submit(kb: KnowledgeBase, st: RunState, files: list[str | bytes]) -> RoundRe
     r = st.round
     texts = [f.decode("utf-8") if isinstance(f, bytes) else f for f in files]
     st.files += texts
-    new_msgs = [m for t in texts for m in parse_file(t, kb, st.version).messages]
+    new_msgs = [m for t in texts for m in parse_file(t, kb, st.version, st.valid_on).messages]
     ch = build_chain(load_scenario(kb, st.test_case), st.version, kb)
     exp_round = [m for m in ch.messages if m.actor == "employer" and m.round == r]
     steps_done = {m.step for m in ch.messages if m.actor == "employer" and m.round <= r}
@@ -121,17 +101,21 @@ def submit(kb: KnowledgeBase, st: RunState, files: list[str | bytes]) -> RoundRe
             ended = True
     if r > max((m.round for m in ch.messages if m.actor == "employer"), default=0) and new_msgs:
         outcomes["import-only"] = RuleOutcome(rule="import-only", outcome="fail",
-                                              message="no new message may be sent in this round")
-    for rule in st.test_case.targets:
-        if rule.startswith("R41") and r == 1:
+                                              message="in dieser Runde darf keine neue Meldung gesendet werden")
+    if r == 1:
+        for rule in families.of_case(st.test_case).round_one_rules(st.test_case):
             outcomes.setdefault(rule, RuleOutcome(rule=rule, outcome="pass"))
     result = RoundResult(round=r, outcomes=list(outcomes.values()), ended=ended)
-    vendor = [m for t in st.files for m in parse_file(t, kb, st.version).messages]
+    vendor = [m for t in st.files for m in parse_file(t, kb, st.version, st.valid_on).messages]
     replies = [m for m in ch.messages if m.actor == "insurer" and m.round == r]
     if replies and not ended:
-        adapted = [_vendor_reply(kb, st, m, vendor) for m in replies]
+        fam = families.of_case(st.test_case)
+        adapted = [fam.adapt_reply(m, vendor) for m in replies]
         result.reply_name = f"TEEK0-{st.test_case.id}-r{r}"
         result.reply = write_file(adapted, kb)
+        written = parse_file(result.reply, kb, st.version, st.valid_on).messages
+        scenario = load_scenario(kb, st.test_case)
+        result.simulator_issues = [f"{x.rule}: {x.message}" for x in fam.self_check(kb, scenario, written, vendor)]
     st.rounds.append(result)
     failed = any(o.outcome == "fail" for o in result.outcomes)
     if ended or failed and r >= st.last_round:
@@ -139,6 +123,16 @@ def submit(kb: KnowledgeBase, st: RunState, files: list[str | bytes]) -> RoundRe
     elif r >= st.last_round:
         st.status = "failed" if any(o.outcome == "fail" for rr in st.rounds for o in rr.outcomes) else "passed"
     return result
+
+
+def self_check_chain(kb: KnowledgeBase, test_case: str | Case, version: str) -> list[str]:
+    """The insurer replies of a case's expected chain checked against its expected employer messages."""
+    sc = load_scenario(kb, test_case)
+    ch = build_chain(sc, version, kb)
+    parse = lambda msgs: parse_file(write_file(msgs, kb), kb, version).messages if msgs else []
+    replies = parse([m for m in ch.messages if m.actor == "insurer"])
+    employer = parse(ch.employer())
+    return [f"{x.rule}: {x.message}" for x in families.of_case(sc.test_case).self_check(kb, sc, replies, employer)]
 
 
 def check_so_far(kb: KnowledgeBase, st: RunState, triage=None) -> CheckResult:

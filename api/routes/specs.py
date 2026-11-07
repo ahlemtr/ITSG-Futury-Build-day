@@ -23,7 +23,7 @@ async def upload(request: Request, file: UploadFile = File(...), document: str =
     """Version and valid-from date are read from the file name or the first page when not given."""
     data = await file.read()
     if not data.startswith(b"%PDF"):
-        raise HTTPException(422, "the upload must be a PDF")
+        raise HTTPException(422, "die hochgeladene Datei muss ein PDF sein")
     tmp = Path(tempfile.mkdtemp()) / (Path(file.filename or "upload.pdf").name or "upload.pdf")
     tmp.write_bytes(data)
     if version is None or valid_from is None:
@@ -40,7 +40,7 @@ async def upload(request: Request, file: UploadFile = File(...), document: str =
         version = version or found.get("version")
         valid_from = valid_from or (date.fromisoformat(found["valid_from"]) if "valid_from" in found else None)
     if not version or not valid_from:
-        raise HTTPException(422, "version and valid_from could not be read from the file: please enter them")
+        raise HTTPException(422, "Version und Gültigkeitsbeginn konnten nicht aus der Datei gelesen werden: bitte eingeben")
     if any(v.version == version for v in kb(request).get_versions(document)):
         raise HTTPException(409, f"{document} {version} is already known")
     job = ingest.new_job(repo(request), document, version, valid_from, file.filename or tmp.name, sha256(data))
@@ -77,7 +77,7 @@ def list_jobs(request: Request):
 def get_job(request: Request, job_id: str):
     job = repo(request).get_job(job_id)
     if job is None:
-        raise HTTPException(404, "job not found")
+        raise HTTPException(404, "Auftrag nicht gefunden")
     return job
 
 

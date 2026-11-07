@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import functools
 import os
 import re
 from pathlib import Path
@@ -99,10 +100,29 @@ def resolve_passage_key(key: str, vb_versions: list[str]) -> str:
     return key
 
 
+# documents whose versions follow the VB: BP 13.2 belongs to VB 13.3 (2026), BP 13.3 to VB 13.4 (2027)
+VERSIONED_WITH_VB = ("BP",)
+
+
 def keep_source(passage_key: str, vb: str | None) -> bool:
-    """get_rules and the deviation context cite VB passages of one version only, other documents always."""
+    """get_rules and the deviation context cite VB passages of one version only, and of the documents that follow
+    the VB (Beispielpapier) the version valid with it; other documents always."""
     doc, version = passage_doc_version(passage_key)
-    return vb is None or doc != "VB" or version == vb
+    if vb is None or (doc != "VB" and doc not in VERSIONED_WITH_VB):
+        return True
+    if doc == "VB":
+        return version == vb
+    from kg.field_evidence import applicable_documents
+
+    docs = _documents()
+    if not any(d["doc"] == "VB" and d["version"] == vb for d in docs):
+        return True  # simulated or unknown rule set: keep every version
+    return f"{doc}@{version}" in applicable_documents(docs, vb)
+
+
+@functools.cache
+def _documents() -> list[dict]:
+    return load_documents()
 
 
 def load_documents(seed_dir: Path = SEED_DIR) -> list[dict]:

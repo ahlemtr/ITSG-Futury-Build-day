@@ -85,6 +85,8 @@ export type RoundDef = {
 
 export type RunDef = {
   testCaseId: string;
+  /** scenario family (Fallgruppe) the test case belongs to */
+  familyTitle?: string;
   title: string;
   ruleSet: string;
   /** hidden variant: the vendor gets the story only, never expected values */

@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, Response
 from pydantic import BaseModel
 
 from api.routes.common import ai, kb, real_versions, repo, test_case
-from engine import intake, layouts, report, signing
+from engine import families, intake, layouts, report, signing
 from engine.checker import Checker
 from engine.diff import Differ
 from engine.expected import build_chain, load_scenario
@@ -55,7 +55,7 @@ def check(request: Request, body: CheckBody):
         repo(request).save_check(s.id, res)
         return {"submission_id": s.id, **res.model_dump(mode="json")}
     if not body.test_case_id:
-        raise HTTPException(422, "test_case_id or submission_id required")
+        raise HTTPException(422, "test_case_id oder submission_id erforderlich")
     return run_check(request, body.test_case_id, body.files, body.valid_on).model_dump(mode="json")
 
 
@@ -186,9 +186,9 @@ def _justifications(k, refs: list[str]) -> list[str]:
 def decide(request: Request, dev_id: str, body: DecideBody):
     found = repo(request).find_deviation(dev_id)
     if not found:
-        raise HTTPException(404, "deviation not found")
+        raise HTTPException(404, "Abweichung nicht gefunden")
     if body.label not in ("correct_variant", "bug", "invalid"):
-        raise HTTPException(422, "label must be correct_variant, bug or invalid")
+        raise HTTPException(422, "Bewertung muss correct_variant, bug oder invalid sein")
     sid, d = found
     cites = body.citations or (d.ai_proposal.citations if d.ai_proposal else []) or d.sources
     p = Precedent(abgabegrund=d.abgabegrund or "", field=d.field_key, kind=d.kind, verdict=body.label,
@@ -242,7 +242,12 @@ def list_reports(request: Request, vendor: str | None = None):
         if res is None or (vendor and s.vendor != vendor):
             continue
         signed = repo(request).get_report(s.id)
+        try:
+            fam = families.of_case(test_case(request, s.test_case_id))
+        except Exception:  # noqa: BLE001 - a deleted test case must not break the list
+            fam = families.get(None)
         out.append({"submission_id": s.id, "test_case_id": s.test_case_id, "vendor": s.vendor,
+                    "family": fam.id, "family_title": fam.title,
                     "rule_set_version": res.version, "label": res.label, "created": s.created.isoformat(),
                     "signed": signed["report"]["created"] if signed else None})
     return out

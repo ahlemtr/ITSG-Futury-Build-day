@@ -27,7 +27,7 @@ class ApproveBody(BaseModel):
 @router.post("/criteria/extract")
 def extract(request: Request, body: ExtractBody):
     if not ai(request):
-        raise HTTPException(503, "LLM services disabled")
+        raise HTTPException(503, "KI-Dienste sind abgeschaltet")
     decided = {c.id: c.review for c in repo(request).list_criteria() if c.review is not None}
     try:
         res = ai(request).criteria(body.document, body.version, body.section, decided)
@@ -45,9 +45,9 @@ def extract(request: Request, body: ExtractBody):
 def approve(request: Request, cid: str, body: ApproveBody):
     c = repo(request).get_criterion(cid)
     if c is None:
-        raise HTTPException(404, "criterion draft not found")
+        raise HTTPException(404, "Kriterienentwurf nicht gefunden")
     if body.decision not in ("approved", "rejected"):
-        raise HTTPException(422, "decision must be approved or rejected")
+        raise HTTPException(422, "Entscheidung muss approved oder rejected sein")
     c.status = body.decision
     if body.review is not None:
         c.review = body.review.model_copy(update={"draft_id": c.id})

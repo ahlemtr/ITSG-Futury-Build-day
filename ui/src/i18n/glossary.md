@@ -46,3 +46,4 @@ Rules:
 - vergleichen / ignorieren / Regel
 - Einreichung
 - Runde
+- Fallgruppe (scenario family, e.g. Vorerkrankung; one kind of test story with its own rules)

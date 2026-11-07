@@ -20,9 +20,14 @@ DBVO has a repeating group (`ANZAHL-AU` x 50 chars). All other blocks are fixed 
 | Status | Blocks | Meaning |
 |---|---|---|
 | extracted | DSLW, DBAL, DBAE, DBZA, DBEE, DBAW, DBFR, DBUN, DBMU, DBVO, DBHE, DBBE, DBLT, DBSF, DBTK, DBID, DBSD | from the spec tables, no gaps |
-| inferred | DBAP | spec has no table. Boundaries measured from the TEEL0 sample, names tentative |
 | extracted (annex) | DBNA | from Anlage 1 (GG/VB section 5): VORSATZWORT, NAMENSZUSATZ, TITEL, KENNZ-AEND-BER at positions 065-125 |
-| missing | DBAN | no table in the VB, not in the sample; the layout is in Pflichtenheft Anlage 19 (roadmap G2) |
+| extracted (annex) | DBAP | the VB has no table; boundaries measured from the TEEL0 sample, confirmed by GG Anlage 1 (positions, lengths, types, M/m); names as in the sample |
+| extracted (annex) | DBAN | positions and M/m from GG Anlage 1, names from Pflichtenheft Anlage 19 (G2) |
+
+Checked against GG Anlage 1 with `python -m tools.compare_anlage1` (G2, 2026-11-01): 247 fields, no structural
+difference. 24 fields differ only in M versus m (Anlage 1 says m, the layout M, e.g. DBVO.ANZAHL-AU): M is the
+unconditional case of m, so these are not contradictions; the layouts keep the stricter marker where the block's
+context makes the field unconditional.
 
 Also derived (marked in the files): DSLW positions 206-224 (MM-* flags, names from the
 Beispielpapier) and DBMU months 2 and 3 (repeat of month 1).

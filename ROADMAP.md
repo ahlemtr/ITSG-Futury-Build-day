@@ -58,25 +58,27 @@ Scope as decided: all 22 EEL codes (certificates 01–04, the other employer and
 
 Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scenario family. New families must plug in without special cases.
 
-- [ ] Define a scenario family interface (inputs, expected chain builder, rules, compare modes) and move the prior-illness logic behind it
-- [ ] Map each Abgabegrund to its required (J), optional (m) and forbidden (N) data blocks from VB Anlage 3 13.3 (`sources/vb/`, table in chapter 2); replace every `mandatory: unknown` in `kg/seed/message_types.yaml`; add VB Anlage 3 to `documents.yaml`
-- [ ] Rules from VB Anlage 3 chapter 3 (continuity of benefits, § 69 SGB IX): which change of benefit needs a new 01/02/03/11-31 and which does not; one gap day always needs a new one
-- [ ] Check every layout in `layouts/` against GG Anlage 1 (`tools/compare_anlage1`), fill gaps
-- [ ] Version the record layouts by validity date like the rules (VB Anlage 1 13.1.4 changes them on 01.07.2027, not at a year start)
-- [ ] Fix the Beispielpapier versions: BP 13.2 (`sources/beispielpapier/`, valid 2026) belongs to VB 13.3, BP 13.3 to VB 13.4 (2027); add BP 13.2 to `documents.yaml` and correct the 13 `BP@13.3` citations in `rules.yaml` and `test_cases.yaml` (the five prior-illness examples are identical in both, so the expected results stay)
-- [ ] Test cases name their family; catalogue, runs and reports group by family
-- [ ] Complete the existing rules (`PROJECT_REPORT.md` section 5.2, item 12):
-  - [ ] Implement E-3 (an update only in interim flags 3 or 4 does not cancel the earlier 61); today it has a rule card and no code
-  - [ ] Compute K61-4 (KZ-NACHWEIS) and K61-5 (KZ-AU) from the case facts; today they are typed into the test data
-  - [ ] Call `check_61` and `check_62` (K61-1..3, K62-1) on every 61/62 the insurer simulator writes, as a self-check; today they are never called
+- [x] Define a scenario family interface (inputs, expected chain builder, rules, compare modes) and move the prior-illness logic behind it (`engine/families/base.py`; prior illness in `engine/families/vorerkrankung/`; a family is found by its folder)
+- [x] Map each Abgabegrund to its required (J), optional (m) and forbidden (N) data blocks from VB Anlage 3 13.3 (`sources/vb/`, table in chapter 2); replace every `mandatory: unknown` in `kg/seed/message_types.yaml`; add VB Anlage 3 to `documents.yaml` (`block_table`, new common rule A3-1)
+- [x] Rules from VB Anlage 3 chapter 3 (continuity of benefits, § 69 SGB IX): which change of benefit needs a new 01/02/03/11-31 and which does not; one gap day always needs a new one (`kg/seed/continuity.yaml`, `engine/rules/continuity.py`, rules A3-2, A3-3)
+- [x] Check every layout in `layouts/` against GG Anlage 1 (`tools/compare_anlage1`), fill gaps (247 fields, no structural difference; DBAP confirmed; 24 M/m-only findings documented)
+- [x] Version the record layouts by validity date like the rules (VB Anlage 1 13.1.4 changes them on 01.07.2027, not at a year start) (`get_layout(..., on_date)`; same structure in 13.1.3 and 13.1.4, 15 check texts differ)
+- [x] Fix the Beispielpapier versions: BP 13.2 (`sources/beispielpapier/`, valid 2026) belongs to VB 13.3, BP 13.3 to VB 13.4 (2027); add BP 13.2 to `documents.yaml` and correct the 13 `BP@13.3` citations in `rules.yaml` and `test_cases.yaml` (the five prior-illness examples are identical in both, so the expected results stay)
+- [x] Test cases name their family; catalogue, runs and reports group by family ("Fallgruppe")
+- [ ] Complete the existing rules (`PROJECT_REPORT.md` section 5.2, item 12): all done except the R41-5 wording, which waits for ITSG
+  - [x] Implement E-3 (an update only in interim flags 3 or 4 does not cancel the earlier 61); today it has a rule card and no code
+  - [x] Compute K61-4 (KZ-NACHWEIS) and K61-5 (KZ-AU) from the case facts; today they are typed into the test data (facts `sick_note`, `insurer_gets_note`, `counts`, `insurer_rechecks` per period)
+  - [x] Call `check_61` and `check_62` (K61-1..3, K62-1) on every 61/62 the insurer simulator writes, as a self-check; today they are never called
   - [ ] Reword the R41-5 rule card once ITSG answers question 5 (the Pflichtenheft and ITSG's criteria file disagree)
-  - [ ] Link R41-5 to Pflichtenheft item a4770b2b and R41-6 to item ac3b56af (today only R41-1..4 carry their item ID)
-  - [ ] New rules for the two prior-illness items with no rule: a 41 only for people with statutory health insurance, addressed to their insurer; never for privately insured people or employee groups 109 and 110
-  - [ ] Complete the DBAN layout from Pflichtenheft Anlage 19 (KENNUNG, LAENDERKENNZ, PLZ, WOHNORT, STRASSE, HAUS-NR, ADR-ZUSATZ)
-  - [ ] One test per rule ID, so every rule is shown to be covered
-- [ ] Backend texts the UI shows in German: rule titles (`kg/seed/rules.yaml`), check explanations and format messages are English today (found in G1); change them together with the rule cards, not the AI prompts
+  - [x] Link R41-5 to Pflichtenheft item a4770b2b and R41-6 to item ac3b56af (today only R41-1..4 carry their item ID)
+  - [x] New rules for the two prior-illness items with no rule: a 41 only for people with statutory health insurance, addressed to their insurer; never for privately insured people or employee groups 109 and 110 (R41-7, R41-8; 109 and 110 are marginal employment)
+  - [x] Complete the DBAN layout from Pflichtenheft Anlage 19 (KENNUNG, LAENDERKENNZ, PLZ, WOHNORT, STRASSE, HAUS-NR, ADR-ZUSATZ)
+  - [x] One test per rule ID, so every rule is shown to be covered (`tests/test_rule_coverage.py` is strict)
+- [x] Backend texts the UI shows in German: rule titles (`kg/seed/rules.yaml`), check explanations and format messages are English today (found in G1); change them together with the rule cards, not the AI prompts
 
 Done when: Peter still passes unchanged, all 37 existing rules have code and a test, and a second family can be added by adding files, not by editing the checker.
+
+State 2026-11-02 (branch `g2-generalise`, not merged yet): the done-when line holds. Peter's employer files and check results are byte-identical (golden snapshot `tests/golden/engine.json`); the insurer's 61 and 62 now carry a DBAP, as VB Anlage 3 requires. All 42 rule cards have code and a test; a test-only family under `tests/fakes/families/demo/` runs through the core without any core change. Open: the R41-5 wording (ITSG question 5) and two paid steps: embeddings for the new passages (VB Anlage 3, BP 13.2) and one AI re-run, because rule cards and engine texts changed the prompts.
 
 Needs: G0.
 

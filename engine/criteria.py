@@ -40,7 +40,10 @@ def draft_id(d: CriterionDraft) -> str:
 
 
 def itsg_rules(kb: KnowledgeBase, version: str, abgabegrund: str = "41") -> list[Rule]:
-    return [r for r in kb.get_rules(abgabegrund, version) if r.criterion]
+    """Rules implementing a criterion of ITSG's criteria file (BVORERK), the set the pipeline is graded on.
+    Rules linked only to a Pflichtenheft item (R41-5..8) are not part of it."""
+    return [r for r in kb.get_rules(abgabegrund, version)
+            if r.criterion and any(s.startswith(f"BVORERK@1#{r.criterion[:8]}") for s in r.sources)]
 
 
 def params_ok(kb: KnowledgeBase, d: CriterionDraft, version: str) -> bool | None:

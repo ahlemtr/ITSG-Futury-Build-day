@@ -36,6 +36,9 @@ package = false
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+markers = [
+    "rules(*ids): the rule IDs a test proves (tests/test_rule_coverage.py counts them)",
+]
 
 [tool.ruff]
 line-length = 120

@@ -31,6 +31,7 @@ class Group:
 class LayoutView:
     record: str
     status: str
+    layout_version: str | None
     fixed_length: int
     fields: list[FieldDef]  # fixed part, layout order
     repeating_group: Group | None = None
@@ -60,22 +61,24 @@ def view(layout: Layout) -> LayoutView:
             if m:
                 order.append(m.group(1))
                 flags[m.group(1)] = f.name
-    return LayoutView(record=layout.record, status=layout.status, fixed_length=layout.fixed_length, fields=fixed,
+    return LayoutView(record=layout.record, status=layout.status, layout_version=layout.layout_version,
+                      fixed_length=layout.fixed_length, fields=fixed,
                       repeating_group=group, block_order=order, flags=flags)
 
 
-_CACHE: dict[tuple[int, str, str], LayoutView] = {}
+_CACHE: dict[tuple, LayoutView] = {}
 
 
-def get(kb: KnowledgeBase, record: str, version: str | None) -> LayoutView:
-    """`version` None = the newest version the knowledge base knows."""
+def get(kb: KnowledgeBase, record: str, version: str | None, on_date=None) -> LayoutView:
+    """`version` None = the newest version the knowledge base knows. `on_date` = the case's validity date: the
+    field definitions of the VB Anlage 1 in force that day (13.1.4 from 01.07.2027); None = the version's start."""
     if version is None:
         from engine.rules.params import latest
 
         version = latest(kb)
-    key = (id(kb), record, version)
+    key = (id(kb), record, version, on_date)
     if key not in _CACHE:
-        _CACHE[key] = view(kb.get_layout(record, version))
+        _CACHE[key] = view(kb.get_layout(record, version, on_date=on_date))
     return _CACHE[key]
 
 

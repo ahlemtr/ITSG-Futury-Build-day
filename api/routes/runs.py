@@ -12,7 +12,7 @@ from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
 from api.routes.common import ai, kb, repo, test_case
-from engine import calendar, intake, runs
+from engine import calendar, families, intake, runs
 from engine.expected import build_chain, load_scenario
 
 router = APIRouter()
@@ -27,7 +27,7 @@ class RunBody(BaseModel):
 def _load(request: Request, run_id: str) -> tuple[runs.RunState, dict]:
     doc = repo(request).get_run(run_id)
     if doc is None:
-        raise HTTPException(404, "run not found")
+        raise HTTPException(404, "Testlauf nicht gefunden")
     return runs.RunState.model_validate(doc), doc
 
 
@@ -57,7 +57,9 @@ def _public(st: runs.RunState, doc: dict) -> dict:
             r = {"round": rr.round, "ended": rr.ended,
                  "outcomes": [{"rule": o.rule, "outcome": o.outcome} for o in rr.outcomes]}
         rounds.append(r)
-    return {"run_id": st.id, "test_case_id": st.test_case.id, "hidden": hidden, "version": st.version,
+    fam = families.of_case(st.test_case)
+    return {"run_id": st.id, "test_case_id": st.test_case.id, "family": fam.id, "family_title": fam.title,
+            "hidden": hidden, "version": st.version,
             "valid_on": st.valid_on.isoformat(), "vendor": doc.get("vendor"), "story": doc.get("story"),
             "round": st.round, "last_round": st.last_round, "status": st.status, "plan": doc.get("plan"),
             "results": rounds}

@@ -33,13 +33,13 @@ class Catalogue:
         v = self.entries.get(d.signature)
         if v:
             d.label, d.resolved_by = v.verdict, "catalogue"
-            d.explanation = f"known variant: {v.reason}"
+            d.explanation = f"bekannte Variante: {v.reason}"
             d.sources = [v.source] if v.source else []
             return True
         p = kb.find_precedent(d.signature)
         if p:
             d.label, d.resolved_by, d.precedent_key = p.verdict, "catalogue", p.key
-            d.explanation = f"precedent ({p.advisor or 'advisor'}, {p.decided}): {p.reason}"
+            d.explanation = f"Präzedenzfall ({p.advisor or 'Systemberater'}, {p.decided}): {p.reason}"
             d.sources = [j for j in p.justified_by if "#" in j]
             return True
         return False

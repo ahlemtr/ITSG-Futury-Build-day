@@ -1,0 +1,25 @@
+# Continuity of benefits, VB Anlage 3 13.3 chapter 3 (§ 69 SGB IX), transcribed 2026-11-01 from pages 8-11.
+# Does the employer send a new certificate when a second benefit directly follows the first?
+#   none       "Keine erneute Meldung" / "Grundsätzlich keine erneute Meldung": the first certificate carries on
+#   required   "Meldung erforderlich": a normal new certificate with the code of the new benefit
+#   same_child "Ggf. Meldung erforderlich": none for the same child (one continuous case), a new one for another child
+#   impossible "Keine Fallgestaltung"
+# A gap of at least one calendar day (non-working days count) always needs a new certificate (rule A3-2).
+# Krankengeld nach § 44a SGB V (organ or tissue donation) has no data exchange; whatever follows it needs a
+# new certificate. Pflegeunterstützungsgeld (§ 44a SGB XI) is outside the procedure (paper certificate).
+source: VB-ANL3@13.3#3
+benefits:  # benefit -> Abgabegründe of its certificate
+  krankengeld: ["01", "04"]
+  uebergangsgeld: ["11", "12", "22", "31"]
+  verletztengeld: ["21"]
+  kinderkrankengeld: ["02"]
+  kinderverletztengeld: ["23"]
+  mutterschaftsgeld: ["03"]
+columns: [krankengeld, uebergangsgeld, verletztengeld, kinderkrankengeld, kinderverletztengeld, mutterschaftsgeld]
+rows:  # earlier benefit -> verdict for each following benefit, in the order of `columns`
+  krankengeld:          [none, none, none, required, required, required]
+  uebergangsgeld:       [none, none, required, required, required, required]
+  verletztengeld:       [none, none, none, required, required, required]
+  kinderkrankengeld:    [required, required, required, same_child, required, required]
+  kinderverletztengeld: [required, required, required, required, same_child, required]
+  mutterschaftsgeld:    [required, required, required, required, required, impossible]

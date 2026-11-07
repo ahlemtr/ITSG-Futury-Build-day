@@ -7,7 +7,7 @@ import datetime as dt
 import re
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, SerializeAsAny, model_validator
 
 RuleKind = Literal["domain", "format", "reply", "chain", "efz", "calculation"]
 DeviationKind = Literal[
@@ -46,6 +46,7 @@ class Layout(BaseModel):
     fixed_length: int
     status: Literal["extracted", "inferred", "partial", "missing"]
     version: str
+    layout_version: str | None = None  # VB Anlage 1 in force, e.g. VB-ANL1@13.1.4 from 01.07.2027
     fields: list[FieldDef]
 
 
@@ -79,6 +80,7 @@ class Rule(BaseModel):
     description: str = ""
     kind: RuleKind
     status: Literal["approved", "draft"]
+    family: str = "common"  # scenario family (engine/families/); common = every family
     criterion: str | None = None
     applies_to: list[str] = Field(default_factory=list)
     fields: list[str] = Field(default_factory=list)
@@ -126,6 +128,7 @@ class TestCaseRef(BaseModel):
     steps: Literal["single", "chain"]
     parent: str | None = None
     targets: list[str] = Field(default_factory=list)
+    family: str = "vorerkrankung"  # scenario family (engine/families/)
 
 
 class TestCase(TestCaseRef):
@@ -164,7 +167,8 @@ class Precedent(BaseModel):
 class FlaggedBlock(BaseModel):
     record: str
     flag: str
-    mandatory: bool | Literal["unknown"]
+    mandatory: bool  # presence J
+    presence: Literal["J", "m"] = "J"  # VB Anlage 3: J must be present, m only when the case calls for it
 
 
 class DeviationContext(BaseModel):
@@ -224,6 +228,15 @@ class AuPeriod(BaseModel):
     start: dt.date
     end: dt.date | None = None  # None = open end (current AU only)
     certified: bool = True
+    # Facts the insurer's 61 flags are computed from (K61-4, K61-5), instead of typing the flags in:
+    # the kind of sick note (None: eAU if certified, else none) and, for a paper note, which 61 the insurer
+    # has it for (first reply, only the corrected reply, never)
+    sick_note: Literal["eau", "paper", "none"] | None = None
+    insurer_gets_note: Literal["first", "corrected", "never"] | None = None
+    counts: Literal["yes", "no", "partly"] = "yes"  # does the period count for the EFZ (KZ-AU 1 / 2 / 5)
+    counts_from: dt.date | None = None  # partly: the part that counts (TEIL-ANR-AU)
+    counts_to: dt.date | None = None
+    insurer_rechecks: bool = False  # the corrected 61 sets this period back to "further check" (KZ-AU 3, E-3)
 
 
 class TestInputs(BaseModel):
@@ -234,6 +247,8 @@ class TestInputs(BaseModel):
     current: AuPeriod | None = None
     priors: list[AuPeriod] = Field(default_factory=list)
     summary: str | None = None
+    insurance: Literal["statutory", "private"] = "statutory"  # R41-7: a 41 only for statutory insured people
+    person_group: int | None = None  # Personengruppenschlüssel; 109, 110 (marginal employment): no 41 (R41-8)
 
 
 class ExpectedOutcome(BaseModel):
@@ -254,21 +269,38 @@ class Case(BaseModel):
     parent: str | None = None
     targets: list[str] = Field(default_factory=list)
     steps: Literal["single", "chain"] = "single"
-    inputs: TestInputs
-    expected: dict[str, ExpectedOutcome] = Field(default_factory=dict)
+    family: str = "vorerkrankung"  # scenario family (engine/families/): types inputs and expected
+    inputs: SerializeAsAny[BaseModel]  # the family's Inputs (vorerkrankung: TestInputs)
+    expected: dict[str, SerializeAsAny[BaseModel]] = Field(default_factory=dict)  # family Outcome per version
     sources: list[str] = Field(default_factory=list)
     branch_point: dt.date | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _typed_by_family(cls, data: Any) -> Any:
+        """Plain dicts (seed, store, API) become the family's Inputs and Outcome models."""
+        if not isinstance(data, dict):
+            return data
+        from engine import families
+
+        fam = families.get(data.get("family"))
+        data = dict(data)
+        if isinstance(data.get("inputs"), dict):
+            data["inputs"] = fam.Inputs.model_validate(data["inputs"])
+        if isinstance(data.get("expected"), dict):
+            data["expected"] = {v: fam.Outcome.model_validate(e) if isinstance(e, dict) else e
+                                for v, e in data["expected"].items()}
+        return data
 
     @classmethod
     def from_kb(cls, tc: TestCase) -> Case:
         return cls(id=tc.key, kind=tc.kind, origin=tc.origin, status=tc.status, hidden=tc.hidden, parent=tc.parent,
-                   targets=tc.targets, steps=tc.steps, inputs=TestInputs.model_validate(tc.inputs),
-                   expected={v: ExpectedOutcome.model_validate(e) for v, e in tc.expected.items()},
-                   sources=tc.sources)
+                   targets=tc.targets, steps=tc.steps, family=tc.family, inputs=dict(tc.inputs),
+                   expected={v: dict(e) for v, e in tc.expected.items()}, sources=tc.sources)
 
     def to_kb(self) -> TestCase:
         return TestCase(key=self.id, kind=self.kind, origin=self.origin, status=self.status, hidden=self.hidden,
-                        steps=self.steps, parent=self.parent, targets=self.targets,
+                        steps=self.steps, parent=self.parent, targets=self.targets, family=self.family,
                         inputs=self.inputs.model_dump(mode="json"),
                         expected={v: e.model_dump(mode="json") for v, e in self.expected.items()},
                         sources=self.sources)

@@ -81,7 +81,12 @@ export function TestCatalogueScreen() {
                 </tr>
               </thead>
               <tbody>
-                {cases.map((c) => (
+                {cases.map((c, i) => [
+                  (i === 0 || cases[i - 1].family !== c.family) && (
+                    <tr key={`family-${c.family}`} className="group-row">
+                      <td colSpan={4}>{t("submissions.col.family")}: {c.family_title}</td>
+                    </tr>
+                  ),
                   <tr
                     key={c.id}
                     tabIndex={0}
@@ -108,8 +113,8 @@ export function TestCatalogueScreen() {
                     <td>
                       <span className={`badge badge-${STATUS_TONE[c.status]}`}>{t(`catalogue.status.${c.status}`)}</span>
                     </td>
-                  </tr>
-                ))}
+                  </tr>,
+                ])}
               </tbody>
             </table>
           </section>

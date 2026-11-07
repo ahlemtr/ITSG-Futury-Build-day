@@ -134,7 +134,7 @@ class YamlBackend:
         criteria = self._targets("Rule", key, "IMPLEMENTS")
         return Rule(
             id=key, title=p["title"], description=p.get("description") or "", kind=p["kind"], status=p["status"],
-            criterion=criteria[0] if criteria else None,
+            family=p.get("family") or "common", criterion=criteria[0] if criteria else None,
             applies_to=sorted(self._targets("Rule", key, "APPLIES_TO")),
             fields=sorted(self._targets("Rule", key, "CONSTRAINS")),
             params=sorted(self._targets("Rule", key, "USES_PARAM")),
@@ -148,7 +148,8 @@ class YamlBackend:
         p = self._props("TestCase", key)
         targets = sorted(self._targets("TestCase", key, "TARGETS"), key=self._rule_order)
         return cls(key=key, kind=p["kind"], origin=p["origin"], status=p["status"], hidden=p["hidden"],
-                   steps=p["steps"], parent=p.get("parent"), targets=targets, **extra)
+                   steps=p["steps"], parent=p.get("parent"), targets=targets,
+                   family=p.get("family") or "vorerkrankung", **extra)
 
     def _precedent(self, key: str) -> Precedent:
         p = self._props("Precedent", key)
@@ -180,8 +181,8 @@ class YamlBackend:
                 for k, p in self._labelled("FieldDefinition")
                 if p["record"] == record and (fkey is None or p["field"] == fkey)]
 
-    def get_layout(self, record: str, version: str) -> Layout:
-        from kg.field_evidence import resolve_fields
+    def get_layout(self, record: str, version: str, on_date=None) -> Layout:
+        from kg.field_evidence import layout_version, resolve_fields
 
         vb = resolve_vb(version, self.vb_versions)
         p = self._props("Record", record)
@@ -192,10 +193,12 @@ class YamlBackend:
             f = dict(self.nodes[("Field", e["to_key"])])
             f["values"] = json.loads(f["values"]) if f.get("values") else None
             raw_fields.append(dict(f, key=e["to_key"]))
-        fields = [FieldDef(**f) for f in resolve_fields(raw_fields, self.get_field_definitions(record, version=vb),
-                                                       self._document_versions(), vb)]
+        fields = [FieldDef(**f) for f in resolve_fields(raw_fields,
+                                                       self.get_field_definitions(record, version=vb, on_date=on_date),
+                                                       self._document_versions(), vb, on_date)]
         return Layout(record=record, title=p["title"], section=p["section"], page=p.get("page"),
-                      fixed_length=p["fixed_length"], status=p["status"], version=vb, fields=fields)
+                      fixed_length=p["fixed_length"], status=p["status"], version=vb,
+                      layout_version=layout_version(self._document_versions(), vb, on_date), fields=fields)
 
     def get_rules(self, abgabegrund: str, version: str) -> list[Rule]:
         vb = resolve_vb(version, self.vb_versions)
@@ -322,7 +325,8 @@ class YamlBackend:
         passage_keys |= {pk for pk in self._targets("Field", fkey, "DESCRIBED_IN") if keep_source(pk, vb)}
         passage_keys = {pk for pk in passage_keys if pk.split("#", 1)[0] in active}
         flag = fkey.split(".", 1)[1]
-        blocks = [FlaggedBlock(record=e["to_key"], flag=flag, mandatory=e["props"]["mandatory"])
+        blocks = [FlaggedBlock(record=e["to_key"], flag=flag, mandatory=e["props"]["mandatory"],
+                               presence=e["props"].get("presence", "J"))
                   for e in self.out[("MessageType", ag)]
                   if e["type"] == "USES_BLOCK" and e["props"].get("flag") == flag]
         return DeviationContext(

@@ -26,7 +26,7 @@ from engine.model import (
     Version,
 )
 from kg import load
-from kg.common import MAX_SUBGRAPH_DEPTH, norm_field, resolve_passage_key, resolve_vb, to_date
+from kg.common import MAX_SUBGRAPH_DEPTH, keep_source, norm_field, resolve_passage_key, resolve_vb, to_date
 
 PASSAGE_PROPS = "{.key, .doc, .version, .section, .part, .heading, .text, .page, .field}"
 NARROW_BOOST = 1.25  # same re-ranking as the YAML backend: a part or field beats its section
@@ -110,8 +110,9 @@ class GraphBackend:
         rows = self._q(RULES_QUERY, keys=list(keys), vb=vb)
         return [Rule(id=r["r"]["key"], title=r["r"]["title"], description=r["r"].get("description") or "",
                      kind=r["r"]["kind"], status=r["r"]["status"], criterion=r["criterion"],
+                     family=r["r"].get("family") or "common",
                      applies_to=sorted(r["applies_to"]), fields=sorted(r["fields"]), params=sorted(r["params"]),
-                     sources=sorted(r["sources"])) for r in rows]
+                     sources=sorted(s for s in r["sources"] if keep_source(s, vb))) for r in rows]
 
     def _passages(self, keys: list[str]) -> list[Passage]:
         rows = self._q(f"MATCH (p:Passage) WHERE p.key IN $keys RETURN p {PASSAGE_PROPS} AS p ORDER BY p.key",
@@ -123,7 +124,8 @@ class GraphBackend:
         for r in self._q(TEST_REFS_QUERY, keys=list(keys)):
             t = r["t"]
             ref = {"key": t["key"], "kind": t["kind"], "origin": t["origin"], "status": t["status"], "hidden": t["hidden"],
-                       "steps": t["steps"], "parent": t.get("parent"), "targets": r["targets"]}
+                       "steps": t["steps"], "parent": t.get("parent"), "targets": r["targets"],
+                   "family": t.get("family") or "vorerkrankung"}
             if full:
                 out.append(TestCase(**ref, inputs=json.loads(t["inputs"]), expected=json.loads(t["expected"]),
                                     sources=sorted(r["sources"])))
@@ -159,8 +161,8 @@ class GraphBackend:
                        record=record, field=fkey)
         return [dict(r["d"], applicable=r["d"]["document_version"] in active) for r in rows]
 
-    def get_layout(self, record: str, version: str) -> Layout:
-        from kg.field_evidence import resolve_fields
+    def get_layout(self, record: str, version: str, on_date=None) -> Layout:
+        from kg.field_evidence import layout_version, resolve_fields
 
         vb = resolve_vb(version, self.vb_versions)
         row = self._one(
@@ -171,13 +173,14 @@ class GraphBackend:
             f"Record {record!r}", record=record)
         rec = row["rec"]
         fields = []
-        resolved = resolve_fields(row["fields"], self.get_field_definitions(record, version=vb),
-                                  self._document_versions(), vb)
+        resolved = resolve_fields(row["fields"], self.get_field_definitions(record, version=vb, on_date=on_date),
+                                  self._document_versions(), vb, on_date)
         for f in resolved:
             f["values"] = json.loads(f["values"]) if f.get("values") else None
             fields.append(FieldDef(**f))
         return Layout(record=record, title=rec["title"], section=rec["section"], page=rec.get("page"),
-                      fixed_length=rec["fixed_length"], status=rec["status"], version=vb, fields=fields)
+                      fixed_length=rec["fixed_length"], status=rec["status"], version=vb,
+                      layout_version=layout_version(self._document_versions(), vb, on_date), fields=fields)
 
     def get_rules(self, abgabegrund: str, version: str) -> list[Rule]:
         vb = resolve_vb(version, self.vb_versions)
@@ -339,18 +342,19 @@ class GraphBackend:
         passage_keys = {s for r in rules for s in r.sources}
         passage_keys |= {r["k"] for r in self._q(
             "MATCH (:Field {key: $field})-[:DESCRIBED_IN]->(p:Passage) WHERE p.doc <> 'VB' OR p.version = $vb "
-            "RETURN p.key AS k", field=fkey, vb=vb)}
+            "RETURN p.key AS k", field=fkey, vb=vb) if keep_source(r["k"], vb)}
         passage_keys = {pk for pk in passage_keys if pk.split("#", 1)[0] in active}
         precedents = [r["k"] for r in self._q(
             "MATCH (p:Precedent)-[:ABOUT]->(:Field {key: $field}) RETURN p.key AS k ORDER BY k", field=fkey)]
         flag = fkey.split(".", 1)[1]
         blocks = self._q("MATCH (:MessageType {key: $ag})-[u:USES_BLOCK {flag: $flag}]->(b:Record) "
-                         "RETURN b.key AS record, u.mandatory AS mandatory ORDER BY record", ag=ag, flag=flag)
+                         "RETURN b.key AS record, u.mandatory AS mandatory, u.presence AS presence ORDER BY record", ag=ag, flag=flag)
         return DeviationContext(
             record=record, field=fkey, abgabegrund=ag, version=version, rules=rules,
             passages=self._passages(sorted(passage_keys)),
             precedents=[self.find_precedent(k) for k in precedents],
-            flagged_blocks=[FlaggedBlock(record=b["record"], flag=flag, mandatory=b["mandatory"]) for b in blocks],
+            flagged_blocks=[FlaggedBlock(record=b["record"], flag=flag, mandatory=b["mandatory"],
+                                         presence=b["presence"] or "J") for b in blocks],
         )
 
     def _normalize_precedent(self, p: Precedent) -> Precedent:

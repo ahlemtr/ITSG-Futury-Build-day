@@ -10,11 +10,12 @@ announced_by:
   record: DSLW
   field: MM-ANSPRECH
   value_if_present: J
-status: inferred
+status: extracted
 fixed_length: 320
 notes:
-- Not commented in the Verfahrensbeschreibung. Field boundaries measured from the TEEL0 sample (total length 320).
-  FAX is empty in the sample and assumed from the gap; field names are tentative. Verify against the GG annexes.
+- Not commented in the Verfahrensbeschreibung. Field boundaries first measured from the TEEL0 sample (total length
+  320); confirmed by GG Anlage 1 (13.1.1), every position, length and type agrees (tools/compare_anlage1, G2).
+  M/m from GG Anlage 1. Field names as in the sample; GG Anlage 1 prints no names for this block.
 fields:
 - name: KENNUNG
   start: 1
@@ -29,75 +30,75 @@ fields:
   end: 34
   length: 30
   type: an
-  required: m
-  source: TEEL0 sample
+  required: M
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1
 - name: TELEFON
   start: 35
   end: 54
   length: 20
   type: an
-  required: m
-  source: TEEL0 sample
+  required: M
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1
 - name: FAX
   start: 55
   end: 74
   length: 20
   type: an
   required: m
-  source: TEEL0 sample
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1
 - name: EMAIL
   start: 75
   end: 144
   length: 70
   type: an
-  required: m
-  source: TEEL0 sample
+  required: M
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1
 - name: FIRMA-1
   start: 145
   end: 174
   length: 30
   type: an
-  required: m
-  source: TEEL0 sample
+  required: M
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1
 - name: FIRMA-2
   start: 175
   end: 204
   length: 30
   type: an
   required: m
-  source: TEEL0 sample
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1
 - name: FIRMA-3
   start: 205
   end: 234
   length: 30
   type: an
   required: m
-  source: TEEL0 sample
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1
 - name: PLZ
   start: 235
   end: 244
   length: 10
   type: an
-  required: m
-  source: TEEL0 sample
+  required: M
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1
 - name: ORT
   start: 245
   end: 278
   length: 34
   type: an
-  required: m
-  source: TEEL0 sample
+  required: M
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1
 - name: STRASSE
   start: 279
   end: 311
   length: 33
   type: an
   required: m
-  source: TEEL0 sample
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1
 - name: HAUSNUMMER
   start: 312
   end: 320
   length: 9
   type: an
   required: m
-  source: TEEL0 sample
+  source: TEEL0 sample, positions and M/m confirmed by GG Anlage 1

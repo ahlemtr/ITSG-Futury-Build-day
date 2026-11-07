@@ -29,10 +29,11 @@ def _show(v: Any) -> Any:
 
 
 class Differ:
-    def __init__(self, kb: KnowledgeBase, version: str):
+    def __init__(self, kb: KnowledgeBase, version: str, on_date=None):
         self.kb = kb
         self.version = version
-        self.dslw = layouts.get(kb, "DSLW", version)
+        self.on_date = on_date
+        self.dslw = layouts.get(kb, "DSLW", version, on_date)
 
     def _flag_of(self, blk: str) -> str | None:
         return self.dslw.flags.get(blk)
@@ -144,7 +145,7 @@ class Differ:
         for blk, exp in m.blocks.items():
             if blk not in r.blocks:
                 continue
-            lay = layouts.get(self.kb, blk, self.version)
+            lay = layouts.get(self.kb, blk, self.version, self.on_date)
             act = r.blocks[blk]
             out += self._cmp_fields(lay, exp, act.fields, base)
             if lay.repeating_group:

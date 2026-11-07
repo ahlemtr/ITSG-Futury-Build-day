@@ -61,7 +61,7 @@ def test_engine_tools(kb):
 def test_retry_once_then_fail(kb, tmp_path, seeds):
     ai, t = ai_with(kb, {"AiProposal": lambda m: content({"proposal": "likely_bug", "reasoning": "x",
                                                           "citations": [], "confidence": 0.5})}, tmp_path)
-    s = seeds["s-no-contact"]
+    s = seeds["s-no-id"]
     res = check(kb, s.test_case_id, list(s.files.values()), date(2027, 1, 1), triage=ai.triage)
     assert res.deviations[0].ai_proposal is None and t.calls == ["AiProposal", "AiProposal"]
 
@@ -69,7 +69,7 @@ def test_retry_once_then_fail(kb, tmp_path, seeds):
 # ---------------------------------------------------------------- triage, advisor, precedent
 
 TRIAGE = {"proposal": "likely_bug", "confidence": 0.7, "citations": ["BP@13.3#13.1"],
-          "reasoning": "Beispielpapier 13.1 shows every 41 with MM-ANSPRECH = J and a DBAP block."}
+          "reasoning": "Beispielpapier 13.1 shows every 41 with MM-ID = J and a DBID block."}
 
 
 def test_no_contact_flow(fresh_kb, tmp_path, monkeypatch):
@@ -77,14 +77,14 @@ def test_no_contact_flow(fresh_kb, tmp_path, monkeypatch):
     monkeypatch.setenv("SIGNING_KEY_PATH", str(tmp_path / "key.pem"))
     ai, t = ai_with(kb, {"AiProposal": lambda m: content(TRIAGE)}, tmp_path)
     c = TestClient(create_app(kb=kb, repo=MemoryRepo(), ai=ai, data_root=tmp_path, seed=True))
-    r = c.post("/check", json={"submission_id": "s-no-contact", "valid_on": "2027-01-01"}).json()
+    r = c.post("/check", json={"submission_id": "s-no-id", "valid_on": "2027-01-01"}).json()
     d = r["deviations"][0]
     assert d["label"] == "unclear" and d["ai_proposal"]["proposal"] == "likely_bug"
     assert "BP@13.3#13.1" in d["ai_proposal"]["citations"] and r["resolved_by"] == {"ai_proposal": 1}
     q = c.get("/advisor/queue").json()
-    c.post(f"/deviations/{q[0]['id']}/decide", json={"label": "bug", "reason": "DBAP required", "advisor": "ITSG"})
+    c.post(f"/deviations/{q[0]['id']}/decide", json={"label": "bug", "reason": "DBID required", "advisor": "ITSG"})
     n = len(t.calls)
-    r = c.post("/check", json={"submission_id": "s-no-contact", "valid_on": "2027-01-01"}).json()
+    r = c.post("/check", json={"submission_id": "s-no-id", "valid_on": "2027-01-01"}).json()
     assert r["label"] == "bug" and r["deviations"][0]["resolved_by"] == "catalogue" and len(t.calls) == n
 
 

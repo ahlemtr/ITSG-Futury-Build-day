@@ -83,6 +83,7 @@ def _vendor_files(kb, tc="peter"):
     return {k: v for k, v in chain_files(ch, tc, kb).items() if k.startswith("TEEL0")}
 
 
+@pytest.mark.rules("K61-1", "K62-1")
 def test_peter_four_rounds(kb):
     st, story = runs.start(kb, "peter", D("2027-01-01"))
     assert "11.03.2026" in story and st.last_round == 4
