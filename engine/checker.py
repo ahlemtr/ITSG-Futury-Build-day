@@ -61,8 +61,9 @@ class Checker:
         r = self.rules.get(rule)
         return "invalid" if r is not None and r.kind == "format" else "bug"
 
-    def _label(self, d: Deviation, label: str, rule: str | None, why: str, resolved_by: str = "rules") -> bool:
-        d.label, d.resolved_by, d.explanation = label, resolved_by, why
+    def _label(self, d: Deviation, label: str | None, rule: str | None, why: str, resolved_by: str = "rules") -> bool:
+        """`label` None: the rule is broken, its card's kind decides (format: invalid, else bug)."""
+        d.label, d.resolved_by, d.explanation = label or self._label_of(rule or ""), resolved_by, why
         if rule:
             d.rule = rule
             r = self.rules.get(rule)
@@ -105,24 +106,25 @@ class Checker:
         self.ctx = CheckContext(kb=self.kb, version=version, scenario=sc, chain=chain, rules=self.rules,
                                 actual=actual, params=self.params, step_of=step_of, label=self._label)
         self.flags = layouts.get(self.kb, "DSLW", version, valid_on).flags  # block -> MM flag
-        results = [(r, x) for r in actual for x in common.check_message(r, self.flags)]
+        # the family's own rules first: on a field two checks name, the specific rule wins over a common one
+        results = self.family.check_records(self.ctx)
         results += common.check_case(actual)
-        results += self.family.check_records(self.ctx)
-        # one failed check per message type and field; a field the diff already shows keeps the diff's deviation
-        # and is labelled from this check in the analysis below
-        self.failed: dict[tuple[str | None, str | None], RuleResult] = {}
-        covered = {_key(d) for d in devs}
+        results += [(r, x) for r in actual for x in common.check_message(r, self.flags)]
+        # one failed check per message and field; a field the diff already shows keeps the diff's deviation and is
+        # labelled from this check in the analysis below
+        self.failed: dict[tuple[int | None, str | None], RuleResult] = {}
+        covered = {self._key(d) for d in devs}
         for rec, x in results:
-            ag = rec.abgabegrund if rec else None
-            if x.ok or (ag, x.field) in self.failed:
+            ag, key = (rec.abgabegrund if rec else None), (id(rec) if rec else None, x.field)
+            if x.ok or key in self.failed:
                 continue
-            self.failed[(ag, x.field)] = x
-            if (ag, x.field) in covered:
+            self.failed[key] = x
+            if key in covered:
                 continue
             rec_name, _, fld = (x.field or "DSLW.").partition(".")
             d = Deviation(step=step_of.get(id(rec)), abgabegrund=ag, record=rec_name, field=fld or None,
                           kind="value_differs", expected=_s(x.expected), actual=_s(x.actual))
-            self._label(d, self._label_of(x.rule), x.rule, x.message)
+            self._label(d, None, x.rule, x.message)
             devs.append(d)
 
         # analysis of the diff deviations
@@ -170,14 +172,15 @@ class Checker:
     # ------------------------------------------------------------ b. rule re-check
     def recheck(self, d: Deviation) -> bool:
         """The failed rule check on the deviation's field, else the family's re-check."""
-        x = self.failed.get(_key(d))
+        x = self.failed.get(self._key(d))
         if x is not None:
-            return self._label(d, self._label_of(x.rule), x.rule, x.message)
+            return self._label(d, None, x.rule, x.message)
         return self.family.recheck(self.ctx, d)
 
-
-def _key(d: Deviation) -> tuple[str | None, str]:
-    return d.abgabegrund, f"{d.record}.{base_field_name(d.field or '')}"
+    def _key(self, d: Deviation) -> tuple[int | None, str]:
+        """The vendor's message a deviation is on (by its chain step) and the field."""
+        rec = self.actual_by_step.get(d.step) if d.step is not None else None
+        return (id(rec) if rec is not None else None), f"{d.record}.{base_field_name(d.field or '')}"
 
 
 def _s(v):

@@ -74,12 +74,12 @@ Why: today `engine/rules/vorerkrankung.py` and the Peter chain are the only scen
   - [x] New rules for the two prior-illness items with no rule: a 41 only for people with statutory health insurance, addressed to their insurer; never for privately insured people or employee groups 109 and 110 (R41-7, R41-8; 109 and 110 are marginal employment)
   - [x] Complete the DBAN layout from Pflichtenheft Anlage 19 (KENNUNG, LAENDERKENNZ, PLZ, WOHNORT, STRASSE, HAUS-NR, ADR-ZUSATZ)
   - [x] One test per rule ID, so every rule is shown to be covered (`tests/test_rule_coverage.py` is strict)
-  - [x] Review every rule against its sources: no rule twice, each card's scope where the documents say it holds, one place for its code (2026-11-03: 45 cards became 36; the 88 sends KORR-ABGABEGRUND 00, VB 3.1.19, BP 23; private insurance is R41-8)
+  - [x] Review every rule against its sources: no rule twice, each card's scope where the documents say it holds, one place for its code (2026-11-03: 45 cards became 36; the 88 sends KORR-ABGABEGRUND 00, VB 3.1.19, BP 23; private insurance is R41-8. Code review 2026-11-07: a failed check labels only its own message, cross-message checks do not depend on file order, the names on an 88 are always checked, DATENSATZ-ID format split off as S-3, 37 cards; `tests/test_checker_matching.py`)
 - [x] Backend texts the UI shows in German: rule titles (`kg/seed/rules.yaml`), check explanations and format messages are English today (found in G1); change them together with the rule cards, not the AI prompts
 
 Done when: Peter still passes unchanged, all 37 existing rules have code and a test, and a second family can be added by adding files, not by editing the checker.
 
-State 2026-11-02 (branch `g2-generalise`, not merged yet): the done-when line holds. Peter's employer files and check results are byte-identical (golden snapshot `tests/golden/engine.json`); the insurer's 61 and 62 now carry a DBAP, as VB Anlage 3 requires. All rule cards have code and a test (36 after the rule review of 2026-11-03, branch `g2c-rules-clean`); a test-only family under `tests/fakes/families/demo/` runs through the core without any core change. Open: the R41-5 wording (ITSG question 5). The two paid steps are done (2026-11-02, G2b session): embeddings for the new chunks and one re-run of the VB 13.4 analysis, together about $0.27.
+State 2026-11-07 (pull request #7 into upstream `main`, open; the rule review is #9): the done-when line holds. Peter's employer files and check results are byte-identical (golden snapshot `tests/golden/engine.json`); the insurer's 61 and 62 now carry a DBAP, as VB Anlage 3 requires. All rule cards have code and a test (37 after the rule review and its code review); a test-only family under `tests/fakes/families/demo/` runs through the core without any core change. Open: the R41-5 wording (ITSG question 5). The two paid steps are done (2026-11-02, G2b session): embeddings for the new chunks and one re-run of the VB 13.4 analysis, together about $0.27.
 
 Needs: G0.
 
@@ -127,7 +127,7 @@ Records
 
 Done when: one runner checks every locked case against its document values, `ta-167-r1` to `-r3` are locked and pass (round 2 as a documented expected failure), our simulated 61s equal ITSG's TEEK0 files except the listed fields, Peter passes with its reviewed new 12-month date, and nothing from the delivery is in Git.
 
-State 2026-11-02 (branch `g2b-ta-solutions` on top of `g2-generalise`, not merged): done except asking ITSG about publication (the follow-up questions are drafted in `PROJECT_REPORT.md` section 9, question 1). The done-when line holds with one change: Peter keeps its 12-month date, because K61-6 kept the reading of BP 16.1 (see the K61-6 box).
+State 2026-11-07 (pull request #8 into upstream `main`, stacked on #7, open): done except asking ITSG about publication (the follow-up questions are drafted in `PROJECT_REPORT.md` section 9, question 1). The done-when line holds with one change: Peter keeps its 12-month date, because K61-6 kept the reading of BP 16.1 (see the K61-6 box).
 
 Needs: G2 (merged). The 01 content of TA 167 needs G3; TA 168 needs G4, G5 and G6.
 
@@ -420,6 +420,7 @@ Needs: G16.
 - [ ] Demo script: vendor run with full EEL coverage, deviations judged, VB 13.4 upload, rules and tests update, signed report, new vendor reaching the certified label
 - [ ] Demo data and accounts, seeded by one command
 - [ ] AI calls run live during the demo; cached answers take over automatically if the network or OpenAI fails; a local run as last resort
+- [ ] Refill the cached AI triage answer of the seed (`s-no-id`, the 41 without DBID): rule titles are part of the triage prompt, so it has missed since G2's German titles (found in the code review of 2026-11-07; one paid call, only with a go)
 - [ ] Answers ready for expected questions (data protection, AI errors, cost, how ITSG would run it)
 - [ ] Update `README.md` and `PROJECT_REPORT.md` to the delivered state; slides
 - [ ] Two full rehearsals on the deployed instance

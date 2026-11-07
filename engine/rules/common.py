@@ -1,7 +1,7 @@
 """Rules every family shares (rule cards with `family: common`).
 
-On each message: S-1 code values of GG Anlage 2, S-2 KORR-ABGABEGRUND, A3-1 data blocks (blocks.py), C-1 the
-DATENSATZ-ID format. Across the employer's messages of one case: C-1 each DATENSATZ-ID once, C-2 the same
+On each message: S-1 code values of GG Anlage 2, S-2 KORR-ABGABEGRUND, S-3 the DATENSATZ-ID format, A3-1 data
+blocks (blocks.py). Across the vendor's messages of one case: C-1 each DATENSATZ-ID once, C-2 the same
 AKTENZEICHEN-VERURSACHER, C-3 an 88 names the message it cancels. Family rules live in
 engine/families/<id>/checks.py.
 
@@ -71,11 +71,11 @@ def check_korr(rec: Record) -> list[RuleResult]:
 
 
 def check_dsid_format(rec: Record) -> list[RuleResult]:
-    """C-1, format part: 8-4-4-4-12 hexadecimal."""
+    """S-3: 8-4-4-4-12 hexadecimal."""
     dsid = rec.dsid or ""
     if UUID_RE.match(dsid):
         return []
-    return [_r("C-1", False, "DATENSATZ-ID im Format 8-4-4-4-12 (hexadezimal)", "8-4-4-4-12", dsid,
+    return [_r("S-3", False, "DATENSATZ-ID im Format 8-4-4-4-12 (hexadezimal)", "8-4-4-4-12", dsid,
                "DSLW.DATENSATZ-ID")]
 
 
@@ -88,16 +88,20 @@ def check_message(rec: Record, flags: dict[str, str]) -> list[RuleResult]:
 
 
 def check_case(msgs: list[Record]) -> list[tuple[Record, RuleResult]]:
-    """C-1 each DATENSATZ-ID once, C-2 one AKTENZEICHEN-VERURSACHER, C-3 an 88 names the earlier message it
-    cancels (its DATENSATZ-ID and names). `msgs`: the employer's messages in file order. Failed results only."""
+    """C-1 each DATENSATZ-ID once, C-2 one AKTENZEICHEN-VERURSACHER, C-3 an 88 names a message of the case it
+    cancels (its DATENSATZ-ID and names). `msgs`: the vendor's messages of all files; the result does not depend on
+    their order. Failed results only."""
     out: list[tuple[Record, RuleResult]] = []
-    earlier: dict[str, Record] = {}
+    first: dict[str, int] = {}
+    for n, m in enumerate(msgs):
+        first.setdefault(m.dsid or "", n)
+    by_dsid = {d: msgs[n] for d, n in first.items()}
     first_az = None
-    for m in msgs:
+    for n, m in enumerate(msgs):
         dsid = m.dsid or ""
-        if dsid in earlier:
+        if first[dsid] != n:
             out.append((m, _r("C-1", False, f"DATENSATZ-ID {dsid} mehrfach verwendet (zuerst in Zeile "
-                                            f"{earlier[dsid].line_no})", "eindeutig", dsid, "DSLW.DATENSATZ-ID")))
+                                            f"{by_dsid[dsid].line_no})", "eindeutig", dsid, "DSLW.DATENSATZ-ID")))
         blk = "DBSD" if m.abgabegrund == "88" else "DBID"
         az = m.get(f"{blk}.AKTENZEICHEN-VERURSACHER")
         if az is not None:
@@ -107,18 +111,21 @@ def check_case(msgs: list[Record]) -> list[tuple[Record, RuleResult]]:
                 out.append((m, _r("C-2", False, f"AKTENZEICHEN-VERURSACHER der Meldung {m.abgabegrund} weicht ab",
                                   first_az, az, f"{blk}.AKTENZEICHEN-VERURSACHER")))
         if m.abgabegrund == "88":
-            out += [(m, x) for x in _check_cancel(m, earlier)]
-        earlier.setdefault(dsid, m)
+            out += [(m, x) for x in _check_cancel(m, msgs, by_dsid)]
     return out
 
 
-def _check_cancel(m88: Record, earlier: dict[str, Record]) -> list[RuleResult]:
+def _check_cancel(m88: Record, msgs: list[Record], by_dsid: dict[str, Record]) -> list[RuleResult]:
     target = m88.get("DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG")
-    cancelled = earlier.get(target or "")
-    if cancelled is None:
-        return [_r("C-3", False, "die 88 verweist auf keine frühere Meldung des Falls", sorted(earlier), target,
-                   "DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG")]
+    cancelled = by_dsid.get(target or "")
     out = []
+    if cancelled is None or cancelled is m88:
+        others = sorted(d for d, m in by_dsid.items() if m is not m88)
+        out.append(_r("C-3", False, "die 88 verweist auf keine andere Meldung des Falls", others, target,
+                      "DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG"))
+        cancelled = next((m for m in msgs if "DBNA" in m.blocks), None)  # the names still have to be the person's
+        if cancelled is None:
+            return out
     for f in ("VORNAME", "FAMILIENNAME"):
         exp, act = cancelled.get(f"DBNA.{f}"), m88.get(f"DBSD.{f}")
         if act != exp:

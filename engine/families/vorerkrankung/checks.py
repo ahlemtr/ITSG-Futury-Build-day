@@ -91,23 +91,32 @@ def self_check(kb, scenario, replies: list[Record], employer: list[Record]) -> l
 # ---------------------------------------------------------------- checks on the vendor's messages
 
 
-def check_cancelled_01(msgs: list[Record]) -> list[tuple[Record, RuleResult]]:
-    """E-2: an 88 cancels the latest 01 before it (that C-3 names some earlier message is not enough)."""
-    out, last_01 = [], None
-    for m in msgs:
-        if m.abgabegrund == "88":
-            target, exp = m.get("DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG"), last_01.dsid if last_01 else None
-            out.append((m, _r("E-2", target == exp, "die 88 storniert die letzte 01 davor (deren DATENSATZ-ID)", exp,
-                              target, "DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG")))
-        if m.abgabegrund == "01":
-            last_01 = m
+def check_cancelled_01(ctx: CheckContext) -> list[tuple[Record, RuleResult]]:
+    """E-2: the vendor's 88 cancels the vendor's 01 that the expected 88 cancels (that C-3 finds some message of the
+    case is not enough). Matched through the chain steps of the diff, so the order of files and lines does not
+    matter. An 88 or 01 the diff could not pair is the diff's missing or extra message."""
+    step_of_dsid = {m.head.get("DATENSATZ-ID"): m.step for m in ctx.chain.employer()}
+    expected = {m.step: m for m in ctx.chain.employer()}
+    sent = {s: r for r in ctx.actual if (s := ctx.step_of.get(id(r))) is not None}
+    out = []
+    for r in ctx.actual:
+        exp88 = expected.get(ctx.step_of.get(id(r)))
+        if r.abgabegrund != "88" or exp88 is None or exp88.abgabegrund != "88":
+            continue
+        cancelled = sent.get(step_of_dsid.get(exp88.blocks["DBSD"]["DATENSATZ-ID-URSPRUNGSMELDUNG"]))
+        if cancelled is None:
+            continue
+        target = r.get("DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG")
+        out.append((r, _r("E-2", target == cancelled.dsid, "die 88 storniert die erste 01 (deren DATENSATZ-ID)",
+                          cancelled.dsid, target, "DBSD.DATENSATZ-ID-URSPRUNGSMELDUNG")))
     return out
 
 
 def check_records(ctx: CheckContext) -> list[tuple[Record | None, RuleResult]]:
     cur = ctx.scenario.test_case.inputs.current
-    out = [(r, x) for r in ctx.actual if r.abgabegrund == "41" for x in check_41_format(r, cur.start)]
-    return out + check_cancelled_01(ctx.actual)
+    start = cur.start if cur else None
+    out = [(r, x) for r in ctx.actual if r.abgabegrund == "41" for x in check_41_format(r, start)]
+    return out + check_cancelled_01(ctx)
 
 
 # ---------------------------------------------------------------- rule re-check of diff deviations
@@ -127,11 +136,11 @@ def _recheck_groups(ctx: CheckContext, d: Deviation) -> bool:
     chain = ctx.chain.decision.chain
     gap = ctx.params.gap_months
     if d.kind == "order_differs":
-        return ctx.label(d, "invalid", "F41-8", "die AU-Zeiten sind absteigend anzugeben, jüngste zuerst (VB 3.12.7)")
+        return ctx.label(d, None, "F41-8", "die AU-Zeiten sind absteigend anzugeben, jüngste zuerst (VB 3.12.7)")
     if d.kind == "missing_group":
         oldest = f"{chain[-1].start}..{chain[-1].end}" if chain else None
         if d.expected == oldest:
-            return ctx.label(d, "bug", "R41-3", f"die Kette reicht bis zur ersten Erkrankung zurück: {oldest} ist "
+            return ctx.label(d, None, "R41-3", f"die Kette reicht bis zur ersten Erkrankung zurück: {oldest} ist "
                                                 f"verkettet (Abstand höchstens {gap} Monate), fehlt aber")
         return ctx.label(d, "correct_variant", "R41-3", f"{d.expected} nicht angegeben: mindestens eine AU-Zeit ist "
                                                         f"erforderlich und die älteste verkettete ist vorhanden; "
@@ -139,18 +148,18 @@ def _recheck_groups(ctx: CheckContext, d: Deviation) -> bool:
     if d.kind == "extra_group":
         uncert = {f"{a.start}..{a.end}" for a in ctx.scenario.test_case.inputs.priors if not a.certified}
         if d.actual in uncert:
-            return ctx.label(d, "bug", "R41-5", f"{d.actual} ist nicht attestiert (keine AU-Bescheinigung) und darf nicht angegeben werden")
-        return ctx.label(d, "bug", "R41-3", f"{d.actual} gehört nicht zur Kette (Abstand über {gap} Monate)")
+            return ctx.label(d, None, "R41-5", f"{d.actual} ist nicht attestiert (keine AU-Bescheinigung) und darf nicht angegeben werden")
+        return ctx.label(d, None, "R41-3", f"{d.actual} gehört nicht zur Kette (Abstand über {gap} Monate)")
     return False
 
 
 def _no_new_01(ctx: CheckContext, d: Deviation) -> bool:
     """An 88 or a further 01 the chain does not have: E-3 if the corrected 61 only set interim flags, else E-2."""
     if ctx.chain.values.get("corrected_61_replaces_first") is False:
-        return ctx.label(d, "bug", "E-3", "die korrigierte 61 setzt nur vorläufige Kennzeichen (KZ-AU 3 / KZ-AK-AU 4): "
+        return ctx.label(d, None, "E-3", "die korrigierte 61 setzt nur vorläufige Kennzeichen (KZ-AU 3 / KZ-AK-AU 4): "
                                           "die frühere 61 gilt weiter, die 01 wird weder storniert noch neu gesendet")
     if "efz" in ctx.chain.values:
-        return ctx.label(d, "bug", "E-2", "die korrigierte 61 ändert das Ende der EFZ nicht: keine 88 und keine neue 01")
+        return ctx.label(d, None, "E-2", "die korrigierte 61 ändert das Ende der EFZ nicht: keine 88 und keine neue 01")
     return False
 
 
@@ -162,28 +171,28 @@ def recheck(ctx: CheckContext, d: Deviation) -> bool:
     if ag == "41":
         if d.kind == "missing_message":
             rule = deciding_rule(i.current, i.priors, i.report_date, ctx.params, i.insurance, i.person_group)
-            return ctx.label(d, "bug", rule, f"nach V{ctx.version} ist eine 41 erforderlich ({_why41(ctx)}), "
+            return ctx.label(d, None, rule, f"nach V{ctx.version} ist eine 41 erforderlich ({_why41(ctx)}), "
                                              f"es wurde aber keine gesendet")
         if d.kind == "extra_message":
             failed = ctx.chain.decision.trace.failed
             rule = failed[-1] if failed else "R41-1"
-            return ctx.label(d, "bug", rule, f"nach V{ctx.version} darf keine 41 gesendet werden: {_last_step(ctx, rule)}")
+            return ctx.label(d, None, rule, f"nach V{ctx.version} darf keine 41 gesendet werden: {_last_step(ctx, rule)}")
         if d.kind in ("missing_group", "extra_group", "order_differs"):
             return _recheck_groups(ctx, d)
         if f in ("DSLW.EMPFAENGERNUMMER", "DSLW.BBNR-KK"):
-            return ctx.label(d, "bug", "R41-7", "die 41 geht an die Krankenkasse der versicherten Person (deren Betriebsnummer)")
+            return ctx.label(d, None, "R41-7", "die 41 geht an die Krankenkasse der versicherten Person (deren Betriebsnummer)")
     if ag == "01":
         if f == "DBAL.DATUM-EGZBIS":
-            return ctx.label(d, "bug", "E-1", f"DATUM-EGZBIS muss das aus der letzten 61 berechnete Ende der EFZ "
+            return ctx.label(d, None, "E-1", f"DATUM-EGZBIS muss das aus der letzten 61 berechnete Ende der EFZ "
                                               f"{d.expected} sein, gesendet wurde {d.actual}")
         if d.kind == "missing_message":
             rule = "E-2" if (d.step or 0) > 3 else "E-1"
-            return ctx.label(d, "bug", rule, "die Entgeltbescheinigung 01 fehlt")
+            return ctx.label(d, None, rule, "die Entgeltbescheinigung 01 fehlt")
         if d.kind == "extra_message":
             return _no_new_01(ctx, d)
     if ag == "88":
         if d.kind == "missing_message":
-            return ctx.label(d, "bug", "E-2", "die korrigierte 61 ändert das Ende der EFZ: die erste 01 ist vor der "
+            return ctx.label(d, None, "E-2", "die korrigierte 61 ändert das Ende der EFZ: die erste 01 ist vor der "
                                               "neuen 01 mit einer 88 zu stornieren")
         if d.kind == "extra_message":
             return _no_new_01(ctx, d)

@@ -6,7 +6,7 @@
 # Sources cite the narrowest passage, in both VB versions where the text exists in both.
 # BP, HINWEISE and BVORERK sources are optional: dropped with a warning if the file is missing.
 # IDs are permanent: a retired ID is never reused. Retired 2026-11-03 (meaning moved to):
-#   F41-1 (could never fail), F41-2 -> S-2, F41-3 -> A3-1, F41-9 -> F41-6, F41-10 -> C-1, C-4 -> C-3,
+#   F41-1 (could never fail), F41-2 -> S-2, F41-3 -> A3-1, F41-9 -> F41-6, F41-10 -> S-3, C-4 -> C-3,
 #   C-5 -> E-2, C-6 -> K62-2, C-7 -> K61-9, C-8 -> A3-1, A3-3 -> A3-2.
 all_messages: &all ["01", "02", "03", "04", "11", "12", "21", "22", "23", "31", "41", "42", "51", "61", "62", "66",
                     "67", "71", "72", "73", "88", "99"]
@@ -46,6 +46,19 @@ rules:
     fields: [DSLW.KORR-ABGABEGRUND]
     params: []
     sources: [VB@13.3#3.1.19, VB@13.4#3.1.19, BP@13.2#23, BP@13.3#23]
+  - id: S-3
+    title: "DATENSATZ-ID im Format 8-4-4-4-12"
+    description: >-
+      DSLW.DATENSATZ-ID ist hexadezimal im Format 8-4-4-4-12 (ohne Prüfung der RFC-4122-Version: ITSG-eigene IDs
+      wie 11111111-2222-AAAA-EEEE-111111111111 würden sonst abgelehnt). Dass jede Meldung eine andere hat: C-1.
+    kind: format
+    family: common
+    status: approved
+    criterion: null
+    applies_to: *all
+    fields: [DSLW.DATENSATZ-ID]
+    params: []
+    sources: [VB@13.3#3.1.11, VB@13.4#3.1.11]
 
   # --- VB Anlage 3 chapter 2: data blocks per Abgabegrund (kg/seed/message_types.yaml block_table)
   - id: A3-1
@@ -68,12 +81,11 @@ rules:
 
   # --- the employer's messages of one case, taken together
   - id: C-1
-    title: "DATENSATZ-ID im Format 8-4-4-4-12, in jeder Meldung eine andere"
+    title: "jede Meldung des Falls hat eine andere DATENSATZ-ID"
     description: >-
-      DSLW.DATENSATZ-ID ist hexadezimal im Format 8-4-4-4-12 (ohne Prüfung der RFC-4122-Version: ITSG-eigene IDs
-      wie 11111111-2222-AAAA-EEEE-111111111111 würden sonst abgelehnt) und in jeder Meldung des Arbeitgebers eine
-      andere.
-    kind: format
+      DSLW.DATENSATZ-ID ist in jeder Meldung des Arbeitgebers eine andere: eine wiederverwendete ID macht die
+      Datei nicht ungültig, verwechselt aber Meldungen (Format der ID: S-3).
+    kind: chain
     family: common
     status: approved
     criterion: null

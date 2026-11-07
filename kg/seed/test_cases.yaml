@@ -18,7 +18,7 @@ test_cases:
     targets: [R41-1, R41-2, R41-3, R41-4, R41-5, R41-6, R41-7, R41-8,
               F41-4, F41-5, F41-6, F41-7, F41-8,
               K61-1, K61-2, K61-3, K61-4, K61-5, K61-6, K61-7, K61-8, K61-9, K62-1, K62-2,
-              E-1, E-2, C-1, C-2, C-3, A3-1, S-1, S-2]
+              E-1, E-2, C-1, C-2, C-3, A3-1, S-1, S-2, S-3]
     steps: chain
     inputs:
       report_date: 2026-03-11
@@ -409,7 +409,7 @@ test_cases:
     status: approved
     hidden: false
     parent: peter
-    targets: [R41-7]
+    targets: [R41-8]
     steps: single
     inputs:
       report_date: 2026-03-11

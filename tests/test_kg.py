@@ -59,7 +59,7 @@ def test_layout_dbvo(kb):
 
 def test_rules_41_under_13_3(kb):
     rules = kb.get_rules("41", "13.3")
-    expected = (["S-1", "S-2", "A3-1", "C-1", "C-2"] + [f"R41-{i}" for i in range(1, 9)]
+    expected = (["S-1", "S-2", "S-3", "A3-1", "C-1", "C-2"] + [f"R41-{i}" for i in range(1, 9)]
                 + [f"F41-{i}" for i in range(4, 9)])  # card order of rules.yaml
     assert [r.id for r in rules] == expected
     sources = [s for r in rules for s in r.sources]

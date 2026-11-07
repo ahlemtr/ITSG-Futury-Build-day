@@ -53,6 +53,8 @@ def test_interim_update_does_not_replace_the_first_61(kb):
     dbvo = lambda au, ak=0: {"KZ-AK-AU": ak, "groups": [g(au)]}
     assert not supersedes(dbvo(1), dbvo(3)) and not supersedes(dbvo(1), dbvo(1, ak=4))
     assert supersedes(dbvo(3), dbvo(1)) and supersedes(dbvo(1), dbvo(2))
+    partly = {**g(5), "TEIL-ANR-AU-BEGINN": D("2025-12-01"), "TEIL-ANR-AU-ENDE": D("2025-12-02")}
+    assert supersedes({"groups": [partly]}, dbvo(3))  # more than an interim flag changed: the earlier 61 is replaced
     ch = build_chain(load_scenario(kb, "peter-interim-update"), "13.4", kb)
     assert [m.abgabegrund for m in ch.messages] == ["41", "61", "01", "61", "62"]
     assert ch.values["corrected_61_replaces_first"] is False

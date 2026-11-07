@@ -65,14 +65,14 @@ class CheckContext:
     actual: list[Record]  # the vendor's messages
     params: Any = None  # the family's parameters of this version
     step_of: dict[int, int] = field(default_factory=dict)  # id(record) -> chain step
-    label: Callable[[Deviation, str, str | None, str], bool] = lambda *a: True  # set by the checker
+    # set by the checker: label(deviation, label, rule, why); label None = the rule is broken, its card's kind decides
+    label: Callable[[Deviation, str | None, str | None, str], bool] = lambda *a: True
 
 
 class Family(ABC):
     id: ClassVar[str]  # "vorerkrankung"
     title: ClassVar[str]  # German, shown in the UI: "Vorerkrankung"
     codes: ClassVar[frozenset[str]]  # Abgabegründe of the chain: 41, 61, 01, 88, 62
-    employer_codes: ClassVar[frozenset[str]]  # the ones the vendor sends: 41, 01, 88
     Inputs: ClassVar[type[BaseModel]]  # typed case facts (vorerkrankung: AU periods, report date ...)
     Outcome: ClassVar[type[BaseModel]]  # expected result per version (vorerkrankung: send 41?, periods, days)
 

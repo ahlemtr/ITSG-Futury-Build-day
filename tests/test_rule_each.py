@@ -87,12 +87,12 @@ def test_f41_6_insurer_only_group_fields(kb):
     assert {(d.rule, d.label) for d in res.deviations if (d.field or "").startswith("KZ-AU")} == {("F41-6", "invalid")}
 
 
-@pytest.mark.rules("C-1")
-def test_c1_datensatz_id_format(kb):
+@pytest.mark.rules("S-3")
+def test_s3_datensatz_id_format(kb):
     m = _41(kb)
     m.head["DATENSATZ-ID"] = "not-a-uuid"
     [rec] = _parsed(kb, [m])
-    assert _fails(common.check_dsid_format(rec), "C-1")
+    assert _fails(common.check_dsid_format(rec), "S-3")
     assert not common.check_dsid_format(_parsed(kb, [_41(kb)])[0])  # ITSG's own style of ID is accepted
 
 

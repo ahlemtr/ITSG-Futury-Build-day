@@ -167,15 +167,18 @@ def insurer_flags(a: AuPeriod, reply: str) -> dict[str, Any]:
 
 def supersedes(old: Mapping[str, Any], new: Mapping[str, Any]) -> bool:
     """E-3: does an updated 61 replace the earlier one? Not if every change only sets an interim flag: a changed
-    period now says KZ-AU 3, a changed KZ-AK-AU now says 4. `old` / `new`: the DBVO blocks of both 61s."""
+    period changes only KZ-AU / KZ-NACHWEIS and now says KZ-AU 3, a changed KZ-AK-AU now says 4. `old` / `new`: the DBVO blocks of both 61s."""
     og, ng = old.get("groups", []), new.get("groups", [])
     span = lambda g: (_g(g, "BEGINN-AU"), _g(g, "ENDE-AU"))
     if [span(g) for g in og] != [span(g) for g in ng]:
         return True
     if _g(old, "KZ-AK-AU") != _g(new, "KZ-AK-AU") and _g(new, "KZ-AK-AU") != INTERIM_KZ_AK_AU:
         return True
-    values = lambda g: {k: _g(g, k) for k in g}
-    return any(values(a) != values(b) and _g(b, "KZ-AU") != INTERIM_KZ_AU for a, b in zip(og, ng))
+    for a, b in zip(og, ng):
+        changed = {k for k in set(a) | set(b) if _g(a, k) != _g(b, k)}
+        if changed and (changed - {"KZ-AU", "KZ-NACHWEIS"} or _g(b, "KZ-AU") != INTERIM_KZ_AU):
+            return True
+    return False
 
 
 # ---------------------------------------------------------------- EFZ end
