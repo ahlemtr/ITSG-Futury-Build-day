@@ -2011,15 +2011,7 @@
    }
   },
   "ta-168": {
-   "13.3": {
-    "error": "KeyError: \"unknown scenario family 'kinderkrankengeld' (known: vorerkrankung)\""
-   },
-   "13.4": {
-    "error": "KeyError: \"unknown scenario family 'kinderkrankengeld' (known: vorerkrankung)\""
-   },
-   "sim-13.5": {
-    "error": "KeyError: \"unknown scenario family 'kinderkrankengeld' (known: vorerkrankung)\""
-   }
+   "family_not_built": "kinderkrankengeld"
   }
  },
  "checks": {
